@@ -10,10 +10,17 @@ Build-Depends: debhelper (>= 11), cmake, qtbase5-dev, pkg-config,libexif-dev, li
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
-Package: image-editor
+Package: libimage-viewer
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5sql5-sqlite, qt5-image-formats-plugins
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
-Description: Image Viewer is an image viewing tool with fashion interface and smooth performance.
- Deepin Image Viewer is an image viewing tool with fashion interface and smooth performance.
+Description: Image Viewer library.
+ Deepin Image Viewer library.
+
+Package: libimage-viewer-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
+Description: Image Viewer library development headers.
+ Deepin Image Viewer library development headers.
 
