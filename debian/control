@@ -6,7 +6,8 @@ Build-Depends: debhelper (>= 11), cmake, qtbase5-dev, pkg-config,libexif-dev, li
  libraw-dev,libfreeimage-dev, libqt5opengl5-dev, qtbase5-private-dev,
  qtmultimedia5-dev, x11proto-xext-dev, libmtdev-dev, libegl1-mesa-dev,
  libudev-dev, libfontconfig1-dev, libfreetype6-dev, libglib2.0-dev,
- libxrender-dev, libdtkwidget-dev, libdtkwidget5-bin,libdtkcore5-bin,libgio-qt-dev,libudisks2-qt5-dev
+ libxrender-dev, libdtkwidget-dev, libdtkwidget5-bin,libdtkcore5-bin,libgio-qt-dev,libudisks2-qt5-dev,
+ libopencv-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
@@ -24,3 +25,14 @@ Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
 
+package: libvisualresult
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This provides a real-time optimized Computer Vision library.
+ This provides optimized Computer Vision library.
+
+package: libvisualresult-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: This provides a real-time optimized Computer Vision library.
+ This provides optimized Computer Vision library.

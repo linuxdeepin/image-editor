@@ -29,4 +29,5 @@ endif()
 
 
 add_subdirectory(libimage-viewer)
+add_subdirectory(libvisualresult)
 

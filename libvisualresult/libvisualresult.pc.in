@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libvisualresult=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include/libvisualresult
+
+Name: libvisualresult
+Description: deepin image viewer plugins
+Version: @PROJECT_VERSION@
+Libs: -lvisualresult
+Cflags: -I${includedir}
+Requires: opencv
+
