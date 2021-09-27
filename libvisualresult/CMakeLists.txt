@@ -1,16 +1,13 @@
 #定义需要的cmake版本
 cmake_minimum_required(VERSION 3.10)
-set(CMD_NAME visualresult)
-project(libvisualresult)
+
+# 设置工程名称
+project(libvisualresult VERSION 0.1.0)
+
+set(TARGET_NAME visualresult)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-option(DOTEST "option for test" OFF)
-add_definitions(-DENABLE_ACCESSIBILITY=1)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
@@ -21,44 +18,57 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_definitions( -DLITE_DIV )
-add_definitions( -DUSE_UNIONIMAGE )
-add_definitions( -DCMAKE_BUILD )
-
-#find_package(Qt5 REQUIRED ${QtModule})
-
 #文件夹包含
-include_directories(src)
+set(SRCS
+    src/lut.cpp
+    src/lut.h
+    src/utils.cpp
+    src/utils.h
+    src/visualresult.cpp
+    src/visualresult.h
+    src/main.c)
 
-aux_source_directory(src allSource)
+file (GLOB_RECURSE OUT_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/visualresult.h)
 
-set(LINK_DIR lib)
+#-------------添加第三方库begins-----------------------#
+set(INC_DIR /usr/include/)
+set(LINK_DIR /usr/lib/)
+
+include_directories(${INC_DIR})
 link_directories(${LINK_DIR})
 
-add_executable(${PROJECT_NAME} ${SRCS} ${allSource} )
+add_executable(${PROJECT_NAME} ${SRCS})
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-link_directories(${OpenCV_LIBRARY_DIRS})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+# 设置不删除生成的文件夹内容文件
+set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
 #编译为库
-add_library(${CMD_NAME} SHARED ${SRCS} ${allHeaders} ${allSource})
+add_library(${TARGET_NAME} SHARED ${SRCS} ${allHeaders} ${allSource})
+
+#将库安装到指定位置
+set(PREFIX /usr)
+set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
+
+set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 include(GNUInstallDirs)
+configure_file(libvisualresult.pc.in  ${PROJECT_BINARY_DIR}/libvisualresult.pc @ONLY)
 
-configure_file(libvisualresult.pc.in ${PROJECT_BINARY_DIR}/libvisualresult.pc @ONLY)
+install(TARGETS ${TARGET_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-set_target_properties(${CMD_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
-install(TARGETS ${CMD_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-install(FILES 
-        src/lut.h 
-        DESTINATION include/libvisualresult)
+install(FILES ${OUT_HEADERS} DESTINATION include/libvisualresult)
 
 install(FILES ${PROJECT_BINARY_DIR}/libvisualresult.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-#set(QtModule Core Gui Widgets DBus LinguistTools)
+# CUBE 颜色表文件 安装到usr/share下， 方便其他应用访问
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
+    DESTINATION ${PREFIX}/share/libvisualresult
+    FILES_MATCHING PATTERN "*.CUBE")
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
+    DESTINATION ${PREFIX}/share/libvisualresult
+    FILES_MATCHING PATTERN "*.dat")
+
 # 加速编译优化参数
 if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wl,-O1 -Wl,--as-needed -Wl,-E -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -z noexecstack")

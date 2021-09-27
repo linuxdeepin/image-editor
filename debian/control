@@ -33,6 +33,6 @@ Description: This provides a real-time optimized Computer Vision library.
 
 package: libvisualresult-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libvisualresult(=${binary:Version})
 Description: This provides a real-time optimized Computer Vision library.
  This provides optimized Computer Vision library.
