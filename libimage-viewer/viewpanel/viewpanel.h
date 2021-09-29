@@ -27,8 +27,11 @@
 #include <DAnchors>
 #include <DIconButton>
 
+#include <bitset>
+
 #include "scen/imagegraphicsview.h"
 
+class AbstractTopToolbar;
 
 DWIDGET_USE_NAMESPACE
 class ImageInfoWidget;
@@ -69,10 +72,11 @@ public:
         IdImageInfo,
         IdSubMenu,
         IdDraw,
-        IdOcr
+        IdOcr,
+        MenuItemCount
     };
 
-    explicit ViewPanel(QWidget *parent = nullptr);
+    explicit ViewPanel(AbstractTopToolbar *customToolbar = nullptr, QWidget *parent = nullptr);
     ~ViewPanel() override;
 
     void loadImage(const QString &path, QStringList paths);
@@ -128,6 +132,12 @@ public:
     //设置Bottomtoolbar的显示和隐藏
     void setBottomtoolbarVisible(bool visible);
 
+    //设置右键菜单显隐：false为永久隐藏，true为跟随原有策略显示或隐藏
+    void setContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible);
+
+    //设置下方工具栏按钮的显示和隐藏，false为永久隐藏，true为跟随原有策略显示或隐藏
+    void setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible);
+
     //获得工具栏按钮
     DIconButton *getBottomtoolbarButton(imageViewerSpace::ButtonType type);
 private slots:
@@ -158,6 +168,15 @@ public slots:
 
     //刷新底部工具栏在全屏的隐藏与否
     void slotBottomMove();
+
+    //下一张图片
+    void showNext();
+
+    //上一张图片
+    void showPrevious();
+
+    //接收到图片缩略图更新
+    void slotUpdateThumbnail(const int &index);
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
@@ -183,9 +202,11 @@ private :
     //ocr接口
     OcrInterface *m_ocrInterface{nullptr};
 
-    TopToolbar *m_topToolbar = nullptr;
+    AbstractTopToolbar *m_topToolbar = nullptr;
+    bool m_topToolBarIsAlwaysHide = false;
 
     DMenu *m_menu = nullptr;
+    std::bitset<MenuItemCount> m_menuItemDisplaySwitch;
 
     bool m_isMaximized = false;
 

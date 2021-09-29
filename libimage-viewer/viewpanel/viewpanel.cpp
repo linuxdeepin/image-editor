@@ -40,6 +40,7 @@
 
 #include "unionimage/imageutils.h"
 #include "unionimage/baseutils.h"
+#include "unionimage/pluginbaseutils.h"
 #include "unionimage/unionimage.h"
 #include "imageengine.h"
 #include "widgets/printhelper.h"
@@ -73,8 +74,9 @@ QString ss(const QString &text, const QString &defaultValue)
     return defaultValue;
 }
 
-ViewPanel::ViewPanel(QWidget *parent)
+ViewPanel::ViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
     : QFrame(parent)
+    , m_topToolbar(customToolbar)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -104,7 +106,6 @@ ViewPanel::ViewPanel(QWidget *parent)
 
 ViewPanel::~ViewPanel()
 {
-
 }
 
 void ViewPanel::loadImage(const QString &path, QStringList paths)
@@ -167,7 +168,7 @@ void ViewPanel::initConnect()
 
     connect(m_bottomToolbar, &BottomToolbar::sigOcr, this, &ViewPanel::slotOcrPicture);
 
-    connect(m_view, &ImageGraphicsView::sigImageOutTitleBar, m_topToolbar, &TopToolbar::setTitleBarTransparent);
+    connect(m_view, &ImageGraphicsView::sigImageOutTitleBar, m_topToolbar, &AbstractTopToolbar::setTitleBarTransparent);
 
     connect(m_view, &ImageGraphicsView::sigMouseMove, this, &ViewPanel::slotBottomMove);
 
@@ -177,10 +178,11 @@ void ViewPanel::initConnect()
         m_nav->setImage(m_view->image());
         m_nav->setRectInImage(m_view->visibleImageRect());
 
-        //正在滑动缩略图的时候不再显示
-        if (m_nav->isVisible()) {
-            m_nav->setVisible(false);
-        }
+//二指放大会触发信号，导致窗口隐藏，这里下面存在问题
+//        //正在滑动缩略图的时候不再显示
+//        if (m_nav->isVisible()) {
+//            m_nav->setVisible(false);
+//        }
     });
 
     connect(m_view, &ImageGraphicsView::sigFIleDelete, this, [ = ]() {
@@ -191,13 +193,24 @@ void ViewPanel::initConnect()
         toggleFullScreen();
     });
 
+    //上一页，下一页信号连接
+    connect(m_view, &ImageGraphicsView::previousRequested, this, &ViewPanel::showPrevious);
+    connect(m_view, &ImageGraphicsView::nextRequested, this, &ViewPanel::showNext);
+
+    //增加双击全屏和退出全屏的功能
+    connect(m_view, &ImageGraphicsView::sigUpdateThunbnail, this, &ViewPanel::slotUpdateThumbnail);
+
 
 }
 
 void ViewPanel::initTopBar()
 {
     //防止在标题栏右键菜单会触发默认的和主窗口的发生
-    m_topToolbar = new TopToolbar(false, dynamic_cast<QWidget *>(this->parent()));
+    if (m_topToolbar == nullptr) { //如果调用者没有指定有效的顶部栏，则使用内置方案
+        m_topToolbar = new TopToolbar(false, dynamic_cast<QWidget *>(this->parent()));
+    } else {
+        m_topToolbar->setParent(dynamic_cast<QWidget *>(this->parent()));
+    }
     m_topToolbar->resize(width(), 50);
     m_topToolbar->move(0, 0);
     m_topToolbar->setTitleBarTransparent(false);
@@ -290,6 +303,9 @@ void ViewPanel::initNavigation()
 
 void ViewPanel::initRightMenu()
 {
+    //初始化时设置所有菜单项都显示
+    m_menuItemDisplaySwitch.set();
+
     if (!m_menu) {
         m_menu = new DMenu(this);
         updateMenuContent();
@@ -500,10 +516,6 @@ void ViewPanel::toggleFullScreen()
             m_view->viewport()->setCursor(Qt::BlankCursor);
         }
     }
-    //选中缩略图居中显示
-    QTimer::singleShot(150, [ = ] {
-        emit CommonService::instance()->sigMouseRelease();
-    });
 }
 
 void ViewPanel::showFullScreen()
@@ -560,7 +572,7 @@ void ViewPanel::showNormal()
 
 void ViewPanel::appendAction(int id, const QString &text, const QString &shortcut)
 {
-    if (m_menu) {
+    if (m_menu && m_menuItemDisplaySwitch.test(static_cast<size_t>(id))) {
         QAction *ac = new QAction(m_menu);
         addAction(ac);
         ac->setText(text);
@@ -568,6 +580,12 @@ void ViewPanel::appendAction(int id, const QString &text, const QString &shortcu
         ac->setShortcut(QKeySequence(shortcut));
         m_menu->addAction(ac);
     }
+}
+
+void ViewPanel::setContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible)
+{
+    m_menuItemDisplaySwitch.set(id, visible);
+    updateMenuContent();
 }
 
 void ViewPanel::setWallpaper(const QImage &img)
@@ -586,7 +604,8 @@ void ViewPanel::setWallpaper(const QImage &img)
                                                  "/com/deepin/daemon/Appearance",
                                                  "com.deepin.daemon.Appearance");
                     if (interface.isValid()) {
-                        QString screenname = QGuiApplication::screenAt(this->pos())->name();
+                        //获取鼠标在的位置的桌面
+                        QString screenname = QGuiApplication::screenAt(QCursor::pos())->name();
                         QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
                         qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
                     }
@@ -626,13 +645,13 @@ bool ViewPanel::startdragImage(const QStringList &paths)
 
         image_list.clear();
         for (int i = 0; i < m_AllPath.size(); i++) {
-            QString path = m_AllPath.at(i).filePath();
-            if (path.isEmpty()) {
+            QString tmpPath = m_AllPath.at(i).filePath();
+            if (tmpPath.isEmpty()) {
                 continue;
             }
             //判断是否图片格式
-            if (ImageEngine::instance()->isImage(path)) {
-                image_list << path;
+            if (ImageEngine::instance()->isImage(tmpPath)) {
+                image_list << tmpPath;
             }
         }
     }
@@ -662,6 +681,7 @@ bool ViewPanel::startdragImage(const QStringList &paths)
 void ViewPanel::setTopBarVisible(bool visible)
 {
     if (m_topToolbar) {
+        m_topToolBarIsAlwaysHide = !visible;
         m_topToolbar->setVisible(visible);
     }
 }
@@ -683,85 +703,93 @@ DIconButton *ViewPanel::getBottomtoolbarButton(imageViewerSpace::ButtonType type
     return button;
 }
 
+void ViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
+{
+    if (m_bottomToolbar) {
+        m_bottomToolbar->setButtonAlawysNotVisible(id, notVisible);
+    }
+}
+
 bool ViewPanel::startChooseFileDialog()
 {
     bool bRet = false;
-    QString filter = tr("All images");
+    if (m_stack->currentWidget() != m_sliderPanel) {
+        QString filter = tr("All images");
 
-    filter.append('(');
-    filter.append(utils::image::supportedImageFormats().join(" "));
-    filter.append(')');
+        filter.append('(');
+        filter.append(utils::image::supportedImageFormats().join(" "));
+        filter.append(')');
 
-    static QString cfgGroupName = QStringLiteral("General"),
-                   cfgLastOpenPath = QStringLiteral("LastOpenPath");
-    QString pictureFolder = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-    QDir existChecker(pictureFolder);
-    if (!existChecker.exists()) {
-        pictureFolder = QDir::currentPath();
-    }
-
-    pictureFolder = ConfigSetter::instance()->value(cfgGroupName, cfgLastOpenPath, pictureFolder).toString();
-#ifndef USE_TEST
-    QStringList image_list =
-        DFileDialog::getOpenFileNames(this, tr("Open Image"), pictureFolder, filter, nullptr,
-                                      DFileDialog::HideNameFilterDetails);
-#else
-    QStringList image_list = QStringList(QApplication::applicationDirPath() + "/test/jpg113.jpg");
-#endif
-    if (image_list.isEmpty())
-        return false;
-
-    QString path = image_list.first();
-    QFileInfo firstFileInfo(path);
-    ConfigSetter::instance()->setValue(cfgGroupName, cfgLastOpenPath, firstFileInfo.path());
-
-    if ((path.indexOf("smb-share:server=") != -1 || path.indexOf("mtp:host=") != -1 || path.indexOf("gphoto2:host=") != -1)) {
-        image_list.clear();
-        //判断是否图片格式
-        if (ImageEngine::instance()->isImage(path)) {
-            image_list << path;
+        static QString cfgGroupName = QStringLiteral("General"),
+                       cfgLastOpenPath = QStringLiteral("LastOpenPath");
+        QString pictureFolder = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+        QDir existChecker(pictureFolder);
+        if (!existChecker.exists()) {
+            pictureFolder = QDir::currentPath();
         }
-    } else {
-        QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
-        QDir _dirinit(DirPath);
-        QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
-        //修复Ｑt带后缀排序错误的问题
-        std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
 
-        image_list.clear();
-        for (int i = 0; i < m_AllPath.size(); i++) {
-            QString path = m_AllPath.at(i).filePath();
-            if (path.isEmpty()) {
-                continue;
-            }
+        pictureFolder = ConfigSetter::instance()->value(cfgGroupName, cfgLastOpenPath, pictureFolder).toString();
+#ifndef USE_TEST
+        QStringList image_list =
+            DFileDialog::getOpenFileNames(this, tr("Open Image"), pictureFolder, filter, nullptr,
+                                          DFileDialog::HideNameFilterDetails);
+#else
+        QStringList image_list = QStringList(QApplication::applicationDirPath() + "/test/jpg113.jpg");
+#endif
+        if (image_list.isEmpty())
+            return false;
+
+        QString path = image_list.first();
+        QFileInfo firstFileInfo(path);
+        ConfigSetter::instance()->setValue(cfgGroupName, cfgLastOpenPath, firstFileInfo.path());
+
+        if ((path.indexOf("smb-share:server=") != -1 || path.indexOf("mtp:host=") != -1 || path.indexOf("gphoto2:host=") != -1)) {
+            image_list.clear();
             //判断是否图片格式
             if (ImageEngine::instance()->isImage(path)) {
                 image_list << path;
             }
+        } else {
+            QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
+            QDir _dirinit(DirPath);
+            QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+            //修复Ｑt带后缀排序错误的问题
+            std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
+
+            image_list.clear();
+            for (int i = 0; i < m_AllPath.size(); i++) {
+                QString tmpPath = m_AllPath.at(i).filePath();
+                if (tmpPath.isEmpty()) {
+                    continue;
+                }
+                //判断是否图片格式
+                if (ImageEngine::instance()->isImage(tmpPath)) {
+                    image_list << tmpPath;
+                }
+            }
+        }
+        if (image_list.count() > 0) {
+            bRet = true;
+        } else {
+            bRet = false;
+        }
+        QString loadingPath;
+        if (image_list.contains(path)) {
+            loadingPath = path;
+        } else {
+            loadingPath = image_list.first();
+        }
+        //展示当前图片
+        loadImage(loadingPath, image_list);
+        //启动线程制作缩略图
+        if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
+                CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
+            //看图首先制作显示的图片的缩略图
+            ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(path), 1);
+            //看图制作全部缩略图
+            ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), image_list, image_list.size());
         }
     }
-    if (image_list.count() > 0) {
-        bRet = true;
-    } else {
-        bRet = false;
-    }
-    QString loadingPath;
-    if (image_list.contains(path)) {
-        loadingPath = path;
-    } else {
-        loadingPath = image_list.first();
-    }
-    //展示当前图片
-    loadImage(loadingPath, image_list);
-    //启动线程制作缩略图
-    if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
-            CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
-        //看图首先制作显示的图片的缩略图
-        ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(path), 1);
-        //看图制作全部缩略图
-        ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), image_list, image_list.size());
-    }
-
     return bRet;
 }
 
@@ -811,6 +839,27 @@ void ViewPanel::slotBottomMove()
     }
 }
 
+void ViewPanel::showNext()
+{
+    DIconButton *NextButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeNext);
+    if (NextButton->isEnabled()) {
+        m_bottomToolbar->onNextButton();
+    }
+}
+
+void ViewPanel::showPrevious()
+{
+    DIconButton *PreviousButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeNext);
+    if (PreviousButton->isEnabled()) {
+        m_bottomToolbar->onPreButton();
+    }
+}
+
+void ViewPanel::slotUpdateThumbnail(const int &index)
+{
+    m_bottomToolbar->onRotateThumbnail(index);
+}
+
 bool ViewPanel::slotOcrPicture()
 {
     if (!m_ocrInterface) {
@@ -840,10 +889,22 @@ void ViewPanel::backImageView(const QString &path)
 //        m_view->setImage(path);
         m_bottomToolbar->setCurrentPath(path);
     }
-    //选中缩略图居中显示
-    QTimer::singleShot(150, [ = ] {
-        emit CommonService::instance()->sigMouseRelease();
-    });
+    //每次退出的时候需要删除幻灯片,释放空间
+    if (m_sliderPanel) {
+        m_sliderPanel->deleteLater();
+        m_sliderPanel = nullptr;
+    }
+    //退出幻灯片的时候导航栏应该出现(未打开不出现)
+    if (m_nav && m_view) {
+        m_nav->setVisible((! m_nav->isAlwaysHidden() && ! m_view->isWholeImageVisible()));
+    }
+    //退出幻灯片，应该切换回应该的窗口
+    if (!QFileInfo(path).isWritable()) {
+        m_stack->setCurrentWidget(m_thumbnailWidget);
+    } else if (m_view->image().isNull()) {
+        m_stack->setCurrentWidget(m_lockWidget);
+    }
+
 }
 
 void ViewPanel::initSlidePanel()
@@ -862,6 +923,10 @@ void ViewPanel::initLockPanel()
         m_stack->addWidget(m_lockWidget);
         connect(m_lockWidget, &LockWidget::sigMouseMove, this, &ViewPanel::slotBottomMove);
         connect(m_lockWidget, &LockWidget::showfullScreen, this, &ViewPanel::toggleFullScreen);
+
+        //上一页，下一页信号连接
+        connect(m_lockWidget, &LockWidget::previousRequested, this, &ViewPanel::showPrevious);
+        connect(m_lockWidget, &LockWidget::nextRequested, this, &ViewPanel::showNext);
     }
 }
 
@@ -872,6 +937,10 @@ void ViewPanel::initThumbnailWidget()
         m_stack->addWidget(m_thumbnailWidget);
         connect(m_thumbnailWidget, &ThumbnailWidget::sigMouseMove, this, &ViewPanel::slotBottomMove);
         connect(m_thumbnailWidget, &ThumbnailWidget::showfullScreen, this, &ViewPanel::toggleFullScreen);
+
+        //上一页，下一页信号连接
+        connect(m_thumbnailWidget, &ThumbnailWidget::previousRequested, this, &ViewPanel::showPrevious);
+        connect(m_thumbnailWidget, &ThumbnailWidget::nextRequested, this, &ViewPanel::showNext);
     }
 }
 
@@ -884,20 +953,24 @@ void ViewPanel::initShortcut()
     sc = new QShortcut(QKeySequence(Qt::Key_Left), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
-        DIconButton *PreButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypePre);
-        if (PreButton->isEnabled())
+        if (m_stack->currentWidget() != m_sliderPanel)
         {
-            m_bottomToolbar->onPreButton();
+            DIconButton *PreButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypePre);
+            if (PreButton->isEnabled()) {
+                m_bottomToolbar->onPreButton();
+            }
         }
     });
     // Next
     sc = new QShortcut(QKeySequence(Qt::Key_Right), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
-        DIconButton *NextButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeNext);
-        if (NextButton->isEnabled())
+        if (m_stack->currentWidget() != m_sliderPanel)
         {
-            m_bottomToolbar->onNextButton();
+            DIconButton *NextButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeNext);
+            if (NextButton->isEnabled()) {
+                m_bottomToolbar->onNextButton();
+            }
         }
     });
 
@@ -907,7 +980,7 @@ void ViewPanel::initShortcut()
     //fix 36530 当图片读取失败时（格式不支持、文件损坏、没有权限），不能进行缩放操作
     connect(sc, &QShortcut::activated, this, [ = ] {
         qDebug() << "Qt::Key_Up:";
-        if (!m_view->image().isNull())
+        if (m_stack->currentWidget() != m_sliderPanel && !m_view->image().isNull())
         {
             m_view->setScaleValue(1.1);
         }
@@ -915,28 +988,34 @@ void ViewPanel::initShortcut()
     sc = new QShortcut(QKeySequence("Ctrl++"), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
-        if (QFile(m_view->path()).exists() && !m_view->image().isNull())
+        if (m_stack->currentWidget() != m_sliderPanel && QFile(m_view->path()).exists() && !m_view->image().isNull())
+        {
             m_view->setScaleValue(1.1);
+        }
     });
     sc = new QShortcut(QKeySequence("Ctrl+="), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
-        if (QFile(m_view->path()).exists() && !m_view->image().isNull())
+        if (m_stack->currentWidget() != m_sliderPanel && QFile(m_view->path()).exists() && !m_view->image().isNull())
+        {
             m_view->setScaleValue(1.1);
+        }
     });
     // Zoom in
     sc = new QShortcut(QKeySequence(Qt::Key_Down), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
         qDebug() << "Qt::Key_Down:";
-        if (QFile(m_view->path()).exists() && !m_view->image().isNull())
+        if (m_stack->currentWidget() != m_sliderPanel && QFile(m_view->path()).exists() && !m_view->image().isNull())
             m_view->setScaleValue(0.9);
     });
     sc = new QShortcut(QKeySequence("Ctrl+-"), this);
     sc->setContext(Qt::WindowShortcut);
     connect(sc, &QShortcut::activated, this, [ = ] {
-        if (QFile(m_view->path()).exists() && !m_view->image().isNull())
+        if (m_stack->currentWidget() != m_sliderPanel && QFile(m_view->path()).exists() && !m_view->image().isNull())
+        {
             m_view->setScaleValue(0.9);
+        }
     });
     // Esc
     QShortcut *esc = new QShortcut(QKeySequence(Qt::Key_Escape), this);
@@ -953,10 +1032,6 @@ void ViewPanel::initShortcut()
 //            toggleFullScreen();
             showNormal();
             m_view->viewport()->setCursor(Qt::ArrowCursor);
-            //选中缩略图居中显示
-            QTimer::singleShot(150, [ = ] {
-                emit CommonService::instance()->sigMouseRelease();
-            });
             //修复连续点击F5和esc的问题
             if (m_sliderPanel) {
                 m_sliderPanel->onShowPause();
@@ -967,152 +1042,166 @@ void ViewPanel::initShortcut()
     QShortcut *adaptImage = new QShortcut(QKeySequence("Ctrl+0"), this);
     adaptImage->setContext(Qt::WindowShortcut);
     connect(adaptImage, &QShortcut::activated, this, [ = ] {
-        if (QFile(m_view->path()).exists())
-            m_view->fitImage();
+        if (m_stack->currentWidget() != m_sliderPanel)
+        {
+            if (QFile(m_view->path()).exists())
+                m_view->fitImage();
+        }
     });
 
 }
 
 void ViewPanel::onMenuItemClicked(QAction *action)
 {
-    //判断旋转图片本体是否旋转
-    if (m_view) {
-        m_view->slotRotatePixCurrent();
-    }
-    const int id = action->property("MenuID").toInt();
-    switch (MenuItemId(id)) {
-    case IdFullScreen:
-    case IdExitFullScreen: {
-        toggleFullScreen();
-        break;
-    }
-    case IdStartSlideShow: {
-        //todo,幻灯片
-        if (!m_sliderPanel) {
-            initSlidePanel();
+    //当幻灯片的情况屏蔽快捷键的使用
+    if (m_stack->currentWidget() != m_sliderPanel) {
+        //判断旋转图片本体是否旋转
+        if (m_view) {
+            m_view->slotRotatePixCurrent();
         }
-        ViewInfo vinfo;
-        vinfo.fullScreen = window()->isFullScreen();
-        vinfo.lastPanel = this;
-        vinfo.path = m_bottomToolbar->getCurrentItemInfo().path;
-        vinfo.paths = m_bottomToolbar->getAllPath();
-        vinfo.viewMainWindowID = 0;
-        m_sliderPanel->startSlideShow(vinfo);
-        m_stack->setCurrentWidget(m_sliderPanel);
-
-        break;
-    }
-    case IdPrint: {
-        PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
-        break;
-    }
-    case IdRename: {
-        //todo,重命名
-        QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
-        RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
+        const int id = action->property("MenuID").toInt();
+        switch (MenuItemId(id)) {
+        case IdFullScreen:
+        case IdExitFullScreen: {
+            toggleFullScreen();
+            break;
+        }
+        case IdStartSlideShow: {
+            //todo,幻灯片
+            if (!m_sliderPanel) {
+                initSlidePanel();
+            }
+            ViewInfo vinfo;
+            vinfo.fullScreen = window()->isFullScreen();
+            vinfo.lastPanel = this;
+            vinfo.path = m_bottomToolbar->getCurrentItemInfo().path;
+            vinfo.paths = m_bottomToolbar->getAllPath();
+            vinfo.viewMainWindowID = 0;
+            m_sliderPanel->startSlideShow(vinfo);
+            m_stack->setCurrentWidget(m_sliderPanel);
+            //正在滑动缩略图的时候不再显示
+            if (m_nav->isVisible()) {
+                m_nav->setVisible(false);
+            }
+            //打开幻灯片默认关闭图片详情
+            if (m_info && m_extensionPanel) {
+                m_info->setVisible(false);
+                m_extensionPanel->setVisible(false);
+            }
+            break;
+        }
+        case IdPrint: {
+            PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
+            break;
+        }
+        case IdRename: {
+            //todo,重命名
+            QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
+            RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
 #ifndef USE_TEST
-        if (renamedlg->exec()) {
+            if (renamedlg->exec()) {
 #else
-        renamedlg->m_lineedt->setText("40_1");
-        renamedlg->show();
-        {
+            renamedlg->m_lineedt->setText("40_1");
+            renamedlg->show();
+            {
 #endif
-            QFile file(oldPath);
-            QString filepath = renamedlg->GetFilePath();
-            QString filename = renamedlg->GetFileName();
-            bool bOk = file.rename(filepath);
-            if (bOk) {
-                //to文件改变后做的事情
-                if (m_topToolbar) {
-                    m_topToolbar->setMiddleContent(filename);
-                    CommonService::instance()->reName(oldPath, filepath);
-                    //重新打开该图片
-                    openImg(0, filepath);
+                QFile file(oldPath);
+                QString filepath = renamedlg->GetFilePath();
+                QString filename = renamedlg->GetFileName();
+                bool bOk = file.rename(filepath);
+                if (bOk) {
+                    //to文件改变后做的事情
+                    if (m_topToolbar) {
+                        m_topToolbar->setMiddleContent(filename);
+                        CommonService::instance()->reName(oldPath, filepath);
+                        //重新打开该图片
+                        m_bottomToolbar->setCurrentPath(filepath);
+                        openImg(0, filepath);
+                    }
                 }
             }
+            break;
         }
-        break;
-    }
-    case IdCopy: {
-        //todo,复制
-        utils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
-        break;
-    }
-    case IdMoveToTrash: {
-        //todo,删除
-        if (m_bottomToolbar) {
-            m_bottomToolbar->deleteImage();
+        case IdCopy: {
+            //todo,复制
+            utils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
+            break;
         }
-        break;
-    }
-    case IdShowNavigationWindow: {
-        m_nav->setAlwaysHidden(false);
-        break;
-    }
-    case IdHideNavigationWindow: {
-        m_nav->setAlwaysHidden(true);
-        break;
-    }
-    case IdRotateClockwise: {
-        //todo旋转
-        if (m_bottomToolbar) {
-            m_bottomToolbar->onRotateLBtnClicked();
+        case IdMoveToTrash: {
+            //todo,删除
+            if (m_bottomToolbar) {
+                m_bottomToolbar->deleteImage();
+            }
+            break;
         }
-        break;
-    }
-    case IdRotateCounterclockwise: {
-        //todo旋转
-        if (m_bottomToolbar) {
-            m_bottomToolbar->onRotateRBtnClicked();
+        case IdShowNavigationWindow: {
+            m_nav->setAlwaysHidden(false);
+            break;
         }
-        break;
-    }
-    case IdSetAsWallpaper: {
-        //todo设置壁纸
-        setWallpaper(m_view->image());
-        break;
-    }
-    case IdDisplayInFileManager : {
-        //todo显示在文管
-        utils::base::showInFileManager(m_bottomToolbar->getCurrentItemInfo().path);
-        break;
-    }
-    case IdImageInfo: {
-        //todo,文件信息
-        if (!m_info && !m_extensionPanel) {
-            initExtensionPanel();
+        case IdHideNavigationWindow: {
+            m_nav->setAlwaysHidden(true);
+            break;
         }
-        //重新刷新文件信息
-        m_info->updateInfo();
-        m_info->show();
+        case IdRotateClockwise: {
+            //todo旋转
+            if (m_bottomToolbar) {
+                m_bottomToolbar->onRotateRBtnClicked();
+            }
+            break;
+        }
+        case IdRotateCounterclockwise: {
+            //todo旋转
+            if (m_bottomToolbar) {
+                m_bottomToolbar->onRotateLBtnClicked();
+            }
+            break;
+        }
+        case IdSetAsWallpaper: {
+            //todo设置壁纸
+            setWallpaper(m_view->image());
+            break;
+        }
+        case IdDisplayInFileManager : {
+            //todo显示在文管
+            utils::base::showInFileManager(m_bottomToolbar->getCurrentItemInfo().path);
+            break;
+        }
+        case IdImageInfo: {
+            //todo,文件信息
+            if (!m_info && !m_extensionPanel) {
+                initExtensionPanel();
+            }
+            //重新刷新文件信息
+            m_info->updateInfo();
+            m_info->show();
 
-        //判断是否有缓存,无缓存,则使用打开路径
-        QString path = m_bottomToolbar->getCurrentItemInfo().path;
-        if (path.isEmpty()) {
-            path = m_currentPath;
+            //判断是否有缓存,无缓存,则使用打开路径
+            QString path = m_bottomToolbar->getCurrentItemInfo().path;
+            if (path.isEmpty()) {
+                path = m_currentPath;
+            }
+            m_info->setImagePath(path);
+            m_extensionPanel->setContent(m_info);
+            m_extensionPanel->show();
+            if (this->window()->isFullScreen() || this->window()->isMaximized()) {
+                m_extensionPanel->move(this->window()->width() - m_extensionPanel->width() - 24,
+                                       TOP_TOOLBAR_HEIGHT * 2);
+            } else {
+                m_extensionPanel->move(this->window()->pos() +
+                                       QPoint(this->window()->width() - m_extensionPanel->width() - 24,
+                                              TOP_TOOLBAR_HEIGHT * 2));
+            }
+            break;
         }
-        m_info->setImagePath(path);
-        m_extensionPanel->setContent(m_info);
-        m_extensionPanel->show();
-        if (this->window()->isFullScreen() || this->window()->isMaximized()) {
-            m_extensionPanel->move(this->window()->width() - m_extensionPanel->width() - 24,
-                                   TOP_TOOLBAR_HEIGHT * 2);
-        } else {
-            m_extensionPanel->move(this->window()->pos() +
-                                   QPoint(this->window()->width() - m_extensionPanel->width() - 24,
-                                          TOP_TOOLBAR_HEIGHT * 2));
+        case IdOcr: {
+            //todo,ocr
+            slotOcrPicture();
+            break;
         }
-        break;
+        default:
+            break;
+        }
     }
-    case IdOcr: {
-        //todo,ocr
-        slotOcrPicture();
-        break;
-    }
-    default:
-        break;
-    }
-
 }
 
 void ViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo itemInfo)
@@ -1198,7 +1287,9 @@ void ViewPanel::resizeEvent(QResizeEvent *e)
         if (window()->isFullScreen()) {
             this->m_topToolbar->setVisible(false);
         } else {
-            this->m_topToolbar->setVisible(true);
+            if (!m_topToolBarIsAlwaysHide) {
+                this->m_topToolbar->setVisible(true);
+            }
         }
 
         if (m_topToolbar->isVisible()) {
@@ -1206,10 +1297,12 @@ void ViewPanel::resizeEvent(QResizeEvent *e)
         }
     }
     //当view处于适应窗口状态的时候,resize也会继承状态
-    if (m_view->isFitImage()) {
-        m_view->fitImage();
-    } else if (m_view->isFitWindow()) {
-        m_view->fitWindow();
+    if (m_stack->currentWidget() == m_view) {
+        if (m_view->isFitImage()) {
+            m_view->fitImage();
+        } else if (m_view->isFitWindow()) {
+            m_view->fitWindow();
+        }
     }
 
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
@@ -1244,6 +1337,10 @@ void ViewPanel::mousePressEvent(QMouseEvent *event)
 
 void ViewPanel::dragEnterEvent(QDragEnterEvent *event)
 {
+    const QMimeData *mimeData = event->mimeData();
+    if (!pluginUtils::base::checkMimeData(mimeData)) {
+        return;
+    }
     event->setDropAction(Qt::CopyAction);
     event->accept();
     event->acceptProposedAction();

@@ -53,6 +53,8 @@ ImgViewListView::ImgViewListView(QWidget *parent)
     QListView::setWrapping(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    this->verticalScrollBar()->setDisabled(true); // 禁用滚动
 //    setAttribute(Qt::WA_TransparentForMouseEvents, true);
 //    QScroller::grabGesture(viewport(), QScroller::LeftMouseButtonGesture);
 
@@ -343,10 +345,13 @@ void ImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInfo p
 
 void ImgViewListView::onClicked(const QModelIndex &index)
 {
+    //重新点击,m_currentPath需要重新赋值
+    imageViewerSpace::ItemInfo info = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
+    m_currentPath = info.path;
     if (index.row() == m_currentRow) {
         return;
     }
-    imageViewerSpace::ItemInfo info = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
+
     if (info.path.isEmpty()) {
         return;
     }
@@ -362,7 +367,6 @@ void ImgViewListView::onClicked(const QModelIndex &index)
                      QVariant(QSize(ImgViewListView::ITEM_CURRENT_WH, ImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
 
     m_currentRow = index.row();
-    m_currentPath = info.path;
     qDebug() << "---" << __FUNCTION__ << "---m_currentRow = " << m_currentRow;
     qDebug() << "---" << __FUNCTION__ << "---info.path = " << info.path;
     //刷新界面

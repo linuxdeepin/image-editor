@@ -18,32 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef BASEUTILS_H
-#define BASEUTILS_H
+#ifndef PLUGINBASEUTILS_H
+#define PLUGINBASEUTILS_H
 
 #include <QObject>
 #include <QTimer>
 #include <QColor>
 #include <QMimeData>
 #include <QFileInfoList>
-
-#if QT_VERSION >= 0x050500
-#define TIMER_SINGLESHOT(Time, Code, captured, ...) \
-    { \
-        QTimer::singleShot(Time, [captured] { Code }); \
-    }
-#else
-#define TIMER_SINGLESHOT(Time, Code, captured...){ \
-        QTimer *timer = new QTimer;\
-        timer->setSingleShot(true);\
-        QObject::connect(timer, &QTimer::timeout, [timer, captured] {\
-                                                                     timer->deleteLater();\
-                                                                     Code\
-                                                                    });\
-        timer->start(Time);\
-    }
-
-#endif
 
 namespace pluginUtils {
 
@@ -57,14 +39,13 @@ namespace base {
 //QDateTime   stringToDateTime(const QString &time);
 //QString     getFileContent(const QString &file);
 //QPixmap     renderSVG(const QString &filePath, const QSize &size);
-//bool checkMimeData(const QMimeData *mimeData);
+bool checkMimeData(const QMimeData *mimeData);
 QString mkMutiDir(const QString &path);
 
-//const QFileInfoList                 getImagesInfo(const QString &dir,
-//                                                  bool recursive = true);
-//bool                                imageSupportRead(const QString &path);
+const QFileInfoList getImagesInfo(const QString &dir, bool recursive = true);
+bool imageSupportRead(const QString &path);
 //bool                                imageSupportSave(const QString &path);
-//QStringList                         supportedImageFormats();
+QStringList supportedImageFormats();
 }  // namespace base
 
 }  // namespace utils
