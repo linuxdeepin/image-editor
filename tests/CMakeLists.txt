@@ -38,6 +38,8 @@ file(GLOB_RECURSE  SOURCESCURRENT  "*.cpp")
 file (GLOB_RECURSE SOURCES
     "../libimage-viewer/*.cpp"
     "../libimage-viewer/*.h"
+    "../libvisualresult/exposure.cpp"
+    "../libvisualresult/exposure.h"
     )
 file(GLOB_RECURSE SOURCESC "../libimage-viewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")
@@ -93,6 +95,11 @@ add_executable( ${TARGET_NAME} ${SOURCES} ${SOURCESC}
     ${RESOURCES} ${HEADERSCURRENT}
     ${SOURCESCURRENT} ${QM}
     )
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+link_directories(${OpenCV_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE})
 target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} )

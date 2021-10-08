@@ -12,6 +12,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 find_package(PkgConfig REQUIRED)
+find_package(OpenCV REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -26,6 +27,8 @@ set(SRCS
     src/utils.h
     src/visualresult.cpp
     src/visualresult.h
+    src/exposure.h
+    src/exposure.cpp
     src/main.c)
 
 file (GLOB_RECURSE OUT_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/visualresult.h)
@@ -38,6 +41,12 @@ include_directories(${INC_DIR})
 link_directories(${LINK_DIR})
 
 add_executable(${PROJECT_NAME} ${SRCS})
+
+# 设置不删除生成的文件夹内容文件
+set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
+
+link_directories(${OpenCV_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 # 设置不删除生成的文件夹内容文件
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)

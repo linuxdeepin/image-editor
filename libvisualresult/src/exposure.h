@@ -22,6 +22,7 @@
 #define EXPOSURE_H
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #define MAX_EXPOSURE 100
 #define MIN_EXPOSURE -100
