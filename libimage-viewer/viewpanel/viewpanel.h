@@ -50,32 +50,6 @@ class ViewPanel : public QFrame
 
     Q_OBJECT
 public:
-    enum MenuItemId {
-        IdFullScreen,
-        IdExitFullScreen,
-        IdStartSlideShow,
-        IdRename,
-        IdPrint,
-        IdAddToAlbum,
-        IdCopy,
-        IdMoveToTrash,
-        IdRemoveFromTimeline,
-        IdRemoveFromAlbum,
-        IdAddToFavorites,
-        IdRemoveFromFavorites,
-        IdShowNavigationWindow,
-        IdHideNavigationWindow,
-        IdRotateClockwise,
-        IdRotateCounterclockwise,
-        IdSetAsWallpaper,
-        IdDisplayInFileManager,
-        IdImageInfo,
-        IdSubMenu,
-        IdDraw,
-        IdOcr,
-        MenuItemCount
-    };
-
     explicit ViewPanel(AbstractTopToolbar *customToolbar = nullptr, QWidget *parent = nullptr);
     ~ViewPanel() override;
 
@@ -133,7 +107,7 @@ public:
     void setBottomtoolbarVisible(bool visible);
 
     //设置右键菜单显隐：false为永久隐藏，true为跟随原有策略显示或隐藏
-    void setContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible);
+    void setContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible);
 
     //设置下方工具栏按钮的显示和隐藏，false为永久隐藏，true为跟随原有策略显示或隐藏
     void setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible);
@@ -206,7 +180,7 @@ private :
     bool m_topToolBarIsAlwaysHide = false;
 
     DMenu *m_menu = nullptr;
-    std::bitset<MenuItemCount> m_menuItemDisplaySwitch;
+    std::bitset<imageViewerSpace::MenuItemCount> m_menuItemDisplaySwitch;
 
     bool m_isMaximized = false;
 

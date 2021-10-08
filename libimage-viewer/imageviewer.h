@@ -42,7 +42,7 @@ public:
     //二次开发接口
 
     //设置图片显示panel右键菜单的显示和隐藏，false为永久隐藏，true为跟随原有策略显示或隐藏
-    void setViewPanelContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible);
+    void setViewPanelContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible);
 
     //设置下方工具栏按钮的显示和隐藏，true为永久隐藏，false为跟随原有策略显示或隐藏
     void setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible);

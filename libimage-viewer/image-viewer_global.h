@@ -15,6 +15,31 @@
 //image viewer plugin space
 namespace imageViewerSpace {
 
+enum NormalMenuItemId {
+    IdFullScreen,
+    IdExitFullScreen,
+    IdStartSlideShow,
+    IdRename,
+    IdPrint,
+    IdAddToAlbum,
+    IdCopy,
+    IdMoveToTrash,
+    IdRemoveFromTimeline,
+    IdRemoveFromAlbum,
+    IdAddToFavorites,
+    IdRemoveFromFavorites,
+    IdShowNavigationWindow,
+    IdHideNavigationWindow,
+    IdRotateClockwise,
+    IdRotateCounterclockwise,
+    IdSetAsWallpaper,
+    IdDisplayInFileManager,
+    IdImageInfo,
+    IdSubMenu,
+    IdDraw,
+    IdOcr,
+    MenuItemCount
+};
 enum ItemInfoType {
     ItemTypeBlank = 1,//空白项，最上面留空使用
     ItemTypePic,

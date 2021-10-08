@@ -57,6 +57,8 @@ const int BOTTOM_SPACING = 10;          //底部工具栏与底部边缘距离
 const int RT_SPACING = 20;
 const int TOP_TOOLBAR_HEIGHT = 50;
 
+using namespace imageViewerSpace;
+
 bool compareByFileInfo(const QFileInfo &str1, const QFileInfo &str2)
 {
     static QCollator sortCollator;
@@ -582,7 +584,7 @@ void ViewPanel::appendAction(int id, const QString &text, const QString &shortcu
     }
 }
 
-void ViewPanel::setContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible)
+void ViewPanel::setContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible)
 {
     m_menuItemDisplaySwitch.set(id, visible);
     updateMenuContent();
@@ -1060,7 +1062,7 @@ void ViewPanel::onMenuItemClicked(QAction *action)
             m_view->slotRotatePixCurrent();
         }
         const int id = action->property("MenuID").toInt();
-        switch (MenuItemId(id)) {
+        switch (imageViewerSpace::NormalMenuItemId(id)) {
         case IdFullScreen:
         case IdExitFullScreen: {
             toggleFullScreen();

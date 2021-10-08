@@ -372,39 +372,39 @@ TEST_F(gtestview, ViewPanel)
     //还剩IdPrint会崩
     QAction menuAction;
 
-    menuAction.setProperty("MenuID", ViewPanel::IdFullScreen);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdFullScreen);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdRename);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRename);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdStartSlideShow);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdStartSlideShow);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
     e.clear();
     e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
     e.simulate(panel.m_sliderPanel);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdCopy);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdCopy);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdShowNavigationWindow);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdHideNavigationWindow);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdShowNavigationWindow);
+    panel.onMenuItemClicked(&menuAction);
+    QTest::qWait(200);
+
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdHideNavigationWindow);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
     DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
@@ -418,31 +418,31 @@ TEST_F(gtestview, ViewPanel)
     e.addDelay(200);
     e.simulate(panel.m_nav.widget());
 
-    menuAction.setProperty("MenuID", ViewPanel::IdRotateClockwise);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRotateClockwise);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdRotateCounterclockwise);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRotateCounterclockwise);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdSetAsWallpaper);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdSetAsWallpaper);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdDisplayInFileManager);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdDisplayInFileManager);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdImageInfo);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdImageInfo);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdOcr);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdOcr);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(500);
 
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
     panel.onMenuItemClicked(&menuAction);
     QTest::qWait(200);
 

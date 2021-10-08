@@ -124,7 +124,7 @@ DIconButton *ImageViewer::getBottomtoolbarButton(imageViewerSpace::ButtonType ty
     return button;
 }
 
-void ImageViewer::setViewPanelContextMenuItemVisible(ViewPanel::MenuItemId id, bool visible)
+void ImageViewer::setViewPanelContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible)
 {
     Q_D(ImageViewer);
     if (d->m_panel) {

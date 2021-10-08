@@ -97,6 +97,7 @@ install(TARGETS ${CMD_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES
     imageengine.h
     imageviewer.h
+    image-viewer_global.h
     DESTINATION include/libimage-viewer)
 
 install(FILES ${PROJECT_BINARY_DIR}/libimage-viewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
