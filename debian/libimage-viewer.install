@@ -1,2 +1,3 @@
 usr/lib/*/libimage-viewer.so.*
+usr/lib/*/libimage-viewer.so
 usr/share/libimage-viewer/translations/*.qm

@@ -20,7 +20,7 @@ Description: Image Viewer library.
 
 Package: libimage-viewer-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libimage-viewer(=${binary:Version})
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
