@@ -23,18 +23,7 @@
 
 int main(int argc, char** argv)
 {
-
-    initFilters("./filter_cube");
-
-    int i;
-    for (i = 0; i < argc; i++) {
-        char* arg = argv[i];
-        if (i == 1) {
-            // 选择的滤镜名称
-            uint8_t* frame = 0;
-            imageFilter24(frame, 1920, 1080, arg, 1);
-        }
-    }
+    initFilters("");
 
     return 0;
 }

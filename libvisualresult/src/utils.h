@@ -18,8 +18,9 @@ public:
     // 读取路径下所有cube文件滤镜数据到内存中
     static void readFilters(const std::string& dir);
     // 读取目标cube文件滤镜数据到内存中
-    static bool readCubeFile(std::string strFile, lutData& lut);
-
+    static bool readCubeFile(std::string filename, lutData& lut);
+    // 从二进制文件读取3dLut数据
+    static bool readCubeFileFromDat(std::string filename, lutData& lut);
     // 用来拆分颜色值字串
     static void split(std::string &str, std::string delimit, std::vector<std::string>&result);
 

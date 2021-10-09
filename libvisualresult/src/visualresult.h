@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2020 ~ 2021 Uniontech Software Technology Co., Ltd.
+ *
+ * Author:     houchengqiu <houchengqiu@uniontech.com>
+ *
+ * Maintainer: houchengqiu <houchengqiu@uniontech.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef VISUALRESULT_H
 #define VISUALRESULT_H
 
@@ -19,10 +39,19 @@ void initFilters(const char* dir);
  * @param           width: 图像分辨率，宽度值
  * @param          height: 图像分辨率，高度值
  * @param      filterName: 滤镜名称 如：warm(暖色)、cold(冷色)、black(黑白)、gray(灰度)、brown(褐色)、print(冲印)、classic(古典)、blues(蓝调)
- * @param          strength: 滤镜强度，范围为0.00~1.00，0.00：没有滤镜 1.00：有滤镜  传入参数1.00时，滤镜强度最大；默认为1.00
+ * @param          strength: 滤镜强度，范围为0~100，0：没有滤镜 100：有滤镜  传入参数100时，滤镜强度最大；默认为100
  * @return
  */
-void imageFilter24(uint8_t* data, int width, int height, const char* filterName, float strength);
+void imageFilter24(uint8_t* data, int width, int height, const char* filterName, int strength);
+
+/**
+* @brief 曝光调节
+* @param data 数据指针
+* @param width 图像宽度
+* @param height 图像高度
+* @param value 调整值 -100 ～ 100, -100：最暗， 0：没有曝光， 100：最强曝光
+*/
+void exposure(uint8_t *data, const int width, const int height, int value);
 
 #ifdef __cplusplus
 #if __cplusplus

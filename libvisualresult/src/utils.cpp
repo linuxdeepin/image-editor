@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "lut.h"
 
 #include <string.h>
 #include <dirent.h>
@@ -28,7 +29,7 @@ void utils::readFilters(const std::string& dir)
     if (dir.empty())
         return;
 
-    unsigned int count=0;								//临时计数，[0，SINGLENUM]
+    int count=0;								//临时计数，[0，SINGLENUM]
 
     DIR *dp ;
     struct dirent *dirp ;
@@ -41,6 +42,7 @@ void utils::readFilters(const std::string& dir)
 
     m_map_lut.clear();
     lutData lut;
+
     //开始遍历目录
     while((dirp = readdir(dp)) != nullptr)
     {
@@ -54,17 +56,30 @@ void utils::readFilters(const std::string& dir)
         if(size < 6)
             continue;
 
-        //只存取.CUBE扩展名的文件名
-        if(strcmp( ( dirp->d_name + (size - 5) ) , ".CUBE") != 0)
+        //只存取扩展名为.CUBE
+        if(strcmp((dirp->d_name + (size - 5)), ".CUBE") != 0)
             continue;
 
-        string filename = dir + "/" + dirp->d_name;
-        if (readCubeFile(filename, lut)) {
+        //根据CUBE文件获取对应dat文件所在路径
+        string filename = dirp->d_name;
+        string filter = filename.substr(0, filename.find_last_of('.'));
+        string filepath = dir + "/" + filename;
+        string datfilepath = dir + "/" + filter + ".dat";
+
+        //若读取dat文件失败，先从CUBE文件转为data，存放到当前目录，然后重新从dat中读取lut数据
+        if (!readCubeFileFromDat(datfilepath, lut)) {
+            parse_lut_cube(filepath, datfilepath.c_str());
+            if (readCubeFileFromDat(datfilepath, lut))
+                count++;
+            else if (readCubeFile(filepath, lut))
+                count++;
+        }
+        else {
             count++;
         }
     }
 
-    printf("read %d CUBE files...\n", count);
+    printf("read %d CUBE/dat files...\n", count);
 }
 
 bool utils::readCubeFile(std::string filename, lutData &lut)
@@ -72,11 +87,10 @@ bool utils::readCubeFile(std::string filename, lutData &lut)
     lut.clear();
 
     bool cubeDataStart = false, sizeDataStart = false;
-    int lut_3d_size = 0;
     ifstream in(filename);
     std::string line;
     if (in.fail()) {
-        printf("%s read fail, may be not exist!\n", filename.c_str());
+        printf("%s read *.CUBE fail, may be not exist!\n", filename.c_str());
         return false;
     }
 
@@ -97,8 +111,6 @@ bool utils::readCubeFile(std::string filename, lutData &lut)
 
         if(sizeDataStart) { //读取lut尺寸
             sizeDataStart = false;
-            string size = line.substr(sizeof("LUT_3D_SIZE"), sizeof(int));
-            lut_3d_size = atoi(size.c_str());
         }
 
         if(strncmp(line.c_str(), "#LUT data points", sizeof("#LUT data points")) == 0) {
@@ -111,6 +123,43 @@ bool utils::readCubeFile(std::string filename, lutData &lut)
 
     in.close();
 
+
+    string filter = filename.substr(0, filename.find_last_of('.'));
+    filter = filter.substr(filter.find_last_of('/') + 1);
+
+    m_map_lut[filter] = lut;
+
+    printf("read %s success,filtername:%s..\n", filename.c_str(), filter.c_str());
+
+    return true;
+}
+
+bool utils::readCubeFileFromDat(string filename, lutData &lut)
+{
+    lut.clear();
+
+    int rgbSize = 3 * sizeof(int);
+    ifstream inFile(filename, ios::in | ios::binary);
+
+    if (inFile.fail()) {
+        printf("%s read *.dat fail, may be not exist!\n", filename.c_str());
+        return false;
+    }
+
+    //先读尺寸
+    int lutSize = -1;
+    inFile.read((char *)&lutSize, sizeof(int));
+
+    //再读数据
+    int temp[3];
+    while (inFile.read((char *)&temp[0], rgbSize)) {
+        vector<uint8_t> rgbInt;
+        for (int i = 0; i < 3; i++) {
+            rgbInt.push_back(static_cast<uint8_t>(temp[i]));
+        }
+        lut.push_back(rgbInt);
+    }
+    inFile.close();
 
     string filter = filename.substr(0, filename.find_last_of('.'));
     filter = filter.substr(filter.find_last_of('/') + 1);

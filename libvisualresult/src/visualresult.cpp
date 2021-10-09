@@ -1,13 +1,37 @@
+/*
+ * Copyright (C) 2020 ~ 2021 Uniontech Software Technology Co., Ltd.
+ *
+ * Author:     houchengqiu <houchengqiu@uniontech.com>
+ *
+ * Maintainer: houchengqiu <houchengqiu@uniontech.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "visualresult.h"
-#include <string.h>
-
 #include "utils.h"
+
+#include <string.h>
+#include <cmath>
 
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
 #endif
 #endif
+
+#define MAX_EXPOSURE 100
+#define MIN_EXPOSURE -100
 
 void initFilters(const char* dir)
 {
@@ -17,7 +41,7 @@ void initFilters(const char* dir)
     utils::readFilters(path);
 }
 
-void imageFilter24(uint8_t *data, int width, int height, const char *filterName, float strength)
+void imageFilter24(uint8_t *data, int width, int height, const char *filterName, int strength)
 {
     printf("12image_filter24 called, filter is %s\n", filterName);
 
@@ -44,20 +68,44 @@ void imageFilter24(uint8_t *data, int width, int height, const char *filterName,
 
             unsigned int index = static_cast<unsigned int>((*R >> 3) + ((*G >> 3) << 5)  + ((*B >> 3) << 10));
 
-            if (strength == 1.f) {
+            if (strength == 100) {
                 *R = lut[index][0];
                 *G = lut[index][1];
                 *B = lut[index][2];
             }
-            else if (strength == 0.f) {
+            else if (strength == 0) {
                 continue;
             }
             else {
-                *R = static_cast<uint8_t>(*R * (1 - strength) + lut[index][0] * strength);
-                *G = static_cast<uint8_t>(*G * (1 - strength) + lut[index][1] * strength);
-                *B = static_cast<uint8_t>(*B * (1 - strength) + lut[index][2] * strength);
+                *R = static_cast<uint8_t>(*R + (lut[index][0] - *R) * strength / 100);
+                *G = static_cast<uint8_t>(*G + (lut[index][1] - *G) * strength / 100);
+                *B = static_cast<uint8_t>(*B + (lut[index][2] - *B) * strength / 100);
             }
         }
+    }
+}
+
+void exposure(uint8_t *data, const int width, const int height, int value)
+{
+    if(value > MAX_EXPOSURE || value < MIN_EXPOSURE)
+        value = 0;
+    if(value == 0)
+        return;
+
+    if (!data)
+        return;
+
+    float step = value / 100.0;
+    int size = width * height;
+
+    for(int i = 0; i < size; i++) {
+        int r = data[i*3] * pow(2, step);
+        int g = data[i*3 + 1] * pow(2, step);
+        int b = data[i*3 + 2] * pow(2, step);
+
+        data[i*3] = r > 255 ? 255 : r;
+        data[i*3 + 1] = g > 255 ? 255 : g;
+        data[i*3 + 2] = b > 255 ? 255 : b;
     }
 }
 
