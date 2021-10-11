@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2020 ~ 2021 Uniontech Software Technology Co., Ltd.
+ * Copyright (C) 2021 Uniontech Software Technology Co., Ltd.
  *
  * Author:     houchengqiu <houchengqiu@uniontech.com>
  *
- * Maintainer: houchengqiu <houchengqiu@uniontech.com>
+ * Maintainer: fengli <fengli@uniontech.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ void initFilters(const char* dir)
 
 void imageFilter24(uint8_t *data, int width, int height, const char *filterName, int strength)
 {
-    printf("12image_filter24 called, filter is %s\n", filterName);
+    //printf("image_filter24 called, filter is %s\n", filterName);
 
     uint8_t* frame = data;
     if (!frame)
@@ -92,20 +92,25 @@ void exposure(uint8_t *data, const int width, const int height, int value)
     if(value == 0)
         return;
 
-    if (!data)
+    uint8_t* frame = static_cast<uint8_t*>(data);
+    if (nullptr == frame)
+        return;
+
+    if (!frame)
         return;
 
     float step = value / 100.0;
     int size = width * height;
 
+    float pow_result = pow(2, step);
     for(int i = 0; i < size; i++) {
-        int r = data[i*3] * pow(2, step);
-        int g = data[i*3 + 1] * pow(2, step);
-        int b = data[i*3 + 2] * pow(2, step);
+        int r = frame[i*3] * pow_result;
+        int g = frame[i*3 + 1] * pow_result;
+        int b = frame[i*3 + 2] * pow_result;
 
-        data[i*3] = r > 255 ? 255 : r;
-        data[i*3 + 1] = g > 255 ? 255 : g;
-        data[i*3 + 2] = b > 255 ? 255 : b;
+        frame[i*3] = r > 255 ? 255 : r;
+        frame[i*3 + 1] = g > 255 ? 255 : g;
+        frame[i*3 + 2] = b > 255 ? 255 : b;
     }
 }
 

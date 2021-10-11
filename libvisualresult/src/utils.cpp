@@ -16,7 +16,7 @@ lutData* utils::getFilterLut(string filter)
         return nullptr;
 
     if (m_map_lut.find(filter) != m_map_lut.end()) {
-        printf("filter:%s is finded..\n", filter.c_str());
+        //printf("filter:%s is finded..\n", filter.c_str());
 
         return &(m_map_lut[filter]);
     }
@@ -171,10 +171,12 @@ bool utils::readCubeFileFromDat(string filename, lutData &lut)
     return true;
 }
 
+//按字符“delimit”分割字符串
 void utils::split(string &str, string delimit, vector<string> &result)
 {
     size_t pos = str.find(delimit);
     str += delimit;//将分隔符加入到最后一个位置，方便分割最后一位
+
     while (pos != string::npos) {
         result.push_back(str.substr(0, pos));
         str = str.substr(pos + 1);

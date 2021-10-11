@@ -14,7 +14,6 @@ public:
     // 根据滤镜名称获取滤镜色标数据
     static lutData* getFilterLut(std::string filter);
 
-
     // 读取路径下所有cube文件滤镜数据到内存中
     static void readFilters(const std::string& dir);
     // 读取目标cube文件滤镜数据到内存中

@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2020 ~ 2021 Uniontech Software Technology Co., Ltd.
+ * Copyright (C)  2021 Uniontech Software Technology Co., Ltd.
  *
  * Author:     houchengqiu <houchengqiu@uniontech.com>
  *
- * Maintainer: houchengqiu <houchengqiu@uniontech.com>
+ * Maintainer: fengli <fengli@uniontech.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

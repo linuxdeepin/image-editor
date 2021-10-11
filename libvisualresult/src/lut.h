@@ -29,14 +29,6 @@
 using namespace std;
 
 /**
-* @brief 从二进制文件读取3dLut
-* @param name 文件名
-* @param lut 指向相应LUT的指针
-* @return LUT size
-*/
-int read_lut_binary(const char *name, vector<vector<int>> *lut);
-
-/**
 * @brief 将3dLut写入二进制文件
 * @param lut 指向相应LUT的指针
 * @param lut_size LUT size

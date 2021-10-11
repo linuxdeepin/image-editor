@@ -19,48 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "lut.h"
-
-
-//按字符“delimit”分割字符串
-void split(string &str, string delimit, vector<string>&result)
-{
-    size_t pos = str.find(delimit);
-    str += delimit;//将分隔符加入到最后一个位置，方便分割最后一位
-
-    while (pos != string::npos) {
-        result.push_back(str.substr(0, pos));
-        str = str.substr(pos + 1);
-        pos = str.find(delimit);
-    }
-}
-
-int read_lut_binary(const char *name, vector<vector<int>> *lut)
-{
-    int rgbSize = 3 * sizeof(int);
-    ifstream inFile(name, ios::in | ios::binary);
-
-    if (!inFile) {
-        cout<< "error" <<endl;
-        return -1;
-    }
-
-    //先读尺寸
-    int lutSize = -1;
-    inFile.read((char *)&lutSize, sizeof(int));
-
-    //再读数据
-    int temp[3];
-    while (inFile.read((char *)&temp[0], rgbSize)) {
-        vector<int> rgb;
-        for (int i = 0; i < 3; i++) {
-            rgb.push_back(temp[i]);
-        }
-        lut->push_back(rgb);
-    }
-    inFile.close();
-
-    return lutSize;
-}
+#include "utils.h"
 
 void write_lut_binary(vector<vector<float>> &lut, const int lutSize, const char *name)
 {
@@ -95,7 +54,7 @@ void parse_lut_cube(const string &filename, const char *binaryName)
             vector<string> strList;
             vector<float> rgbList;
 
-            split(line, " ", strList);
+            utils::split(line, " ", strList);
 
             for (int i = 0; i < 3; i++) {
                 rgbList.push_back(atof(strList[i].c_str()));

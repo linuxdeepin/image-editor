@@ -27,8 +27,6 @@ set(SRCS
     src/utils.h
     src/visualresult.cpp
     src/visualresult.h
-    src/exposure.h
-    src/exposure.cpp
     src/main.c)
 
 file (GLOB_RECURSE OUT_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/visualresult.h)
