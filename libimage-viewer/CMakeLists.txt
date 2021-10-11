@@ -33,6 +33,7 @@ add_definitions( -DCMAKE_BUILD )
 #库目录
 aux_source_directory(image-viewer allSources)
 
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(3rd_lib REQUIRED
     dtkwidget
@@ -80,12 +81,14 @@ add_library(image-viewer SHARED ${allHeaders} ${allSources} ${RESOURCES} ${QM})
 #使用库
 qt5_use_modules(image-viewer ${QtModule})
 
+
 #将库安装到指定位置
 set(PREFIX /usr)
-set(image-viewer ${CMAKE_INSTALL_LIBDIR})
+set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
+
+set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
-set_target_properties(${CMD_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
 target_link_libraries(image-viewer ${3rd_lib_LIBRARIES} freeimage )
 
@@ -105,3 +108,14 @@ install(FILES ${PROJECT_BINARY_DIR}/libimage-viewer.pc DESTINATION ${CMAKE_INSTA
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
     DESTINATION ${PREFIX}/share/libimage-viewer
     FILES_MATCHING PATTERN "*.qm")
+
+# 加速编译优化参数
+if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wl,-O1 -Wl,--as-needed -Wl,-E -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -z noexecstack")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wl,-O1 -Wl,--as-needed -Wl,-E -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -z noexecstack")
+    SET(CMAKE_EXE_LINKER_FLAGS  "-pie")
+else()
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wl,-O1 -Wl,--as-needed -Wl,-E -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3  -Wl,-O1 -Wl,--as-needed -Wl,-E -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections")
+    SET(CMAKE_EXE_LINKER_FLAGS  "-pie")
+endif()

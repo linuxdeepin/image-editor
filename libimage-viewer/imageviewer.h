@@ -5,7 +5,6 @@
 #include <DIconButton>
 
 #include "image-viewer_global.h"
-#include "viewpanel/viewpanel.h"
 
 class AbstractTopToolbar;
 
