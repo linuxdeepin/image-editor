@@ -447,8 +447,9 @@ void ImageGraphicsView::setScaleValue(qreal v)
         emit disCheckAdaptImageBtn();
     }
 
-//    emit scaled(imageRelativeScale() * 100);
-    emit scaled(m_scal * 100);
+    //使用正确的缩放比例
+    emit scaled(imageRelativeScale() * 100);
+//    emit scaled(m_scal * 100);
     emit showScaleLabel();
     emit transformChanged();
 
