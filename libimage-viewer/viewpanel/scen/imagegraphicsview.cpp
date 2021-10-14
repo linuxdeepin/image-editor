@@ -511,7 +511,7 @@ void ImageGraphicsView::fitWindow()
     if (wrs > 20.0) {
         wrs = 20.0;
     }
-    m_scal = wrs;
+    m_scal = wrs; //注意，这个东西的初始化要和附近的scale函数同步
     scale(wrs, wrs);
     emit checkAdaptScreenBtn();
     if (wrs - 1 > -0.01 &&
@@ -533,7 +533,7 @@ void ImageGraphicsView::fitImage()
     qreal wrs = windowRelativeScale();
     resetTransform();
     scale(1, 1);
-    m_scal = wrs;
+    m_scal = 1; //注意，这个东西的初始化要和附近的scale函数同步
     emit checkAdaptImageBtn();
     if (wrs - 1 > -0.01 &&
             wrs - 1 < 0.01) {
