@@ -157,6 +157,8 @@ int BottomToolbar::getToolbarWidth()
         //ITEM_CURRENT_WH存在着数字是60,但实际大小绘制的时候减小为30所以使用ImgViewListView::ITEM_CURRENT_WH / 2
         width += ImgViewListView::ITEM_CURRENT_WH;
         width += (m_imgListWidget->getImgCount() /*- 1*/) * (ImgViewListView::ITEM_CURRENT_WH / 2 + ImgViewListView::ITEM_SPACING);
+        width += m_spaceWidget_thumbnailLeft->width();
+        width += m_spaceWidget_thumbnailRight->width();
     }
 
     return width;
@@ -300,6 +302,12 @@ void BottomToolbar::deleteImage()
                 }
                 if (m_spaceWidget) {
                     m_spaceWidget->setVisible(false);
+                }
+                if (m_spaceWidget_thumbnailLeft) {
+                    m_spaceWidget_thumbnailLeft->setVisible(false);
+                }
+                if (m_spaceWidget_thumbnailRight) {
+                    m_spaceWidget_thumbnailRight->setVisible(false);
                 }
                 //BUG#93072 图片删到最后要清理一下控件聚焦
                 m_trashBtn->clearFocus();
@@ -542,10 +550,14 @@ void BottomToolbar::setAllFile(QString path, QStringList paths)
         setButtonVisible(imageViewerSpace::ButtonTypePre, false);
         setButtonVisible(imageViewerSpace::ButtonTypeNext, false);
         m_spaceWidget->setVisible(false);
+        m_spaceWidget_thumbnailLeft->setVisible(false);
+        m_spaceWidget_thumbnailRight->setVisible(false);
     } else {
         setButtonVisible(imageViewerSpace::ButtonTypePre, true);
         setButtonVisible(imageViewerSpace::ButtonTypeNext, true);
         m_spaceWidget->setVisible(true);
+        m_spaceWidget_thumbnailLeft->setVisible(true);
+        m_spaceWidget_thumbnailRight->setVisible(true);
     }
 
     QList<imageViewerSpace::ItemInfo> itemInfos;
@@ -702,9 +714,19 @@ void BottomToolbar::initUI()
     m_rotateRBtn->setToolTip(QObject::tr("Rotate clockwise"));
     hb->addWidget(m_rotateRBtn);
 
+    //增加缩略图左侧空隙
+    m_spaceWidget_thumbnailLeft = new QWidget(this);
+    m_spaceWidget_thumbnailLeft->setFixedWidth(1);
+    hb->addWidget(m_spaceWidget_thumbnailLeft);
+
     //缩略图列表
     m_imgListWidget = new MyImageListWidget(this);
     hb->addWidget(m_imgListWidget);
+
+    //增加缩略图右侧空隙
+    m_spaceWidget_thumbnailRight = new QWidget(this);
+    m_spaceWidget_thumbnailRight->setFixedWidth(5);
+    hb->addWidget(m_spaceWidget_thumbnailRight);
 
     //删除
     m_trashBtn = new DIconButton(this);

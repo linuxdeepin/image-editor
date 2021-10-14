@@ -168,6 +168,8 @@ private:
     DIconButton *m_preButton = nullptr;
     DIconButton *m_nextButton = nullptr;
     QWidget *m_spaceWidget = nullptr;
+    QWidget *m_spaceWidget_thumbnailLeft = nullptr;
+    QWidget *m_spaceWidget_thumbnailRight = nullptr;
 
     DIconButton *m_adaptImageBtn = nullptr;
     DIconButton *m_adaptScreenBtn = nullptr;
