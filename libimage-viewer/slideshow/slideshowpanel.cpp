@@ -292,7 +292,11 @@ void SlideShowPanel::startSlideShow(const ViewInfo &vinfo)
         return;
     }
     m_vinfo = vinfo;
-    this->setCursor(Qt::BlankCursor);
+
+    QTimer::singleShot(100, [this]() {
+        this->setCursor(Qt::BlankCursor);
+    });
+
     if (1 < vinfo.paths.length()) {
         slideshowbottombar->m_preButton->setEnabled(true);
         slideshowbottombar->m_nextButton->setEnabled(true);
