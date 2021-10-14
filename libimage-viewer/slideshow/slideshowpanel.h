@@ -55,7 +55,7 @@ public:
     DIconButton *m_nextButton;
     DIconButton *m_playpauseButton;
     DIconButton *m_cancelButton;
-    int a = 0;
+    bool isStop = false;
 
 public slots:
     void onPreButtonClicked();

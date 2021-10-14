@@ -110,22 +110,24 @@ void SlideShowBottomBar::onPreButtonClicked()
     //todo屏蔽了全局信号
 //    emit dApp->signalM->updatePauseButton();
 //    emit dApp->signalM->updateButton();
+
+    onUpdatePauseButton();
     emit showPrevious();
 }
 
 void SlideShowBottomBar::onPlaypauseButtonClicked()
 {
-    if (0 == a) {
+    if (!isStop) {
         m_playpauseButton->setIcon(QIcon::fromTheme("dcc_play_normal"));
         m_playpauseButton->setToolTip(tr("Play"));
-        a = 1;
+        isStop = true;
         //todo屏蔽了全局信号
 //        emit dApp->signalM->updateButton();
         emit showPause();
     } else {
         m_playpauseButton->setIcon(QIcon::fromTheme("dcc_suspend_normal"));
         m_playpauseButton->setToolTip(tr("Pause"));
-        a = 0;
+        isStop = false;
         //todo屏蔽了全局信号
 //        emit dApp->signalM->sigStartTimer();
         emit showContinue();
@@ -136,14 +138,14 @@ void SlideShowBottomBar::onUpdatePauseButton()
 {
     m_playpauseButton->setIcon(QIcon::fromTheme("dcc_play_normal"));
     m_playpauseButton->setToolTip(tr("Play"));
-    a = 1;
+    isStop = true;
 }
 
 void SlideShowBottomBar::onInitSlideShowButton()
 {
     m_playpauseButton->setIcon(QIcon::fromTheme("dcc_suspend_normal"));
     m_playpauseButton->setToolTip(tr("Pause"));
-    a = 0;
+    isStop = false;
 }
 
 void SlideShowBottomBar::onNextButtonClicked()
@@ -151,6 +153,8 @@ void SlideShowBottomBar::onNextButtonClicked()
     //todo屏蔽了全局信号
 //    emit dApp->signalM->updatePauseButton();
 //    emit dApp->signalM->updateButton();
+
+    onUpdatePauseButton();
     emit showNext();
 }
 
@@ -293,6 +297,7 @@ void SlideShowPanel::startSlideShow(const ViewInfo &vinfo)
     }
     m_vinfo = vinfo;
 
+    //BUG#98244 延时触发鼠标消失，防止F5进入后重复进入mouse move触发鼠标出现
     QTimer::singleShot(100, [this]() {
         this->setCursor(Qt::BlankCursor);
     });
