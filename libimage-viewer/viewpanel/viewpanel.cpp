@@ -897,7 +897,7 @@ void ViewPanel::backImageView(const QString &path)
     }
     //退出幻灯片的时候导航栏应该出现(未打开不出现)
     if (m_nav && m_view) {
-        m_nav->setVisible((! m_nav->isAlwaysHidden() && ! m_view->isWholeImageVisible()));
+        m_nav->setVisible((!m_nav->isAlwaysHidden() && !m_view->isWholeImageVisible()) && !m_view->image().isNull());
     }
     //退出幻灯片，应该切换回应该的窗口
     if (!QFileInfo(path).isWritable()) {
