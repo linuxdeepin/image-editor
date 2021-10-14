@@ -69,6 +69,10 @@ ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType, QString 
 
 ImageViewer::~ImageViewer()
 {
+    //析构时删除m_panel
+    Q_D(ImageViewer);
+    d->m_panel->deleteLater();
+    d->m_panel = nullptr;
 }
 
 bool ImageViewer::startChooseFileDialog()

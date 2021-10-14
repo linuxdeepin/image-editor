@@ -162,7 +162,6 @@ ImageGraphicsView::ImageGraphicsView(QWidget *parent)
     new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Up), this);
     new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Down), this);
 
-    Dtk::Core::DVtableHook::overrideVfptrFun(qApp, &DApplication::handleQuitAction, this, &ImageGraphicsView::slotSavePic);
 }
 
 ImageGraphicsView::~ImageGraphicsView()
