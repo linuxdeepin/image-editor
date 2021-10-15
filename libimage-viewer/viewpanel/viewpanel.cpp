@@ -796,28 +796,29 @@ void LibViewPanel::slotBottomMove()
     if (m_bottomToolbar) {
         if (window()->isFullScreen()) {
             QPoint pos = mapFromGlobal(QCursor::pos());
+            int height = QGuiApplication::screenAt(this->pos())->geometry().height();
 
-            if (height() - 20 < pos.y() && height() > pos.y() && height() == m_bottomToolbar->y()) {
+            if (height - 20 < pos.y() && height > pos.y() && height == m_bottomToolbar->y()) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((width() - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
                 m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2,
-                                                      height() - m_bottomToolbar->height() - 10));
+                                                      height - m_bottomToolbar->height() - 10));
                 connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_bottomAnimation;
                     m_bottomAnimation = nullptr;
                 });
                 m_bottomAnimation->start();
-            } else if (height() - m_bottomToolbar->height() - 10 > pos.y() &&
-                       height() - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) {
+            } else if (height - m_bottomToolbar->height() - 10 > pos.y() &&
+                       height - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((width() - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
-                m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2, height()));
+                m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2, height));
                 connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_bottomAnimation;
                     m_bottomAnimation = nullptr;

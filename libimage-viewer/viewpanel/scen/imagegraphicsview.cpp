@@ -479,9 +479,11 @@ void LibImageGraphicsView::fitWindow()
 {
     qreal wrs = windowRelativeScale();
     resetTransform();
-    //可能存在比例超过20.0的情况，设置为20.0
+    //可能存在比例超过20.0的情况，设置为20.0，低于0.02，设置为0.02
     if (wrs > 20.0) {
         wrs = 20.0;
+    } else if (wrs < 0.02) {
+        wrs = 0.02;
     }
     m_scal = wrs; //注意，这个东西的初始化要和附近的scale函数同步
     scale(wrs, wrs);
