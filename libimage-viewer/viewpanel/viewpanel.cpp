@@ -850,7 +850,7 @@ void LibViewPanel::showNext()
 
 void LibViewPanel::showPrevious()
 {
-    DIconButton *PreviousButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeNext);
+    DIconButton *PreviousButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypePre);
     if (PreviousButton->isEnabled()) {
         m_bottomToolbar->onPreButton();
     }
