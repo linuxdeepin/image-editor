@@ -197,6 +197,9 @@ void MyImageListWidget::resizeEvent(QResizeEvent *event)
 }
 MyImageListWidget::~MyImageListWidget()
 {
+    if (m_resetAnimation != nullptr) {
+        m_resetAnimation->deleteLater();
+    }
 }
 
 void MyImageListWidget::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QString path)
@@ -253,7 +256,7 @@ void MyImageListWidget::initAnimation()
     m_timer->setInterval(200);
     m_timer->setSingleShot(true);
     if (m_listview) {
-        m_resetAnimation = new QPropertyAnimation(m_listview, "pos", m_listview); //和上层m_obj的销毁绑在一起
+        m_resetAnimation = new QPropertyAnimation(m_listview, "pos", nullptr); //和上层m_obj的销毁绑在一起
     }
     connect(m_resetAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
     connect(m_resetAnimation, SIGNAL(valueChanged(const QVariant)), this, SLOT(animationValueChanged(const QVariant)));
