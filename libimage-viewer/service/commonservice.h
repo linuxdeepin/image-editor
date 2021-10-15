@@ -49,7 +49,7 @@ public:
     void reName(const QString &oldPath, const QString &newPath);
 
 signals:
-    void sigMouseRelease();
+    void sigRightMousePress();
 public slots:
     //有新的图片加载上来,保存制作好的图片信息
     void slotSetImgInfoByPath(QString path, imageViewerSpace::ItemInfo itemInfo);

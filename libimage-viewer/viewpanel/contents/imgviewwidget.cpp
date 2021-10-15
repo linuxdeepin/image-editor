@@ -71,7 +71,7 @@ MyImageListWidget::MyImageListWidget(QWidget *parent)
     initAnimation();
 
     //解决释放到程序外,不会动画的问题
-    connect(LibCommonService::instance(), &LibCommonService::sigMouseRelease, this, [ = ] {
+    connect(LibCommonService::instance(), &LibCommonService::sigRightMousePress, this, [ = ] {
         qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
         if (currentTime - 100 > m_lastReleaseTime)
         {

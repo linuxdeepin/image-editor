@@ -22,6 +22,7 @@
 
 #include <QImage>
 #include <QCoreApplication>
+#include <QMouseEvent>
 
 #include "imageengine.h"
 
@@ -88,8 +89,10 @@ LibCommonService::LibCommonService(QObject *parent) : QObject(parent)
 
 bool LibCommonService::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::MouseButtonRelease) {
-        emit sigMouseRelease();
+    if (event->type() == QEvent::MouseButtonPress) {
+        if (dynamic_cast<QMouseEvent *>(event)->button() == Qt::RightButton) {
+            emit sigRightMousePress();
+        }
     }
     return QObject::eventFilter(obj, event);
 }
