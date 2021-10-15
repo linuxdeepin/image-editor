@@ -40,6 +40,7 @@
 #include <QtGlobal>
 #include <QDesktopWidget>
 #include <QShortcut>
+#include <QApplication>
 
 #include "graphicsitem.h"
 #include "imagesvgitem.h"
@@ -53,10 +54,6 @@
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
 
-#define protected public
-#include <DApplication>
-#undef protected
-#include <DVtableHook>
 
 #ifndef QT_NO_OPENGL
 //#include <QGLWidget>

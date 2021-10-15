@@ -36,6 +36,7 @@
 #include <QMimeDatabase>
 #include <QtSvg/QSvgRenderer>
 #include <QDir>
+#include <QDebug>
 
 #include "unionimage/imageutils.h"
 
@@ -177,7 +178,8 @@ public:
                       << "RAF"  << "CR2" << "MEF" << "ORF" << "ICO"
                       << "RAW"
                       << "MRW"
-                      << "NEF" ;
+                      << "NEF"
+                      << "JP2";
         //pic（多张图片） pcx不支持旋转
         m_canSave << "BMP" << "JPG" << "JPEG"  << "JPS" << "JPE" << "PNG"
                   << "PGM" << "PPM" << "PNM"
@@ -196,7 +198,8 @@ public:
          * PGM保存速度Qt略快于FreeImage
          * PBM保存速度Qt是FreeImage的20倍，且FreeImage旋转后会反色
         */
-        m_qtrotate << "ICNS" << "JPG" << "JPEG" << "PNG" << "BMP" << "PGM" << "PBM";
+        /*<< "PGM" << "PBM"*/
+        m_qtrotate << "ICNS" << "JPG" << "JPEG" << "PNG" << "BMP" ;
     }
     ~UnionImage_Private()
     {
@@ -579,13 +582,22 @@ UNIONIMAGESHARED_EXPORT bool canSave(const QString &path)
  * @param flag
  * @return
  */
-UNIONIMAGESHARED_EXPORT bool writeFIBITMAPToFile(FIBITMAP *dib, const QString &path, FREE_IMAGE_FORMAT fif, int flag = 0)
+UNIONIMAGESHARED_EXPORT bool writeFIBITMAPToFile(FIBITMAP *dib, const QString &path, int flag = 0)
 {
+    FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
     BOOL bSuccess = FALSE;
     const QByteArray ba = path.toUtf8();
     const char *pc = ba.data();
+    // Try to guess the file format from the file extension
+    fif = FreeImage_GetFIFFromFilename(pc);
+    FREE_IMAGE_FORMAT realfif = FIF_UNKNOWN;
+    if (fif == FIF_UNKNOWN) {
+        realfif = FreeImage_GetFileType(pc);
+    }
     if (fif != FIF_UNKNOWN) {
         bSuccess = FreeImage_Save(fif, dib, pc, flag);
+    } else if (realfif != FIF_UNKNOWN) {
+        bSuccess = FreeImage_Save(realfif, dib, pc, flag);
     }
     return bSuccess;
 }
@@ -677,9 +689,14 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
         }
         return true;
     } else {
-        if (f != FREE_IMAGE_FORMAT::FIF_UNKNOWN && union_image_private.m_freeimage_formats.contains(file_suffix_upper)) {
+        if (f != FREE_IMAGE_FORMAT::FIF_UNKNOWN || union_image_private.m_freeimage_formats.contains(file_suffix_upper)) {
             if (f == FREE_IMAGE_FORMAT::FIF_UNKNOWN)
                 f = FREE_IMAGE_FORMAT(union_image_private.m_freeimage_formats[file_suffix_upper]);
+            if (f == FREE_IMAGE_FORMAT::FIF_JP2 && file_info.size() > 40960000) {
+                errorMsg = "image load faild, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
+                res = QImage();
+                return false;
+            }
             FIBITMAP *dib = FreeImage_Load(f, temp_path.data());
             if (nullptr == dib) {
                 errorMsg = "image load faild, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
@@ -956,16 +973,28 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
             erroMsg = "rotate load QImage faild, path:" + path + "  ,format:+" + format;
             return false;
         }
-        QPixmap svgpixmap(path);
-        QMatrix matrix;
-        matrix.rotate(angel);
-        svgpixmap = svgpixmap.transformed(QTransform(matrix));
         QSvgGenerator generator;
         generator.setFileName(path);
-        generator.setViewBox(svgpixmap.rect());
+        generator.setViewBox(QRect(0, 0, image_copy.width(), image_copy.height()));
         QPainter rotatePainter;
         rotatePainter.begin(&generator);
-        rotatePainter.drawPixmap(svgpixmap.rect(), svgpixmap);
+        rotatePainter.resetTransform();
+        rotatePainter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        int realangel = angel / 90;
+        if (realangel > 0) {
+            for (int i = 0; i < qAbs(realangel); i++) {
+                rotatePainter.translate(image_copy.width(), 0);
+                rotatePainter.rotate(90 * (realangel / qAbs(realangel)));
+            }
+        } else {
+            for (int i = 0; i < qAbs(realangel); i++) {
+                rotatePainter.translate(0, image_copy.height());
+                rotatePainter.rotate(90 * (realangel / qAbs(realangel)));
+            }
+        }
+        rotatePainter.drawImage(image_copy.rect(), image_copy.scaled(image_copy.width(), image_copy.height()));
+        rotatePainter.resetTransform();
+        generator.setSize(QSize(image_copy.width(), image_copy.height()));
         rotatePainter.end();
         return true;
     } else if (union_image_private.m_qtrotate.contains(format)) {
@@ -997,6 +1026,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         if (FreeImage_GetThumbnail(dib)) {
             FIBITMAP *thumb = FreeImage_GetThumbnail(dib);
             FIBITMAP *rotateThumb = FreeImage_Rotate(thumb, -angel);
+
             FreeImage_SetThumbnail(rotateRes, rotateThumb);
             FreeImage_Unload(rotateThumb);
         }
@@ -1010,7 +1040,8 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         FreeImage_Unload(rotateRes);
         return false;
     }
-    if (!writeFIBITMAPToFile(rotateRes, path, f)) {
+    ;
+    if (!writeFIBITMAPToFile(rotateRes, path)) {
         erroMsg = "rotate image save faild, unkown format";
         FreeImage_Unload(dib);
         FreeImage_Unload(rotateRes);
@@ -1096,7 +1127,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIleWithImage(int angel, QImage &img, co
         return false;
     }
     img = FIBitmap2QImage(rotateRes);
-    if (!writeFIBITMAPToFile(rotateRes, path, f)) {
+    if (!writeFIBITMAPToFile(rotateRes, path)) {
         erroMsg = "rotate image save faild, unkown format";
         FreeImage_Unload(dib);
         FreeImage_Unload(rotateRes);

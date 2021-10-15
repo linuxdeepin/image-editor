@@ -1364,7 +1364,12 @@ void LibViewPanel::dropEvent(QDropEvent *event)
     }
     QStringList paths;
     for (QUrl url : urls) {
-        paths << url.toLocalFile();
+        //lmh0901判断是否是图片
+        QString path = url.toLocalFile();
+        if (path.isEmpty()) {
+            path = url.path();
+        }
+        paths << path;
     }
     startdragImage(paths);
 }
