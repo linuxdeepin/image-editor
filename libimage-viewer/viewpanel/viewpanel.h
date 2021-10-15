@@ -97,8 +97,8 @@ public:
     //设置壁纸
     void setWallpaper(const QImage &img);
 
-    //drog事件打开图片
-    bool startdragImage(const QStringList &paths);
+    //drag事件打开图片
+    bool startdragImage(const QStringList &paths, const QString &firstPath = "");
 
     //设置topBar的显示和隐藏
     void setTopBarVisible(bool visible);

@@ -24,7 +24,7 @@ public:
     bool startChooseFileDialog();
 
     //传入路径加载图片
-    bool startdragImage(const QStringList &paths);
+    bool startdragImage(const QStringList &paths, const QString &firstPath = "");
 
     //启动图片展示入口
     void startImgView(QString currentPath, QStringList paths = QStringList());

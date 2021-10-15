@@ -161,7 +161,7 @@ void LibTopToolbar::initWidgets()
     m_titlebar->setWindowFlags(Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint |
                                Qt::WindowCloseButtonHint);
     m_titlebar->setMenu(m_menu);
-    m_titlebar->setIcon(QIcon::fromTheme("deepin-image-viewer"));
+    m_titlebar->setIcon(QIcon::fromTheme(qApp->applicationName()));
     QPalette pa;
     pa.setColor(QPalette::WindowText, QColor(255, 255, 255, 255));
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,

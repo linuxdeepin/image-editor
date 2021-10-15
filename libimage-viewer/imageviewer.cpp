@@ -81,10 +81,10 @@ bool ImageViewer::startChooseFileDialog()
     return d->m_panel->startChooseFileDialog();
 }
 
-bool ImageViewer::startdragImage(const QStringList &paths)
+bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath)
 {
     Q_D(ImageViewer);
-    return d->m_panel->startdragImage(paths);
+    return d->m_panel->startdragImage(paths, firstPath);
 }
 
 void ImageViewer::startImgView(QString currentPath, QStringList paths)
