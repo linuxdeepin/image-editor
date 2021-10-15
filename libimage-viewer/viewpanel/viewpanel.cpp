@@ -370,6 +370,7 @@ void LibViewPanel::updateMenuContent(QString path)
         QFileInfo info(currentPath);
         bool isReadable = info.isReadable();//是否可读
         bool isWritable = info.isWritable();//是否可写
+        bool isFile = info.isFile(); //是否存在
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
@@ -377,7 +378,7 @@ void LibViewPanel::updateMenuContent(QString path)
         if (m_info) {
             m_info->setImagePath(currentPath);
         }
-        if (!isReadable && !currentPath.isEmpty()) {
+        if (!isFile && !currentPath.isEmpty()) {
             if (m_thumbnailWidget) {
                 m_stack->setCurrentWidget(m_thumbnailWidget);
                 //损坏图片不透明
@@ -903,7 +904,8 @@ void LibViewPanel::backImageView(const QString &path)
         m_nav->setVisible((!m_nav->isAlwaysHidden() && !m_view->isWholeImageVisible()) && !m_view->image().isNull());
     }
     //退出幻灯片，应该切换回应该的窗口
-    if (!QFileInfo(path).isWritable()) {
+    //判断文件是否存在
+    if (!QFileInfo(path).isFile()) {
         m_stack->setCurrentWidget(m_thumbnailWidget);
     } else if (m_view->image().isNull()) {
         m_stack->setCurrentWidget(m_lockWidget);

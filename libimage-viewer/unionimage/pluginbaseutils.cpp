@@ -200,7 +200,11 @@ bool checkMimeData(const QMimeData *mimeData)
 
     //遍历URL，只要存在图片就允许拖入
     for (QUrl url : urlList) {
-        const QString path = url.toLocalFile();
+        //判断图片更新
+        QString path = url.toLocalFile();
+        if (path.isEmpty()) {
+            path = url.path();
+        }
         QFileInfo fileinfo(path);
         if (fileinfo.isDir()) {
             if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) { //相册模式的时候额外允许文件夹拖入
