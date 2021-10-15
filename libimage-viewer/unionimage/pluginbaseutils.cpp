@@ -203,7 +203,7 @@ bool checkMimeData(const QMimeData *mimeData)
         const QString path = url.toLocalFile();
         QFileInfo fileinfo(path);
         if (fileinfo.isDir()) {
-            if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) { //相册模式的时候额外允许文件夹拖入
+            if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) { //相册模式的时候额外允许文件夹拖入
                 result = true;
                 break;
             } else {
@@ -284,7 +284,7 @@ bool imageSupportRead(const QString &path)
         return false;
     }
     //return QImageReader::supportedImageFormats().contains(suffix.toUtf8());
-    return UnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
+    return LibUnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
 }
 
 const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
@@ -316,7 +316,7 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
 //
 QStringList supportedImageFormats()
 {
-    return UnionImage_NameSpace::unionImageSupportFormat();
+    return LibUnionImage_NameSpace::unionImageSupportFormat();
 }
 
 }  // namespace base

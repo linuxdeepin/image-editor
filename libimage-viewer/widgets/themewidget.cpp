@@ -29,8 +29,8 @@ ThemeWidget::ThemeWidget(const QString &darkFile, const QString &lightFile,
     : QWidget(parent)
 {
 
-    m_darkStyle = utils::base::getFileContent(darkFile);
-    m_lightStyle = utils::base::getFileContent(lightFile);
+    m_darkStyle = Libutils::base::getFileContent(darkFile);
+    m_lightStyle = Libutils::base::getFileContent(lightFile);
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
     onThemeChanged(themeType);
     setObjectName(THEME_WIDGET);

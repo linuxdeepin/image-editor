@@ -38,7 +38,7 @@ void initFilters(const char* dir)
     std::string path = dir;
     if (path.empty())
         path = "/usr/share/libvisualresult/filter_cube";
-    utils::readFilters(path);
+    Libutils::readFilters(path);
 }
 
 void imageFilter24(uint8_t *data, int width, int height, const char *filterName, int strength)
@@ -49,7 +49,7 @@ void imageFilter24(uint8_t *data, int width, int height, const char *filterName,
     if (!frame)
         return;
 
-    lutData* pLut = utils::getFilterLut(filterName);
+    lutData* pLut = Libutils::getFilterLut(filterName);
     if (!pLut || pLut->size() == 0) {
         printf("filter:%s file is not found..", filterName);
         return;

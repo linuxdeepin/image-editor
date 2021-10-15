@@ -29,7 +29,7 @@
 #include "image-viewer_global.h"
 
 class TDThumbnailThread;
-class ImgViewDelegate : public QStyledItemDelegate
+class LibImgViewDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
@@ -43,7 +43,7 @@ public:
         SearchViewType
     };
 
-    explicit ImgViewDelegate(QObject *parent = nullptr);
+    explicit LibImgViewDelegate(QObject *parent = nullptr);
 
     void setItemSize(QSize size);
     void paint(QPainter *painter,

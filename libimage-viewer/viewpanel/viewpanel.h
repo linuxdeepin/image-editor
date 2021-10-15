@@ -34,24 +34,24 @@
 class AbstractTopToolbar;
 
 DWIDGET_USE_NAMESPACE
-class ImageInfoWidget;
+class LibImageInfoWidget;
 class ExtensionPanel;
 class NavigationWidget;
-class BottomToolbar;
-class TopToolbar;
+class LibBottomToolbar;
+class LibTopToolbar;
 class OcrInterface;
-class SlideShowPanel;
+class LibSlideShowPanel;
 class QPropertyAnimation;
 class LockWidget;
 class ThumbnailWidget;
 
-class ViewPanel : public QFrame
+class LibViewPanel : public QFrame
 {
 
     Q_OBJECT
 public:
-    explicit ViewPanel(AbstractTopToolbar *customToolbar = nullptr, QWidget *parent = nullptr);
-    ~ViewPanel() override;
+    explicit LibViewPanel(AbstractTopToolbar *customToolbar = nullptr, QWidget *parent = nullptr);
+    ~LibViewPanel() override;
 
     void loadImage(const QString &path, QStringList paths);
 
@@ -165,11 +165,11 @@ signals:
     void imageChanged(const QString &path);
 private :
     DStackedWidget *m_stack = nullptr;
-    ImageGraphicsView *m_view = nullptr;
+    LibImageGraphicsView *m_view = nullptr;
     LockWidget *m_lockWidget = nullptr;
     ThumbnailWidget *m_thumbnailWidget = nullptr;
-    BottomToolbar *m_bottomToolbar = nullptr;
-    ImageInfoWidget *m_info = nullptr;
+    LibBottomToolbar *m_bottomToolbar = nullptr;
+    LibImageInfoWidget *m_info = nullptr;
     ExtensionPanel  *m_extensionPanel {nullptr};
     DAnchors<NavigationWidget> m_nav ;
 
@@ -186,7 +186,7 @@ private :
 
     QTimer *m_tSaveImage = nullptr;//保存旋转图片定时器
 
-    SlideShowPanel *m_sliderPanel{nullptr};
+    LibSlideShowPanel *m_sliderPanel{nullptr};
 
     QPropertyAnimation *m_bottomAnimation{nullptr};
 

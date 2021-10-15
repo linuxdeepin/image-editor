@@ -30,7 +30,7 @@ const QString CONFIG_PATH =   QDir::homePath() +
 const QString DB_PATH = QDir::homePath() +
                         "/.local/share/deepin/deepin-image-viewer/deepinimageviewer.db";
 
-ConfigSetter::ConfigSetter(QObject *parent) : QObject(parent)
+LibConfigSetter::LibConfigSetter(QObject *parent) : QObject(parent)
 {
     if (!QFileInfo(CONFIG_PATH).exists())
         QProcess::startDetached(QString("rm %1").arg(DB_PATH));
@@ -39,17 +39,17 @@ ConfigSetter::ConfigSetter(QObject *parent) : QObject(parent)
     qDebug() << "Setting file:" << m_settings->fileName();
 }
 
-ConfigSetter *ConfigSetter::m_setter = nullptr;
-ConfigSetter *ConfigSetter::instance()
+LibConfigSetter *LibConfigSetter::m_setter = nullptr;
+LibConfigSetter *LibConfigSetter::instance()
 {
     if (! m_setter) {
-        m_setter = new ConfigSetter();
+        m_setter = new LibConfigSetter();
     }
 
     return m_setter;
 }
 
-void ConfigSetter::setValue(const QString &group, const QString &key,
+void LibConfigSetter::setValue(const QString &group, const QString &key,
                             const QVariant &value)
 {
 //    QMutexLocker locker(&m_mutex);
@@ -61,7 +61,7 @@ void ConfigSetter::setValue(const QString &group, const QString &key,
     emit valueChanged(group, key, value);
 }
 
-QVariant ConfigSetter::value(const QString &group, const QString &key,
+QVariant LibConfigSetter::value(const QString &group, const QString &key,
                              const QVariant &defaultValue)
 {
     QMutexLocker locker(&m_mutex);

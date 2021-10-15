@@ -25,38 +25,38 @@
 
 #include "imageengine.h"
 
-CommonService *CommonService::m_commonService = nullptr;
-CommonService *CommonService::instance()
+LibCommonService *LibCommonService::m_commonService = nullptr;
+LibCommonService *LibCommonService::instance()
 {
     if (m_commonService == nullptr) {
-        m_commonService = new CommonService;
+        m_commonService = new LibCommonService;
     }
 
     return m_commonService;
 }
 
-void CommonService::setImgViewerType(imageViewerSpace::ImgViewerType type)
+void LibCommonService::setImgViewerType(imageViewerSpace::ImgViewerType type)
 {
     m_imgViewerType = type;
 }
 
-imageViewerSpace::ImgViewerType CommonService::getImgViewerType()
+imageViewerSpace::ImgViewerType LibCommonService::getImgViewerType()
 {
     return m_imgViewerType;
 }
 
-void CommonService::setImgSavePath(QString path)
+void LibCommonService::setImgSavePath(QString path)
 {
     m_imgSavePath = path;
 }
 
-QString CommonService::getImgSavePath()
+QString LibCommonService::getImgSavePath()
 {
     return m_imgSavePath;
 }
 
 
-imageViewerSpace::ItemInfo CommonService::getImgInfoByPath(QString path)
+imageViewerSpace::ItemInfo LibCommonService::getImgInfoByPath(QString path)
 {
     return m_allInfoMap[path];
 }
@@ -66,7 +66,7 @@ imageViewerSpace::ItemInfo CommonService::getImgInfoByPath(QString path)
     m_allInfoMap[path] = itemInfo;
 }*/
 
-void CommonService::reName(const QString &oldPath, const QString &newPath)
+void LibCommonService::reName(const QString &oldPath, const QString &newPath)
 {
     imageViewerSpace::ItemInfo info = m_allInfoMap[oldPath];
     info.path = newPath;
@@ -75,18 +75,18 @@ void CommonService::reName(const QString &oldPath, const QString &newPath)
     emit ImageEngine::instance()->sigOneImgReady(oldPath, info);
 }
 
-void CommonService::slotSetImgInfoByPath(QString path, imageViewerSpace::ItemInfo itemInfo)
+void LibCommonService::slotSetImgInfoByPath(QString path, imageViewerSpace::ItemInfo itemInfo)
 {
     m_allInfoMap[path] = itemInfo;
     emit ImageEngine::instance()->sigOneImgReady(path, itemInfo);
 }
 
-CommonService::CommonService(QObject *parent) : QObject(parent)
+LibCommonService::LibCommonService(QObject *parent) : QObject(parent)
 {
     qApp->installEventFilter(this);
 }
 
-bool CommonService::eventFilter(QObject *obj, QEvent *event)
+bool LibCommonService::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonRelease) {
         emit sigMouseRelease();

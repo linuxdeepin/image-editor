@@ -70,7 +70,7 @@ LockWidget::LockWidget(const QString &darkFile,
             m_theme = false;
         }
 
-        QPixmap logo_pix = utils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
+        QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
         m_bgLabel->setPixmap(logo_pix);
     });
     m_lockTips = new QLbtoDLabel();
@@ -80,7 +80,7 @@ LockWidget::LockWidget(const QString &darkFile,
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addStretch(1);
-    QPixmap logo_pix = utils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
+    QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
     m_bgLabel->setPixmap(logo_pix);
     layout->addWidget(m_bgLabel, 0, Qt::AlignHCenter);
     //layout->addSpacing(18);
@@ -94,7 +94,7 @@ LockWidget::LockWidget(const QString &darkFile,
 void LockWidget::setContentText(const QString &text)
 {
     m_lockTips->setText(text);
-    int textHeight = utils::base::stringHeight(m_lockTips->font(),
+    int textHeight = Libutils::base::stringHeight(m_lockTips->font(),
                                                m_lockTips->text());
     m_lockTips->setMinimumHeight(textHeight + 2);
 }

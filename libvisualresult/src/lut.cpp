@@ -54,7 +54,7 @@ void parse_lut_cube(const string &filename, const char *binaryName)
             vector<string> strList;
             vector<float> rgbList;
 
-            utils::split(line, " ", strList);
+            Libutils::split(line, " ", strList);
 
             for (int i = 0; i < 3; i++) {
                 rgbList.push_back(atof(strList[i].c_str()));

@@ -39,7 +39,7 @@
 
 #include "image-viewer_global.h"
 
-namespace  UnionImage_NameSpace {
+namespace  LibUnionImage_NameSpace {
 
 enum SupportType {
     UNKNOWNTYPE = 0,    // unknown type

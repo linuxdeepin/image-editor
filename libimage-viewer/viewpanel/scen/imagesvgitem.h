@@ -39,7 +39,7 @@ DGUI_USE_NAMESPACE
 class QSvgRenderer;
 class ImageSvgItemPrivate;
 
-class ImageSvgItem : public QGraphicsObject
+class LibImageSvgItem : public QGraphicsObject
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -47,9 +47,9 @@ class ImageSvgItem : public QGraphicsObject
     Q_PROPERTY(QSize maximumCacheSize READ maximumCacheSize WRITE setMaximumCacheSize)
 
 public:
-    ImageSvgItem(QGraphicsItem *parentItem = nullptr);
-    ImageSvgItem(const QString &fileName, QGraphicsItem *parentItem = nullptr);
-    ~ImageSvgItem() override;
+    LibImageSvgItem(QGraphicsItem *parentItem = nullptr);
+    LibImageSvgItem(const QString &fileName, QGraphicsItem *parentItem = nullptr);
+    ~LibImageSvgItem() override;
 
     void setSharedRenderer(QSvgRenderer *renderer);
     QSvgRenderer *renderer() const;

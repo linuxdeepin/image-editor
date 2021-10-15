@@ -62,7 +62,7 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
         m_theme = false;
     }
 
-    QPixmap logo_pix = utils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
+    QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
     m_logo = logo_pix;
 
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
@@ -79,7 +79,7 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
         }
 
         //修复style风格错误
-        m_logo = utils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
+        m_logo = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
         if (m_isDefaultThumbnail) {
             //这里之前修复风格错误,导致bug68248,现在已经修复
             m_defaultImage = m_logo;
@@ -169,11 +169,11 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
 void ThumbnailWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 {
     if (theme == DGuiApplicationHelper::ColorType::DarkType) {
-        m_inBorderColor = utils::common::DARK_BORDER_COLOR;
+        m_inBorderColor = Libutils::common::DARK_BORDER_COLOR;
         if (m_isDefaultThumbnail)
             m_defaultImage = m_logo;
     } else {
-        m_inBorderColor = utils::common::LIGHT_BORDER_COLOR;
+        m_inBorderColor = Libutils::common::LIGHT_BORDER_COLOR;
         if (m_isDefaultThumbnail)
             m_defaultImage = m_logo;
     }

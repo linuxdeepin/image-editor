@@ -42,7 +42,7 @@
 
 #endif
 
-namespace utils {
+namespace Libutils {
 namespace common {
 const int TOP_TOOLBAR_THEIGHT = 40;
 const int BOTTOM_TOOLBAR_HEIGHT = 22;

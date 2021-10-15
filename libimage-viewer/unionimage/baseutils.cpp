@@ -55,7 +55,7 @@
 #endif
 DWIDGET_USE_NAMESPACE
 
-namespace utils {
+namespace Libutils {
 
 namespace base {
 
@@ -72,7 +72,7 @@ QPixmap renderSVG(const QString &filePath, const QSize &size)
 //    if (!UnionImage_NameSpace::loadStaticImageFromFile(filePath, tImg, realSize, errMsg)) {
 //        qDebug() << errMsg;
 //    }
-    if (!UnionImage_NameSpace::loadStaticImageFromFile(filePath, tImg, errMsg)) {
+    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(filePath, tImg, errMsg)) {
         qDebug() << errMsg;
     }
     QPixmap pixmap;
@@ -321,7 +321,7 @@ bool trashFile(const QString &file)
         return false;
     }
     // Remove thumbnail
-    utils::image::removeThumbnail(file);
+    Libutils::image::removeThumbnail(file);
     return true;
 #else
     Q_UNUSED(file);

@@ -25,11 +25,11 @@
 #include <QSettings>
 #include <QMutex>
 
-class ConfigSetter : public QObject
+class LibConfigSetter : public QObject
 {
     Q_OBJECT
 public:
-    static ConfigSetter *instance();
+    static LibConfigSetter *instance();
     void setValue(const QString &group, const QString &key,
                   const QVariant &value);
     QVariant value(const QString &group, const QString &key,
@@ -41,10 +41,10 @@ signals:
                       const QVariant &value);
 
 private:
-    explicit ConfigSetter(QObject *parent = nullptr);
+    explicit LibConfigSetter(QObject *parent = nullptr);
 
 private:
-    static ConfigSetter *m_setter;
+    static LibConfigSetter *m_setter;
     QSettings *m_settings;
     QMutex m_mutex;
 };

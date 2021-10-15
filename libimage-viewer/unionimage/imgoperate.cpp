@@ -36,17 +36,17 @@
 #include "imageutils.h"
 
 
-ImgOperate::ImgOperate(QObject *parent)
+LibImgOperate::LibImgOperate(QObject *parent)
 {
     Q_UNUSED(parent);
 }
 
-ImgOperate::~ImgOperate()
+LibImgOperate::~LibImgOperate()
 {
 
 }
 
-void ImgOperate::slotMakeImgThumbnail(QString thumbnailSavePath, QStringList paths, int makeCount, bool remake)
+void LibImgOperate::slotMakeImgThumbnail(QString thumbnailSavePath, QStringList paths, int makeCount, bool remake)
 {
     QString path;
     imageViewerSpace::ItemInfo itemInfo;
@@ -84,7 +84,7 @@ void ImgOperate::slotMakeImgThumbnail(QString thumbnailSavePath, QStringList pat
         }
 
         QString errMsg;
-        if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
+        if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
             qDebug() << errMsg;
             continue;
         }
@@ -125,12 +125,12 @@ void ImgOperate::slotMakeImgThumbnail(QString thumbnailSavePath, QStringList pat
     }
 }
 
-imageViewerSpace::ImageType ImgOperate::getImageType(const QString &imagepath)
+imageViewerSpace::ImageType LibImgOperate::getImageType(const QString &imagepath)
 {
-    return UnionImage_NameSpace::getImageType(imagepath);
+    return LibUnionImage_NameSpace::getImageType(imagepath);
 }
 
-imageViewerSpace::PathType ImgOperate::getPathType(const QString &imagepath)
+imageViewerSpace::PathType LibImgOperate::getPathType(const QString &imagepath)
 {
     //判断文件路径来自于哪里
     imageViewerSpace::PathType type = imageViewerSpace::PathType::PathTypeLOCAL;
@@ -142,7 +142,7 @@ imageViewerSpace::PathType ImgOperate::getPathType(const QString &imagepath)
         type = imageViewerSpace::PathTypePTP;
     } else if (imagepath.indexOf("gphoto2:host=Apple") != -1) {
         type = imageViewerSpace::PathTypeAPPLE;
-    } else if (utils::image::isVaultFile(imagepath)) {
+    } else if (Libutils::image::isVaultFile(imagepath)) {
         type = imageViewerSpace::PathTypeSAFEBOX;
     } else if (imagepath.contains(QDir::homePath() + "/.local/share/Trash")) {
         type = imageViewerSpace::PathTypeRECYCLEBIN;

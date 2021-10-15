@@ -30,7 +30,7 @@
 
 #define VAULT_DECRYPT_DIR_NAME          "vault_unlocked"
 #define VAULT_BASE_PATH (QDir::homePath() + QString("/.local/share/applications"))  //! 获取保险箱创建的目录地址
-namespace utils {
+namespace Libutils {
 
 namespace image {
 

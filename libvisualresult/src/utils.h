@@ -8,7 +8,7 @@
 typedef std::vector<std::vector<uint8_t>>       lutData;
 typedef std::map<std::string, lutData>          map_lut;
 
-class utils
+class Libutils
 {
 public:
     // 根据滤镜名称获取滤镜色标数据

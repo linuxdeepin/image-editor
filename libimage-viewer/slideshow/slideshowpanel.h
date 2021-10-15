@@ -73,7 +73,7 @@ signals:
     void showCancel();
 };
 
-class SlideShowPanel : public QWidget
+class LibSlideShowPanel : public QWidget
 {
     Q_OBJECT
 public:
@@ -83,7 +83,7 @@ public:
         IdPlay,
         IdPause
     };
-    explicit SlideShowPanel(QWidget *parent = nullptr);
+    explicit LibSlideShowPanel(QWidget *parent = nullptr);
     void initConnections();
     void initMenu();
     void appendAction(int id, const QString &text, const QString &shortcut);
@@ -112,7 +112,7 @@ protected:
     void timerEvent(QTimerEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
 private:
-    ImageAnimation *m_animation;
+    LibImageAnimation *m_animation;
     DMenu *m_menu;
     QShortcut *m_sEsc;
     ViewInfo m_vinfo;

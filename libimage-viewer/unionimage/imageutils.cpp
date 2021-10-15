@@ -43,7 +43,7 @@
 #include <QUrl>
 #include <QApplication>
 
-namespace utils {
+namespace Libutils {
 
 namespace image {
 
@@ -60,7 +60,7 @@ const QImage scaleImage(const QString &path, const QSize &size)
 //    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, realSize, errMsg)) {
 //        qDebug() << errMsg;
 //    }
-    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
+    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
         qDebug() << errMsg;
     }
     if (tImg.size() != size) { //调用加速接口失败，主动进行缩放
@@ -149,7 +149,7 @@ bool imageSupportRead(const QString &path)
     if (errorList.indexOf(suffix.toUpper()) != -1) {
         return false;
     }
-    return UnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
+    return LibUnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
 #else
     const QString suffix = QFileInfo(path).suffix();
 //解决freeimage不支持icns
@@ -175,7 +175,7 @@ bool imageSupportSave(const QString &path)
 {
     /*lmh0724使用USE_UNIONIMAGE*/
 #ifdef USE_UNIONIMAGE
-    return UnionImage_NameSpace::canSave(path);
+    return LibUnionImage_NameSpace::canSave(path);
 #else
     const QString suffix = QFileInfo(path).suffix();
     //J2K格式暂时不支持
@@ -227,7 +227,7 @@ bool rotate(const QString &path, int degree)
     /*lmh0724使用USE_UNIONIMAGE*/
 #ifdef USE_UNIONIMAGE
     QString erroMsg;
-    return UnionImage_NameSpace::rotateImageFIle(degree, path, erroMsg);
+    return LibUnionImage_NameSpace::rotateImageFIle(degree, path, erroMsg);
 #else
     if (degree % 90 != 0)
         return false;
@@ -288,7 +288,7 @@ bool rotate(const QString &path, int degree)
  */
 const QPixmap cutSquareImage(const QPixmap &pixmap)
 {
-    return utils::image::cutSquareImage(pixmap, pixmap.size());
+    return Libutils::image::cutSquareImage(pixmap, pixmap.size());
 }
 
 /*!
@@ -370,7 +370,7 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
 const QString getOrientation(const QString &path)
 {
 #ifdef USE_UNIONIMAGE
-    return UnionImage_NameSpace::getOrientation(path);
+    return LibUnionImage_NameSpace::getOrientation(path);
 #else
     return freeimage::getOrientation(path);
 #endif
@@ -522,7 +522,7 @@ const QImage getRotatedImage(const QString &path)
 //    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, realSize, errMsg)) {
 //        qDebug() << errMsg;
 //    }
-    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
+    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
         qDebug() << errMsg;
     }
 #else
@@ -556,7 +556,7 @@ const QMap<QString, QString> getAllMetaData(const QString &path)
 {
     /*lmh0724使用USE_UNIONIMAGE*/
 #ifdef USE_UNIONIMAGE
-    return UnionImage_NameSpace::getAllMetaData(path);
+    return LibUnionImage_NameSpace::getAllMetaData(path);
 #else
     return freeimage::getAllMetaData(path);
 #endif
@@ -778,7 +778,7 @@ QStringList supportedImageFormats()
     /*lmh0724使用USE_UNIONIMAGE*/
 #ifdef USE_UNIONIMAGE
     QStringList list ;
-    for (auto str : UnionImage_NameSpace::unionImageSupportFormat()) {
+    for (auto str : LibUnionImage_NameSpace::unionImageSupportFormat()) {
         str = "*." + str;
         list += str;
     }

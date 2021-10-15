@@ -40,8 +40,8 @@
 
 QT_BEGIN_NAMESPACE
 
-class ImageAnimationPrivate;
-class ImageAnimation : public QWidget
+class LibImageAnimationPrivate;
+class LibImageAnimation : public QWidget
 {
     Q_OBJECT
     enum AnimationType {
@@ -74,8 +74,8 @@ class ImageAnimation : public QWidget
     };
 
 public:
-    explicit ImageAnimation(QWidget *parent = nullptr);
-    ~ImageAnimation() override;
+    explicit LibImageAnimation(QWidget *parent = nullptr);
+    ~LibImageAnimation() override;
 
     void startSlideShow(const QString &beginPath, const QStringList &pathlist);
     void endSlider();
@@ -96,9 +96,9 @@ protected:
     void setPaintTarget(PaintTarget target);
 private:
     PaintTarget current_target;
-    ImageAnimationPrivate *const d_ptr;
-    Q_DECLARE_PRIVATE(ImageAnimation)
-    Q_DISABLE_COPY(ImageAnimation)
+    LibImageAnimationPrivate *const d_ptr;
+    Q_DECLARE_PRIVATE(LibImageAnimation)
+    Q_DISABLE_COPY(LibImageAnimation)
 };
 
 QT_END_NAMESPACE

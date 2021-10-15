@@ -34,7 +34,7 @@ QT_BEGIN_NAMESPACE
     inline const Class* q_func() const { return static_cast<const Class *>(q_ptr); } \
     friend class Class;
 
-ImageSvgItem::ImageSvgItem(QGraphicsItem *parent)
+LibImageSvgItem::LibImageSvgItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
 {
     setParentItem(parent);
@@ -43,7 +43,7 @@ ImageSvgItem::ImageSvgItem(QGraphicsItem *parent)
     setMaximumCacheSize(QSize(1024, 768));
 }
 
-ImageSvgItem::ImageSvgItem(const QString &fileName, QGraphicsItem *parent)
+LibImageSvgItem::LibImageSvgItem(const QString &fileName, QGraphicsItem *parent)
 //:QGraphicsSvgItem(parent)
     : QGraphicsObject(parent)
 {
@@ -55,16 +55,16 @@ ImageSvgItem::ImageSvgItem(const QString &fileName, QGraphicsItem *parent)
     updateDefaultSize();
 }
 
-ImageSvgItem::~ImageSvgItem()
+LibImageSvgItem::~LibImageSvgItem()
 {
 }
 
-QSvgRenderer *ImageSvgItem::renderer() const
+QSvgRenderer *LibImageSvgItem::renderer() const
 {
     return m_renderer;
 }
 
-QRectF ImageSvgItem::boundingRect() const
+QRectF LibImageSvgItem::boundingRect() const
 {
     return m_boundingRect;
 }
@@ -121,7 +121,7 @@ static void qt_graphicsItem_highlightSelected(QGraphicsItem *item, QPainter *pai
     painter->drawRect(item->boundingRect().adjusted(pad, pad, -pad, -pad));
 }
 
-void ImageSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void LibImageSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     //    Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -138,12 +138,12 @@ void ImageSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         qt_graphicsItem_highlightSelected(this, painter, option);
 }
 
-int ImageSvgItem::type() const
+int LibImageSvgItem::type() const
 {
     return Type;
 }
 
-void ImageSvgItem::updateDefaultSize()
+void LibImageSvgItem::updateDefaultSize()
 {
     QRectF bounds;
     if (m_elemId.isEmpty()) {
@@ -157,31 +157,31 @@ void ImageSvgItem::updateDefaultSize()
     }
 }
 
-void ImageSvgItem::setMaximumCacheSize(const QSize &size)
+void LibImageSvgItem::setMaximumCacheSize(const QSize &size)
 {
     Q_UNUSED(size);
 //    QGraphicsItem::d_ptr->setExtra(QGraphicsItemPrivate::ExtraMaxDeviceCoordCacheSize, size);
     update();
 }
 
-QSize ImageSvgItem::maximumCacheSize() const
+QSize LibImageSvgItem::maximumCacheSize() const
 {
     return QSize();//QGraphicsItem::d_ptr->extra(QGraphicsItemPrivate::ExtraMaxDeviceCoordCacheSize).toSize();
 }
 
-void ImageSvgItem::setElementId(const QString &id)
+void LibImageSvgItem::setElementId(const QString &id)
 {
     m_elemId = id;
     updateDefaultSize();
     update();
 }
 
-QString ImageSvgItem::elementId() const
+QString LibImageSvgItem::elementId() const
 {
     return m_elemId;
 }
 
-void ImageSvgItem::setSharedRenderer(QSvgRenderer *renderer)
+void LibImageSvgItem::setSharedRenderer(QSvgRenderer *renderer)
 {
     m_renderer = renderer;
 
@@ -190,12 +190,12 @@ void ImageSvgItem::setSharedRenderer(QSvgRenderer *renderer)
     update();
 }
 
-void ImageSvgItem::setCachingEnabled(bool caching)
+void LibImageSvgItem::setCachingEnabled(bool caching)
 {
     setCacheMode(caching ? QGraphicsItem::DeviceCoordinateCache : QGraphicsItem::NoCache);
 }
 
-bool ImageSvgItem::isCachingEnabled() const
+bool LibImageSvgItem::isCachingEnabled() const
 {
     return cacheMode() != QGraphicsItem::NoCache;
 }

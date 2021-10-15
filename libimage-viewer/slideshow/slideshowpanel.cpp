@@ -163,8 +163,8 @@ void SlideShowBottomBar::onCancelButtonClicked()
     emit showCancel();
 }
 
-SlideShowPanel::SlideShowPanel(QWidget *parent) : QWidget(parent)
-    , slideshowbottombar(new SlideShowBottomBar(this)), m_animation(new ImageAnimation(this))
+LibSlideShowPanel::LibSlideShowPanel(QWidget *parent) : QWidget(parent)
+    , slideshowbottombar(new SlideShowBottomBar(this)), m_animation(new LibImageAnimation(this))
     , m_hideCursorTid(0)
 {
     setObjectName(SLIDE_SHOW_WIDGET);
@@ -182,34 +182,34 @@ SlideShowPanel::SlideShowPanel(QWidget *parent) : QWidget(parent)
     slideshowbottombar->raise();
 }
 
-void SlideShowPanel::initConnections()
+void LibSlideShowPanel::initConnections()
 {
-    connect(m_animation, &ImageAnimation::singleAnimationEnd, this, &SlideShowPanel::onSingleAnimationEnd);
+    connect(m_animation, &LibImageAnimation::singleAnimationEnd, this, &LibSlideShowPanel::onSingleAnimationEnd);
 //todo屏蔽了全局信号
 //    connect(dApp->signalM, &SignalManager::startSlideShow, this, &SlideShowPanel::startSlideShow);
 //    connect(dApp->signalM, &SignalManager::sigESCKeyStopSlide, this, &SlideShowPanel::onESCKeyStopSlide);
 
-    connect(slideshowbottombar, &SlideShowBottomBar::showPause, this, &SlideShowPanel::onShowPause);
-    connect(slideshowbottombar, &SlideShowBottomBar::showContinue, this, &SlideShowPanel::onShowContinue);
-    connect(slideshowbottombar, &SlideShowBottomBar::showPrevious, this, &SlideShowPanel::onShowPrevious);
-    connect(slideshowbottombar, &SlideShowBottomBar::showNext, this, &SlideShowPanel::onShowNext);
-    connect(slideshowbottombar, &SlideShowBottomBar::showCancel, this, &SlideShowPanel::backToLastPanel);
+    connect(slideshowbottombar, &SlideShowBottomBar::showPause, this, &LibSlideShowPanel::onShowPause);
+    connect(slideshowbottombar, &SlideShowBottomBar::showContinue, this, &LibSlideShowPanel::onShowContinue);
+    connect(slideshowbottombar, &SlideShowBottomBar::showPrevious, this, &LibSlideShowPanel::onShowPrevious);
+    connect(slideshowbottombar, &SlideShowBottomBar::showNext, this, &LibSlideShowPanel::onShowNext);
+    connect(slideshowbottombar, &SlideShowBottomBar::showCancel, this, &LibSlideShowPanel::backToLastPanel);
 }
 
-void SlideShowPanel::initMenu()
+void LibSlideShowPanel::initMenu()
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     m_menu = new DMenu;
     m_menu->setStyle(QStyleFactory::create("dlight"));
-    QString stopSc = ConfigSetter::instance()->value(SHORTCUTVIEW_GROUP, "Slide show").toString();
+    QString stopSc = LibConfigSetter::instance()->value(SHORTCUTVIEW_GROUP, "Slide show").toString();
     stopSc.replace(" ", "");
     appendAction(IdPlayOrPause, tr(slideshowbottombar->m_playpauseButton->toolTip().toStdString().c_str()), stopSc);
     appendAction(IdStopslideshow, tr(slideshowbottombar->m_cancelButton->toolTip().toStdString().c_str()), stopSc);
-    connect(m_menu, &QMenu::triggered, this, &SlideShowPanel::onMenuItemClicked);
-    connect(this, &SlideShowPanel::customContextMenuRequested, this, &SlideShowPanel::onCustomContextMenuRequested);
+    connect(m_menu, &QMenu::triggered, this, &LibSlideShowPanel::onMenuItemClicked);
+    connect(this, &LibSlideShowPanel::customContextMenuRequested, this, &LibSlideShowPanel::onCustomContextMenuRequested);
 }
 
-void SlideShowPanel::appendAction(int id, const QString &text, const QString &shortcut)
+void LibSlideShowPanel::appendAction(int id, const QString &text, const QString &shortcut)
 {
     QAction *ac = new QAction(m_menu);
     addAction(ac);
@@ -233,7 +233,7 @@ void SlideShowPanel::appendAction(int id, const QString &text, const QString &sh
     }
 }
 
-void SlideShowPanel::backToLastPanel()
+void LibSlideShowPanel::backToLastPanel()
 {
     m_animation->endSlider();
     showNormal();
@@ -268,7 +268,7 @@ void SlideShowPanel::backToLastPanel()
     m_hideCursorTid = 0;
 }
 
-void SlideShowPanel::showNormal()
+void LibSlideShowPanel::showNormal()
 {
     if (m_isMaximized) {
         window()->showNormal();
@@ -278,7 +278,7 @@ void SlideShowPanel::showNormal()
     }
 }
 
-void SlideShowPanel::showFullScreen()
+void LibSlideShowPanel::showFullScreen()
 {
     m_isMaximized = window()->isMaximized();
     window()->showFullScreen();
@@ -289,7 +289,7 @@ void SlideShowPanel::showFullScreen()
 //    emit dApp->signalM->hideTopToolbar(true);
 }
 
-void SlideShowPanel::startSlideShow(const ViewInfo &vinfo)
+void LibSlideShowPanel::startSlideShow(const ViewInfo &vinfo)
 {
     if (vinfo.paths.isEmpty()) {
         qDebug() << "Start SlideShow failed! Paths is empty!";
@@ -337,7 +337,7 @@ void SlideShowPanel::startSlideShow(const ViewInfo &vinfo)
     showFullScreen();
 }
 
-void SlideShowPanel::onMenuItemClicked(QAction *action)
+void LibSlideShowPanel::onMenuItemClicked(QAction *action)
 {
     const int id = action->property("MenuID").toInt();
     switch (id) {
@@ -363,43 +363,43 @@ void SlideShowPanel::onMenuItemClicked(QAction *action)
 //    update();
 //}
 
-void SlideShowPanel::onSingleAnimationEnd()
+void LibSlideShowPanel::onSingleAnimationEnd()
 {
     return ;
 }
 
-void SlideShowPanel::onESCKeyStopSlide()
+void LibSlideShowPanel::onESCKeyStopSlide()
 {
     if (isVisible())
         backToLastPanel();
 }
 
-void SlideShowPanel::onShowPause()
+void LibSlideShowPanel::onShowPause()
 {
     m_animation->pauseAndNext();
 }
 
-void SlideShowPanel::onShowContinue()
+void LibSlideShowPanel::onShowContinue()
 {
     m_animation->ifPauseAndContinue();
 }
 
-void SlideShowPanel::onShowPrevious()
+void LibSlideShowPanel::onShowPrevious()
 {
     m_animation->playAndPre();
 }
 
-void SlideShowPanel::onShowNext()
+void LibSlideShowPanel::onShowNext()
 {
     m_animation->playAndNext();
 }
 
-void SlideShowPanel::onCustomContextMenuRequested()
+void LibSlideShowPanel::onCustomContextMenuRequested()
 {
     m_menu->popup(QCursor::pos());
 }
 
-void SlideShowPanel::mouseMoveEvent(QMouseEvent *event)
+void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     this->setCursor(Qt::ArrowCursor);
@@ -429,7 +429,7 @@ void SlideShowPanel::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void SlideShowPanel::timerEvent(QTimerEvent *event)
+void LibSlideShowPanel::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_hideCursorTid && qApp->modalWindow() == nullptr) {
         this->setCursor(Qt::BlankCursor);
@@ -437,7 +437,7 @@ void SlideShowPanel::timerEvent(QTimerEvent *event)
     QWidget::timerEvent(event);
 }
 
-void SlideShowPanel::mouseDoubleClickEvent(QMouseEvent *e)
+void LibSlideShowPanel::mouseDoubleClickEvent(QMouseEvent *e)
 {
     //解决幻灯片无法使用双击退出问题bug67409
     if (e->button() == Qt::LeftButton) {

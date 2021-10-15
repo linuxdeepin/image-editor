@@ -28,11 +28,11 @@
 
 #include "image-viewer_global.h"
 
-class CommonService : public QObject
+class LibCommonService : public QObject
 {
     Q_OBJECT
 public:
-    static CommonService *instance();
+    static LibCommonService *instance();
 
     //设置图片展示类型，看图，相册
     void setImgViewerType(imageViewerSpace::ImgViewerType type);
@@ -54,10 +54,10 @@ public slots:
     //有新的图片加载上来,保存制作好的图片信息
     void slotSetImgInfoByPath(QString path, imageViewerSpace::ItemInfo itemInfo);
 private:
-    explicit CommonService(QObject *parent = nullptr);
+    explicit LibCommonService(QObject *parent = nullptr);
     bool eventFilter(QObject *obj, QEvent *event);
 private:
-    static CommonService *m_commonService;
+    static LibCommonService *m_commonService;
 
     imageViewerSpace::ImgViewerType m_imgViewerType = imageViewerSpace::ImgViewerTypeNull;
     QString       m_imgSavePath;

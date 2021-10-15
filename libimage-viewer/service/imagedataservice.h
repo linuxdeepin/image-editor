@@ -30,14 +30,14 @@
 
 #include "image-viewer_global.h"
 
-class readThumbnailThread;
-class ImageDataService: public QObject
+class LibReadThumbnailThread;
+class LibImageDataService: public QObject
 {
     Q_OBJECT
 public:
-    static ImageDataService *instance(QObject *parent = nullptr);
-    explicit ImageDataService(QObject *parent = nullptr);
-    ~ImageDataService();
+    static LibImageDataService *instance(QObject *parent = nullptr);
+    explicit LibImageDataService(QObject *parent = nullptr);
+    ~LibImageDataService();
 
     bool add(const QStringList &paths);
     bool add(const QString &path);
@@ -68,7 +68,7 @@ signals:
     void sigeUpdateListview();
 public:
 private:
-    static ImageDataService *s_ImageDataService;
+    static LibImageDataService *s_ImageDataService;
     QMutex m_queuqMutex;
     QList<QString> m_requestQueue;
 
@@ -82,12 +82,12 @@ private:
 
 
 //缩略图读取线程
-class readThumbnailThread : public QThread
+class LibReadThumbnailThread : public QThread
 {
     Q_OBJECT
 public:
-    readThumbnailThread(QObject *parent = nullptr);
-    ~readThumbnailThread() override;
+    LibReadThumbnailThread(QObject *parent = nullptr);
+    ~LibReadThumbnailThread() override;
     void readThumbnail(QString m_path);
     void setQuit(bool quit);
     QString m_thumbnailPath = "";

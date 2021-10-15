@@ -74,7 +74,7 @@ const int LOAD_LEFT_RIGHT = 25;     //前后加载图片数（动态）
 
 }  // namespace
 
-BottomToolbar::BottomToolbar(QWidget *parent) : DFloatingWidget(parent)
+LibBottomToolbar::LibBottomToolbar(QWidget *parent) : DFloatingWidget(parent)
 {
     this->setBlurBackgroundEnabled(true);
 //    this->blurBackground()->setRadius(30);
@@ -85,16 +85,16 @@ BottomToolbar::BottomToolbar(QWidget *parent) : DFloatingWidget(parent)
     initUI();
     initConnection();
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
-                     this, &BottomToolbar::slotThemeChanged);
+                     this, &LibBottomToolbar::slotThemeChanged);
     slotThemeChanged(DGuiApplicationHelper::instance()->themeType());
 }
 
-BottomToolbar::~BottomToolbar()
+LibBottomToolbar::~LibBottomToolbar()
 {
 
 }
 
-int BottomToolbar::getAllFileCount()
+int LibBottomToolbar::getAllFileCount()
 {
     if (m_imgListWidget) {
         return m_imgListWidget->getImgCount();
@@ -103,16 +103,16 @@ int BottomToolbar::getAllFileCount()
     }
 }
 
-int BottomToolbar::getToolbarWidth()
+int LibBottomToolbar::getToolbarWidth()
 {
     //默认值，下面会重新计算
     int width = 300;
-    if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeLocal
-            || CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeNull) {
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeLocal
+            || LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeNull) {
         width = 0;
         setButtonVisible(imageViewerSpace::ButtonTypeBack, false);
         setButtonVisible(imageViewerSpace::ButtonTypeCollection, false);
-    } else if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
+    } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
         //相册
         width = 0;
         setButtonVisible(imageViewerSpace::ButtonTypeBack, true);
@@ -155,8 +155,8 @@ int BottomToolbar::getToolbarWidth()
         width += 0;
     } else {
         //ITEM_CURRENT_WH存在着数字是60,但实际大小绘制的时候减小为30所以使用ImgViewListView::ITEM_CURRENT_WH / 2
-        width += ImgViewListView::ITEM_CURRENT_WH;
-        width += (m_imgListWidget->getImgCount() /*- 1*/) * (ImgViewListView::ITEM_CURRENT_WH / 2 + ImgViewListView::ITEM_SPACING);
+        width += LibImgViewListView::ITEM_CURRENT_WH;
+        width += (m_imgListWidget->getImgCount() /*- 1*/) * (LibImgViewListView::ITEM_CURRENT_WH / 2 + LibImgViewListView::ITEM_SPACING);
         width += m_spaceWidget_thumbnailLeft->width();
         width += m_spaceWidget_thumbnailRight->width();
     }
@@ -164,22 +164,22 @@ int BottomToolbar::getToolbarWidth()
     return width;
 }
 
-imageViewerSpace::ItemInfo BottomToolbar::getCurrentItemInfo()
+imageViewerSpace::ItemInfo LibBottomToolbar::getCurrentItemInfo()
 {
     return m_imgListWidget->getCurrentImgInfo();
 }
 
-void BottomToolbar::setCurrentPath(const QString &path)
+void LibBottomToolbar::setCurrentPath(const QString &path)
 {
     m_imgListWidget->setCurrentPath(path);
 }
 
-QStringList BottomToolbar::getAllPath()
+QStringList LibBottomToolbar::getAllPath()
 {
     return m_imgListWidget->getAllPath();
 }
 
-void BottomToolbar::setRotateBtnClicked(const bool &bRet)
+void LibBottomToolbar::setRotateBtnClicked(const bool &bRet)
 {
     if (m_rotateLBtn) {
         m_rotateLBtn->setEnabled(bRet);
@@ -189,7 +189,7 @@ void BottomToolbar::setRotateBtnClicked(const bool &bRet)
     }
 }
 
-void BottomToolbar::setPictureDoBtnClicked(const bool &bRet)
+void LibBottomToolbar::setPictureDoBtnClicked(const bool &bRet)
 {
     if (m_ocrBtn) {
         m_ocrBtn->setEnabled(bRet);
@@ -208,7 +208,7 @@ void BottomToolbar::setPictureDoBtnClicked(const bool &bRet)
     }
 }
 
-DIconButton *BottomToolbar::getBottomtoolbarButton(imageViewerSpace::ButtonType type)
+DIconButton *LibBottomToolbar::getBottomtoolbarButton(imageViewerSpace::ButtonType type)
 {
     DIconButton *button = nullptr;
     switch (type) {
@@ -248,29 +248,29 @@ DIconButton *BottomToolbar::getBottomtoolbarButton(imageViewerSpace::ButtonType 
     return button;
 }
 
-void BottomToolbar::disCheckAdaptImageBtn()
+void LibBottomToolbar::disCheckAdaptImageBtn()
 {
     m_adaptImageBtn->setChecked(false);
     badaptImageBtnChecked = false;
 }
-void BottomToolbar::disCheckAdaptScreenBtn()
+void LibBottomToolbar::disCheckAdaptScreenBtn()
 {
     m_adaptScreenBtn->setChecked(false);
     badaptScreenBtnChecked = false;
 }
 
-void BottomToolbar::checkAdaptImageBtn()
+void LibBottomToolbar::checkAdaptImageBtn()
 {
     m_adaptImageBtn->setChecked(true);
     badaptImageBtnChecked = true;
 }
-void BottomToolbar::checkAdaptScreenBtn()
+void LibBottomToolbar::checkAdaptScreenBtn()
 {
     m_adaptScreenBtn->setChecked(true);
     badaptScreenBtnChecked = true;
 }
 
-void BottomToolbar::deleteImage()
+void LibBottomToolbar::deleteImage()
 {
     if (m_imgListWidget->getImgCount() == 0)
         return;
@@ -284,7 +284,7 @@ void BottomToolbar::deleteImage()
         }
         //先删除文件，需要判断文件是否删除，如果删除了，再决定看图软件的显示
         //不再采用默认删除,使用utils里面的删除
-        utils::base::trashFile(path);
+        Libutils::base::trashFile(path);
         QFile fileRemove(path);
         //文件是否被删除的判断bool值
         bool iRetRemove = false;
@@ -334,14 +334,14 @@ void BottomToolbar::deleteImage()
 
 }
 
-void BottomToolbar::onBackButtonClicked()
+void LibBottomToolbar::onBackButtonClicked()
 {
     //2020/6/9 DJH 优化退出全屏，不再闪出退出全屏的间隙 31331
     this->setVisible(false);
     this->setVisible(true);
 }
 
-void BottomToolbar::onAdaptImageBtnClicked()
+void LibBottomToolbar::onAdaptImageBtnClicked()
 {
     emit resetTransform(false);
     m_adaptImageBtn->setChecked(true);
@@ -350,7 +350,7 @@ void BottomToolbar::onAdaptImageBtnClicked()
     }
 }
 
-void BottomToolbar::onAdaptScreenBtnClicked()
+void LibBottomToolbar::onAdaptScreenBtnClicked()
 {
     emit resetTransform(true);
     m_adaptScreenBtn->setChecked(true);
@@ -359,7 +359,7 @@ void BottomToolbar::onAdaptScreenBtnClicked()
     }
 }
 
-void BottomToolbar::onclBTClicked()
+void LibBottomToolbar::onclBTClicked()
 {
     if (true == m_bClBTChecked) {
 //        DBManager::instance()->removeFromAlbum(COMMON_STR_FAVORITES, QStringList(m_currentpath), AlbumDBType::Favourite);
@@ -369,30 +369,30 @@ void BottomToolbar::onclBTClicked()
     }
 }
 
-void BottomToolbar::onRotateLBtnClicked()
+void LibBottomToolbar::onRotateLBtnClicked()
 {
     onRotate(-90);
     emit rotateClockwise();
 }
 
-void BottomToolbar::onRotateRBtnClicked()
+void LibBottomToolbar::onRotateRBtnClicked()
 {
     onRotate(90);
     emit rotateCounterClockwise();
 }
 
-void BottomToolbar::onRotateThumbnail(int index)
+void LibBottomToolbar::onRotateThumbnail(int index)
 {
     onRotate(index);
 }
 
-void BottomToolbar::onTrashBtnClicked()
+void LibBottomToolbar::onTrashBtnClicked()
 {
     deleteImage();
     //    emit dApp->signalM->deleteByMenu();
 }
 
-void BottomToolbar::slotThemeChanged(int type)
+void LibBottomToolbar::slotThemeChanged(int type)
 {
     QString rStr;
     if (type == 1) {
@@ -448,7 +448,7 @@ void BottomToolbar::slotThemeChanged(int type)
     }
 }
 
-void BottomToolbar::slotOpenImage(int index, QString path)
+void LibBottomToolbar::slotOpenImage(int index, QString path)
 {
     if (index == 0) {
         m_preButton->setEnabled(false);
@@ -479,21 +479,21 @@ void BottomToolbar::slotOpenImage(int index, QString path)
     }
 }
 
-void BottomToolbar::setIsConnectDel(bool bFlags)
+void LibBottomToolbar::setIsConnectDel(bool bFlags)
 {
     if (bFlags) {
-        connect(m_trashBtn, &DIconButton::clicked, this, &BottomToolbar::onTrashBtnClicked, Qt::UniqueConnection);
+        connect(m_trashBtn, &DIconButton::clicked, this, &LibBottomToolbar::onTrashBtnClicked, Qt::UniqueConnection);
     } else {
         m_trashBtn->disconnect();
     }
 }
 
-void BottomToolbar::thumbnailMoveCenterWidget()
+void LibBottomToolbar::thumbnailMoveCenterWidget()
 {
     m_imgListWidget->moveCenterWidget();
 }
 
-void BottomToolbar::onNextButton()
+void LibBottomToolbar::onNextButton()
 {
     if (m_rotateLBtn) {
         m_rotateLBtn->setEnabled(false);
@@ -509,7 +509,7 @@ void BottomToolbar::onNextButton()
     }
 }
 
-void BottomToolbar::onPreButton()
+void LibBottomToolbar::onPreButton()
 {
     if (m_rotateLBtn) {
         m_rotateLBtn->setEnabled(false);
@@ -525,24 +525,24 @@ void BottomToolbar::onPreButton()
     }
 }
 
-void BottomToolbar::onRotate(int matrix)
+void LibBottomToolbar::onRotate(int matrix)
 {
     m_imgListWidget->rotate(matrix);
 }
 
-void BottomToolbar::resizeEvent(QResizeEvent *event)
+void LibBottomToolbar::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     m_imgListWidget->moveCenterWidget();
 }
 
-void BottomToolbar::showEvent(QShowEvent *event)
+void LibBottomToolbar::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
     m_imgListWidget->moveCenterWidget();
 }
 
-void BottomToolbar::setAllFile(QString path, QStringList paths)
+void LibBottomToolbar::setAllFile(QString path, QStringList paths)
 {
     //每次打开清空一下缩略图
     m_imgListWidget->clearListView();
@@ -570,7 +570,7 @@ void BottomToolbar::setAllFile(QString path, QStringList paths)
     m_imgListWidget->setAllFile(itemInfos, path);
 }
 
-void BottomToolbar::updateCollectButton()
+void LibBottomToolbar::updateCollectButton()
 {
     if (m_currentpath.isEmpty()) {
         return;
@@ -590,7 +590,7 @@ void BottomToolbar::updateCollectButton()
 //    }
 }
 
-void BottomToolbar::initUI()
+void LibBottomToolbar::initUI()
 {
     auto backLayout = new QVBoxLayout(this);
     backLayout->setSpacing(0);
@@ -627,7 +627,7 @@ void BottomToolbar::initUI()
 
     m_spaceWidget = new QWidget(this);
     m_spaceWidget->setFixedSize(ICON_SPACING, ICON_SPACING);
-    if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
         hb->addWidget(m_spaceWidget);
         setButtonVisible(imageViewerSpace::ButtonTypeBack, true);
     }
@@ -653,7 +653,7 @@ void BottomToolbar::initUI()
     m_nextButton->setToolTip(QObject::tr("Next"));
     m_nextButton->hide();
     hb->addWidget(m_nextButton);
-    if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeLocal) {
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeLocal) {
         hb->addWidget(m_spaceWidget);
     }
 
@@ -739,34 +739,34 @@ void BottomToolbar::initUI()
     hb->addWidget(m_trashBtn);
 }
 
-void BottomToolbar::initConnection()
+void LibBottomToolbar::initConnection()
 {
     //返回按钮，相册使用
-    connect(m_backButton, &DIconButton::clicked, this, &BottomToolbar::onBackButtonClicked);
+    connect(m_backButton, &DIconButton::clicked, this, &LibBottomToolbar::onBackButtonClicked);
     //前一张
-    connect(m_preButton, &DIconButton::clicked, this, &BottomToolbar::onPreButton);
+    connect(m_preButton, &DIconButton::clicked, this, &LibBottomToolbar::onPreButton);
     //下一张
-    connect(m_nextButton, &DIconButton::clicked, this, &BottomToolbar::onNextButton);
+    connect(m_nextButton, &DIconButton::clicked, this, &LibBottomToolbar::onNextButton);
     //适应图片
-    connect(m_adaptImageBtn, &DIconButton::clicked, this, &BottomToolbar::onAdaptImageBtnClicked);
+    connect(m_adaptImageBtn, &DIconButton::clicked, this, &LibBottomToolbar::onAdaptImageBtnClicked);
     //适应屏幕
-    connect(m_adaptScreenBtn, &DIconButton::clicked, this, &BottomToolbar::onAdaptScreenBtnClicked);
+    connect(m_adaptScreenBtn, &DIconButton::clicked, this, &LibBottomToolbar::onAdaptScreenBtnClicked);
     //收藏，相册使用
-    connect(m_clBT, &DIconButton::clicked, this, &BottomToolbar::onclBTClicked);
+    connect(m_clBT, &DIconButton::clicked, this, &LibBottomToolbar::onclBTClicked);
     //向左旋转
-    connect(m_rotateLBtn, &DIconButton::clicked, this, &BottomToolbar::onRotateLBtnClicked);
+    connect(m_rotateLBtn, &DIconButton::clicked, this, &LibBottomToolbar::onRotateLBtnClicked);
     //向右旋转
-    connect(m_rotateRBtn, &DIconButton::clicked, this, &BottomToolbar::onRotateRBtnClicked);
+    connect(m_rotateRBtn, &DIconButton::clicked, this, &LibBottomToolbar::onRotateRBtnClicked);
     //缩略图列表，单机打开图片
-    connect(m_imgListWidget, &MyImageListWidget::openImg, this, &BottomToolbar::openImg, Qt::QueuedConnection);
-    connect(m_imgListWidget, &MyImageListWidget::openImg, this, &BottomToolbar::slotOpenImage);
+    connect(m_imgListWidget, &MyImageListWidget::openImg, this, &LibBottomToolbar::openImg, Qt::QueuedConnection);
+    connect(m_imgListWidget, &MyImageListWidget::openImg, this, &LibBottomToolbar::slotOpenImage);
     //删除
-    connect(m_trashBtn, &DIconButton::clicked, this, &BottomToolbar::onTrashBtnClicked);
+    connect(m_trashBtn, &DIconButton::clicked, this, &LibBottomToolbar::onTrashBtnClicked);
     //ocr
-    connect(m_ocrBtn, &DIconButton::clicked, this, &BottomToolbar::sigOcr);
+    connect(m_ocrBtn, &DIconButton::clicked, this, &LibBottomToolbar::sigOcr);
 }
 
-void BottomToolbar::setButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
+void LibBottomToolbar::setButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
 {
     m_btnDisplaySwitch.set(id, !notVisible);
 
@@ -778,7 +778,7 @@ void BottomToolbar::setButtonAlawysNotVisible(imageViewerSpace::ButtonType id, b
     }
 }
 
-void BottomToolbar::setButtonVisible(imageViewerSpace::ButtonType id, bool visible)
+void LibBottomToolbar::setButtonVisible(imageViewerSpace::ButtonType id, bool visible)
 {
     auto btn = getBottomtoolbarButton(id);
     if (btn != nullptr) {

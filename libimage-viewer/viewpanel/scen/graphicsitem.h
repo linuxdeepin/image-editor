@@ -25,11 +25,11 @@
 #include <QPointer>
 #include <QMovie>
 class QMovie;
-class GraphicsMovieItem : public QGraphicsPixmapItem, QObject
+class LibGraphicsMovieItem : public QGraphicsPixmapItem, QObject
 {
 public:
-    explicit GraphicsMovieItem(const QString &fileName, const QString &suffix = NULL, QGraphicsItem *parent = 0);
-    ~GraphicsMovieItem();
+    explicit LibGraphicsMovieItem(const QString &fileName, const QString &suffix = NULL, QGraphicsItem *parent = 0);
+    ~LibGraphicsMovieItem();
     bool isValid() const;
     void start();
     void stop();
@@ -38,11 +38,11 @@ private:
     QPointer<QMovie> m_movie;
 };
 
-class GraphicsPixmapItem : public QGraphicsPixmapItem
+class LibGraphicsPixmapItem : public QGraphicsPixmapItem
 {
 public:
-    explicit GraphicsPixmapItem(const QPixmap &pixmap);
-    ~GraphicsPixmapItem();
+    explicit LibGraphicsPixmapItem(const QPixmap &pixmap);
+    ~LibGraphicsPixmapItem();
 
     void setPixmap(const QPixmap &pixmap);
 

@@ -96,12 +96,12 @@ static int maxTitleWidth()
     int maxWidth = 0;
     for (const MetaData *i = MetaDataBasics; !i->key.isEmpty(); ++i) {
         maxWidth = qMax(maxWidth + 1,
-                        utils::base::stringWidth(
+                        Libutils::base::stringWidth(
                             DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
     }
     for (const MetaData *i = MetaDataDetails; !i->key.isEmpty(); ++i) {
         maxWidth = qMax(maxWidth + 1,
-                        utils::base::stringWidth(
+                        Libutils::base::stringWidth(
                             DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
     }
 
@@ -159,7 +159,7 @@ protected:
 
 #include "imageinfowidget.moc"
 
-ImageInfoWidget::ImageInfoWidget(const QString &darkStyle, const QString &lightStyle,
+LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &lightStyle,
                                  QWidget *parent)
     : QFrame(parent)
     , m_maxTitleWidth(maxTitleWidth())
@@ -262,7 +262,7 @@ ImageInfoWidget::ImageInfoWidget(const QString &darkStyle, const QString &lightS
 #endif
 }
 
-void ImageInfoWidget::setImagePath(const QString path)
+void LibImageInfoWidget::setImagePath(const QString path)
 {
     if (path == m_path)
         return;
@@ -321,17 +321,17 @@ void ImageInfoWidget::setImagePath(const QString path)
     layout->addStretch(1);
 }
 
-void ImageInfoWidget::resizeEvent(QResizeEvent *e)
+void LibImageInfoWidget::resizeEvent(QResizeEvent *e)
 {
     DWidget::resizeEvent(e);
 }
 
-void ImageInfoWidget::timerEvent(QTimerEvent *e)
+void LibImageInfoWidget::timerEvent(QTimerEvent *e)
 {
     QWidget::timerEvent(e);
 }
 //LMH0609解决31498 【看图】【5.6.3.9】【sp2】更改字体大小后，图片信息窗口文字布局展示异常
-void ImageInfoWidget::paintEvent(QPaintEvent *event)
+void LibImageInfoWidget::paintEvent(QPaintEvent *event)
 {
     QFont font;
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
@@ -344,7 +344,7 @@ void ImageInfoWidget::paintEvent(QPaintEvent *event)
     QWidget::paintEvent(event);
 }
 
-void ImageInfoWidget::clearLayout(QLayout *layout)
+void LibImageInfoWidget::clearLayout(QLayout *layout)
 {
     QFormLayout *fl = static_cast<QFormLayout *>(layout);
     if (fl) {
@@ -369,15 +369,15 @@ void ImageInfoWidget::clearLayout(QLayout *layout)
 //{
 //    return QSize(m_maxContentWidth, height());
 //}
-const QString ImageInfoWidget::trLabel(const char *str)
+const QString LibImageInfoWidget::trLabel(const char *str)
 {
     return qApp->translate("MetadataName", str);
 }
 
-void ImageInfoWidget::updateInfo()
+void LibImageInfoWidget::updateInfo()
 {
-    using namespace utils::image;
-    using namespace utils::base;
+    using namespace Libutils::image;
+    using namespace Libutils::base;
     auto mds = getAllMetaData(m_path);
     // Minus layout margins
     //    m_maxFieldWidth = width() - m_maxTitleWidth - 20*2;
@@ -396,13 +396,13 @@ void ImageInfoWidget::updateInfo()
     updateDetailsInfo(mds, CNflag);
 }
 
-void ImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, bool CNflag)
+void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, bool CNflag)
 {
-    using namespace utils::image;
-    using namespace utils::base;
+    using namespace Libutils::image;
+    using namespace Libutils::base;
     clearLayout(m_exifLayout_base);
 
-    auto info = CommonService::instance()->getImgInfoByPath(m_path);
+    auto info = LibCommonService::instance()->getImgInfoByPath(m_path);
 
     QFileInfo fi(m_path);
     QString suffix = fi.suffix();
@@ -473,10 +473,10 @@ void ImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, bool C
     }
 }
 
-void ImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, bool CNflag)
+void LibImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, bool CNflag)
 {
-    using namespace utils::image;
-    using namespace utils::base;
+    using namespace Libutils::image;
+    using namespace Libutils::base;
     clearLayout(m_exifLayout_details);
     for (MetaData *i = MetaDataDetails; !i->key.isEmpty(); i++) {
         QString value = infos.value(i->key);
@@ -515,7 +515,7 @@ void ImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, boo
     }
 }
 
-QList<DDrawer *> ImageInfoWidget::addExpandWidget(const QStringList &titleList)
+QList<DDrawer *> LibImageInfoWidget::addExpandWidget(const QStringList &titleList)
 {
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->layout());
     QList<DDrawer *> group;
@@ -530,7 +530,7 @@ QList<DDrawer *> ImageInfoWidget::addExpandWidget(const QStringList &titleList)
 
     return group;
 }
-void ImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
+void LibImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
 {
     expand->setFixedHeight(ArrowLineExpand_HIGHT);
     QMargins cm = layout->contentsMargins();
@@ -562,7 +562,7 @@ void ImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
 //    }
 //}
 
-int ImageInfoWidget::contentHeight() const
+int LibImageInfoWidget::contentHeight() const
 {
     int expandsHeight = ArrowLineExpand_SPACING;
     foreach (const DDrawer *expand, m_expandGroup) {

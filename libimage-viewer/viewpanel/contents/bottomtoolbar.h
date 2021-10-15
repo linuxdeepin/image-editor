@@ -50,11 +50,11 @@ class ElidedLabel;
 class QAbstractItemModel;
 //class DImageButton;
 class ImageButton;
-class ImgViewListView;
+class LibImgViewListView;
 class ImageItem;
 class MyImageListWidget;
 
-class BottomToolbar : public DFloatingWidget
+class LibBottomToolbar : public DFloatingWidget
 {
     Q_OBJECT
 public:
@@ -68,8 +68,8 @@ public:
 //        ImageDataSt data;
     };
 //    explicit TTBContent(bool inDB, DBImgInfoList m_infos, QWidget *parent = 0);
-    explicit BottomToolbar(QWidget *parent = nullptr);
-    ~BottomToolbar() override;
+    explicit LibBottomToolbar(QWidget *parent = nullptr);
+    ~LibBottomToolbar() override;
 
     void initUI();
     void initConnection();

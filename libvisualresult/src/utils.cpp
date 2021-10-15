@@ -8,9 +8,9 @@
 
 using namespace std;
 
-map_lut utils::m_map_lut;
+map_lut Libutils::m_map_lut;
 
-lutData* utils::getFilterLut(string filter)
+lutData* Libutils::getFilterLut(string filter)
 {
     if (filter.empty())
         return nullptr;
@@ -24,7 +24,7 @@ lutData* utils::getFilterLut(string filter)
     return nullptr;
 }
 
-void utils::readFilters(const std::string& dir)
+void Libutils::readFilters(const std::string& dir)
 {
     if (dir.empty())
         return;
@@ -82,7 +82,7 @@ void utils::readFilters(const std::string& dir)
     printf("read %d CUBE/dat files...\n", count);
 }
 
-bool utils::readCubeFile(std::string filename, lutData &lut)
+bool Libutils::readCubeFile(std::string filename, lutData &lut)
 {
     lut.clear();
 
@@ -134,7 +134,7 @@ bool utils::readCubeFile(std::string filename, lutData &lut)
     return true;
 }
 
-bool utils::readCubeFileFromDat(string filename, lutData &lut)
+bool Libutils::readCubeFileFromDat(string filename, lutData &lut)
 {
     lut.clear();
 
@@ -172,7 +172,7 @@ bool utils::readCubeFileFromDat(string filename, lutData &lut)
 }
 
 //按字符“delimit”分割字符串
-void utils::split(string &str, string delimit, vector<string> &result)
+void Libutils::split(string &str, string delimit, vector<string> &result)
 {
     size_t pos = str.find(delimit);
     str += delimit;//将分隔符加入到最后一个位置，方便分割最后一位

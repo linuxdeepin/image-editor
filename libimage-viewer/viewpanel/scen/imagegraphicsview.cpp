@@ -87,7 +87,7 @@ QVariantList cachePixmap(const QString &path)
     QSize size;
     Q_UNUSED(size);
 //    UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, size, errMsg);
-    UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg);
+    LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg);
     QPixmap p = QPixmap::fromImage(tImg);
     if (QFileInfo(path).exists() && p.isNull()) {
         //判定为损坏图片
@@ -100,7 +100,7 @@ QVariantList cachePixmap(const QString &path)
 }
 
 }  // namespace
-ImageGraphicsView::ImageGraphicsView(QWidget *parent)
+LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     : QGraphicsView(parent)
     , m_renderer(Native)
     , m_pool(new QThreadPool(this))
@@ -130,25 +130,25 @@ ImageGraphicsView::ImageGraphicsView(QWidget *parent)
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
 
-    connect(&m_watcher, &QFutureWatcherBase::finished, this, &ImageGraphicsView::onCacheFinish);
+    connect(&m_watcher, &QFutureWatcherBase::finished, this, &LibImageGraphicsView::onCacheFinish);
 //    connect(dApp->viewerTheme, &ViewerThemeManager::viewerThemeChanged, this, &ImageView::onThemeChanged);
     m_pool->setMaxThreadCount(1);
     m_loadTimer = new QTimer(this);
     m_loadTimer->setSingleShot(true);
     m_loadTimer->setInterval(300);
 
-    connect(m_loadTimer, &QTimer::timeout, this, &ImageGraphicsView::onLoadTimerTimeout);
-    QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &ImageGraphicsView::onThemeTypeChanged);
+    connect(m_loadTimer, &QTimer::timeout, this, &LibImageGraphicsView::onLoadTimerTimeout);
+    QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &LibImageGraphicsView::onThemeTypeChanged);
     //初始化主题
     onThemeTypeChanged();
     m_imgFileWatcher = new QFileSystemWatcher(this);
-    connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &ImageGraphicsView::onImgFileChanged);
+    connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
     m_isChangedTimer = new QTimer(this);
-    QObject::connect(m_isChangedTimer, &QTimer::timeout, this, &ImageGraphicsView::onIsChangedTimerTimeout);
+    QObject::connect(m_isChangedTimer, &QTimer::timeout, this, &LibImageGraphicsView::onIsChangedTimerTimeout);
 
     //让默认的快捷键失效，默认会滑动窗口
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this), &QShortcut::activated, this, &ImageGraphicsView::slotsUp);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this), &QShortcut::activated, this, &ImageGraphicsView::slotsDown);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsUp);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsDown);
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left), this);
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right), this);
 
@@ -164,7 +164,7 @@ ImageGraphicsView::ImageGraphicsView(QWidget *parent)
 
 }
 
-ImageGraphicsView::~ImageGraphicsView()
+LibImageGraphicsView::~LibImageGraphicsView()
 {
     if (m_imgFileWatcher) {
 //        m_imgFileWatcher->clear();
@@ -177,7 +177,7 @@ ImageGraphicsView::~ImageGraphicsView()
     slotRotatePixCurrent();
 }
 
-void ImageGraphicsView::clear()
+void LibImageGraphicsView::clear()
 {
     if (m_pixmapItem != nullptr) {
         delete m_pixmapItem;
@@ -187,7 +187,7 @@ void ImageGraphicsView::clear()
     scene()->clear();
 }
 
-void ImageGraphicsView::setImage(const QString &path, const QImage &image)
+void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
     //默认多页图的按钮显示为false
     if (m_morePicFloatWidget) {
@@ -201,7 +201,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
     //重新生成数据缓存
 //    ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(path), 1, true);
     //检测数据缓存,如果存在,则使用缓存
-    imageViewerSpace::ItemInfo info = CommonService::instance()->getImgInfoByPath(path);
+    imageViewerSpace::ItemInfo info = LibCommonService::instance()->getImgInfoByPath(path);
     m_bRoate = ImageEngine::instance()->isRotatable(path); //是否可旋转
     //如果不可写则不可旋转
     if (m_bRoate && !QFileInfo(path).isWritable()) {
@@ -219,13 +219,13 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
     QString strfixL = QFileInfo(path).suffix().toUpper();
     QGraphicsScene *s = scene();
     QFileInfo fi(path);
-    QStringList fList = UnionImage_NameSpace::supportMovieFormat(); //"gif","mng"
+    QStringList fList = LibUnionImage_NameSpace::supportMovieFormat(); //"gif","mng"
     //QMovie can't read frameCount of "mng" correctly,so change
     //the judge way to solve the problem
 
     imageViewerSpace::ImageType Type = info.imageType;
     if (Type == imageViewerSpace::ImageTypeBlank) {
-        Type = UnionImage_NameSpace::getImageType(path);
+        Type = LibUnionImage_NameSpace::getImageType(path);
     }
     //ImageTypeDynamic
     if (Type == imageViewerSpace::ImageTypeDynamic) {
@@ -239,7 +239,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
         }
         s->clear();
         resetTransform();
-        m_movieItem = new GraphicsMovieItem(path, strfixL);
+        m_movieItem = new LibGraphicsMovieItem(path, strfixL);
         //        m_movieItem->start();
         // Make sure item show in center of view after reload
         setSceneRect(m_movieItem->boundingRect());
@@ -260,7 +260,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
 
         QSvgRenderer *svgRenderer = new QSvgRenderer;
         svgRenderer->load(path);
-        m_imgSvgItem = new ImageSvgItem();
+        m_imgSvgItem = new LibImageSvgItem();
         m_imgSvgItem->setSharedRenderer(svgRenderer);
         //不会出现锯齿
         m_imgSvgItem->setCacheMode(QGraphicsItem::NoCache);
@@ -334,7 +334,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
             if (wScale < wWindow && hScale < hWindow) {
                 pix.setDevicePixelRatio(devicePixelRatioF());
             }
-            m_pixmapItem = new GraphicsPixmapItem(pix);
+            m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
             // Make sure item show in center of view after reload
             m_blurEffect = new QGraphicsBlurEffect;
@@ -352,7 +352,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
             //当传入的image有效时，直接刷入图像，不再重复读取
             QPixmap pix = QPixmap::fromImage(image);
             pix.setDevicePixelRatio(devicePixelRatioF());
-            m_pixmapItem = new GraphicsPixmapItem(pix);
+            m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
             setSceneRect(m_pixmapItem->boundingRect());
             scene()->clear();
@@ -396,7 +396,7 @@ void ImageGraphicsView::setImage(const QString &path, const QImage &image)
     m_firstset = true;
 }
 
-void ImageGraphicsView::setScaleValue(qreal v)
+void LibImageGraphicsView::setScaleValue(qreal v)
 {
 
     m_scal *= v;
@@ -455,7 +455,7 @@ void ImageGraphicsView::setScaleValue(qreal v)
     titleBarControl();
 }
 
-void ImageGraphicsView::autoFit()
+void LibImageGraphicsView::autoFit()
 {
     //确认场景加载出来后，才能调用场景内的item
 //    if (!scene()->isActive())
@@ -472,7 +472,7 @@ void ImageGraphicsView::autoFit()
     }
 }
 
-const QImage ImageGraphicsView::image()
+const QImage LibImageGraphicsView::image()
 {
     QImage img;
     if (m_movieItem) {           // bit-map
@@ -503,7 +503,7 @@ const QImage ImageGraphicsView::image()
     return img;
 }
 
-void ImageGraphicsView::fitWindow()
+void LibImageGraphicsView::fitWindow()
 {
     qreal wrs = windowRelativeScale();
     resetTransform();
@@ -528,7 +528,7 @@ void ImageGraphicsView::fitWindow()
     titleBarControl();
 }
 
-void ImageGraphicsView::fitImage()
+void LibImageGraphicsView::fitImage()
 {
     qreal wrs = windowRelativeScale();
     resetTransform();
@@ -549,11 +549,11 @@ void ImageGraphicsView::fitImage()
     titleBarControl();
 }
 
-void ImageGraphicsView::rotateClockWise()
+void LibImageGraphicsView::rotateClockWise()
 {
     QString errMsg;
     QImage rotateResult;
-    if (!UnionImage_NameSpace::rotateImageFIleWithImage(90, rotateResult, m_path, errMsg)) {
+    if (!LibUnionImage_NameSpace::rotateImageFIleWithImage(90, rotateResult, m_path, errMsg)) {
         qDebug() << errMsg;
         return;
     }
@@ -561,11 +561,11 @@ void ImageGraphicsView::rotateClockWise()
     setImage(m_path, rotateResult);
 }
 
-void ImageGraphicsView::rotateCounterclockwise()
+void LibImageGraphicsView::rotateCounterclockwise()
 {
     QString errMsg;
     QImage rotateResult;
-    if (!UnionImage_NameSpace::rotateImageFIleWithImage(-90, rotateResult, m_path, errMsg)) {
+    if (!LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, rotateResult, m_path, errMsg)) {
         qDebug() << errMsg;
         return;
     }
@@ -573,20 +573,20 @@ void ImageGraphicsView::rotateCounterclockwise()
     setImage(m_path, rotateResult);
 }
 
-void ImageGraphicsView::centerOn(qreal x, qreal y)
+void LibImageGraphicsView::centerOn(qreal x, qreal y)
 {
     QGraphicsView::centerOn(x, y);
     emit transformChanged();
 }
 
 
-qreal ImageGraphicsView::imageRelativeScale() const
+qreal LibImageGraphicsView::imageRelativeScale() const
 {
     // vertical scale factor are equal to the horizontal one
     return transform().m11();
 }
 
-qreal ImageGraphicsView::windowRelativeScale() const
+qreal LibImageGraphicsView::windowRelativeScale() const
 {
     QRectF bf = sceneRect();
     if (1.0 * width() / height() > 1.0 * bf.width() / bf.height()) {
@@ -596,27 +596,27 @@ qreal ImageGraphicsView::windowRelativeScale() const
     }
 }
 
-const QString ImageGraphicsView::path() const
+const QString LibImageGraphicsView::path() const
 {
     return m_path;
 }
 
-QPoint ImageGraphicsView::mapToImage(const QPoint &p) const
+QPoint LibImageGraphicsView::mapToImage(const QPoint &p) const
 {
     return viewportTransform().inverted().map(p);
 }
 
-QRect ImageGraphicsView::mapToImage(const QRect &r) const
+QRect LibImageGraphicsView::mapToImage(const QRect &r) const
 {
     return viewportTransform().inverted().mapRect(r);
 }
 
-QRect ImageGraphicsView::visibleImageRect() const
+QRect LibImageGraphicsView::visibleImageRect() const
 {
     return mapToImage(rect()) & QRect(0, 0, static_cast<int>(sceneRect().width()), static_cast<int>(sceneRect().height()));
 }
 
-bool ImageGraphicsView::isWholeImageVisible() const
+bool LibImageGraphicsView::isWholeImageVisible() const
 {
     const QRect &r = visibleImageRect();
     const QRectF &sr = sceneRect();
@@ -625,30 +625,30 @@ bool ImageGraphicsView::isWholeImageVisible() const
     return r.width() >= (sr.width() - 1) && r.height() >= (sr.height() - 1);
 }
 
-bool ImageGraphicsView::isFitImage() const
+bool LibImageGraphicsView::isFitImage() const
 {
     return m_isFitImage;
 }
 
-bool ImageGraphicsView::isFitWindow() const
+bool LibImageGraphicsView::isFitWindow() const
 {
     return m_isFitWindow;
 }
 
-void ImageGraphicsView::initMorePicWidget()
+void LibImageGraphicsView::initMorePicWidget()
 {
     m_morePicFloatWidget = new MorePicFloatWidget(this);
     m_morePicFloatWidget->initUI();
 
-    connect(m_morePicFloatWidget->getButtonUp(), &DIconButton::clicked, this, &ImageGraphicsView::slotsUp);
-    connect(m_morePicFloatWidget->getButtonDown(), &DIconButton::clicked, this, &ImageGraphicsView::slotsDown);
+    connect(m_morePicFloatWidget->getButtonUp(), &DIconButton::clicked, this, &LibImageGraphicsView::slotsUp);
+    connect(m_morePicFloatWidget->getButtonDown(), &DIconButton::clicked, this, &LibImageGraphicsView::slotsDown);
 
     m_morePicFloatWidget->setFixedWidth(70);
     m_morePicFloatWidget->setFixedHeight(140);
     m_morePicFloatWidget->show();
 }
 
-void ImageGraphicsView::titleBarControl()
+void LibImageGraphicsView::titleBarControl()
 {
     qreal realHeight = 0.0;
     //简化image()的使用
@@ -667,19 +667,19 @@ void ImageGraphicsView::titleBarControl()
     }
 }
 
-void ImageGraphicsView::slotSavePic()
+void LibImageGraphicsView::slotSavePic()
 {
     //保存旋转的图片
     slotRotatePixCurrent();
 }
 
-void ImageGraphicsView::onImgFileChanged(const QString &ddfFile)
+void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
 {
     Q_UNUSED(ddfFile)
     m_isChangedTimer->start(200);
 }
 
-void ImageGraphicsView::onLoadTimerTimeout()
+void LibImageGraphicsView::onLoadTimerTimeout()
 {
     QFuture<QVariantList> f = QtConcurrent::run(m_pool, cachePixmap, m_loadPath);
     if (m_watcher.isRunning()) {
@@ -690,21 +690,21 @@ void ImageGraphicsView::onLoadTimerTimeout()
     emit hideNavigation();
 
     //重新刷新缓存
-    ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(m_loadPath), 1, true);
+    ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(m_loadPath), 1, true);
 }
 
-void ImageGraphicsView::onThemeTypeChanged()
+void LibImageGraphicsView::onThemeTypeChanged()
 {
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
     if (themeType == DGuiApplicationHelper::DarkType) {
-        m_backgroundColor = utils::common::DARK_BACKGROUND_COLOR;
+        m_backgroundColor = Libutils::common::DARK_BACKGROUND_COLOR;
     } else {
-        m_backgroundColor = utils::common::LIGHT_BACKGROUND_COLOR;
+        m_backgroundColor = Libutils::common::LIGHT_BACKGROUND_COLOR;
     }
     update();
 }
 
-void ImageGraphicsView::onIsChangedTimerTimeout()
+void LibImageGraphicsView::onIsChangedTimerTimeout()
 {
     QFileInfo file(m_path);
     if (file.exists()) {
@@ -717,7 +717,7 @@ void ImageGraphicsView::onIsChangedTimerTimeout()
     }
 }
 
-void ImageGraphicsView::slotsUp()
+void LibImageGraphicsView::slotsUp()
 {
     if (m_morePicFloatWidget) {
         if (m_morePicFloatWidget->getButtonUp()) {
@@ -755,7 +755,7 @@ void ImageGraphicsView::slotsUp()
             resetTransform();
             QPixmap pixmap = QPixmap::fromImage(m_imageReader->read());
             pixmap.setDevicePixelRatio(devicePixelRatioF());
-            m_pixmapItem = new GraphicsPixmapItem(pixmap);
+            m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
             scene()->addItem(m_pixmapItem);
             QRectF rect = m_pixmapItem->boundingRect();
             setSceneRect(rect);
@@ -771,7 +771,7 @@ void ImageGraphicsView::slotsUp()
     }
 }
 
-void ImageGraphicsView::slotsDown()
+void LibImageGraphicsView::slotsDown()
 {
     if (m_morePicFloatWidget) {
         if (m_morePicFloatWidget->getButtonUp()) {
@@ -805,7 +805,7 @@ void ImageGraphicsView::slotsDown()
             resetTransform();
             QPixmap pixmap = QPixmap::fromImage(m_imageReader->read());
             pixmap.setDevicePixelRatio(devicePixelRatioF());
-            m_pixmapItem = new GraphicsPixmapItem(pixmap);
+            m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
             scene()->addItem(m_pixmapItem);
             QRectF rect = m_pixmapItem->boundingRect();
             setSceneRect(rect);
@@ -822,7 +822,7 @@ void ImageGraphicsView::slotsDown()
     }
 }
 
-bool ImageGraphicsView::slotRotatePixmap(int nAngel)
+bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
 {
     if (!m_pixmapItem) return false;
     QPixmap pixmap = m_pixmapItem->pixmap();
@@ -833,7 +833,7 @@ bool ImageGraphicsView::slotRotatePixmap(int nAngel)
     pixmap.setDevicePixelRatio(devicePixelRatioF());
     scene()->clear();
     resetTransform();
-    m_pixmapItem = new GraphicsPixmapItem(pixmap);
+    m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
     // Make sure item show in center of view after reload
     QRectF rect = m_pixmapItem->boundingRect();
@@ -849,22 +849,22 @@ bool ImageGraphicsView::slotRotatePixmap(int nAngel)
     return true;
 }
 
-void ImageGraphicsView::slotRotatePixCurrent()
+void LibImageGraphicsView::slotRotatePixCurrent()
 {
     if (0 != m_rotateAngel) {
         m_rotateAngel =  m_rotateAngel % 360;
         if (0 != m_rotateAngel) {
-            disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &ImageGraphicsView::onImgFileChanged);
-            utils::image::rotate(m_path, m_rotateAngel);
+            disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
+            Libutils::image::rotate(m_path, m_rotateAngel);
             QTimer::singleShot(1000, [ = ] {
-                connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &ImageGraphicsView::onImgFileChanged);
+                connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             });
             m_rotateAngel = 0;
         }
     }
 }
 
-void ImageGraphicsView::mouseDoubleClickEvent(QMouseEvent *e)
+void LibImageGraphicsView::mouseDoubleClickEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton) {
         emit doubleClicked();
@@ -873,7 +873,7 @@ void ImageGraphicsView::mouseDoubleClickEvent(QMouseEvent *e)
     QGraphicsView::mouseDoubleClickEvent(e);
 }
 
-void ImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
+void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseReleaseEvent(e);
 
@@ -903,7 +903,7 @@ void ImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 #endif
 }
 
-void ImageGraphicsView::mousePressEvent(QMouseEvent *e)
+void LibImageGraphicsView::mousePressEvent(QMouseEvent *e)
 {
 #ifdef tablet_PC
     m_press = true;
@@ -919,7 +919,7 @@ void ImageGraphicsView::mousePressEvent(QMouseEvent *e)
     m_startpointx = e->pos().x();
 }
 
-void ImageGraphicsView::mouseMoveEvent(QMouseEvent *e)
+void LibImageGraphicsView::mouseMoveEvent(QMouseEvent *e)
 {
 
     m_press = false;
@@ -935,14 +935,14 @@ void ImageGraphicsView::mouseMoveEvent(QMouseEvent *e)
     emit sigMouseMove();
 }
 
-void ImageGraphicsView::leaveEvent(QEvent *e)
+void LibImageGraphicsView::leaveEvent(QEvent *e)
 {
 //    dApp->getDAppNew()->restoreOverrideCursor();
 
     QGraphicsView::leaveEvent(e);
 }
 
-void ImageGraphicsView::resizeEvent(QResizeEvent *event)
+void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
 {
     qDebug() << "---" << __FUNCTION__ << "---" << event->size();
     //20201027曾在右侧浮动窗口，关于多图片
@@ -955,12 +955,12 @@ void ImageGraphicsView::resizeEvent(QResizeEvent *event)
 //                  height() - 80 - m_toast->height() / 2 - 11);
 }
 
-void ImageGraphicsView::paintEvent(QPaintEvent *event)
+void LibImageGraphicsView::paintEvent(QPaintEvent *event)
 {
     QGraphicsView::paintEvent(event);
 }
 
-void ImageGraphicsView::dragEnterEvent(QDragEnterEvent *e)
+void LibImageGraphicsView::dragEnterEvent(QDragEnterEvent *e)
 {
     const QMimeData *mimeData = e->mimeData();
     if (!pluginUtils::base::checkMimeData(mimeData)) {
@@ -969,7 +969,7 @@ void ImageGraphicsView::dragEnterEvent(QDragEnterEvent *e)
     e->accept();
 }
 
-void ImageGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
+void LibImageGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
 {
 //    QPixmap pm(12, 12);
 //    QPainter pmp(&pm);
@@ -990,7 +990,7 @@ void ImageGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
     painter->restore();
 }
 int static count = 0;
-bool ImageGraphicsView::event(QEvent *event)
+bool LibImageGraphicsView::event(QEvent *event)
 {
     QEvent::Type evType = event->type();
     if (evType == QEvent::TouchBegin || evType == QEvent::TouchUpdate ||
@@ -1043,7 +1043,7 @@ bool ImageGraphicsView::event(QEvent *event)
     return QGraphicsView::event(event);
 }
 
-void ImageGraphicsView::onCacheFinish()
+void LibImageGraphicsView::onCacheFinish()
 {
     QVariantList vl = m_watcher.result();
     if (vl.length() == 2) {
@@ -1075,7 +1075,7 @@ void ImageGraphicsView::onCacheFinish()
 //    update();
 //}
 
-void ImageGraphicsView::scaleAtPoint(QPoint pos, qreal factor)
+void LibImageGraphicsView::scaleAtPoint(QPoint pos, qreal factor)
 {
     // Remember zoom anchor point.
     const QPointF targetPos = pos;
@@ -1095,13 +1095,13 @@ void ImageGraphicsView::scaleAtPoint(QPoint pos, qreal factor)
     centerOn(static_cast<int>(centerScenePos.x()), static_cast<int>(centerScenePos.y()));
 }
 
-void ImageGraphicsView::handleGestureEvent(QGestureEvent *gesture)
+void LibImageGraphicsView::handleGestureEvent(QGestureEvent *gesture)
 {
     if (QGesture *pinch = gesture->gesture(Qt::PinchGesture))
         pinchTriggered(static_cast<QPinchGesture *>(pinch));
 }
 
-void ImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
+void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
 {
     m_maxTouchPoints = 2;
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
@@ -1203,7 +1203,7 @@ void ImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
     }
 }
 
-void ImageGraphicsView::OnFinishPinchAnimal()
+void LibImageGraphicsView::OnFinishPinchAnimal()
 {
     m_rotateflag = true;
     m_bnextflag = true;
@@ -1227,7 +1227,7 @@ void ImageGraphicsView::OnFinishPinchAnimal()
     pixmap.setDevicePixelRatio(devicePixelRatioF());
     scene()->clear();
     resetTransform();
-    m_pixmapItem = new GraphicsPixmapItem(pixmap);
+    m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
     // Make sure item show in center of view after reload
     QRectF rect = m_pixmapItem->boundingRect();
@@ -1246,7 +1246,7 @@ void ImageGraphicsView::OnFinishPinchAnimal()
     qDebug() << m_endvalue;
 }
 
-void ImageGraphicsView::wheelEvent(QWheelEvent *event)
+void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
 {
     QFileInfo file(m_path);
     if (!file.exists()) {

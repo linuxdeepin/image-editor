@@ -20,7 +20,7 @@ public:
 
 public:
     ImageEngine *const q_ptr;
-    ImgOperate *m_worker = nullptr;
+    LibImgOperate *m_worker = nullptr;
 //    QString m_thumbnailSavePath;//缩略图保存路径
     Q_DECLARE_PUBLIC(ImageEngine)
 };
@@ -30,10 +30,10 @@ ImageEnginePrivate::ImageEnginePrivate(ImageEngine *parent): q_ptr(parent)
     Q_Q(ImageEngine);
 
     QThread *workerThread = new QThread(q_ptr);
-    m_worker = new ImgOperate(workerThread);
+    m_worker = new LibImgOperate(workerThread);
     m_worker->moveToThread(workerThread);
     //一张缩略图制作完成，发送到主线程
-    q->connect(m_worker, &ImgOperate::sigOneImgReady, CommonService::instance(), &CommonService::slotSetImgInfoByPath);
+    q->connect(m_worker, &LibImgOperate::sigOneImgReady, LibCommonService::instance(), &LibCommonService::slotSetImgInfoByPath);
     workerThread->start();
 }
 
@@ -76,7 +76,7 @@ void ImageEngine::makeImgThumbnail(QString thumbnailSavePath, QStringList paths,
 //                              , Q_ARG(bool, remake)
 //                             );
     Q_UNUSED(makeCount);
-    ImageDataService::instance()->readThumbnailByPaths(thumbnailSavePath, paths, remake);
+    LibImageDataService::instance()->readThumbnailByPaths(thumbnailSavePath, paths, remake);
 }
 //判断是否图片格式
 bool ImageEngine::isImage(const QString &path)
@@ -101,7 +101,7 @@ bool ImageEngine::isRotatable(const QString &path)
     if (!info.isFile() || !info.exists()) {
         return false;
     } else {
-        return UnionImage_NameSpace::isImageSupportRotate(path);
+        return LibUnionImage_NameSpace::isImageSupportRotate(path);
     }
 }
 //根据文件路径制作md5

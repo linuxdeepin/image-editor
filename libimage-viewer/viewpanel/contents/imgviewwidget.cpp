@@ -56,22 +56,22 @@ MyImageListWidget::MyImageListWidget(QWidget *parent)
     hb->setSpacing(0);
     this->setLayout(hb);
 
-    m_listview = new ImgViewListView(this);
+    m_listview = new LibImgViewListView(this);
     m_listview->setObjectName("ImgViewListView");
 //    hb->addWidget(m_listview);
     m_listview->viewport()->installEventFilter(this);
     //设置一个可以放置的高度
     m_listview->viewport()->setFixedHeight(90);
-    connect(m_listview, &ImgViewListView::clicked, this, &MyImageListWidget::onClicked);
+    connect(m_listview, &LibImgViewListView::clicked, this, &MyImageListWidget::onClicked);
 //    connect(m_listview->selectionModel(), &QItemSelectionModel::selectionChanged,
 //            this, &MyImageListWidget::ONselectionChanged);
 
-    connect(m_listview, &ImgViewListView::openImg, this, &MyImageListWidget::openImg);
+    connect(m_listview, &LibImgViewListView::openImg, this, &MyImageListWidget::openImg);
     connect(m_listview->horizontalScrollBar(), &QScrollBar::valueChanged, this, &MyImageListWidget::onScrollBarValueChanged);
     initAnimation();
 
     //解决释放到程序外,不会动画的问题
-    connect(CommonService::instance(), &CommonService::sigMouseRelease, this, [ = ] {
+    connect(LibCommonService::instance(), &LibCommonService::sigMouseRelease, this, [ = ] {
         qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
         if (currentTime - 100 > m_lastReleaseTime)
         {
@@ -101,7 +101,7 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
         m_preListGeometryLeft = m_listview->geometry().left();
 
         m_listview->update();
-        qDebug() << "------------getCount = " << ImageDataService::instance()->getCount();
+        qDebug() << "------------getCount = " << LibImageDataService::instance()->getCount();
     }
     if (e->type() == QEvent::MouseButtonRelease) {
         if (m_movePoints.size() > 0) {

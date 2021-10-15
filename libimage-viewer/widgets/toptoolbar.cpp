@@ -54,7 +54,7 @@ const QColor DARK_BOTTOM_BORDERCOLOR = QColor(0, 0, 0, 51);
 const QColor LIGHT_BOTTOM_BORDERCOLOR = QColor(0, 0, 0, 26);
 }  // namespace
 
-TopToolbar::TopToolbar(bool manager, QWidget *parent)
+LibTopToolbar::LibTopToolbar(bool manager, QWidget *parent)
     : AbstractTopToolbar(parent)
 {
     m_manager = manager;
@@ -65,7 +65,7 @@ TopToolbar::TopToolbar(bool manager, QWidget *parent)
     initWidgets();
 }
 
-void TopToolbar::setMiddleContent(const QString &path)
+void LibTopToolbar::setMiddleContent(const QString &path)
 {
     //保存当前名称
     m_filename = path;
@@ -77,7 +77,7 @@ void TopToolbar::setMiddleContent(const QString &path)
     m_titletxt->setAccessibleName(a);
 }
 
-void TopToolbar::setTitleBarTransparent(bool a)
+void LibTopToolbar::setTitleBarTransparent(bool a)
 {
     m_viewChange = a;
 
@@ -113,7 +113,7 @@ void TopToolbar::setTitleBarTransparent(bool a)
     }
 }
 
-void TopToolbar::mouseDoubleClickEvent(QMouseEvent *e)
+void LibTopToolbar::mouseDoubleClickEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton) {
         if (window()->isMaximized())
@@ -124,7 +124,7 @@ void TopToolbar::mouseDoubleClickEvent(QMouseEvent *e)
     DBlurEffectWidget::mouseDoubleClickEvent(e);
 }
 
-void TopToolbar::paintEvent(QPaintEvent *e)
+void LibTopToolbar::paintEvent(QPaintEvent *e)
 {
     Q_UNUSED(e);
     QPainter p(this);
@@ -138,7 +138,7 @@ void TopToolbar::paintEvent(QPaintEvent *e)
     p.fillPath(pp, bgColor);
 }
 
-void TopToolbar::resizeEvent(QResizeEvent *event)
+void LibTopToolbar::resizeEvent(QResizeEvent *event)
 {
     //在resize的时候,需要重新计算大小
     if (m_filename != "") {
@@ -151,7 +151,7 @@ void TopToolbar::resizeEvent(QResizeEvent *event)
     DBlurEffectWidget::resizeEvent(event);
 }
 
-void TopToolbar::initWidgets()
+void LibTopToolbar::initWidgets()
 {
     m_layout = new QHBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -203,7 +203,7 @@ void TopToolbar::initWidgets()
 //    connect(dApp->signalM, &SignalManager::updateFileName, this, &TopToolbar::onUpdateFileName);
 }
 
-QString TopToolbar::geteElidedText(QFont font, QString str, int MaxWidth)
+QString LibTopToolbar::geteElidedText(QFont font, QString str, int MaxWidth)
 {
     QFontMetrics fontWidth(font);
     int width = fontWidth.horizontalAdvance(str);
@@ -236,7 +236,7 @@ QString TopToolbar::geteElidedText(QFont font, QString str, int MaxWidth)
 //    });
 }*/
 
-void TopToolbar::initMenu()
+void LibTopToolbar::initMenu()
 {
     m_menu = new DMenu(this);
     m_menu->addSeparator();

@@ -295,7 +295,7 @@ TEST_F(gtestview, Widgets)
     //top tool bar
     {
         DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
-        TopToolbar toolBar(false, nullptr);
+        LibTopToolbar toolBar(false, nullptr);
         toolBar.setTitleBarTransparent(false);
 
         toolBar.show();
@@ -312,10 +312,10 @@ TEST_F(gtestview, Widgets)
 }
 
 //view panel
-TEST_F(gtestview, ViewPanel)
+TEST_F(gtestview, LibViewPanel)
 {
     //初始化
-    ViewPanel panel;
+    LibViewPanel panel;
     panel.loadImage(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                       QApplication::applicationDirPath() + "/tif.tif",
                                                                       QApplication::applicationDirPath() + "/jpg.jpg",
@@ -456,24 +456,24 @@ TEST_F(gtestview, ViewPanel)
     QTest::qWait(500);
 }
 
-TEST_F(gtestview, ImageDataService)
+TEST_F(gtestview, LibImageDataService)
 {
     auto testPath = QApplication::applicationDirPath() + "/jpg.jpg";
-    ImageDataService::instance()->imageIsLoaded(testPath);
-    ImageDataService::instance()->addImage(testPath, ImageDataService::instance()->getThumnailImageByPath(testPath));
-    ImageDataService::instance()->getMovieDurationStrByPath(testPath);
-    ImageDataService::instance()->getVisualIndex();
-    ImageDataService::instance()->getCount();
-    ImageDataService::instance()->setVisualIndex(0);
-    ImageDataService::instance()->addMovieDurationStr("", "");
-    ImageDataService::instance()->deleteLater();
+    LibImageDataService::instance()->imageIsLoaded(testPath);
+    LibImageDataService::instance()->addImage(testPath, LibImageDataService::instance()->getThumnailImageByPath(testPath));
+    LibImageDataService::instance()->getMovieDurationStrByPath(testPath);
+    LibImageDataService::instance()->getVisualIndex();
+    LibImageDataService::instance()->getCount();
+    LibImageDataService::instance()->setVisualIndex(0);
+    LibImageDataService::instance()->addMovieDurationStr("", "");
+    LibImageDataService::instance()->deleteLater();
 
     QTest::qWait(500);
 }
 
-TEST_F(gtestview, BottomToolbar)
+TEST_F(gtestview, LibBottomToolbar)
 {
-    BottomToolbar toolBar;
+    LibBottomToolbar toolBar;
     toolBar.setAllFile(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                          QApplication::applicationDirPath() + "/tif.tif",
                                                                          QApplication::applicationDirPath() + "/jpg.jpg",
@@ -493,40 +493,40 @@ TEST_F(gtestview, BottomToolbar)
 TEST_F(gtestview, UnionImage)
 {
     //base utils
-    utils::base::hash("12345");
-    utils::base::mountDeviceExist("/media/uos/");
-    utils::base::mountDeviceExist("/run/media/uos/");
-    utils::base::onMountDevice("12345");
-    utils::base::showInFileManager(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::base::stringToDateTime("1970-01-01 00:00:00");
-    utils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), true);
-    utils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), false);
+    Libutils::base::hash("12345");
+    Libutils::base::mountDeviceExist("/media/uos/");
+    Libutils::base::mountDeviceExist("/run/media/uos/");
+    Libutils::base::onMountDevice("12345");
+    Libutils::base::showInFileManager(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::base::stringToDateTime("1970-01-01 00:00:00");
+    Libutils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), true);
+    Libutils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), false);
 
     //image utils
-    utils::image::scaleImage(QApplication::applicationDirPath() + "/f827t3r9qwheo.icns");
-    utils::image::scaleImage(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::getCreateDateTime(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::imageSupportSave(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::scaleImage(QApplication::applicationDirPath() + "/f827t3r9qwheo.icns");
+    Libutils::image::scaleImage(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getCreateDateTime(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::imageSupportSave(QApplication::applicationDirPath() + "/jpg.jpg");
 
-    auto pix = utils::image::cachePixmap(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::cutSquareImage(pix);
-    utils::image::cutSquareImage(pix, {200, 200});
+    auto pix = Libutils::image::cachePixmap(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::cutSquareImage(pix);
+    Libutils::image::cutSquareImage(pix, {200, 200});
 
-    utils::image::getImagesInfo(QApplication::applicationDirPath(), false);
-    utils::image::getImagesInfo(QApplication::applicationDirPath(), true);
-    utils::image::getOrientation(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::getRotatedImage(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getImagesInfo(QApplication::applicationDirPath(), false);
+    Libutils::image::getImagesInfo(QApplication::applicationDirPath(), true);
+    Libutils::image::getOrientation(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getRotatedImage(QApplication::applicationDirPath() + "/jpg.jpg");
 
-    utils::image::generateThumbnail(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::generateThumbnail(QApplication::applicationDirPath() + "/errorPic.icns");
-    utils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", true);
-    utils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", false);
+    Libutils::image::generateThumbnail(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::generateThumbnail(QApplication::applicationDirPath() + "/errorPic.icns");
+    Libutils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", true);
+    Libutils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", false);
 
-    utils::image::isCanRemove(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::isCanRemove("ngw8uhrt8owjfpowsj");
+    Libutils::image::isCanRemove(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::isCanRemove("ngw8uhrt8owjfpowsj");
 
     //Img Operate
-    ImgOperate worker;
+    LibImgOperate worker;
     worker.slotMakeImgThumbnail(QApplication::applicationDirPath(), {QApplication::applicationDirPath() + "/jpg.jpg"}, 1, true);
     worker.slotMakeImgThumbnail(QApplication::applicationDirPath(), {QApplication::applicationDirPath() + "/jpg.jpg"}, 1, false);
 
@@ -544,28 +544,28 @@ TEST_F(gtestview, UnionImage)
     DetectImageFormat(QApplication::applicationDirPath() + "/tga.tga");
 
     //union image detial
-    UnionImage_NameSpace::supportStaticFormat();
-    UnionImage_NameSpace::supportMovieFormat();
+    LibUnionImage_NameSpace::supportStaticFormat();
+    LibUnionImage_NameSpace::supportMovieFormat();
     QImage res;
-    UnionImage_NameSpace::creatNewImage(res);
-    UnionImage_NameSpace::detectImageFormat(QApplication::applicationDirPath() + "/jpg.jpg");
-    ASSERT_EQ(UnionImage_NameSpace::isNoneQImage(QImage()), true);
-    UnionImage_NameSpace::rotateImage(90, res);
-    UnionImage_NameSpace::rotateImage(80, res);
+    LibUnionImage_NameSpace::creatNewImage(res);
+    LibUnionImage_NameSpace::detectImageFormat(QApplication::applicationDirPath() + "/jpg.jpg");
+    ASSERT_EQ(LibUnionImage_NameSpace::isNoneQImage(QImage()), true);
+    LibUnionImage_NameSpace::rotateImage(90, res);
+    LibUnionImage_NameSpace::rotateImage(80, res);
     res = QImage(QApplication::applicationDirPath() + "/jpg.jpg");
-    UnionImage_NameSpace::rotateImage(90, res);
+    LibUnionImage_NameSpace::rotateImage(90, res);
     QString err;
-    UnionImage_NameSpace::rotateImageFIle(80, "", err);
-    UnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/dds.dds", err);
-    UnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/dds.dds", err);
-    UnionImage_NameSpace::unionImageVersion();
-    UnionImage_NameSpace::rotateImageFIleWithImage(-80, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
-    UnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/svg.svg", res, err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(90, res, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/tga.tga", res, err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/tga.tga", err);
+    LibUnionImage_NameSpace::rotateImageFIle(80, "", err);
+    LibUnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/dds.dds", err);
+    LibUnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/dds.dds", err);
+    LibUnionImage_NameSpace::unionImageVersion();
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-80, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
+    LibUnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/svg.svg", res, err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(90, res, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/tga.tga", res, err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/tga.tga", err);
 }

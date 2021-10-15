@@ -50,7 +50,7 @@ class QAbstractItemModel;
 class ImageButton;
 class MyImageListWidget;
 class ImageItem;
-class ImgViewListView;
+class LibImgViewListView;
 
 class MyImageListWidget : public QWidget
 {
@@ -120,7 +120,7 @@ public slots:
     void moveCenterWidget();
 
 private:
-    ImgViewListView *m_listview = nullptr;
+    LibImgViewListView *m_listview = nullptr;
     QPoint m_pressPoint;//鼠标按下位置
     QPoint m_movePoint;//鼠标实时移动位置
     QPoint m_moveViewPoint;//实时

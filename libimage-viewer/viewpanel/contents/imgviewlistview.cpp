@@ -38,11 +38,11 @@
 #include "service/commonservice.h"
 #include "accessibility/ac-desktop-define.h"
 
-ImgViewListView::ImgViewListView(QWidget *parent)
+LibImgViewListView::LibImgViewListView(QWidget *parent)
     :  DListView(parent)
 {
     m_model = new QStandardItemModel(this);
-    m_delegate = new ImgViewDelegate(this);
+    m_delegate = new LibImgViewDelegate(this);
     setResizeMode(QListView::Adjust);
     setViewMode(QListView::IconMode);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -66,15 +66,15 @@ ImgViewListView::ImgViewListView(QWidget *parent)
 
 //    setMouseTracking(true);
 //    this->viewport()->setMouseTracking(true);
-    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &ImgViewListView::slotOneImgReady);
+    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibImgViewListView::slotOneImgReady);
 }
 
-ImgViewListView::~ImgViewListView()
+LibImgViewListView::~LibImgViewListView()
 {
     qDebug() << "~-------------------ImgViewListView";
 }
 
-void ImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QString path)
+void LibImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QString path)
 {
     qDebug() << "---" << __FUNCTION__ << "---path = " << path;
     m_model->clear();
@@ -104,7 +104,7 @@ void ImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QS
     this->setFixedSize((2 * (count + 1) + ITEM_NORMAL_WIDTH * count + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH), 80);
 }
 
-int ImgViewListView::getSelectIndexByPath(QString path)
+int LibImgViewListView::getSelectIndexByPath(QString path)
 {
     int index = -1;
     for (int i = 0; i < m_model->rowCount(); i++) {
@@ -117,14 +117,14 @@ int ImgViewListView::getSelectIndexByPath(QString path)
     return index;
 }
 
-void ImgViewListView::setSelectCenter()
+void LibImgViewListView::setSelectCenter()
 {
     QModelIndex itemIndex = m_model->index(m_currentRow, 0);
     QRect rect = this->visualRect(itemIndex);
     this->horizontalScrollBar()->setValue(rect.x());
 }
 
-void ImgViewListView::openNext()
+void LibImgViewListView::openNext()
 {
     if (m_currentRow == (m_model->rowCount() - 1)) {
         return;
@@ -144,13 +144,13 @@ void ImgViewListView::openNext()
     if (currentIndex.isValid()) {
         //重置前一个选中项的宽高
         m_model->setData(currentIndex,
-                         QVariant(QSize(ImgViewListView::ITEM_NORMAL_WIDTH, ImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
+                         QVariant(QSize(LibImgViewListView::ITEM_NORMAL_WIDTH, LibImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
     }
 
     if (nextIndex.isValid()) {
         //重置新选中项的宽高
         m_model->setData(nextIndex,
-                         QVariant(QSize(ImgViewListView::ITEM_CURRENT_WH, ImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
+                         QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
 
     }
     doItemsLayout();
@@ -165,7 +165,7 @@ void ImgViewListView::openNext()
     emit openImg(m_currentRow, m_currentPath);
 }
 
-void ImgViewListView::openPre()
+void LibImgViewListView::openPre()
 {
     if (m_currentRow <= 0) {
         return;
@@ -185,13 +185,13 @@ void ImgViewListView::openPre()
     if (currentIndex.isValid()) {
         //重置前一个选中项的宽高
         m_model->setData(currentIndex,
-                         QVariant(QSize(ImgViewListView::ITEM_NORMAL_WIDTH, ImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
+                         QVariant(QSize(LibImgViewListView::ITEM_NORMAL_WIDTH, LibImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
     }
 
     if (preIndex.isValid()) {
         //重置新选中项的宽高
         m_model->setData(preIndex,
-                         QVariant(QSize(ImgViewListView::ITEM_CURRENT_WH, ImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
+                         QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
 
     }
     doItemsLayout();
@@ -202,7 +202,7 @@ void ImgViewListView::openPre()
     emit openImg(m_currentRow, m_currentPath);
 }
 
-void ImgViewListView::removeCurrent()
+void LibImgViewListView::removeCurrent()
 {
     //当前显示数量大于3
     if (m_model->rowCount() > 1) {
@@ -238,7 +238,7 @@ void ImgViewListView::removeCurrent()
     }
 }
 
-void ImgViewListView::rotate(int index)
+void LibImgViewListView::rotate(int index)
 {
     //取数据
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
@@ -257,7 +257,7 @@ void ImgViewListView::rotate(int index)
     info.imgOriginalWidth = info.imgOriginalHeight;
     info.imgOriginalHeight = tmp;
     //同步更新缓存数据
-    CommonService::instance()->slotSetImgInfoByPath(info.path, info);
+    LibCommonService::instance()->slotSetImgInfoByPath(info.path, info);
 
     QVariant infoVariant;
     infoVariant.setValue(info);
@@ -265,7 +265,7 @@ void ImgViewListView::rotate(int index)
     m_model->setData(currentIndex, infoVariant, Qt::DisplayRole);
 }
 
-void ImgViewListView::setCurrentPath(const QString &path)
+void LibImgViewListView::setCurrentPath(const QString &path)
 {
     for (int i = 0; i < m_model->rowCount(); i++) {
         QModelIndex index = m_model->index(i, 0);
@@ -276,7 +276,7 @@ void ImgViewListView::setCurrentPath(const QString &path)
     }
 }
 
-QStringList ImgViewListView::getAllPath()
+QStringList LibImgViewListView::getAllPath()
 {
     QStringList list;
     for (int i = 0; i < m_model->rowCount(); i++) {
@@ -287,7 +287,7 @@ QStringList ImgViewListView::getAllPath()
     return list;
 }
 
-int ImgViewListView::getCurrentItemX()
+int LibImgViewListView::getCurrentItemX()
 {
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
 //    qDebug() << this->visualRect(currentIndex).x();
@@ -298,7 +298,7 @@ int ImgViewListView::getCurrentItemX()
     return this->visualRect(currentIndex).x();
 }
 
-int ImgViewListView::getRowWidth()
+int LibImgViewListView::getRowWidth()
 {
     int count = m_model->rowCount();
     return 2 * (count + 1) + ITEM_NORMAL_WIDTH * count + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH;
@@ -324,7 +324,7 @@ int ImgViewListView::getRowWidth()
 //    return DListView::mouseReleaseEvent(event);
 //}
 
-void ImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInfo pix)
+void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInfo pix)
 {
     for (int i = 0; i < m_model->rowCount(); i++) {
         QModelIndex index = m_model->index(i, 0);
@@ -343,7 +343,7 @@ void ImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInfo p
     }
 }
 
-void ImgViewListView::onClicked(const QModelIndex &index)
+void LibImgViewListView::onClicked(const QModelIndex &index)
 {
     //重新点击,m_currentPath需要重新赋值
     imageViewerSpace::ItemInfo info = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
@@ -360,11 +360,11 @@ void ImgViewListView::onClicked(const QModelIndex &index)
     if (currentIndex.isValid()) {
         //重置前一个选中项的宽高
         m_model->setData(currentIndex,
-                         QVariant(QSize(ImgViewListView::ITEM_NORMAL_WIDTH, ImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
+                         QVariant(QSize(LibImgViewListView::ITEM_NORMAL_WIDTH, LibImgViewListView::ITEM_NORMAL_HEIGHT)), Qt::SizeHintRole);
     }
     //重置新选中项的宽高
     m_model->setData(index,
-                     QVariant(QSize(ImgViewListView::ITEM_CURRENT_WH, ImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
+                     QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
 
     m_currentRow = index.row();
     qDebug() << "---" << __FUNCTION__ << "---m_currentRow = " << m_currentRow;
@@ -379,7 +379,7 @@ void ImgViewListView::onClicked(const QModelIndex &index)
     emit openImg(m_currentRow, m_currentPath);
 }
 
-void ImgViewListView::cutPixmap(imageViewerSpace::ItemInfo &iteminfo)
+void LibImgViewListView::cutPixmap(imageViewerSpace::ItemInfo &iteminfo)
 {
     int width = iteminfo.image.width();
     if (width == 0)
@@ -401,7 +401,7 @@ void ImgViewListView::cutPixmap(imageViewerSpace::ItemInfo &iteminfo)
     }
 }
 //加载后50张
-void ImgViewListView::loadFiftyRight()
+void LibImgViewListView::loadFiftyRight()
 {
     int count = 0;
     for (int i = m_currentRow; i < m_model->rowCount(); i++) {
@@ -420,7 +420,7 @@ void ImgViewListView::loadFiftyRight()
     }
 }
 
-void ImgViewListView::startMoveToLeftAnimation()
+void LibImgViewListView::startMoveToLeftAnimation()
 {
     if (m_moveAnimation == nullptr) {
         m_moveAnimation = new QPropertyAnimation(this->horizontalScrollBar(), "value", this);
@@ -440,7 +440,7 @@ void ImgViewListView::startMoveToLeftAnimation()
     }
 }
 
-const QString ImgViewListView::getPathByRow(int row)
+const QString LibImgViewListView::getPathByRow(int row)
 {
     QString result;
     if (row <= (m_model->rowCount() - 1)) {

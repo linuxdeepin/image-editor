@@ -38,14 +38,14 @@ QT_BEGIN_NAMESPACE
 class QWheelEvent;
 class QPaintEvent;
 class QFile;
-class GraphicsMovieItem;
-class GraphicsPixmapItem;
+class LibGraphicsMovieItem;
+class LibGraphicsPixmapItem;
 class QGraphicsSvgItem;
 class QThreadPool;
 class QGestureEvent;
 class QPinchGesture;
 class QSwipeGesture;
-class ImageSvgItem;
+class LibImageSvgItem;
 class MorePicFloatWidget;
 QT_END_NAMESPACE
 
@@ -54,15 +54,15 @@ DWIDGET_BEGIN_NAMESPACE
 DWIDGET_END_NAMESPACE
 
 class CFileWatcher;
-class ImageGraphicsView : public QGraphicsView
+class LibImageGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
     enum RendererType { Native, OpenGL };
 
-    explicit ImageGraphicsView(QWidget *parent = nullptr);
-    ~ImageGraphicsView() override;
+    explicit LibImageGraphicsView(QWidget *parent = nullptr);
+    ~LibImageGraphicsView() override;
     void clear();
     void fitWindow();
     void fitImage();
@@ -183,9 +183,9 @@ private:
     QString m_path;
     QString m_loadingIconPath;
     QThreadPool *m_pool;
-    GraphicsMovieItem *m_movieItem = nullptr;
-    GraphicsPixmapItem *m_pixmapItem = nullptr;
-    ImageSvgItem *m_imgSvgItem = nullptr;
+    LibGraphicsMovieItem *m_movieItem = nullptr;
+    LibGraphicsPixmapItem *m_pixmapItem = nullptr;
+    LibImageSvgItem *m_imgSvgItem = nullptr;
 
     QPointer<QGraphicsBlurEffect> m_blurEffect;
 //    CFileWatcher *m_imgFileWatcher;

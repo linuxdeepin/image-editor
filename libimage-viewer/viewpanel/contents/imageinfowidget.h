@@ -38,13 +38,13 @@ typedef DLabel QLbtoDLabel;
 class QFormLayout;
 class QVBoxLayout;
 class ViewSeparator;
-class ImageInfoWidget : public QFrame
+class LibImageInfoWidget : public QFrame
 {
     Q_OBJECT
 public:
-    explicit ImageInfoWidget(const QString &darkStyle,
-                             const QString &lightStyle,
-                             QWidget *parent = 0);
+    explicit LibImageInfoWidget(const QString &darkStyle,
+                                const QString &lightStyle,
+                                QWidget *parent = 0);
     void setImagePath(const QString path);
     void updateInfo();
     int contentHeight() const;

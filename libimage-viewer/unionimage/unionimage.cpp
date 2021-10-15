@@ -45,7 +45,7 @@
 const QString DATETIME_FORMAT_NORMAL = "yyyy.MM.dd";
 const QString DATETIME_FORMAT_EXIF = "yyyy:MM:dd HH:mm";
 
-namespace UnionImage_NameSpace {
+namespace LibUnionImage_NameSpace {
 
 //    enum SupportFormat {
 //        UNKNOWN = -1,
@@ -1392,7 +1392,7 @@ imageViewerSpace::PathType getPathType(const QString &imagepath)
         type = imageViewerSpace::PathTypePTP;
     } else if (imagepath.indexOf("gphoto2:host=Apple") != -1) {
         type = imageViewerSpace::PathTypeAPPLE;
-    } else if (utils::image::isVaultFile(imagepath)) {
+    } else if (Libutils::image::isVaultFile(imagepath)) {
         type = imageViewerSpace::PathTypeSAFEBOX;
     } else if (imagepath.contains(QDir::homePath() + "/.local/share/Trash")) {
         type = imageViewerSpace::PathTypeRECYCLEBIN;

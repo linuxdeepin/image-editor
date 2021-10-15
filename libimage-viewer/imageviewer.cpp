@@ -25,7 +25,7 @@ public:
 
 public:
     ImageViewer     *q_ptr;
-    ViewPanel       *m_panel = nullptr;
+    LibViewPanel       *m_panel = nullptr;
     imageViewerSpace::ImgViewerType   m_imgViewerType;
     Q_DECLARE_PUBLIC(ImageViewer)
 };
@@ -48,14 +48,14 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     Q_Q(ImageViewer);
     m_imgViewerType = imgViewerType;
     //记录当前展示模式
-    CommonService::instance()->setImgViewerType(imgViewerType);
+    LibCommonService::instance()->setImgViewerType(imgViewerType);
     //记录缩略图保存路径
-    CommonService::instance()->setImgSavePath(savePath);
+    LibCommonService::instance()->setImgSavePath(savePath);
 
     QVBoxLayout *layout = new QVBoxLayout(q);
     layout->setContentsMargins(0, 0, 0, 0);
     q->setLayout(layout);
-    m_panel = new ViewPanel(customTopToolbar, q);
+    m_panel = new LibViewPanel(customTopToolbar, q);
     layout->addWidget(m_panel);
 }
 
@@ -93,12 +93,12 @@ void ImageViewer::startImgView(QString currentPath, QStringList paths)
     //展示当前图片
     d->m_panel->loadImage(currentPath, paths);
     //启动线程制作缩略图
-    if (CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
-            CommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
+            LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
         //首先生成当前图片的缓存
-        ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(currentPath), 1);
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(currentPath), 1);
         //看图制作全部缩略图
-        ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), paths, paths.size());
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), paths, paths.size());
     }
 }
 

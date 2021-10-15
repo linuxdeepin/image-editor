@@ -29,12 +29,12 @@
 
 #include "image-viewer_global.h"
 
-class ImgOperate : public QObject
+class LibImgOperate : public QObject
 {
     Q_OBJECT
 public:
-    explicit ImgOperate(QObject *parent = nullptr);
-    ~ImgOperate();
+    explicit LibImgOperate(QObject *parent = nullptr);
+    ~LibImgOperate();
 
 public slots:
     void slotMakeImgThumbnail(QString thumbnailSavePath, QStringList paths, int makeCount, bool remake);

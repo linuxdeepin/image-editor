@@ -45,13 +45,13 @@
 
 DWIDGET_USE_NAMESPACE
 
-class ImgViewListView : public DListView
+class LibImgViewListView : public DListView
 {
     Q_OBJECT
 
 public:
-    explicit ImgViewListView(QWidget *parent = nullptr);
-    ~ImgViewListView() override;
+    explicit LibImgViewListView(QWidget *parent = nullptr);
+    ~LibImgViewListView() override;
 
     void setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QString path);//设置需要展示的所有缩略图
 
@@ -104,7 +104,7 @@ public:
     const static int ITEM_CURRENT_WH = 60;//当前选中状态宽高
     const static int ITEM_SPACING = 2;//间隔
 public:
-    ImgViewDelegate *m_delegate = nullptr;
+    LibImgViewDelegate *m_delegate = nullptr;
     QStandardItemModel *m_model = nullptr;
     QStringList m_allFileList;//需要展示的全部缩略图路径
 

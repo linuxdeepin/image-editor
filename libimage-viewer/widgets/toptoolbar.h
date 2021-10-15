@@ -40,11 +40,11 @@ class SettingsWindow;
 class QHBoxLayout;
 class QProcess;
 
-class TopToolbar : public AbstractTopToolbar
+class LibTopToolbar : public AbstractTopToolbar
 {
     Q_OBJECT
 public:
-    TopToolbar(bool manager, QWidget *parent);
+    LibTopToolbar(bool manager, QWidget *parent);
     void setMiddleContent(const QString &path) override;
 public slots:
     void setTitleBarTransparent(bool a) override;

@@ -31,22 +31,22 @@
 #include "unionimage/imageutils.h"
 #include "commonservice.h"
 
-ImageDataService *ImageDataService::s_ImageDataService = nullptr;
+LibImageDataService *LibImageDataService::s_ImageDataService = nullptr;
 
-ImageDataService *ImageDataService::instance(QObject *parent)
+LibImageDataService *LibImageDataService::instance(QObject *parent)
 {
     Q_UNUSED(parent);
     if (!s_ImageDataService) {
-        s_ImageDataService = new ImageDataService();
+        s_ImageDataService = new LibImageDataService();
     }
     return s_ImageDataService;
 }
 
-ImageDataService::~ImageDataService()
+LibImageDataService::~LibImageDataService()
 {
 }
 
-bool ImageDataService::add(const QStringList &paths)
+bool LibImageDataService::add(const QStringList &paths)
 {
     QMutexLocker locker(&m_imgDataMutex);
 //    m_requestQueue.clear();
@@ -58,7 +58,7 @@ bool ImageDataService::add(const QStringList &paths)
     return true;
 }
 
-bool ImageDataService::add(const QString &path)
+bool LibImageDataService::add(const QString &path)
 {
     QMutexLocker locker(&m_imgDataMutex);
     if (!path.isEmpty()) {
@@ -69,7 +69,7 @@ bool ImageDataService::add(const QString &path)
     return true;
 }
 
-QString ImageDataService::pop()
+QString LibImageDataService::pop()
 {
     QMutexLocker locker(&m_imgDataMutex);
     if (m_requestQueue.empty())
@@ -79,18 +79,18 @@ QString ImageDataService::pop()
     return res;
 }
 
-bool ImageDataService::isRequestQueueEmpty()
+bool LibImageDataService::isRequestQueueEmpty()
 {
     QMutexLocker locker(&m_imgDataMutex);
     return m_requestQueue.isEmpty();
 }
 
-int ImageDataService::getCount()
+int LibImageDataService::getCount()
 {
     return m_AllImageMap.count();
 }
 #include <QDebug>
-bool ImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake)
+bool LibImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake)
 {
 
     qDebug() << "------------files.size = " << files.size();
@@ -98,7 +98,7 @@ bool ImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList f
 
     if (empty) {
 
-        ImageDataService::instance()->add(files);
+        LibImageDataService::instance()->add(files);
         int needCoreCounts = static_cast<int>(std::thread::hardware_concurrency());
         needCoreCounts = needCoreCounts / 2;
         if (files.size() < needCoreCounts) {
@@ -108,7 +108,7 @@ bool ImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList f
             needCoreCounts = 1;
         QList<QThread *> threads;
         for (int i = 0; i < needCoreCounts; i++) {
-            readThumbnailThread *thread = new readThumbnailThread;
+            LibReadThumbnailThread *thread = new LibReadThumbnailThread;
             thread->m_thumbnailPath = thumbnailPath;
             thread->m_remake = remake;
             thread->start();
@@ -119,13 +119,13 @@ bool ImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList f
 //            thread->deleteLater();
 //        }
     } else {
-        ImageDataService::instance()->add(files);
+        LibImageDataService::instance()->add(files);
     }
     return true;
 }
 
 #include "imageengine.h"
-void ImageDataService::addImage(const QString &path, const QImage &image)
+void LibImageDataService::addImage(const QString &path, const QImage &image)
 {
     QMutexLocker locker(&m_imgDataMutex);
     m_AllImageMap[path] = image;
@@ -145,64 +145,64 @@ void ImageDataService::addImage(const QString &path, const QImage &image)
 //    }
 }
 
-void ImageDataService::addMovieDurationStr(const QString &path, const QString &durationStr)
+void LibImageDataService::addMovieDurationStr(const QString &path, const QString &durationStr)
 {
     QMutexLocker locker(&m_imgDataMutex);
     m_movieDurationStrMap[path] = durationStr;
 }
 
-QString ImageDataService::getMovieDurationStrByPath(const QString &path)
+QString LibImageDataService::getMovieDurationStrByPath(const QString &path)
 {
     QMutexLocker locker(&m_imgDataMutex);
     return m_movieDurationStrMap.contains(path) ? m_movieDurationStrMap[path] : QString() ;
 }
 
-void ImageDataService::setAllDataKeys(const QStringList &paths, bool single)
+void LibImageDataService::setAllDataKeys(const QStringList &paths, bool single)
 {
     Q_UNUSED(paths);
     Q_UNUSED(single);
 }
 
-void ImageDataService::setVisualIndex(int row)
+void LibImageDataService::setVisualIndex(int row)
 {
     QMutexLocker locker(&m_imgDataMutex);
     m_visualIndex = row;
 }
 
-int ImageDataService::getVisualIndex()
+int LibImageDataService::getVisualIndex()
 {
     QMutexLocker locker(&m_imgDataMutex);
     return m_visualIndex;
 }
 
-QImage ImageDataService::getThumnailImageByPath(const QString &path)
+QImage LibImageDataService::getThumnailImageByPath(const QString &path)
 {
     QMutexLocker locker(&m_imgDataMutex);
     return m_AllImageMap.contains(path) ? m_AllImageMap[path] : QImage();
 }
 
-bool ImageDataService::imageIsLoaded(const QString &path)
+bool LibImageDataService::imageIsLoaded(const QString &path)
 {
     QMutexLocker locker(&m_imgDataMutex);
     return m_AllImageMap.contains(path);
 }
 
-ImageDataService::ImageDataService(QObject *parent)
+LibImageDataService::LibImageDataService(QObject *parent)
 {
     Q_UNUSED(parent);
 }
 
 //缩略图读取线程
-readThumbnailThread::readThumbnailThread(QObject *parent): QThread(parent)
+LibReadThumbnailThread::LibReadThumbnailThread(QObject *parent): QThread(parent)
 {
 }
 
-readThumbnailThread::~readThumbnailThread()
+LibReadThumbnailThread::~LibReadThumbnailThread()
 {
 
 }
 
-void readThumbnailThread::readThumbnail(QString path)
+void LibReadThumbnailThread::readThumbnail(QString path)
 {
     if (!QFileInfo(path).exists()) {
         return;
@@ -220,7 +220,7 @@ void readThumbnailThread::readThumbnail(QString path)
     itemInfo.imgOriginalWidth = imagreader.size().width();
     itemInfo.imgOriginalHeight = imagreader.size().height();
 
-    using namespace UnionImage_NameSpace;
+    using namespace LibUnionImage_NameSpace;
     QImage tImg;
     QString srcPath = path;
     //缩略图保存路径
@@ -234,13 +234,13 @@ void readThumbnailThread::readThumbnail(QString path)
         itemInfo.image = tImg;
         //获取图片类型
         itemInfo.imageType = getImageType(path);
-        CommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
+        LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
         return;
     }
     QString errMsg;
     QSize readSize;
 
-    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
+    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
         qDebug() << errMsg;
         return;
     }
@@ -279,36 +279,36 @@ void readThumbnailThread::readThumbnail(QString path)
         //获取图片类型
         itemInfo.imageType = getImageType(path);
     }
-    CommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
+    LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
 //    ImageDataService::instance()->addImage(path, tImg);
 }
 
-void readThumbnailThread::setQuit(bool quit)
+void LibReadThumbnailThread::setQuit(bool quit)
 {
     m_quit = quit;
 }
 
-imageViewerSpace::ImageType readThumbnailThread::getImageType(const QString &imagepath)
+imageViewerSpace::ImageType LibReadThumbnailThread::getImageType(const QString &imagepath)
 {
-    return UnionImage_NameSpace::getImageType(imagepath);
+    return LibUnionImage_NameSpace::getImageType(imagepath);
 }
 
-imageViewerSpace::PathType readThumbnailThread::getPathType(const QString &imagepath)
+imageViewerSpace::PathType LibReadThumbnailThread::getPathType(const QString &imagepath)
 {
-    return UnionImage_NameSpace::getPathType(imagepath);
+    return LibUnionImage_NameSpace::getPathType(imagepath);
 }
 
-void readThumbnailThread::run()
+void LibReadThumbnailThread::run()
 {
-    while (!ImageDataService::instance()->isRequestQueueEmpty()) {
+    while (!LibImageDataService::instance()->isRequestQueueEmpty()) {
         if (m_quit) {
             break;
         }
-        QString res = ImageDataService::instance()->pop();
+        QString res = LibImageDataService::instance()->pop();
         if (!res.isEmpty()) {
             readThumbnail(res);
         }
     }
-    emit ImageDataService::instance()->sigeUpdateListview();
+    emit LibImageDataService::instance()->sigeUpdateListview();
     this->deleteLater();
 }

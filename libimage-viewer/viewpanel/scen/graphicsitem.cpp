@@ -23,7 +23,7 @@
 #include <QDebug>
 #include <QPainter>
 
-GraphicsMovieItem::GraphicsMovieItem(const QString &fileName, const QString &suffix, QGraphicsItem *parent)
+LibGraphicsMovieItem::LibGraphicsMovieItem(const QString &fileName, const QString &suffix, QGraphicsItem *parent)
     : QGraphicsPixmapItem(fileName, parent)
 {
     Q_UNUSED(suffix);
@@ -36,7 +36,7 @@ GraphicsMovieItem::GraphicsMovieItem(const QString &fileName, const QString &suf
     m_movie->start();
 }
 
-GraphicsMovieItem::~GraphicsMovieItem()
+LibGraphicsMovieItem::~LibGraphicsMovieItem()
 {
     // Prepares the item for a geometry change. Call this function
     // before changing the bounding rect of an item to keep
@@ -55,34 +55,34 @@ GraphicsMovieItem::~GraphicsMovieItem()
  * supported this function still return true.
  * \return
  */
-bool GraphicsMovieItem::isValid() const
+bool LibGraphicsMovieItem::isValid() const
 {
     return m_movie->frameCount() > 1;
 }
 
-void GraphicsMovieItem::start()
+void LibGraphicsMovieItem::start()
 {
     m_movie->start();
 }
 
-void GraphicsMovieItem::stop()
+void LibGraphicsMovieItem::stop()
 {
     m_movie->stop();
 }
 
 
-GraphicsPixmapItem::GraphicsPixmapItem(const QPixmap &pixmap)
+LibGraphicsPixmapItem::LibGraphicsPixmapItem(const QPixmap &pixmap)
     : QGraphicsPixmapItem(pixmap, nullptr)
 {
 
 }
 
-GraphicsPixmapItem::~GraphicsPixmapItem()
+LibGraphicsPixmapItem::~LibGraphicsPixmapItem()
 {
     prepareGeometryChange();
 }
 
-void GraphicsPixmapItem::setPixmap(const QPixmap &pixmap)
+void LibGraphicsPixmapItem::setPixmap(const QPixmap &pixmap)
 {
     cachePixmap = qMakePair(cachePixmap.first, pixmap);
     QGraphicsPixmapItem::setPixmap(pixmap);

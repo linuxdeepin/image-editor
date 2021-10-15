@@ -57,7 +57,7 @@ const QString DAMAGE_IMAGE_LIGHT_PICTURE = ":/light/images/picture_damaged_58.sv
 const int NORMAL_ITEM_PAINT_OFFSET = 10;//绘制时普通项向下偏移大小
 const int SELECT_ITEM_PAINT_OFFSET = 2;//绘制时选中项向下偏移大小
 
-ImgViewDelegate::ImgViewDelegate(QObject *parent)
+LibImgViewDelegate::LibImgViewDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
 {
     if (DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::LightType) {
@@ -77,13 +77,13 @@ ImgViewDelegate::ImgViewDelegate(QObject *parent)
     });
 }
 
-void ImgViewDelegate::setItemSize(QSize size)
+void LibImgViewDelegate::setItemSize(QSize size)
 {
     Q_UNUSED(size);
 //    m_size = size;
 }
 #include "service/imagedataservice.h"
-void ImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 //    QRect backgroundRect2 = option.rect;
 //    painter->fillRect(backgroundRect2, QBrush(DGuiApplicationHelper::instance()->applicationPalette().highlight().color()));
@@ -111,7 +111,7 @@ void ImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
                             QPainter::SmoothPixmapTransform |
                             QPainter::Antialiasing);
     QRect backgroundRect = option.rect;
-    if (backgroundRect.width() != ImgViewListView::ITEM_CURRENT_WH) {
+    if (backgroundRect.width() != LibImgViewListView::ITEM_CURRENT_WH) {
         backgroundRect.setTopLeft(QPoint(backgroundRect.topLeft() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET)));
         backgroundRect.setBottomRight(QPoint(backgroundRect.bottomRight() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET)));
     } else {
@@ -121,7 +121,7 @@ void ImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     QRect pixmapRect;
     QBrush  backbrush;
     //当前显示项
-    if (backgroundRect.width() == ImgViewListView::ITEM_CURRENT_WH) {
+    if (backgroundRect.width() == LibImgViewListView::ITEM_CURRENT_WH) {
         QPainterPath backgroundBp;
         backgroundBp.addRoundedRect(backgroundRect, 8, 8);
         painter->setClipPath(backgroundBp);
@@ -134,10 +134,10 @@ void ImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
         DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
         if (themeType == DGuiApplicationHelper::DarkType) {
             pixmapstring = LOCMAP_SELECTED_DARK;
-            backbrush = QBrush(utils::common::DARK_BACKGROUND_COLOR);
+            backbrush = QBrush(Libutils::common::DARK_BACKGROUND_COLOR);
         } else {
             pixmapstring = LOCMAP_SELECTED_LIGHT;
-            backbrush = QBrush(utils::common::LIGHT_BACKGROUND_COLOR);
+            backbrush = QBrush(Libutils::common::LIGHT_BACKGROUND_COLOR);
         }
 
         //绘制默认选中背景
@@ -185,21 +185,21 @@ void ImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     painter->restore();
 }
 
-QSize ImgViewDelegate::sizeHint(const QStyleOptionViewItem &option,
+QSize LibImgViewDelegate::sizeHint(const QStyleOptionViewItem &option,
                                 const QModelIndex &index) const
 {
     Q_UNUSED(option)
     return index.data(Qt::SizeHintRole).value<QSize>();
 }
 
-imageViewerSpace::ItemInfo ImgViewDelegate::itemData(const QModelIndex &index) const
+imageViewerSpace::ItemInfo LibImgViewDelegate::itemData(const QModelIndex &index) const
 {
     imageViewerSpace::ItemInfo data = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
     data.isSelected = index.data(Qt::UserRole).toBool();
     return data;
 }
 
-bool ImgViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+bool LibImgViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     Q_UNUSED(option);
     Q_UNUSED(event);
