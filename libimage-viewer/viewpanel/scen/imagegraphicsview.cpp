@@ -395,60 +395,35 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 
 void LibImageGraphicsView::setScaleValue(qreal v)
 {
+    //预先计算需要的缩放比
+    double temp = m_scal * v;
+    double scaleFactor = -1.0;
+    if (v < 1 && temp <= MIN_SCALE_FACTOR) {
+        scaleFactor = MIN_SCALE_FACTOR / m_scal;
+    } else if (v > 1 && temp >= MAX_SCALE_FACTOR) {
+        scaleFactor = MAX_SCALE_FACTOR / m_scal;
+    } else {
+        scaleFactor = v;
+        m_isFitImage = false;
+        m_isFitWindow = false;
+    }
 
-    m_scal *= v;
-    scale(v, v);
+    //执行缩放
+    m_scal *= scaleFactor;
+    scale(scaleFactor, scaleFactor);
     qDebug() << m_scal;
-#ifdef tablet_PC
-    //平板模式下限制缩放范围：初始值--200%
-    if (m_firstset) {
-        m_firstset = false;
-        m_value = imageRelativeScale();
-    }
-    const qreal irs = imageRelativeScale();
-    if ((v < 1 && m_scal <= m_value)) {
-        const qreal minv = m_value / m_scal;
-        scale(minv, minv);
-        m_scal *= minv;
-    } else if (v > 1 && m_scal >= m_max_scale_factor) {
-        const qreal maxv = m_max_scale_factor / m_scal;
-        scale(maxv, maxv);
-        m_scal *= maxv;
-    } else {
-        m_isFitImage = false;
-        m_isFitWindow = false;
-    }
-#else
-//    m_scal = imageRelativeScale();
-    // Rollback
-    if ((v < 1 && m_scal <= MIN_SCALE_FACTOR)) {
-        const qreal minv = MIN_SCALE_FACTOR / m_scal;
-        scale(minv, minv);
-        m_scal *= minv;
-    } else if (v > 1 && m_scal >= MAX_SCALE_FACTOR) {
-        const qreal maxv = MAX_SCALE_FACTOR / m_scal;
-        scale(maxv, maxv);
-        m_scal *= maxv;
-    } else {
-        m_isFitImage = false;
-        m_isFitWindow = false;
-    }
-#endif
 
-    qreal rescale = imageRelativeScale();
-    if (rescale - 1 > -0.01 &&
-            rescale - 1 < 0.01) {
+    //1:1高亮按钮
+    if (m_scal - 1 > -0.01 && m_scal - 1 < 0.01) {
         emit checkAdaptImageBtn();
     } else {
         emit disCheckAdaptImageBtn();
     }
 
-    //使用正确的缩放比例
-    emit scaled(imageRelativeScale() * 100);
-//    emit scaled(m_scal * 100);
+    //缩放通知信号
+    emit scaled(m_scal * 100);
     emit showScaleLabel();
     emit transformChanged();
-
     titleBarControl();
 }
 

@@ -260,13 +260,6 @@ void LibViewPanel::initScaleLabel()
 
     connect(m_view, &LibImageGraphicsView::scaled, this, [ = ](qreal perc) {
         label->setText(QString("%1%").arg(int(perc)));
-        if (perc > 100) {
-
-        } else if (perc == 100.0) {
-
-        } else {
-
-        }
     });
     connect(m_view, &LibImageGraphicsView::showScaleLabel, this, [ = ]() {
         scalePerc->show();
