@@ -104,6 +104,9 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
     setAcceptDrops(true);
 //    initExtensionPanel();
+
+    QObject::connect(m_view, &LibImageGraphicsView::currentThumbnailChanged, m_bottomToolbar, &LibBottomToolbar::onThumbnailChanged);
+    QObject::connect(m_view, &LibImageGraphicsView::gestureRotate, this, &LibViewPanel::slotRotateImage);
 }
 
 LibViewPanel::~LibViewPanel()
@@ -127,7 +130,6 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     //重置底部工具栏位置与大小
     qDebug() << "---" << __FUNCTION__ << "---111111111111111";
     resetBottomToolbarGeometry(true);
-
 }
 
 void LibViewPanel::initConnect()
@@ -198,11 +200,6 @@ void LibViewPanel::initConnect()
     //上一页，下一页信号连接
     connect(m_view, &LibImageGraphicsView::previousRequested, this, &LibViewPanel::showPrevious);
     connect(m_view, &LibImageGraphicsView::nextRequested, this, &LibViewPanel::showNext);
-
-    //增加双击全屏和退出全屏的功能
-    connect(m_view, &LibImageGraphicsView::sigUpdateThunbnail, this, &LibViewPanel::slotUpdateThumbnail);
-
-
 }
 
 void LibViewPanel::initTopBar()
@@ -880,11 +877,6 @@ void LibViewPanel::showPrevious()
     }
 }
 
-void LibViewPanel::slotUpdateThumbnail(const int &index)
-{
-    m_bottomToolbar->onRotateThumbnail(index);
-}
-
 bool LibViewPanel::slotOcrPicture()
 {
     if (!m_ocrInterface) {
@@ -1081,10 +1073,6 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
 {
     //当幻灯片的情况屏蔽快捷键的使用
     if (m_stack->currentWidget() != m_sliderPanel) {
-        //判断旋转图片本体是否旋转
-        if (m_view) {
-            m_view->slotRotatePixCurrent();
-        }
         const int id = action->property("MenuID").toInt();
         switch (imageViewerSpace::NormalMenuItemId(id)) {
         case IdFullScreen:
@@ -1093,6 +1081,10 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdStartSlideShow: {
+            //判断旋转图片本体是否旋转
+            if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,幻灯片
             if (!m_sliderPanel) {
                 initSlidePanel();
@@ -1117,10 +1109,16 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdPrint: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
             break;
         }
         case IdRename: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,重命名
             QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
             RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
@@ -1149,11 +1147,17 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdCopy: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,复制
             Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
             break;
         }
         case IdMoveToTrash: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,删除
             if (m_bottomToolbar) {
                 m_bottomToolbar->deleteImage();
@@ -1183,16 +1187,25 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdSetAsWallpaper: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo设置壁纸
             setWallpaper(m_view->image());
             break;
         }
         case IdDisplayInFileManager : {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo显示在文管
             Libutils::base::showInFileManager(m_bottomToolbar->getCurrentItemInfo().path);
             break;
         }
         case IdImageInfo: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,文件信息
             if (!m_info && !m_extensionPanel) {
                 initExtensionPanel();
@@ -1220,6 +1233,9 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdOcr: {
+                        if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             //todo,ocr
             slotOcrPicture();
             break;
@@ -1274,6 +1290,9 @@ void LibViewPanel::openImg(int index, QString path)
 void LibViewPanel::slotRotateImage(int angle)
 {
     if (m_view) {
+        if (m_view->loadPhase() == LibImageGraphicsView::ThumbnailFinish) {
+            m_view->setNewImageRotateAngle(angle);
+        }
         m_view->slotRotatePixmap(angle);
     }
     //实时保存太卡，因此采用2s后延时保存的问题

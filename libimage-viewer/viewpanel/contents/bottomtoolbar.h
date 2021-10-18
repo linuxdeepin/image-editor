@@ -133,15 +133,14 @@ public slots:
     void deleteImage();
     void onNextButton();
     void onPreButton();
-    void onRotate(int matrix);
     void onBackButtonClicked();
     void onAdaptImageBtnClicked();
     void onAdaptScreenBtnClicked();
     void onclBTClicked();
     void onRotateLBtnClicked();
     void onRotateRBtnClicked();
-    void onRotateThumbnail(int index);
     void onTrashBtnClicked();
+    void onThumbnailChanged(QPixmap pix, const QSize &originalSize);
     //主题变化
     void slotThemeChanged(int type);
 

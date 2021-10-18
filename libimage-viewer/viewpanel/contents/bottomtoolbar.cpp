@@ -371,19 +371,12 @@ void LibBottomToolbar::onclBTClicked()
 
 void LibBottomToolbar::onRotateLBtnClicked()
 {
-    onRotate(-90);
     emit rotateClockwise();
 }
 
 void LibBottomToolbar::onRotateRBtnClicked()
 {
-    onRotate(90);
     emit rotateCounterClockwise();
-}
-
-void LibBottomToolbar::onRotateThumbnail(int index)
-{
-    onRotate(index);
 }
 
 void LibBottomToolbar::onTrashBtnClicked()
@@ -525,9 +518,9 @@ void LibBottomToolbar::onPreButton()
     }
 }
 
-void LibBottomToolbar::onRotate(int matrix)
+void LibBottomToolbar::onThumbnailChanged(QPixmap pix, const QSize &originalSize)
 {
-    m_imgListWidget->rotate(matrix);
+    m_imgListWidget->flushCurrentImg(pix, originalSize);
 }
 
 void LibBottomToolbar::resizeEvent(QResizeEvent *event)

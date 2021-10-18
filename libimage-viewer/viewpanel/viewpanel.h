@@ -149,8 +149,6 @@ public slots:
     //上一张图片
     void showPrevious();
 
-    //接收到图片缩略图更新
-    void slotUpdateThumbnail(const int &index);
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
@@ -163,6 +161,9 @@ protected:
     void dropEvent(QDropEvent *event) override;
 signals:
     void imageChanged(const QString &path);
+
+    //刷新缩略图
+    void updateThumbnail(QPixmap pix, const QSize &originalSize);
 private :
     DStackedWidget *m_stack = nullptr;
     LibImageGraphicsView *m_view = nullptr;

@@ -100,10 +100,11 @@ public slots:
     void openPre();
     //移除当前选中
     void removeCurrent();
-    //旋转图片
-    void rotate(int matrix);
     //设置当前图片
     void setCurrentPath(const QString &path);
+
+    //刷新当前图片
+    void flushCurrentImg(QPixmap pix, const QSize &originalSize);
 
     //获取所有路径
     QStringList getAllPath();

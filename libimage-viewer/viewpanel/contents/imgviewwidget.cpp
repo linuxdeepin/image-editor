@@ -278,15 +278,14 @@ void MyImageListWidget::removeCurrent()
     this->setVisible(getImgCount() > 1);
 }
 
-void MyImageListWidget::rotate(int matrix)
+void MyImageListWidget::flushCurrentImg(QPixmap pix, const QSize &originalSize)
 {
-    m_listview->rotate(matrix);
+    m_listview->slotCurrentImgFlush(pix, originalSize);
 }
 
 void MyImageListWidget::setCurrentPath(const QString &path)
 {
     m_listview->setCurrentPath(path);
-
 }
 
 QStringList MyImageListWidget::getAllPath()

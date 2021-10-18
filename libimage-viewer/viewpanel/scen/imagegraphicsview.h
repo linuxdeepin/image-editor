@@ -61,6 +61,24 @@ class LibImageGraphicsView : public QGraphicsView
 public:
     enum RendererType { Native, OpenGL };
 
+    //新图加载阶段
+    enum NewImageLoadPhase { ThumbnailFinish, FullFinish };
+    NewImageLoadPhase loadPhase()
+    {
+        return m_newImageLoadPhase;
+    }
+
+    //新图同步旋转角度
+    void setNewImageRotateAngle(int angle)
+    {
+        m_newImageRotateAngle = angle;
+    }
+
+    int getNewImageRotateAngle()
+    {
+        return m_newImageRotateAngle;
+    }
+
     explicit LibImageGraphicsView(QWidget *parent = nullptr);
     ~LibImageGraphicsView() override;
     void clear();
@@ -117,9 +135,11 @@ signals:
     //刷新缩略图导航栏
     void UpdateNavImg();
 
-    //刷新缩略图
-    void sigUpdateThunbnail(const int &index);
+    //当前缩略图
+    void currentThumbnailChanged(QPixmap pix, const QSize &originalSize);
 
+    //手势旋转
+    void gestureRotate(int endValue);
 
 public slots:
 //    void setHighQualityAntialiasing(bool highQualityAntialiasing);
@@ -226,7 +246,8 @@ private:
     qreal m_endvalue;
     qreal m_scal = 1.0;
 
-
+    NewImageLoadPhase m_newImageLoadPhase{FullFinish};
+    int m_newImageRotateAngle = 0;
 };
 
 //class CFileWatcher: public QThread

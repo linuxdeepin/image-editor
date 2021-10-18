@@ -238,33 +238,6 @@ void LibImgViewListView::removeCurrent()
     }
 }
 
-void LibImgViewListView::rotate(int index)
-{
-    //取数据
-    QModelIndex currentIndex = m_model->index(m_currentRow, 0);
-    imageViewerSpace::ItemInfo info = currentIndex.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
-    if (info.path.isEmpty()) {
-        return;
-    }
-    //旋转图片,根据角度
-    QImage img = info.image;
-    QMatrix matrix;
-    matrix.rotate(index);
-    img = img.transformed(matrix);
-    //重新赋值数据
-    info.image = img;
-    int tmp = info.imgOriginalWidth;
-    info.imgOriginalWidth = info.imgOriginalHeight;
-    info.imgOriginalHeight = tmp;
-    //同步更新缓存数据
-    LibCommonService::instance()->slotSetImgInfoByPath(info.path, info);
-
-    QVariant infoVariant;
-    infoVariant.setValue(info);
-    //重新赋值给界面
-    m_model->setData(currentIndex, infoVariant, Qt::DisplayRole);
-}
-
 void LibImgViewListView::setCurrentPath(const QString &path)
 {
     for (int i = 0; i < m_model->rowCount(); i++) {
@@ -341,6 +314,23 @@ void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInf
             break;
         }
     }
+}
+
+void LibImgViewListView::slotCurrentImgFlush(QPixmap pix, const QSize &originalSize)
+{
+    QModelIndex currentIndex = m_model->index(m_currentRow, 0);
+    imageViewerSpace::ItemInfo data = currentIndex.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
+
+    data.imgOriginalWidth = originalSize.width();
+    data.imgOriginalHeight = originalSize.height();
+    data.image = pix.toImage();
+    QVariant meta;
+    meta.setValue(data);
+    m_model->setData(currentIndex, meta, Qt::DisplayRole);
+
+    LibCommonService::instance()->slotSetImgInfoByPath(data.path, data);
+    this->update(currentIndex);
+    this->viewport()->update();
 }
 
 void LibImgViewListView::onClicked(const QModelIndex &index)

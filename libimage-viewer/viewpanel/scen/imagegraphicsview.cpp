@@ -266,6 +266,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             resetTransform();
             autoFit();
         }, Qt::QueuedConnection);
+        m_newImageLoadPhase = FullFinish;
     } else if (Type == imageViewerSpace::ImageTypeSvg) {
         //svg采用svgRender显示
         m_movieItem = nullptr;
@@ -287,6 +288,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             resetTransform();
             autoFit();
         }, Qt::QueuedConnection);
+        m_newImageLoadPhase = FullFinish;
     } else {
         //当传入的image无效时，需要重新读取数据
         m_movieItem = nullptr;
@@ -364,6 +366,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             QMetaObject::invokeMethod(this, [ = ]() {
                 resetTransform();
             }, Qt::QueuedConnection);
+            m_newImageLoadPhase = ThumbnailFinish;
         } else {
             //当传入的image有效时，直接刷入图像，不再重复读取
             QPixmap pix = QPixmap::fromImage(image);
@@ -377,6 +380,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             emit imageChanged(path);
             this->update();
             emit hideNavigation();
+            m_newImageLoadPhase = FullFinish;
         }
         if (Type == imageViewerSpace::ImageTypeMulti) {
             if (!m_morePicFloatWidget) {
@@ -681,7 +685,7 @@ void LibImageGraphicsView::onLoadTimerTimeout()
     emit hideNavigation();
 
     //重新刷新缓存
-    ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(m_loadPath), 1, true);
+    //ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(m_loadPath), 1, true);
 }
 
 void LibImageGraphicsView::onThemeTypeChanged()
@@ -836,22 +840,21 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
     autoFit();
     m_rotateAngel += nAngel;
 
+    emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
     emit imageChanged(m_path);
     return true;
 }
 
 void LibImageGraphicsView::slotRotatePixCurrent()
 {
+    m_rotateAngel =  m_rotateAngel % 360;
     if (0 != m_rotateAngel) {
-        m_rotateAngel =  m_rotateAngel % 360;
-        if (0 != m_rotateAngel) {
-            disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
-            Libutils::image::rotate(m_path, m_rotateAngel);
-            QTimer::singleShot(1000, [ = ] {
-                connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
-            });
-            m_rotateAngel = 0;
-        }
+        disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
+        Libutils::image::rotate(m_path, m_rotateAngel);
+        QTimer::singleShot(1000, [ = ] {
+            connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
+        });
+        m_rotateAngel = 0;
     }
 }
 
@@ -1047,17 +1050,30 @@ void LibImageGraphicsView::onCacheFinish()
     QVariantList vl = m_watcher.result();
     if (vl.length() == 2) {
         const QString path = vl.first().toString();
-        QPixmap pixmap = vl.last().value<QPixmap>();
-        pixmap.setDevicePixelRatio(devicePixelRatioF());
         if (path == m_path) {
-            if (!m_pixmapItem)
+            if (!m_pixmapItem) {
                 return;
+            }
+
+            QPixmap pixmap = vl.last().value<QPixmap>();
+            pixmap.setDevicePixelRatio(devicePixelRatioF());
+            if (m_newImageRotateAngle != 0) {
+                QMatrix rotate;
+                rotate.rotate(m_newImageRotateAngle);
+                pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
+                m_newImageRotateAngle = 0;
+            }
+
             m_pixmapItem->setGraphicsEffect(nullptr);
             m_pixmapItem->setPixmap(pixmap);
             setSceneRect(m_pixmapItem->boundingRect());
             autoFit();
             emit imageChanged(path);
             this->update();
+            m_newImageLoadPhase = FullFinish;
+
+            //刷新缩略图
+            emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
         }
     }
 }
@@ -1238,8 +1254,8 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
     scale(m_scal, m_scal);
     if (m_bRoate) {
         m_rotateAngel += m_endvalue;
-//        dApp->m_imageloader->updateImageLoader(QStringList(m_path), true, static_cast<int>(m_endvalue));
-        emit sigUpdateThunbnail(static_cast<int>(m_endvalue));
+        emit gestureRotate(static_cast<int>(0));
+        emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
         emit UpdateNavImg();
     }
     qDebug() << m_endvalue;

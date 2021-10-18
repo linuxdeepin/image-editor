@@ -64,8 +64,6 @@ public:
     void openPre();
     //移除当前选中
     void removeCurrent();
-    //旋转
-    void rotate(int index);
 
     //设置当前图片
     void setCurrentPath(const QString &path);
@@ -86,6 +84,8 @@ public:
 public slots:
     //有新的图片加载上来
     void slotOneImgReady(QString path, imageViewerSpace::ItemInfo pix);
+    //当前图片刷新
+    void slotCurrentImgFlush(QPixmap pix, const QSize &originalSize);
     //列表点击事件
     void onClicked(const QModelIndex &index);
 private:

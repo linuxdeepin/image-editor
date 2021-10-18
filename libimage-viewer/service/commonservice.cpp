@@ -56,7 +56,6 @@ QString LibCommonService::getImgSavePath()
     return m_imgSavePath;
 }
 
-
 imageViewerSpace::ItemInfo LibCommonService::getImgInfoByPath(QString path)
 {
     return m_allInfoMap[path];
