@@ -192,7 +192,7 @@ void MyImageListWidget::mousePressEvent(QMouseEvent *event)
 void MyImageListWidget::resizeEvent(QResizeEvent *event)
 {
     //resize之后需要重新找到中心点
-    animationStart(true, 0, 400);
+    moveCenterWidget();
     Q_UNUSED(event);
 }
 MyImageListWidget::~MyImageListWidget()
@@ -354,7 +354,10 @@ void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
 
 void MyImageListWidget::stopAnimation()
 {
-    m_resetAnimation->stop();
+    if (m_resetAnimation) {
+        m_resetAnimation->stop();
+    }
+
 }
 
 void MyImageListWidget::thumbnailIsMoving()
@@ -400,6 +403,7 @@ void MyImageListWidget::thumbnailIsMoving()
 
 void MyImageListWidget::moveCenterWidget()
 {
+//    stopAnimation();
     int moveX = 0;
     int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
     int itemX = m_listview->x() + m_listview->getCurrentItemX();

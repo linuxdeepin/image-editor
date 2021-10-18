@@ -159,6 +159,25 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Up), this);
     new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Down), this);
 
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Down), this);
+
+    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Down), this);
+
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Down), this);
+
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Down), this);
 }
 
 LibImageGraphicsView::~LibImageGraphicsView()
@@ -479,11 +498,9 @@ void LibImageGraphicsView::fitWindow()
 {
     qreal wrs = windowRelativeScale();
     resetTransform();
-    //可能存在比例超过20.0的情况，设置为20.0，低于0.02，设置为0.02
+    //可能存在比例超过20.0的情况，设置为20.0
     if (wrs > 20.0) {
         wrs = 20.0;
-    } else if (wrs < 0.02) {
-        wrs = 0.02;
     }
     m_scal = wrs; //注意，这个东西的初始化要和附近的scale函数同步
     scale(wrs, wrs);
@@ -924,6 +941,7 @@ void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
         m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 - 50);
     }
     titleBarControl();
+    scaleAtPoint(QPoint(0, 0), 1.0);
     QGraphicsView::resizeEvent(event);
 //    m_toast->move(width() / 2 - m_toast->width() / 2,
 //                  height() - 80 - m_toast->height() / 2 - 11);
@@ -963,6 +981,13 @@ void LibImageGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
 //        painter->fillRect(currentImage.rect(), QBrush(pm));
     painter->restore();
 }
+
+void LibImageGraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    scaleAtPoint(QPoint(0, 0), 1.0);
+    return QGraphicsView::keyPressEvent(event);
+}
+
 int static count = 0;
 bool LibImageGraphicsView::event(QEvent *event)
 {

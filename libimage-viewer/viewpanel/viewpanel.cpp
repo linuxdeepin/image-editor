@@ -277,9 +277,36 @@ void LibViewPanel::initNavigation()
 
     connect(this, &LibViewPanel::imageChanged, this, [ = ](const QString & path) {
         //BUG#93145 去除对path的判断，直接隐藏导航窗口
-        Q_UNUSED(path)
         m_nav->setVisible(false);
-        m_nav->setImage(m_view->image());
+        QImage img = m_view->image();
+        m_nav->setImage(img);
+        //转移到中心位置
+//        m_bottomToolbar->thumbnailMoveCenterWidget();
+
+        bool isFile = QFileInfo(path).isFile();
+        //判断是否是损坏图片
+        if (!isFile && !path.isEmpty()) {
+            if (m_thumbnailWidget) {
+                m_stack->setCurrentWidget(m_thumbnailWidget);
+                //损坏图片不透明
+                emit m_view->sigImageOutTitleBar(false);
+                imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
+                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+            }
+        } else if (!img.isNull()) {
+            if (m_view) {
+                m_stack->setCurrentWidget(m_view);
+                //判断下是否透明
+                m_view->titleBarControl();
+            }
+
+        } else if (!path.isEmpty() && img.isNull()) {
+            if (m_lockWidget) {
+                m_stack->setCurrentWidget(m_lockWidget);
+                //损坏图片不透明
+                emit m_view->sigImageOutTitleBar(false);
+            }
+        }
     });
 
     connect(m_nav, &NavigationWidget::requestMove, [this](int x, int y) {
@@ -371,24 +398,24 @@ void LibViewPanel::updateMenuContent(QString path)
         if (m_info) {
             m_info->setImagePath(currentPath);
         }
-        if (!isFile && !currentPath.isEmpty()) {
-            if (m_thumbnailWidget) {
-                m_stack->setCurrentWidget(m_thumbnailWidget);
-                //损坏图片不透明
-                emit m_view->sigImageOutTitleBar(false);
-                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
-            }
-        } else if (isPic) {
-            m_stack->setCurrentWidget(m_view);
-            //判断下是否透明
-            m_view->titleBarControl();
-        } else if (!currentPath.isEmpty()) {
-            if (m_lockWidget) {
-                m_stack->setCurrentWidget(m_lockWidget);
-                //损坏图片不透明
-                emit m_view->sigImageOutTitleBar(false);
-            }
-        }
+//        if (!isFile && !currentPath.isEmpty()) {
+//            if (m_thumbnailWidget) {
+//                m_stack->setCurrentWidget(m_thumbnailWidget);
+//                //损坏图片不透明
+//                emit m_view->sigImageOutTitleBar(false);
+//                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+//            }
+//        } else if (isPic) {
+//            m_stack->setCurrentWidget(m_view);
+//            //判断下是否透明
+//            m_view->titleBarControl();
+//        } else if (!currentPath.isEmpty() && ItemInfo.pathType == pathType && ItemInfo.imageType == imageType) {
+//            if (m_lockWidget) {
+//                m_stack->setCurrentWidget(m_lockWidget);
+//                //损坏图片不透明
+//                emit m_view->sigImageOutTitleBar(false);
+//            }
+//        }
 
         //如果是图片，按钮恢复，否则按钮置灰
 //        if (isPic) {
@@ -796,29 +823,28 @@ void LibViewPanel::slotBottomMove()
     if (m_bottomToolbar) {
         if (window()->isFullScreen()) {
             QPoint pos = mapFromGlobal(QCursor::pos());
-            int height = QGuiApplication::screenAt(this->pos())->geometry().height();
 
-            if (height - 20 < pos.y() && height > pos.y() && height == m_bottomToolbar->y()) {
+            if (height() - 20 < pos.y() && height() > pos.y() && height() == m_bottomToolbar->y()) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((width() - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
                 m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2,
-                                                      height - m_bottomToolbar->height() - 10));
+                                                      height() - m_bottomToolbar->height() - 10));
                 connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_bottomAnimation;
                     m_bottomAnimation = nullptr;
                 });
                 m_bottomAnimation->start();
-            } else if (height - m_bottomToolbar->height() - 10 > pos.y() &&
-                       height - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) {
+            } else if (height() - m_bottomToolbar->height() - 10 > pos.y() &&
+                       height() - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((width() - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
-                m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2, height));
+                m_bottomAnimation->setEndValue(QPoint((width() - m_bottomToolbar->width()) / 2, height()));
                 connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_bottomAnimation;
                     m_bottomAnimation = nullptr;
