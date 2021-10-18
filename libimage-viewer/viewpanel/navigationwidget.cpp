@@ -138,7 +138,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
 void NavigationWidget::setAlwaysHidden(bool value)
 {
     LibConfigSetter::instance()->setValue(SETTINGS_GROUP, SETTINGS_ALWAYSHIDDEN_KEY,
-                                       QVariant(value));
+                                          QVariant(value));
     if (isAlwaysHidden())
         hide();
     else
@@ -148,7 +148,7 @@ void NavigationWidget::setAlwaysHidden(bool value)
 bool NavigationWidget::isAlwaysHidden() const
 {
     return LibConfigSetter::instance()->value(SETTINGS_GROUP, SETTINGS_ALWAYSHIDDEN_KEY,
-                                           QVariant(false)).toBool();
+                                              QVariant(false)).toBool();
 }
 
 QPoint NavigationWidget::transImagePos(QPoint pos)
@@ -175,11 +175,14 @@ void NavigationWidget::setImage(const QImage &img)
     }
     //修复尺寸如果接近当前框体尺寸,会出现出界的情况
     QImage tmpImg = m_img;
-    if (m_img.height() > 85 && m_img.width() >= 139) {
-        m_img = m_img.scaled(m_img.width(), 85);
-    } else if (m_img.height() > 100 && m_img.width() >= 125) {
-        m_img = m_img.scaled(125, m_img.height());
+
+    //适应缩放比例
+    if (m_img.height() > (tmpImageRect.height() - 20) && m_img.width() >= (tmpImageRect.width() - 10)) {
+        m_img = m_img.scaled(m_img.width(), tmpImageRect.height() - 20);
+    } else if (m_img.height() > (tmpImageRect.height() - 10) && m_img.width() > (tmpImageRect.width() - 25)) {
+        m_img = m_img.scaled((tmpImageRect.width() - 25), m_img.height());
     }
+
     m_widthScale = qreal(m_img.width()) / qreal(tmpImg.width());
     m_heightScale = qreal(m_img.height()) / qreal(tmpImg.height());
     m_pix = QPixmap::fromImage(m_img);
