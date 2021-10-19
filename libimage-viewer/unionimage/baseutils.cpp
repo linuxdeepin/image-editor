@@ -260,6 +260,42 @@ QString getFileContent(const QString &file)
 //    return false;
 //}
 
+QString getNotExistsTrashFileName(const QString &fileName)
+{
+    QByteArray name = fileName.toUtf8();
+
+    int index = name.lastIndexOf('/');
+
+    if (index >= 0)
+        name = name.mid(index + 1);
+
+    index = name.lastIndexOf('.');
+    QByteArray suffix;
+
+    if (index >= 0)
+        suffix = name.mid(index);
+
+    if (suffix.size() > 200)
+        suffix = suffix.left(200);
+
+    name.chop(suffix.size());
+    name = name.left(200 - suffix.size());
+
+    QString trashpath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.local/share/Trash";
+
+    while (true) {
+        QFileInfo info(trashpath + name + suffix);
+        // QFile::exists ==> If the file is a symlink that points to a non-existing file, false is returned.
+        if (!info.isSymLink() && !info.exists()) {
+            break;
+        }
+
+        name = QCryptographicHash::hash(name, QCryptographicHash::Md5).toHex();
+    }
+
+    return QString::fromUtf8(name + suffix);
+}
+
 bool trashFile(const QString &file)
 {
 #ifdef QT_GUI_LIB
@@ -294,7 +330,7 @@ bool trashFile(const QString &file)
     infoStr += QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
     infoStr += "\n";
 
-    QString trashname = originalInfo.fileName();
+    QString trashname = getNotExistsTrashFileName(originalInfo.fileName());
     QString infopath = trashInfoPath + "/" + trashname + ".trashinfo";
     QString filepath = trashFilesPath + "/" + trashname;
     int nr = 1;

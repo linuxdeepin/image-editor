@@ -1109,14 +1109,14 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdPrint: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
             break;
         }
         case IdRename: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo,重命名
@@ -1147,7 +1147,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdCopy: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo,复制
@@ -1155,7 +1155,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdMoveToTrash: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo,删除
@@ -1187,7 +1187,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdSetAsWallpaper: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo设置壁纸
@@ -1195,7 +1195,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdDisplayInFileManager : {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo显示在文管
@@ -1203,7 +1203,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdImageInfo: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo,文件信息
@@ -1233,7 +1233,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdOcr: {
-                        if (m_view) {
+            if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
             //todo,ocr
