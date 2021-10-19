@@ -42,6 +42,7 @@
 #include "unionimage/unionimage.h"
 #include "service/commonservice.h"
 #include "imageengine.h"
+#include "image-viewer_global.h"
 DWIDGET_USE_NAMESPACE
 namespace {
 /////////
@@ -282,15 +283,20 @@ void LibBottomToolbar::deleteImage()
         if (!file.exists()) {
             return;
         }
-        //先删除文件，需要判断文件是否删除，如果删除了，再决定看图软件的显示
-        //不再采用默认删除,使用utils里面的删除
-        Libutils::base::trashFile(path);
-        QFile fileRemove(path);
         //文件是否被删除的判断bool值
         bool iRetRemove = false;
-        if (!fileRemove.exists()) {
+        if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal) {
+            //先删除文件，需要判断文件是否删除，如果删除了，再决定看图软件的显示
+            //不再采用默认删除,使用utils里面的删除
+            Libutils::base::trashFile(path);
+            QFile fileRemove(path);
+            if (!fileRemove.exists()) {
+                iRetRemove = true;
+            }
+        } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
             iRetRemove = true;
         }
+
         if (iRetRemove) {
             m_imgListWidget->removeCurrent();
             if (m_imgListWidget->getImgCount() == 1) {
@@ -381,6 +387,7 @@ void LibBottomToolbar::onRotateRBtnClicked()
 
 void LibBottomToolbar::onTrashBtnClicked()
 {
+    emit ImageEngine::instance()->sigDel(m_currentpath);
     deleteImage();
     //    emit dApp->signalM->deleteByMenu();
 }

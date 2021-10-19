@@ -35,6 +35,12 @@ signals:
 
     //当前图片数量为0
     void sigPicCountIsNull();
+
+    //可以写一个专门的信号管理类，管理相册和其他地方需要用到的专门的信号
+    //更新收藏按钮
+    void sigUpdateCollectBtn();
+    //删除
+    void sigDel(QString path);
 private:
 
     static ImageEngine *m_ImageEngine;

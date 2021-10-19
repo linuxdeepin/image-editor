@@ -128,6 +128,16 @@ DIconButton *ImageViewer::getBottomtoolbarButton(imageViewerSpace::ButtonType ty
     return button;
 }
 
+QString ImageViewer::getCurrentPath()
+{
+    Q_D(ImageViewer);
+    QString path;
+    if (d->m_panel) {
+        path = d->m_panel->getCurrentPath();
+    }
+    return path;
+}
+
 void ImageViewer::setViewPanelContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible)
 {
     Q_D(ImageViewer);

@@ -127,6 +127,8 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     }
     m_bottomToolbar->setAllFile(path, paths);
     m_currentPath = path;
+    //刷新收藏按钮
+    emit ImageEngine::instance()->sigUpdateCollectBtn();
     //重置底部工具栏位置与大小
     qDebug() << "---" << __FUNCTION__ << "---111111111111111";
     resetBottomToolbarGeometry(true);
@@ -724,6 +726,11 @@ DIconButton *LibViewPanel::getBottomtoolbarButton(imageViewerSpace::ButtonType t
     return button;
 }
 
+QString LibViewPanel::getCurrentPath()
+{
+    return m_currentPath;
+}
+
 void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
 {
     if (m_bottomToolbar) {
@@ -1282,6 +1289,8 @@ void LibViewPanel::openImg(int index, QString path)
     QFileInfo info(path);
     m_topToolbar->setMiddleContent(info.fileName());
     m_currentPath = path;
+    //刷新收藏按钮
+    emit ImageEngine::instance()->sigUpdateCollectBtn();
     updateMenuContent(path);
     Q_UNUSED(index);
 }

@@ -38,6 +38,9 @@ public:
     //获得工具栏按钮
     DIconButton *getBottomtoolbarButton(imageViewerSpace::ButtonType type);
 
+    //获得当前展示图片路径
+    QString getCurrentPath();
+
     //二次开发接口
 
     //设置图片显示panel右键菜单的显示和隐藏，false为永久隐藏，true为跟随原有策略显示或隐藏

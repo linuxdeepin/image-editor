@@ -114,6 +114,9 @@ public:
 
     //获得工具栏按钮
     DIconButton *getBottomtoolbarButton(imageViewerSpace::ButtonType type);
+
+    //获得当前展示图片路径
+    QString getCurrentPath();
 private slots:
     void onMenuItemClicked(QAction *action);
 
