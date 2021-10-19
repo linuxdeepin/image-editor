@@ -952,7 +952,9 @@ void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
         m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 - 50);
     }
     titleBarControl();
-    scaleAtPoint(QPoint(0, 0), 1.0);
+    if (!m_isFitWindow) {
+        scaleAtPoint(QPoint(0, 0), 1.0);
+    }
     QGraphicsView::resizeEvent(event);
 //    m_toast->move(width() / 2 - m_toast->width() / 2,
 //                  height() - 80 - m_toast->height() / 2 - 11);

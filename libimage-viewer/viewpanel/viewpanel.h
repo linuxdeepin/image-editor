@@ -117,11 +117,17 @@ public:
 
     //获得当前展示图片路径
     QString getCurrentPath();
+
+
+
 private slots:
     void onMenuItemClicked(QAction *action);
 
     //存在图片刷新
     void slotOneImgReady(QString path, imageViewerSpace::ItemInfo itemInfo);
+
+    //设置当前图片应该的界面
+    void setCurrentWidget(const QString &path);
 public slots:
     //刷新底部工具栏大小与位置
     void resetBottomToolbarGeometry(bool visible);

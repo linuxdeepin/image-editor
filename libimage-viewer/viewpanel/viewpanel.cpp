@@ -281,32 +281,6 @@ void LibViewPanel::initNavigation()
         m_nav->setImage(img);
         //转移到中心位置
 //        m_bottomToolbar->thumbnailMoveCenterWidget();
-
-        bool isFile = QFileInfo(path).isFile();
-        imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
-        //判断是否是损坏图片
-        if (!isFile && !path.isEmpty()) {
-            if (m_thumbnailWidget) {
-                m_stack->setCurrentWidget(m_thumbnailWidget);
-                //损坏图片不透明
-                emit m_view->sigImageOutTitleBar(false);
-                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
-            }
-        } else if (!img.isNull()) {
-            if (m_view) {
-                m_stack->setCurrentWidget(m_view);
-                //判断下是否透明
-                m_view->titleBarControl();
-            }
-            //判断是否存在缓存
-        } else if (!path.isEmpty() && img.isNull() && ItemInfo.pathType != imageViewerSpace::PathType::PathTypeBlank) {
-            if (m_lockWidget) {
-                m_stack->setCurrentWidget(m_lockWidget);
-                //损坏图片不透明
-                emit m_view->sigImageOutTitleBar(false);
-            }
-        }
-
     });
 
     connect(m_nav, &NavigationWidget::requestMove, [this](int x, int y) {
@@ -377,6 +351,13 @@ void LibViewPanel::updateMenuContent(QString path)
         bool isPic = !ItemInfo.image.isNull();
         if (!isPic) {
             isPic = !m_view->image().isNull();//当前视图是否是图片
+        }
+        if (isPic) {
+            if (m_view) {
+                m_stack->setCurrentWidget(m_view);
+                //判断下是否透明
+                m_view->titleBarControl();
+            }
         }
         QString currentPath;
         if (path.isEmpty()) {
@@ -503,13 +484,18 @@ void LibViewPanel::updateMenuContent(QString path)
         }
 
         //20211019修改：都可以转，但特殊位置不能执行写
-        if (isPic) {
+        if (isRotatable && isWritable && isPic) {
             appendAction(IdRotateClockwise, QObject::tr("Rotate clockwise"), ss("Rotate clockwise", "Ctrl+R"));
             appendAction(IdRotateCounterclockwise, QObject::tr("Rotate counterclockwise"),
                          ss("Rotate counterclockwise", "Ctrl+Shift+R"));
             if (m_bottomToolbar) {
                 m_bottomToolbar->setRotateBtnClicked(true);
             }
+        } else {
+            if (m_bottomToolbar) {
+                m_bottomToolbar->setRotateBtnClicked(false);
+            }
+
         }
 
         //需要判断图片是否支持设置壁纸,todo
@@ -729,6 +715,35 @@ DIconButton *LibViewPanel::getBottomtoolbarButton(imageViewerSpace::ButtonType t
 QString LibViewPanel::getCurrentPath()
 {
     return m_currentPath;
+}
+
+void LibViewPanel::setCurrentWidget(const QString &path)
+{
+    QImage img = m_view->image();
+    bool isFile = QFileInfo(path).isFile();
+    imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
+    //判断是否是损坏图片
+    if (!isFile && !path.isEmpty()) {
+        if (m_thumbnailWidget) {
+            m_stack->setCurrentWidget(m_thumbnailWidget);
+            //损坏图片不透明
+            emit m_view->sigImageOutTitleBar(false);
+            m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+        }
+    } else if (!img.isNull()) {
+        if (m_view) {
+            m_stack->setCurrentWidget(m_view);
+            //判断下是否透明
+            m_view->titleBarControl();
+        }
+        //判断是否存在缓存
+    } else if (!path.isEmpty() && img.isNull()) {
+        if (m_lockWidget) {
+            m_stack->setCurrentWidget(m_lockWidget);
+            //损坏图片不透明
+            emit m_view->sigImageOutTitleBar(false);
+        }
+    }
 }
 
 void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
@@ -1257,6 +1272,7 @@ void LibViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo item
     imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
     if (path.contains(ItemInfo.path)) {
         updateMenuContent();
+        setCurrentWidget(path);
     }
     Q_UNUSED(itemInfo);
 }
