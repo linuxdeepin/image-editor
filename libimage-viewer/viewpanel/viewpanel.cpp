@@ -281,13 +281,13 @@ void LibViewPanel::initNavigation()
 //        m_bottomToolbar->thumbnailMoveCenterWidget();
 
         bool isFile = QFileInfo(path).isFile();
+        imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
         //判断是否是损坏图片
         if (!isFile && !path.isEmpty()) {
             if (m_thumbnailWidget) {
                 m_stack->setCurrentWidget(m_thumbnailWidget);
                 //损坏图片不透明
                 emit m_view->sigImageOutTitleBar(false);
-                imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
                 m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
             }
         } else if (!img.isNull()) {
@@ -296,14 +296,15 @@ void LibViewPanel::initNavigation()
                 //判断下是否透明
                 m_view->titleBarControl();
             }
-
-        } else if (!path.isEmpty() && img.isNull()) {
+            //判断是否存在缓存
+        } else if (!path.isEmpty() && img.isNull() && ItemInfo.pathType != imageViewerSpace::PathType::PathTypeBlank) {
             if (m_lockWidget) {
                 m_stack->setCurrentWidget(m_lockWidget);
                 //损坏图片不透明
                 emit m_view->sigImageOutTitleBar(false);
             }
         }
+
     });
 
     connect(m_nav, &NavigationWidget::requestMove, [this](int x, int y) {
