@@ -847,14 +847,22 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
 
 void LibImageGraphicsView::slotRotatePixCurrent()
 {
-    m_rotateAngel =  m_rotateAngel % 360;
-    if (0 != m_rotateAngel) {
-        disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
-        Libutils::image::rotate(m_path, m_rotateAngel);
-        QTimer::singleShot(1000, [ = ] {
-            connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
-        });
-        m_rotateAngel = 0;
+    //20211019修改：特殊位置不执行写入操作
+    imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(m_path);
+
+    if (pathType != imageViewerSpace::PathTypeMTP && pathType != imageViewerSpace::PathTypePTP && //安卓手机
+            pathType != imageViewerSpace::PathTypeAPPLE && //苹果手机
+            pathType != imageViewerSpace::PathTypeSAFEBOX && //保险箱
+            pathType != imageViewerSpace::PathTypeRECYCLEBIN) { //回收站
+        m_rotateAngel =  m_rotateAngel % 360;
+        if (0 != m_rotateAngel) {
+            disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
+            Libutils::image::rotate(m_path, m_rotateAngel);
+            QTimer::singleShot(1000, [ = ] {
+                connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
+            });
+            m_rotateAngel = 0;
+        }
     }
 }
 

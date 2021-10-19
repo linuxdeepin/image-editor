@@ -465,16 +465,22 @@ void LibViewPanel::updateMenuContent(QString path)
         }
 
         //如果程序有可读可写的权限,才能重命名,todo
-        if (isReadable && isWritable) {
+        //20211019新增：安卓手机和苹果手机也不进行重命名
+        if (isReadable && isWritable &&
+                imageViewerSpace::PathTypeMTP != pathType &&
+                imageViewerSpace::PathTypePTP != pathType &&
+                imageViewerSpace::PathTypeAPPLE != pathType) {
             appendAction(IdRename, QObject::tr("Rename"), ss("Rename", "F2"));
         }
 
         //apple phone的delete没有权限,保险箱无法删除,垃圾箱也无法删除,其他需要判断可读权限,todo
-
+        //20211019新增：安卓手机也不进行删除
         DIconButton *TrashButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeTrash);
         if (imageViewerSpace::PathTypeAPPLE != pathType &&
                 imageViewerSpace::PathTypeSAFEBOX != pathType &&
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
+                imageViewerSpace::PathTypeMTP != pathType &&
+                imageViewerSpace::PathTypePTP != pathType &&
                 isWritable) {
             appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", "Delete"));
             TrashButton->setEnabled(true);
@@ -492,23 +498,15 @@ void LibViewPanel::updateMenuContent(QString path)
             appendAction(IdHideNavigationWindow, QObject::tr("Hide navigation window"),
                          ss("Hide navigation window", ""));
         }
-        //apple手机特殊处理，不具备旋转功能,todo,需要有写的权限
-        if (imageViewerSpace::PathTypeAPPLE != pathType
-                && imageViewerSpace::PathTypeSAFEBOX != pathType
-                && imageViewerSpace::PathTypeRECYCLEBIN != pathType
-                && isRotatable && isWritable && isPic) {
+
+        //20211019修改：都可以转，但特殊位置不能执行写
+        if (isPic) {
             appendAction(IdRotateClockwise, QObject::tr("Rotate clockwise"), ss("Rotate clockwise", "Ctrl+R"));
             appendAction(IdRotateCounterclockwise, QObject::tr("Rotate counterclockwise"),
                          ss("Rotate counterclockwise", "Ctrl+Shift+R"));
             if (m_bottomToolbar) {
                 m_bottomToolbar->setRotateBtnClicked(true);
             }
-
-        } else {
-            if (m_bottomToolbar) {
-                m_bottomToolbar->setRotateBtnClicked(false);
-            }
-
         }
 
         //需要判断图片是否支持设置壁纸,todo
@@ -1295,6 +1293,7 @@ void LibViewPanel::slotRotateImage(int angle)
         }
         m_view->slotRotatePixmap(angle);
     }
+
     //实时保存太卡，因此采用2s后延时保存的问题
     if (!m_tSaveImage) {
         m_tSaveImage = new QTimer(this);
@@ -1302,9 +1301,9 @@ void LibViewPanel::slotRotateImage(int angle)
             m_view->slotRotatePixCurrent();
         });
     }
-
     m_tSaveImage->setSingleShot(true);
     m_tSaveImage->start(2000);
+
     m_view->autoFit();
 }
 
