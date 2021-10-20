@@ -995,12 +995,6 @@ void LibImageGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
     painter->restore();
 }
 
-void LibImageGraphicsView::keyPressEvent(QKeyEvent *event)
-{
-    scaleAtPoint(QPoint(0, 0), 1.0);
-    return QGraphicsView::keyPressEvent(event);
-}
-
 int static count = 0;
 bool LibImageGraphicsView::event(QEvent *event)
 {
