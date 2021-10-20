@@ -352,13 +352,7 @@ void LibViewPanel::updateMenuContent(QString path)
         if (!isPic) {
             isPic = !m_view->image().isNull();//当前视图是否是图片
         }
-        if (isPic) {
-            if (m_view) {
-                m_stack->setCurrentWidget(m_view);
-                //判断下是否透明
-                m_view->titleBarControl();
-            }
-        }
+
         QString currentPath;
         if (path.isEmpty()) {
             currentPath = ItemInfo.path;
@@ -375,6 +369,25 @@ void LibViewPanel::updateMenuContent(QString path)
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
+
+        //判断是否是损坏图片
+        if (!isFile && !currentPath.isEmpty()) {
+            if (m_thumbnailWidget) {
+                m_stack->setCurrentWidget(m_thumbnailWidget);
+                //损坏图片不透明
+                emit m_view->sigImageOutTitleBar(false);
+                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+                if (m_bottomToolbar->getAllFileCount() <= 1) {
+                    emit ImageEngine::instance()->sigPicCountIsNull();
+                }
+            }
+        } else if (isPic) {
+            if (m_view) {
+                m_stack->setCurrentWidget(m_view);
+                //判断下是否透明
+                m_view->titleBarControl();
+            }
+        }
 
         if (m_info) {
             m_info->setImagePath(currentPath);
@@ -729,6 +742,9 @@ void LibViewPanel::setCurrentWidget(const QString &path)
             //损坏图片不透明
             emit m_view->sigImageOutTitleBar(false);
             m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+            if (m_bottomToolbar->getAllFileCount() <= 1) {
+                emit ImageEngine::instance()->sigPicCountIsNull();
+            }
         }
     } else if (!img.isNull()) {
         if (m_view) {

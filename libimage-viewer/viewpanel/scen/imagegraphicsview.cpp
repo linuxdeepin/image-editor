@@ -840,7 +840,7 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
     autoFit();
     m_rotateAngel += nAngel;
 
-    emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
+    emit currentThumbnailChanged(pixmap, pixmap.size());
     emit imageChanged(m_path);
     return true;
 }
@@ -1077,7 +1077,10 @@ void LibImageGraphicsView::onCacheFinish()
             m_newImageLoadPhase = FullFinish;
 
             //刷新缩略图
-            emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
+            if (!pixmap.isNull()) {
+                emit currentThumbnailChanged(pixmap, pixmap.size());
+            }
+
         }
     }
 }
@@ -1259,7 +1262,7 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
     if (m_bRoate) {
         m_rotateAngel += m_endvalue;
         emit gestureRotate(static_cast<int>(0));
-        emit currentThumbnailChanged(pixmap.scaled(200, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), pixmap.size());
+        emit currentThumbnailChanged(pixmap, pixmap.size());
         emit UpdateNavImg();
     }
     qDebug() << m_endvalue;
