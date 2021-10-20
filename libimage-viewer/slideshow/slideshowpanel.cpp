@@ -298,10 +298,9 @@ void LibSlideShowPanel::startSlideShow(const ViewInfo &vinfo)
     }
     m_vinfo = vinfo;
 
-    //BUG#98244 延时触发鼠标消失，防止F5进入后重复进入mouse move触发鼠标出现
-    QTimer::singleShot(100, [this]() {
-        this->setCursor(Qt::BlankCursor);
-    });
+    //防止F5进入后重复进入mouse move触发鼠标出现
+    m_isf5move = true;
+    this->setCursor(Qt::BlankCursor);
 
     if (1 < vinfo.paths.length()) {
         slideshowbottombar->m_preButton->setEnabled(true);
@@ -403,7 +402,13 @@ void LibSlideShowPanel::onCustomContextMenuRequested()
 void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    this->setCursor(Qt::ArrowCursor);
+
+    if (m_isf5move) {
+        m_isf5move = false;
+    } else {
+        this->setCursor(Qt::ArrowCursor);
+    }
+
     if (window()->isFullScreen()) {
         QPoint pos = mapFromGlobal(QCursor::pos());
         // 处理程序界面的初始高度和全屏下幻灯片界面不一致导致底部工具栏位置错误

@@ -119,6 +119,7 @@ private:
     QColor m_bgColor;
     bool m_isMaximized;
     int m_hideCursorTid;
+    bool m_isf5move = false;
 };
 
 #endif // SLIDESHOWPANEL_H
