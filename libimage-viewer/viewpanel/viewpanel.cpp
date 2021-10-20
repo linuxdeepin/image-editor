@@ -1300,7 +1300,7 @@ void LibViewPanel::resetBottomToolbarGeometry(bool visible)
         m_bottomToolbar->setVisible(visible);
     }
     if (visible) {
-        int width = qMin(m_bottomToolbar->getToolbarWidth(), (this->width() - RT_SPACING));
+        int width = qMin(m_bottomToolbar->getToolbarWidth() + 22, (this->width() - RT_SPACING));
         int x = (this->width() - width) / 2;
         //窗口高度-工具栏高度-工具栏到底部距离
         //全屏默认隐藏
@@ -1345,8 +1345,6 @@ void LibViewPanel::slotRotateImage(int angle)
     }
     m_tSaveImage->setSingleShot(true);
     m_tSaveImage->start(2000);
-
-    m_view->autoFit();
 }
 
 void LibViewPanel::slotResetTransform(bool bRet)

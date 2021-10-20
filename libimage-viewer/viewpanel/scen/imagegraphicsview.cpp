@@ -1261,9 +1261,11 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
     scale(m_scal, m_scal);
     if (m_bRoate) {
         m_rotateAngel += m_endvalue;
-        emit gestureRotate(static_cast<int>(0));
-        emit currentThumbnailChanged(pixmap, pixmap.size());
-        emit UpdateNavImg();
+        if (m_endvalue > 0) {
+            emit gestureRotate(static_cast<int>(0));
+            emit currentThumbnailChanged(pixmap, pixmap.size());
+            emit UpdateNavImg();
+        }
     }
     qDebug() << m_endvalue;
 }
