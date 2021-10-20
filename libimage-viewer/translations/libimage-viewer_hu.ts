@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Alapvető információk</translation>
+        <translation type="vanished">Alapvető információk</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Részletek</translation>
+        <translation type="vanished">Részletek</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Alapvető információk</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Részletek</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Összes kép</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Kép megnyitása</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -121,7 +167,7 @@
     <name>QObject</name>
     <message>
         <source>day</source>
-        <translation>nap</translation>
+        <translation type="vanished">nap</translation>
     </message>
     <message>
         <source>Back</source>
@@ -257,11 +303,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Kép megnyitása</translation>
+        <translation type="vanished">Kép megnyitása</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Összes kép</translation>
+        <translation type="vanished">Összes kép</translation>
     </message>
 </context>
 </TS>

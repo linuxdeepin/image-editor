@@ -41,6 +41,8 @@ signals:
     void sigUpdateCollectBtn();
     //删除
     void sigDel(QString path);
+    //获取自定义相册
+    void sigGetAlbumName(const QString &path);
 private:
 
     static ImageEngine *m_ImageEngine;

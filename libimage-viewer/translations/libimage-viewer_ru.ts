@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Основная информация</translation>
+        <translation type="vanished">Основная информация</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Детали</translation>
+        <translation type="vanished">Детали</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Основная информация</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Детали</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Все изображения</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Открыть  Изображение</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Назад</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Открыть  Изображение</translation>
+        <translation type="vanished">Открыть  Изображение</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Все изображения</translation>
+        <translation type="vanished">Все изображения</translation>
     </message>
 </context>
 </TS>

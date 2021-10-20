@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>आधारभूत जानकारी</translation>
+        <translation type="vanished">आधारभूत जानकारी</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>विवरण</translation>
+        <translation type="vanished">विवरण</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">आधारभूत जानकारी</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">विवरण</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">सबै छविहरू</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">छवि खोल्नुहोस्</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">पछाडि</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>छवि खोल्नुहोस्</translation>
+        <translation type="vanished">छवि खोल्नुहोस्</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>सबै छविहरू</translation>
+        <translation type="vanished">सबै छविहरू</translation>
     </message>
 </context>
 </TS>

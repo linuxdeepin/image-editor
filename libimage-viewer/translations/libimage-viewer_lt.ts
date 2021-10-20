@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Pagrindinė informacija</translation>
+        <translation type="vanished">Pagrindinė informacija</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Išsamiau</translation>
+        <translation type="vanished">Išsamiau</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Pagrindinė informacija</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Išsamiau</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Visi paveikslai</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Atverti paveikslą</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Atgal</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Atverti paveikslą</translation>
+        <translation type="vanished">Atverti paveikslą</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Visi paveikslai</translation>
+        <translation type="vanished">Visi paveikslai</translation>
     </message>
 </context>
 </TS>

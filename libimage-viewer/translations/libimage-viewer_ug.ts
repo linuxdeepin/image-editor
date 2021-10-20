@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>ئاساسى ئۇچۇر</translation>
+        <translation type="vanished">ئاساسى ئۇچۇر</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>تەپسىلاتلار</translation>
+        <translation type="vanished">تەپسىلاتلار</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">ئاساسى ئۇچۇر</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">تەپسىلاتلار</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">بارلىق رەسىملەر</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">رەسىمنى ئېچىش</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation>قايتىش</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>رەسىمنى ئېچىش</translation>
+        <translation type="vanished">رەسىمنى ئېچىش</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>بارلىق رەسىملەر</translation>
+        <translation type="vanished">بارلىق رەسىملەر</translation>
     </message>
 </context>
 </TS>

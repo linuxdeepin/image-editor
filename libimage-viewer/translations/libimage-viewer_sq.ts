@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Të dhëna elementare</translation>
+        <translation type="vanished">Të dhëna elementare</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Hollësi</translation>
+        <translation type="vanished">Hollësi</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Të dhëna elementare</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Hollësi</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Krejt figurat</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Hap Figurë</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -121,7 +167,7 @@
     <name>QObject</name>
     <message>
         <source>day</source>
-        <translation>ditë</translation>
+        <translation type="vanished">ditë</translation>
     </message>
     <message>
         <source>Back</source>
@@ -257,11 +303,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Hap Figurë</translation>
+        <translation type="vanished">Hap Figurë</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Krejt figurat</translation>
+        <translation type="vanished">Krejt figurat</translation>
     </message>
 </context>
 </TS>

@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Temel bilgi</translation>
+        <translation type="vanished">Temel bilgi</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Ayrıntılar</translation>
+        <translation type="vanished">Ayrıntılar</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Temel bilgi</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Ayrıntılar</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Tüm görüntüler</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Görüntü Aç</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation>Geri</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Görüntü Aç</translation>
+        <translation type="vanished">Görüntü Aç</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Tüm görüntüler</translation>
+        <translation type="vanished">Tüm görüntüler</translation>
     </message>
 </context>
 </TS>

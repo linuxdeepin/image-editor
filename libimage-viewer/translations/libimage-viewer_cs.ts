@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Základní údaje</translation>
+        <translation type="vanished">Základní údaje</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Podrobnosti</translation>
+        <translation type="vanished">Podrobnosti</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Základní údaje</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Podrobnosti</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Všechny obrázky</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Otevřít obrázek</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Zpět</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Otevřít obrázek</translation>
+        <translation type="vanished">Otevřít obrázek</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Všechny obrázky</translation>
+        <translation type="vanished">Všechny obrázky</translation>
     </message>
 </context>
 </TS>

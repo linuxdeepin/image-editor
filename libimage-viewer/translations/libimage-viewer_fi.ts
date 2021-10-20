@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Perustiedot</translation>
+        <translation type="vanished">Perustiedot</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Tiedot</translation>
+        <translation type="vanished">Tiedot</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Perustiedot</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Tiedot</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Kaikki kuvat</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Avaa kuva</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -121,7 +167,7 @@
     <name>QObject</name>
     <message>
         <source>day</source>
-        <translation>päivä</translation>
+        <translation type="vanished">päivä</translation>
     </message>
     <message>
         <source>Back</source>
@@ -257,11 +303,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Avaa kuva</translation>
+        <translation type="vanished">Avaa kuva</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Kaikki kuvat</translation>
+        <translation type="vanished">Kaikki kuvat</translation>
     </message>
 </context>
 </TS>

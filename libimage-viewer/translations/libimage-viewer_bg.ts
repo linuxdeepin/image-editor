@@ -13,13 +13,48 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
+    <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Всички изображения</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Отваряне на изображение</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -119,10 +154,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Обратно</translation>
@@ -257,11 +288,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Отваряне на изображение</translation>
+        <translation type="vanished">Отваряне на изображение</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Всички изображения</translation>
+        <translation type="vanished">Всички изображения</translation>
     </message>
 </context>
 </TS>

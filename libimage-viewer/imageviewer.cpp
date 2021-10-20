@@ -81,9 +81,10 @@ bool ImageViewer::startChooseFileDialog()
     return d->m_panel->startChooseFileDialog();
 }
 
-bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath)
+bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath, bool isCustom)
 {
     Q_D(ImageViewer);
+    d->m_panel->setIsCustomAlbum(isCustom);
     return d->m_panel->startdragImage(paths, firstPath);
 }
 
@@ -151,6 +152,14 @@ void ImageViewer::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::Butto
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setBottomToolBarButtonAlawysNotVisible(id, notVisible);
+    }
+}
+
+void ImageViewer::setCustomAlbumName(const QMap<QString, bool> map, bool isFav)
+{
+    Q_D(ImageViewer);
+    if (d->m_panel) {
+        d->m_panel->updateCustomAlbum(map, isFav);
     }
 }
 

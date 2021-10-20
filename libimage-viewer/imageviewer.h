@@ -24,7 +24,7 @@ public:
     bool startChooseFileDialog();
 
     //传入路径加载图片
-    bool startdragImage(const QStringList &paths, const QString &firstPath = "");
+    bool startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false);
 
     //启动图片展示入口
     void startImgView(QString currentPath, QStringList paths = QStringList());
@@ -48,6 +48,9 @@ public:
 
     //设置下方工具栏按钮的显示和隐藏，true为永久隐藏，false为跟随原有策略显示或隐藏
     void setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible);
+
+    //相册-给右键菜单传输自定义相册名称
+    void setCustomAlbumName(const QMap<QString, bool> map, bool isFav);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

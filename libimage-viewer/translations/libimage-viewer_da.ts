@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Grundlæggende info</translation>
+        <translation type="vanished">Grundlæggende info</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Detaljer</translation>
+        <translation type="vanished">Detaljer</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Grundlæggende info</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Detaljer</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Alle billeder</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Åbn billede</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Tilbage</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Åbn billede</translation>
+        <translation type="vanished">Åbn billede</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Alle billeder</translation>
+        <translation type="vanished">Alle billeder</translation>
     </message>
 </context>
 </TS>

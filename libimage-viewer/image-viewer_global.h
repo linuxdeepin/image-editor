@@ -22,6 +22,7 @@ enum NormalMenuItemId {
     IdRename,
     IdPrint,
     IdAddToAlbum,
+    IdExport,
     IdCopy,
     IdMoveToTrash,
     IdRemoveFromTimeline,

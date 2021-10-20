@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Basisinformationen</translation>
+        <translation type="vanished">Basisinformationen</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Details</translation>
+        <translation type="vanished">Details</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Basisinformationen</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Details</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Alle Bilder</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Bild öffnen</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -121,7 +167,7 @@
     <name>QObject</name>
     <message>
         <source>day</source>
-        <translation>Tag</translation>
+        <translation type="vanished">Tag</translation>
     </message>
     <message>
         <source>Back</source>
@@ -257,11 +303,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Bild öffnen</translation>
+        <translation type="vanished">Bild öffnen</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Alle Bilder</translation>
+        <translation type="vanished">Alle Bilder</translation>
     </message>
 </context>
 </TS>

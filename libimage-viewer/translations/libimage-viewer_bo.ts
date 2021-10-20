@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>གཞི་རྩའི་ཆ་འཕྲིན། </translation>
+        <translation type="vanished">གཞི་རྩའི་ཆ་འཕྲིན། </translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
+        <translation type="vanished">ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">གཞི་རྩའི་ཆ་འཕྲིན། </translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">པར་ཚང་མ།</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">པར་ཁ་ཕྱེ་བ།</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">ཕྱིར་ལོག</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>པར་ཁ་ཕྱེ་བ།</translation>
+        <translation type="vanished">པར་ཁ་ཕྱེ་བ།</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>པར་ཚང་མ།</translation>
+        <translation type="vanished">པར་ཚང་མ།</translation>
     </message>
 </context>
 </TS>

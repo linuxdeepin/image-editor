@@ -338,6 +338,11 @@ void LibViewPanel::initExtensionPanel()
 
 void LibViewPanel::updateMenuContent(QString path)
 {
+    //判断是否为相册调用
+    bool isAlbum = false;
+    if (ImgViewerType::ImgViewerTypeAlbum == LibCommonService::instance()->getImgViewerType()) {
+        isAlbum = true;
+    }
     if (!window()->isFullScreen()) {
         resetBottomToolbarGeometry(true);
     }
@@ -439,8 +444,38 @@ void LibViewPanel::updateMenuContent(QString path)
 
         //如果图片数量大于0才能有幻灯片
         appendAction(IdStartSlideShow, QObject::tr("Slide show"), ss("Slide show", "F5"));
+        //添加到相册
+        if (isAlbum) {
+            emit ImageEngine::instance()->sigGetAlbumName(ItemInfo.path);
+            if (!m_CustomAlbumName.isEmpty()) {
+                m_menu->addSeparator();
+                DMenu *am = new DMenu(tr("Add to album"));
+
+                QAction *ac1 = new QAction(am);
+                ac1->setProperty("MenuID", IdAddToAlbum);
+                ac1->setText(tr("New album"));
+                ac1->setData("Add to new album");
+                ac1->setShortcut(QKeySequence("Ctrl+Shift+N"));
+                am->addAction(ac1);
+                am->addSeparator();
+                for (auto iter = m_CustomAlbumName.begin(); iter != m_CustomAlbumName.end(); iter++) {
+                    QAction *ac = new QAction(am);
+                    ac->setProperty("MenuID", IdAddToAlbum);
+                    ac->setText(fontMetrics().elidedText(QString(iter.key()).replace("&", "&&"), Qt::ElideMiddle, 200));
+                    ac->setData(iter.key());
+                    am->addAction(ac);
+                    if (iter.value()) {
+                        ac->setEnabled(false);
+                    }
+                }
+                m_menu->addMenu(am);
+            }
+        }
 
         m_menu->addSeparator();
+        if (isAlbum) {
+            appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
+        }
         if (isReadable) {
             appendAction(IdCopy, QObject::tr("Copy"), ss("Copy", "Ctrl+C"));
         }
@@ -450,7 +485,7 @@ void LibViewPanel::updateMenuContent(QString path)
         if (isReadable && isWritable &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                imageViewerSpace::PathTypeAPPLE != pathType) {
+                imageViewerSpace::PathTypeAPPLE != pathType && !isAlbum) {
             appendAction(IdRename, QObject::tr("Rename"), ss("Rename", "F2"));
         }
 
@@ -468,8 +503,20 @@ void LibViewPanel::updateMenuContent(QString path)
         } else {
             TrashButton->setEnabled(false);
         }
-
+        //IdRemoveFromAlbum
+        if (isAlbum && m_isCustomAlbum) {
+            appendAction(IdRemoveFromAlbum, tr("Remove from album"), ss("Remove from album", ""));
+        }
         m_menu->addSeparator();
+        //fav
+        if (isAlbum) {
+            if (m_isFav) {
+                appendAction(IdRemoveFromFavorites, tr("Unfavorite"), "");    //取消收藏
+            } else {
+                appendAction(IdAddToFavorites, tr("Favorite"), "");       //收藏
+            }
+            m_menu->addSeparator();
+        }
 
         //判断导航栏隐藏,需要添加一个当前是否有图片,todo
         if (isReadable && isPic && !m_view->isWholeImageVisible() && m_nav->isAlwaysHidden()) {
@@ -896,6 +943,18 @@ void LibViewPanel::showPrevious()
     if (PreviousButton->isEnabled()) {
         m_bottomToolbar->onPreButton();
     }
+}
+
+void LibViewPanel::updateCustomAlbum(const QMap<QString, bool> &map, bool isFav)
+{
+    m_CustomAlbumName.clear();
+    m_CustomAlbumName = map;
+    m_isFav = isFav;
+}
+
+void LibViewPanel::setIsCustomAlbum(bool isCustom)
+{
+    m_isCustomAlbum = isCustom;
 }
 
 bool LibViewPanel::slotOcrPicture()

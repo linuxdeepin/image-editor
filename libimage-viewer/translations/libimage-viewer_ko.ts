@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>기본 정보</translation>
+        <translation type="vanished">기본 정보</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>상세 정보</translation>
+        <translation type="vanished">상세 정보</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">기본 정보</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">상세 정보</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">모든 이미지</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">이미지 열기</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">뒤로</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>이미지 열기</translation>
+        <translation type="vanished">이미지 열기</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>모든 이미지</translation>
+        <translation type="vanished">모든 이미지</translation>
     </message>
 </context>
 </TS>

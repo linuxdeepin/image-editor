@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Osnovne informacije</translation>
+        <translation type="vanished">Osnovne informacije</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Pojedinosti</translation>
+        <translation type="vanished">Pojedinosti</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Osnovne informacije</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Pojedinosti</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Sve slike</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Otvori sliku</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Natrag</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Otvori sliku</translation>
+        <translation type="vanished">Otvori sliku</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Sve slike</translation>
+        <translation type="vanished">Sve slike</translation>
     </message>
 </context>
 </TS>

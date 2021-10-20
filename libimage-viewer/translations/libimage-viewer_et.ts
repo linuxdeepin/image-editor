@@ -16,11 +16,57 @@
     <name>ImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Põhiinfo</translation>
+        <translation type="vanished">Põhiinfo</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation>Üksikasjad</translation>
+        <translation type="vanished">Üksikasjad</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageInfoWidget</name>
+    <message>
+        <source>Basic info</source>
+        <translation type="unfinished">Põhiinfo</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished">Üksikasjad</translation>
+    </message>
+</context>
+<context>
+    <name>LibViewPanel</name>
+    <message>
+        <source>Add to album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All images</source>
+        <translation type="unfinished">Kõik pildid</translation>
+    </message>
+    <message>
+        <source>Open Image</source>
+        <translation type="unfinished">Ava pilt</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unfavorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -119,10 +165,6 @@
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>day</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Back</source>
         <translation type="unfinished">Tagasi</translation>
@@ -257,11 +299,11 @@
     <name>ViewPanel</name>
     <message>
         <source>Open Image</source>
-        <translation>Ava pilt</translation>
+        <translation type="vanished">Ava pilt</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation>Kõik pildid</translation>
+        <translation type="vanished">Kõik pildid</translation>
     </message>
 </context>
 </TS>
