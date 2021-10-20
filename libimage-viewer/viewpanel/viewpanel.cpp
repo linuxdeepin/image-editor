@@ -1378,6 +1378,7 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     resetBottomToolbarGeometry(true);
     QFrame::resizeEvent(e);
+    emit m_view->transformChanged();
 }
 
 void LibViewPanel::showEvent(QShowEvent *e)
