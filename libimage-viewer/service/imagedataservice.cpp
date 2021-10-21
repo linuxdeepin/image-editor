@@ -238,10 +238,12 @@ void LibReadThumbnailThread::readThumbnail(QString path)
         return;
     }
     QString errMsg;
-    QSize readSize;
 
     if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
         qDebug() << errMsg;
+        //损坏图片也需要缓存更新
+        itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
+        LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
         return;
     }
     //读取图片,给长宽重新赋值

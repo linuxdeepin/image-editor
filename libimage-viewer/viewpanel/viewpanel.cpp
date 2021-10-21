@@ -365,29 +365,13 @@ void LibViewPanel::updateMenuContent(QString path)
         QFileInfo info(currentPath);
         bool isReadable = info.isReadable();//是否可读
         bool isWritable = info.isWritable();//是否可写
-        bool isFile = info.isFile(); //是否存在
+//        bool isFile = info.isFile(); //是否存在
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
 
         //判断是否是损坏图片
-        if (!isFile && !currentPath.isEmpty()) {
-            if (m_thumbnailWidget) {
-                m_stack->setCurrentWidget(m_thumbnailWidget);
-                //损坏图片不透明
-                emit m_view->sigImageOutTitleBar(false);
-                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
-                if (m_bottomToolbar->getAllFileCount() <= 1) {
-                    emit ImageEngine::instance()->sigPicCountIsNull();
-                }
-            }
-        } else if (isPic) {
-            if (m_view) {
-                m_stack->setCurrentWidget(m_view);
-                //判断下是否透明
-                m_view->titleBarControl();
-            }
-        }
+        setCurrentWidget(currentPath);
 
         if (m_info) {
             m_info->setImagePath(currentPath);
@@ -753,7 +737,7 @@ void LibViewPanel::setCurrentWidget(const QString &path)
             m_view->titleBarControl();
         }
         //判断是否存在缓存
-    } else if (!path.isEmpty() && img.isNull()) {
+    } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
         if (m_lockWidget) {
             m_stack->setCurrentWidget(m_lockWidget);
             //损坏图片不透明
@@ -1288,7 +1272,6 @@ void LibViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo item
     imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
     if (path.contains(ItemInfo.path)) {
         updateMenuContent();
-        setCurrentWidget(path);
     }
     Q_UNUSED(itemInfo);
 }
