@@ -1153,6 +1153,10 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
 {
     //当幻灯片的情况屏蔽快捷键的使用
     if (m_stack->currentWidget() != m_sliderPanel) {
+        QString currentpath = m_bottomToolbar->getCurrentItemInfo().path;
+        if (currentpath.isEmpty()) {
+            currentpath = m_currentPath;
+        }
         const int id = action->property("MenuID").toInt();
         switch (imageViewerSpace::NormalMenuItemId(id)) {
         case IdFullScreen:
@@ -1318,6 +1322,31 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             }
             //todo,ocr
             slotOcrPicture();
+            break;
+        }
+        case IdAddToAlbum: {
+            const QString album = action->data().toString();
+            if (album != "Add to new album") {
+                emit ImageEngine::instance()->sigAddToAlbum(false, album, currentpath);
+            } else {
+                emit ImageEngine::instance()->sigAddToAlbum(true, "", currentpath);
+            }
+            break;
+        }
+        case IdExport: {
+            emit ImageEngine::instance()->sigExport(currentpath);
+            break;
+        }
+        case IdRemoveFromAlbum: {
+            emit ImageEngine::instance()->sigRemoveFromCustom(currentpath);
+            break;
+        }
+        case IdAddToFavorites: {
+            emit ImageEngine::instance()->sigAddOrRemoveToFav(currentpath, true);
+            break;
+        }
+        case IdRemoveFromFavorites: {
+            emit ImageEngine::instance()->sigAddOrRemoveToFav(currentpath, false);
             break;
         }
         default:
