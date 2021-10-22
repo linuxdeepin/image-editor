@@ -23,8 +23,8 @@ public:
     //调用文件选择窗口
     bool startChooseFileDialog();
 
-    //传入路径加载图片
-    bool startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false);
+    //传入路径加载图片 paths：所有照片 firstPath：第一张 isCustom：是否是自定义相册 album：自定义相册名称
+    bool startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "");
 
     //启动图片展示入口
     void startImgView(QString currentPath, QStringList paths = QStringList());

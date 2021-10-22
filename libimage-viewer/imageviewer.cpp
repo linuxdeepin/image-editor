@@ -81,10 +81,10 @@ bool ImageViewer::startChooseFileDialog()
     return d->m_panel->startChooseFileDialog();
 }
 
-bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath, bool isCustom)
+bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album)
 {
     Q_D(ImageViewer);
-    d->m_panel->setIsCustomAlbum(isCustom);
+    d->m_panel->setIsCustomAlbum(isCustom, album);
     return d->m_panel->startdragImage(paths, firstPath);
 }
 

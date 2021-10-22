@@ -50,7 +50,7 @@ signals:
     //导出
     void sigExport(const QString &path);
     //从自定义相册中移除
-    void sigRemoveFromCustom(const QString &path);
+    void sigRemoveFromCustom(const QString &path, const QString &album);
 private:
 
     static ImageEngine *m_ImageEngine;

@@ -952,9 +952,10 @@ void LibViewPanel::updateCustomAlbum(const QMap<QString, bool> &map, bool isFav)
     m_isFav = isFav;
 }
 
-void LibViewPanel::setIsCustomAlbum(bool isCustom)
+void LibViewPanel::setIsCustomAlbum(bool isCustom, const QString &album)
 {
     m_isCustomAlbum = isCustom;
+    m_CurrentCustomName = album;
 }
 
 bool LibViewPanel::slotOcrPicture()
@@ -1338,7 +1339,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdRemoveFromAlbum: {
-            emit ImageEngine::instance()->sigRemoveFromCustom(currentpath);
+            emit ImageEngine::instance()->sigRemoveFromCustom(currentpath, m_CurrentCustomName);
             break;
         }
         case IdAddToFavorites: {

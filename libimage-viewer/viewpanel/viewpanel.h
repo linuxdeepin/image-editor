@@ -161,7 +161,7 @@ public slots:
     //更新当前照片的自定义相册包含情况
     void updateCustomAlbum(const QMap<QString, bool> &map, bool isFav);
     //缩略图打开界面是否是从自定义界面打开
-    void setIsCustomAlbum(bool isCustom);
+    void setIsCustomAlbum(bool isCustom, const QString &album = "");
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
@@ -211,6 +211,8 @@ private :
     //当前相册所有自定义相册名以及是否包含当前照片
     QMap<QString, bool> m_CustomAlbumName;
     bool m_isFav = false;
+    //当前打开图片是否从自定义打开，自定义相册名
     bool m_isCustomAlbum = false;
+    QString m_CurrentCustomName = "";
 };
 #endif  // VIEWPANEL_H
