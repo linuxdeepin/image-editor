@@ -1344,10 +1344,12 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
         }
         case IdAddToFavorites: {
             emit ImageEngine::instance()->sigAddOrRemoveToFav(currentpath, true);
+            emit ImageEngine::instance()->sigUpdateCollectBtn();
             break;
         }
         case IdRemoveFromFavorites: {
             emit ImageEngine::instance()->sigAddOrRemoveToFav(currentpath, false);
+            emit ImageEngine::instance()->sigUpdateCollectBtn();
             break;
         }
         default:
