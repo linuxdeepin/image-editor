@@ -52,6 +52,12 @@ public:
     //相册-给右键菜单传输自定义相册名称
     void setCustomAlbumName(const QMap<QString, bool> map, bool isFav);
 
+    //设置全屏/退出全屏
+    void switchFullScreen();
+
+    //设置启动幻灯片
+    void startSlideShow(const QStringList &paths, const QString &firstPath);
+
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;

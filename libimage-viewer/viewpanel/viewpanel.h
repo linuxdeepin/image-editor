@@ -30,6 +30,7 @@
 #include <bitset>
 
 #include "scen/imagegraphicsview.h"
+#include "slideshow/slideshowpanel.h"
 
 class AbstractTopToolbar;
 
@@ -86,6 +87,8 @@ public:
     void showFullScreen();
     //退出全屏
     void showNormal();
+    //启动幻灯片播放
+    void startSlideShow(const ViewInfo &info);
     /**
      * @brief appendAction  添加右键菜单按钮
      * @param id            按钮枚举ID
@@ -178,7 +181,7 @@ signals:
 
     //刷新缩略图
     void updateThumbnail(QPixmap pix, const QSize &originalSize);
-private :
+private:
     DStackedWidget *m_stack = nullptr;
     LibImageGraphicsView *m_view = nullptr;
     LockWidget *m_lockWidget = nullptr;

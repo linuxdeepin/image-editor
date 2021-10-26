@@ -103,6 +103,24 @@ void ImageViewer::startImgView(QString currentPath, QStringList paths)
     }
 }
 
+void ImageViewer::switchFullScreen()
+{
+    Q_D(ImageViewer);
+    d->m_panel->toggleFullScreen();
+}
+
+void ImageViewer::startSlideShow(const QStringList &paths, const QString &firstPath)
+{
+    Q_D(ImageViewer);
+    ViewInfo info;
+    info.fullScreen = window()->isFullScreen();
+    info.lastPanel = this;
+    info.path = firstPath;
+    info.paths = paths;
+    info.viewMainWindowID = 0;
+    d->m_panel->startSlideShow(info);
+}
+
 void ImageViewer::setTopBarVisible(bool visible)
 {
     Q_D(ImageViewer);

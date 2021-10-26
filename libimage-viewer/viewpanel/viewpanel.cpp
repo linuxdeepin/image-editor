@@ -1017,6 +1017,7 @@ void LibViewPanel::initSlidePanel()
         m_sliderPanel = new LibSlideShowPanel(this);
         m_stack->addWidget(m_sliderPanel);
         connect(m_sliderPanel, &LibSlideShowPanel::hideSlidePanel, this, &LibViewPanel::backImageView);
+        connect(m_sliderPanel, &LibSlideShowPanel::hideSlidePanel, ImageEngine::instance(), &ImageEngine::exitSlideShow);
     }
 }
 
@@ -1141,6 +1142,8 @@ void LibViewPanel::initShortcut()
                 m_sliderPanel->onShowPause();
             }
         }
+
+        getBottomtoolbarButton(imageViewerSpace::ButtonType::ButtonTypeBack)->click();
     });
     // 1:1 size
     QShortcut *adaptImage = new QShortcut(QKeySequence("Ctrl+0"), this);
@@ -1171,31 +1174,13 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdStartSlideShow: {
-            //判断旋转图片本体是否旋转
-            if (m_view) {
-                m_view->slotRotatePixCurrent();
-            }
-            //todo,幻灯片
-            if (!m_sliderPanel) {
-                initSlidePanel();
-            }
             ViewInfo vinfo;
             vinfo.fullScreen = window()->isFullScreen();
             vinfo.lastPanel = this;
             vinfo.path = m_bottomToolbar->getCurrentItemInfo().path;
             vinfo.paths = m_bottomToolbar->getAllPath();
             vinfo.viewMainWindowID = 0;
-            m_sliderPanel->startSlideShow(vinfo);
-            m_stack->setCurrentWidget(m_sliderPanel);
-            //正在滑动缩略图的时候不再显示
-            if (m_nav->isVisible()) {
-                m_nav->setVisible(false);
-            }
-            //打开幻灯片默认关闭图片详情
-            if (m_info && m_extensionPanel) {
-                m_info->setVisible(false);
-                m_extensionPanel->setVisible(false);
-            }
+            startSlideShow(vinfo);
             break;
         }
         case IdPrint: {
@@ -1370,6 +1355,29 @@ void LibViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo item
         updateMenuContent();
     }
     Q_UNUSED(itemInfo);
+}
+
+void LibViewPanel::startSlideShow(const ViewInfo &info)
+{
+    //判断旋转图片本体是否旋转
+    if (m_view) {
+        m_view->slotRotatePixCurrent();
+    }
+    //todo,幻灯片
+    if (!m_sliderPanel) {
+        initSlidePanel();
+    }
+    m_sliderPanel->startSlideShow(info);
+    m_stack->setCurrentWidget(m_sliderPanel);
+    //正在滑动缩略图的时候不再显示
+    if (m_nav->isVisible()) {
+        m_nav->setVisible(false);
+    }
+    //打开幻灯片默认关闭图片详情
+    if (m_info && m_extensionPanel) {
+        m_info->setVisible(false);
+        m_extensionPanel->setVisible(false);
+    }
 }
 
 void LibViewPanel::resetBottomToolbarGeometry(bool visible)
