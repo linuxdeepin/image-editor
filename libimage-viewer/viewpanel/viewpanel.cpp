@@ -888,16 +888,6 @@ void LibViewPanel::slotBottomMove()
     if (m_bottomToolbar) {
         if (window()->isFullScreen()) {
             QPoint pos = mapFromGlobal(QCursor::pos());
-            qDebug() << pos;
-
-            qDebug() << width();
-            qDebug() << height();
-
-            qDebug() << m_bottomToolbar->x();
-            qDebug() << m_bottomToolbar->y();
-
-            qDebug() << m_bottomToolbar->width();
-            qDebug() << m_bottomToolbar->height();
 
             if (height() - 20 < pos.y() && height() > pos.y() && height() == m_bottomToolbar->y()) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");

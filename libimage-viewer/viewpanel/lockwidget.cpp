@@ -95,7 +95,7 @@ void LockWidget::setContentText(const QString &text)
 {
     m_lockTips->setText(text);
     int textHeight = Libutils::base::stringHeight(m_lockTips->font(),
-                                               m_lockTips->text());
+                                                  m_lockTips->text());
     m_lockTips->setMinimumHeight(textHeight + 2);
 }
 
@@ -120,7 +120,7 @@ void LockWidget::mouseReleaseEvent(QMouseEvent *e)
 #if 0
     //平板单击全屏需求
     if (dApp->isPanelDev()) {
-        int xpos = e->pos().x() - m_startx;
+        int xpos = QCursor::pos().x() - m_startx;
         if ((QDateTime::currentMSecsSinceEpoch() - m_clickTime) < 200 && abs(xpos) < 50) {
             m_clickTime = QDateTime::currentMSecsSinceEpoch();
             emit showfullScreen();
@@ -129,7 +129,7 @@ void LockWidget::mouseReleaseEvent(QMouseEvent *e)
 #endif
     QWidget::mouseReleaseEvent(e);
     if (e->source() == Qt::MouseEventSynthesizedByQt && m_maxTouchPoints == 1) {
-        int offset = e->pos().x() - m_startx;
+        int offset = QCursor::pos().x() - m_startx;
         if (qAbs(offset) > 200) {
             if (offset > 0) {
                 emit previousRequested();
@@ -152,7 +152,7 @@ void LockWidget::mousePressEvent(QMouseEvent *e)
     }
 #endif
     QWidget::mousePressEvent(e);
-    m_startx = e->pos().x();
+    m_startx = QCursor::pos().x();
 }
 
 void LockWidget::mouseMoveEvent(QMouseEvent *event)
