@@ -1,2 +1,3 @@
 usr/include/libimage-viewer/*.h
+usr/lib/*/libimage-viewer.so
 usr/lib/*/pkgconfig/libimage-viewer.pc
