@@ -1240,7 +1240,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             }
             //todo,删除
             if (m_bottomToolbar) {
-                m_bottomToolbar->deleteImage();
+                m_bottomToolbar->onTrashBtnClicked();
             }
             break;
         }
