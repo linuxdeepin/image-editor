@@ -499,7 +499,11 @@ void LibViewPanel::updateMenuContent(QString path)
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
                 isWritable) {
-            appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", "Delete"));
+            if (isAlbum) {
+                appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
+            } else {
+                appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", "Delete"));
+            }
             TrashButton->setEnabled(true);
         } else {
             TrashButton->setEnabled(false);
@@ -512,9 +516,9 @@ void LibViewPanel::updateMenuContent(QString path)
         //fav
         if (isAlbum) {
             if (m_isFav) {
-                appendAction(IdRemoveFromFavorites, tr("Unfavorite"), "");    //取消收藏
+                appendAction(IdRemoveFromFavorites, tr("Unfavorite"), ".");    //取消收藏
             } else {
-                appendAction(IdAddToFavorites, tr("Favorite"), "");       //收藏
+                appendAction(IdAddToFavorites, tr("Favorite"), ".");       //收藏
             }
             m_menu->addSeparator();
         }
