@@ -53,6 +53,8 @@ signals:
     void sigRemoveFromCustom(const QString &path, const QString &album);
     //退出幻灯片
     void exitSlideShow();
+    //按下ESC键
+    void escShortcutActivated(bool isSwitchFullScreen);
 private:
 
     static ImageEngine *m_ImageEngine;

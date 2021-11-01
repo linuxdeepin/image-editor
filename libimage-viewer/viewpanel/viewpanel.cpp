@@ -1134,6 +1134,7 @@ void LibViewPanel::initShortcut()
         if (m_stack->currentWidget() == m_sliderPanel)
         {
             m_sliderPanel->backToLastPanel();
+            emit ImageEngine::instance()->escShortcutActivated(true);
         } else if (window()->isFullScreen())
         {
             if (m_stack->currentWidget() != m_thumbnailWidget && m_stack->currentWidget() != m_lockWidget) {
@@ -1146,9 +1147,12 @@ void LibViewPanel::initShortcut()
             if (m_sliderPanel) {
                 m_sliderPanel->onShowPause();
             }
+            emit ImageEngine::instance()->escShortcutActivated(true);
+        } else
+        {
+            //非全屏状态按ESC，等于按下m_back
+            emit ImageEngine::instance()->escShortcutActivated(false);
         }
-
-        getBottomtoolbarButton(imageViewerSpace::ButtonType::ButtonTypeBack)->click();
     });
     // 1:1 size
     QShortcut *adaptImage = new QShortcut(QKeySequence("Ctrl+0"), this);
