@@ -181,6 +181,14 @@ void ImageViewer::setCustomAlbumName(const QMap<QString, bool> map, bool isFav)
     }
 }
 
+void ImageViewer::setDropEnabled(bool enable)
+{
+    Q_D(ImageViewer);
+    if (d->m_panel) {
+        d->m_panel->setAcceptDrops(enable);
+    }
+}
+
 void ImageViewer::resizeEvent(QResizeEvent *e)
 {
     qDebug() << "ImageViewer::resizeEvent = " << e->size();

@@ -58,6 +58,9 @@ public:
     //设置启动幻灯片
     void startSlideShow(const QStringList &paths, const QString &firstPath);
 
+    //设置panel拖拽使能
+    void setDropEnabled(bool enable);
+
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
