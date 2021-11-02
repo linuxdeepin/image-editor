@@ -498,7 +498,7 @@ void LibViewPanel::updateMenuContent(QString path)
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                isWritable) {
+                (isWritable || isAlbum)) { //如果是相册，也应当激活删除
             if (isAlbum) {
                 appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
             } else {
