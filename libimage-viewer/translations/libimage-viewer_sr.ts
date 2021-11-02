@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sr" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Основни подаци</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Детаљи</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Основни подаци</translation>
+        <translation>Основни подаци</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Детаљи</translation>
+        <translation>Детаљи</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Додај у албум</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Нови албум</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Све слике</translation>
+        <translation>Све слике</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Отвори слику</translation>
+        <translation>Отвори слику</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Уклони из албума</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Из омиљеног</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>У омиљено</translation>
     </message>
 </context>
 <context>
@@ -187,7 +174,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Издвоји текст</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -245,6 +232,10 @@
         <source>Image info</source>
         <translation>Својства слике</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>дан</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Датотека слике није пронађена</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Отвори слику</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Све слике</translation>
     </message>
 </context>
 </TS>

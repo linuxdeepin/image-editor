@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -13,60 +11,49 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Basisinformationen</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Details</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Basisinformationen</translation>
+        <translation>Basisinformationen</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Details</translation>
+        <translation>Details</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu Album hinzufügen</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Alle Bilder</translation>
+        <translation>Alle Bilder</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Bild öffnen</translation>
+        <translation>Bild öffnen</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Aus Album entfernen</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorit entfernen</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorit hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -166,10 +153,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>day</source>
-        <translation type="vanished">Tag</translation>
-    </message>
-    <message>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
@@ -249,6 +232,10 @@
         <source>Image info</source>
         <translation>Bildinformationen</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>Tag</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -297,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Bilddatei nicht gefunden</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Bild öffnen</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Alle Bilder</translation>
     </message>
 </context>
 </TS>

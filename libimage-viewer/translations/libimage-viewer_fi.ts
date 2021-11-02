@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fi">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fi" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -13,60 +11,49 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Perustiedot</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Tiedot</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Perustiedot</translation>
+        <translation>Perustiedot</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Tiedot</translation>
+        <translation>Tiedot</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää albumiin</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusi albumi</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Kaikki kuvat</translation>
+        <translation>Kaikki kuvat</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Avaa kuva</translation>
+        <translation>Avaa kuva</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista albumista</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista-suosikki</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Suosikkini</translation>
     </message>
 </context>
 <context>
@@ -166,10 +153,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>day</source>
-        <translation type="vanished">päivä</translation>
-    </message>
-    <message>
         <source>Back</source>
         <translation>Takaisin</translation>
     </message>
@@ -249,6 +232,10 @@
         <source>Image info</source>
         <translation>Kuvan tiedot</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>päivä</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -297,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Kuvatiedostoa ei löytynyt</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Avaa kuva</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Kaikki kuvat</translation>
     </message>
 </context>
 </TS>

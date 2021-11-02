@@ -1,61 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="bg">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="bg" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Информация за изображението</translation>
+        <translation>Информация за изображението</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавяне към албум</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Нов албум</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Всички изображения</translation>
+        <translation>Всички изображения</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Отваряне на изображение</translation>
+        <translation>Отваряне на изображение</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Премахване от албума</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Премахване от Любими</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Любими</translation>
     </message>
 </context>
 <context>
@@ -145,113 +143,19 @@
     </message>
     <message>
         <source>Dimensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tag</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Обратно</translation>
+        <translation>Обратно</translation>
     </message>
-    <message>
-        <source>Previous</source>
-        <translation type="unfinished">Предишно</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished">Следващ</translation>
-    </message>
-    <message>
-        <source>1:1 Size</source>
-        <translation type="unfinished">размер 1:1</translation>
-    </message>
-    <message>
-        <source>Fit to window</source>
-        <translation type="unfinished">Оразмеряване според прозореца</translation>
-    </message>
-    <message>
-        <source>Extract text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rotate counterclockwise</source>
-        <translation type="unfinished">Завъртане обратно на часовниковата стрелка</translation>
-    </message>
-    <message>
-        <source>Rotate clockwise</source>
-        <translation type="unfinished">Завъртане по часовниковата стрелка</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit fullscreen</source>
-        <translation type="unfinished">Изход от цял екран</translation>
-    </message>
-    <message>
-        <source>Fullscreen</source>
-        <translation type="unfinished">Цял екран</translation>
-    </message>
-    <message>
-        <source>Print</source>
-        <translation type="unfinished">Печат</translation>
-    </message>
-    <message>
-        <source>Slide show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation type="unfinished">Копиране</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="unfinished">Преименуване</translation>
-    </message>
-    <message>
-        <source>Show navigation window</source>
-        <translation type="unfinished">Покажи прозореца за управление</translation>
-    </message>
-    <message>
-        <source>Hide navigation window</source>
-        <translation type="unfinished">Скрий прозореца за управление</translation>
-    </message>
-    <message>
-        <source>Set as wallpaper</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display in file manager</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image info</source>
-        <translation type="unfinished">Информация за изображението</translation>
-    </message>
-</context>
-<context>
-    <name>RenameDialog</name>
-    <message>
-        <source>Cancel</source>
-        <translation>Отказ</translation>
-    </message>
-    <message>
-        <source>Confirm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input a new name</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SlideShowBottomBar</name>
     <message>
         <source>Previous</source>
         <translation>Предишно</translation>
@@ -261,16 +165,114 @@
         <translation>Следващ</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>Изход</translation>
+        <source>1:1 Size</source>
+        <translation>размер 1:1</translation>
+    </message>
+    <message>
+        <source>Fit to window</source>
+        <translation>Оразмеряване според прозореца</translation>
+    </message>
+    <message>
+        <source>Extract text</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Rotate counterclockwise</source>
+        <translation>Завъртане обратно на часовниковата стрелка</translation>
+    </message>
+    <message>
+        <source>Rotate clockwise</source>
+        <translation>Завъртане по часовниковата стрелка</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Премахване</translation>
+    </message>
+    <message>
+        <source>Exit fullscreen</source>
+        <translation>Изход от цял екран</translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation>Цял екран</translation>
+    </message>
+    <message>
+        <source>Print</source>
+        <translation>Печат</translation>
+    </message>
+    <message>
+        <source>Slide show</source>
+        <translation>Прожекция</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копиране</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Преименуване</translation>
+    </message>
+    <message>
+        <source>Show navigation window</source>
+        <translation>Покажи прозореца за управление</translation>
+    </message>
+    <message>
+        <source>Hide navigation window</source>
+        <translation>Скрий прозореца за управление</translation>
+    </message>
+    <message>
+        <source>Set as wallpaper</source>
+        <translation>Задаване като тапет</translation>
+    </message>
+    <message>
+        <source>Display in file manager</source>
+        <translation>Показване във файлов мениджър</translation>
+    </message>
+    <message>
+        <source>Image info</source>
+        <translation>Информация за изображението</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>RenameDialog</name>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>Input a new name</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>SlideShowBottomBar</name>
+    <message>
+        <source>Previous</source>
+        <translation>Предишно</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Следващ</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Изход</translation>
     </message>
 </context>
 <context>
@@ -281,18 +283,7 @@
     </message>
     <message>
         <source>Image file not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Отваряне на изображение</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Всички изображения</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

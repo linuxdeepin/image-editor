@@ -234,6 +234,10 @@
         <source>Image info</source>
         <translation type="unfinished">Info gambar</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -282,13 +286,6 @@
     <message>
         <source>Image file not found</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="obsolete">Buka Gambar</translation>
     </message>
 </context>
 </TS>

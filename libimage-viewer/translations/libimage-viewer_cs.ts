@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="cs">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Základní údaje</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Podrobnosti</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Základní údaje</translation>
+        <translation>Základní údaje</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Podrobnosti</translation>
+        <translation>Podrobnosti</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Přidat do alba</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Nové album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Všechny obrázky</translation>
+        <translation>Všechny obrázky</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Otevřít obrázek</translation>
+        <translation>Otevřít obrázek</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstranit z alba</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Odebrat z oblíbených</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Oblíbené</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Zpět</translation>
+        <translation>Zpět</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Předchozí</translation>
+        <translation>Předchozí</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Další</translation>
+        <translation>Další</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Velikost 1:1</translation>
+        <translation>Velikost 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Přizpůsobit oknu</translation>
+        <translation>Přizpůsobit oknu</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpoznat text</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Otočit doleva</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Otočit doprava</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Smazat</translation>
+        <translation>Smazat</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Opustit celou obrazovku</translation>
+        <translation>Opustit celou obrazovku</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Celá obrazovka</translation>
+        <translation>Celá obrazovka</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Tisk</translation>
+        <translation>Tisk</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Promítání</translation>
+        <translation>Promítání</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Kopírovat</translation>
+        <translation>Kopírovat</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Přejmenovat</translation>
+        <translation>Přejmenovat</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Zobrazit okno navigace</translation>
+        <translation>Zobrazit okno navigace</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Skrýt okno navigace</translation>
+        <translation>Skrýt okno navigace</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Nastavit jako pozadí plochy</translation>
+        <translation>Nastavit jako pozadí plochy</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Zobrazit ve správci souborů</translation>
+        <translation>Zobrazit ve správci souborů</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Informace o obrázku</translation>
+        <translation>Informace o obrázku</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>den</translation>
     </message>
 </context>
 <context>
@@ -254,7 +245,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Zrušit</translation>
+        <translation>Storno</translation>
     </message>
     <message>
         <source>Input a new name</source>
@@ -292,18 +283,7 @@
     </message>
     <message>
         <source>Image file not found</source>
-        <translation>Soubor s obrázkem nenalezen</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Otevřít obrázek</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Všechny obrázky</translation>
+        <translation>Soubor s obrázkem nenalezen.</translation>
     </message>
 </context>
 </TS>

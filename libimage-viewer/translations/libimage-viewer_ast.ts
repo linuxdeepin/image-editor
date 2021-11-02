@@ -234,6 +234,10 @@
         <source>Image info</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -282,13 +286,6 @@
     <message>
         <source>Image file not found</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Toles imáxenes</translation>
     </message>
 </context>
 </TS>

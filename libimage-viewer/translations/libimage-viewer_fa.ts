@@ -1,61 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fa">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fa" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">اطلاعات تصویر</translation>
+        <translation>اطلاعات تصویر</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>اضافه کردن به آلبوم</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>آلبوم جدید</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">همه تصاویر</translation>
+        <translation>همه تصاویر</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">باز کردن تصویر</translation>
+        <translation>باز کردن تصویر</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>حذف از آلبوم</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>غیر علاقه مندی</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>علاقه مندی</translation>
     </message>
 </context>
 <context>
@@ -145,113 +143,19 @@
     </message>
     <message>
         <source>Dimensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tag</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">برگشت</translation>
+        <translation>برگشت</translation>
     </message>
-    <message>
-        <source>Previous</source>
-        <translation type="unfinished">قبلی</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished">بعدی</translation>
-    </message>
-    <message>
-        <source>1:1 Size</source>
-        <translation type="unfinished">اندازه 1: 1</translation>
-    </message>
-    <message>
-        <source>Fit to window</source>
-        <translation type="unfinished">متناسب با پنجره</translation>
-    </message>
-    <message>
-        <source>Extract text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rotate counterclockwise</source>
-        <translation type="unfinished">چرخش در جهت خلاف عقربه های ساعت</translation>
-    </message>
-    <message>
-        <source>Rotate clockwise</source>
-        <translation type="unfinished">چرخش در جهت عقربه های ساعت</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">حذف</translation>
-    </message>
-    <message>
-        <source>Exit fullscreen</source>
-        <translation type="unfinished">خروج از تمام صفحه</translation>
-    </message>
-    <message>
-        <source>Fullscreen</source>
-        <translation type="unfinished">تمام صفحه</translation>
-    </message>
-    <message>
-        <source>Print</source>
-        <translation type="unfinished">چاپ</translation>
-    </message>
-    <message>
-        <source>Slide show</source>
-        <translation type="unfinished">نمایش اسلاید</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation type="unfinished">کپی</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="unfinished">تغییر اسم</translation>
-    </message>
-    <message>
-        <source>Show navigation window</source>
-        <translation type="unfinished">نمایش پنجره ناوبری</translation>
-    </message>
-    <message>
-        <source>Hide navigation window</source>
-        <translation type="unfinished">پنهان کردن پنجره ناوبری</translation>
-    </message>
-    <message>
-        <source>Set as wallpaper</source>
-        <translation type="unfinished">تنظیم به عنوان تصویر پس زمینه</translation>
-    </message>
-    <message>
-        <source>Display in file manager</source>
-        <translation type="unfinished">نمایش در مدیر فایل</translation>
-    </message>
-    <message>
-        <source>Image info</source>
-        <translation type="unfinished">اطلاعات تصویر</translation>
-    </message>
-</context>
-<context>
-    <name>RenameDialog</name>
-    <message>
-        <source>Cancel</source>
-        <translation>لغو</translation>
-    </message>
-    <message>
-        <source>Confirm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input a new name</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SlideShowBottomBar</name>
     <message>
         <source>Previous</source>
         <translation>قبلی</translation>
@@ -261,16 +165,114 @@
         <translation>بعدی</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>خروج</translation>
+        <source>1:1 Size</source>
+        <translation>اندازه 1: 1</translation>
+    </message>
+    <message>
+        <source>Fit to window</source>
+        <translation>متناسب با پنجره</translation>
+    </message>
+    <message>
+        <source>Extract text</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Rotate counterclockwise</source>
+        <translation>چرخش در جهت خلاف عقربه های ساعت</translation>
+    </message>
+    <message>
+        <source>Rotate clockwise</source>
+        <translation>چرخش در جهت عقربه های ساعت</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>حذف</translation>
+    </message>
+    <message>
+        <source>Exit fullscreen</source>
+        <translation>خروج از تمام صفحه</translation>
+    </message>
+    <message>
+        <source>Fullscreen</source>
+        <translation>تمام صفحه</translation>
+    </message>
+    <message>
+        <source>Print</source>
+        <translation>چاپ</translation>
+    </message>
+    <message>
+        <source>Slide show</source>
+        <translation>نمایش اسلاید</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>کپی</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>تغییر اسم</translation>
+    </message>
+    <message>
+        <source>Show navigation window</source>
+        <translation>نمایش پنجره ناوبری</translation>
+    </message>
+    <message>
+        <source>Hide navigation window</source>
+        <translation>پنهان کردن پنجره ناوبری</translation>
+    </message>
+    <message>
+        <source>Set as wallpaper</source>
+        <translation>تنظیم به عنوان تصویر پس زمینه</translation>
+    </message>
+    <message>
+        <source>Display in file manager</source>
+        <translation>نمایش در مدیر فایل</translation>
+    </message>
+    <message>
+        <source>Image info</source>
+        <translation>اطلاعات تصویر</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>RenameDialog</name>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>لغو</translation>
+    </message>
+    <message>
+        <source>Input a new name</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>SlideShowBottomBar</name>
+    <message>
+        <source>Previous</source>
+        <translation>قبلی</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>بعدی</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>خروج</translation>
     </message>
 </context>
 <context>
@@ -281,18 +283,7 @@
     </message>
     <message>
         <source>Image file not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">باز کردن تصویر</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">همه تصاویر</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

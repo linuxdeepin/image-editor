@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="tr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="tr" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Temel bilgi</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Ayrıntılar</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Temel bilgi</translation>
+        <translation>Temel bilgi</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Ayrıntılar</translation>
+        <translation>Ayrıntılar</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Albüme ekle</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni albüm</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Tüm görüntüler</translation>
+        <translation>Tüm görüntüler</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Görüntü Aç</translation>
+        <translation>Görüntü Aç</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Albümden kaldır</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Sık kullanılanlardan kaldır</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Sık kullanılanlara ekle</translation>
     </message>
 </context>
 <context>
@@ -187,7 +174,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Metni çıkar</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -211,7 +198,7 @@
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished"></translation>
+        <translation>Yazdır</translation>
     </message>
     <message>
         <source>Slide show</source>
@@ -244,6 +231,10 @@
     <message>
         <source>Image info</source>
         <translation>Görsel bilgisi</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>gün</translation>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Görsel dosya bulunamadı</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Görüntü Aç</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Tüm görüntüler</translation>
     </message>
 </context>
 </TS>

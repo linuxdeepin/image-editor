@@ -234,6 +234,10 @@
         <source>Image info</source>
         <translation type="unfinished">Informácie o obrázku</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>

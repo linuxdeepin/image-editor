@@ -13,60 +13,49 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">基本信息</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">详细信息</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">基本信息</translation>
+        <translation>基本信息</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">详细信息</translation>
+        <translation>详细信息</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>添加到相册</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>新建相册</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">所有图片</translation>
+        <translation>所有图片</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">打开图片</translation>
+        <translation>打开图片</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>导出</translation>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>从相册中移除</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>取消收藏</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>收藏</translation>
     </message>
 </context>
 <context>
@@ -166,10 +155,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>day</source>
-        <translation type="vanished">天</translation>
-    </message>
-    <message>
         <source>Back</source>
         <translation>返回</translation>
     </message>
@@ -249,6 +234,10 @@
         <source>Image info</source>
         <translation>图片信息</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>天</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -297,17 +286,6 @@
     <message>
         <source>Image file not found</source>
         <translation>未发现图片文件</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">打开图片</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">所有图片</translation>
     </message>
 </context>
 </TS>

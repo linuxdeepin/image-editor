@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ko">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">기본 정보</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">상세 정보</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">기본 정보</translation>
+        <translation>기본 정보</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">상세 정보</translation>
+        <translation>상세 정보</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>앨범에 추가</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>새 앨범</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">모든 이미지</translation>
+        <translation>모든 이미지</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">이미지 열기</translation>
+        <translation>이미지 열기</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>엘범에서 제거</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>즐겨찾기 해제</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>즐겨찾기</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">뒤로</translation>
+        <translation>뒤로</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">이전</translation>
+        <translation>이전</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">다음</translation>
+        <translation>다음</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">1:1 크기</translation>
+        <translation>1:1 크기</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">창에 맞춤</translation>
+        <translation>창에 맞춤</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">시계 반대 방향으로 회전</translation>
+        <translation>시계 반대 방향으로 회전</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">시계 방향으로 회전</translation>
+        <translation>시계 방향으로 회전</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">삭제</translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">전체화면 종료</translation>
+        <translation>전체화면 종료</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">전체화면</translation>
+        <translation>전체화면</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">인쇄</translation>
+        <translation>인쇄</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">슬라이드 표시</translation>
+        <translation>슬라이드 표시</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">복사</translation>
+        <translation>복사</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">이름 변경</translation>
+        <translation>이름 변경</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">탐색 창 표시</translation>
+        <translation>탐색 창 표시</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">탐색 창 숨기기</translation>
+        <translation>탐색 창 숨기기</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">바탕화면으로 설정</translation>
+        <translation>바탕화면으로 설정</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">파일 관리도구에 표시</translation>
+        <translation>파일 관리도구에 표시</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">이미지 정보</translation>
+        <translation>이미지 정보</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>이미지 파일을 찾을 수 없음</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">이미지 열기</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">모든 이미지</translation>
     </message>
 </context>
 </TS>

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sq">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sq" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -13,60 +11,49 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Të dhëna elementare</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Hollësi</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Të dhëna elementare</translation>
+        <translation>Të dhëna elementare</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Hollësi</translation>
+        <translation>Hollësi</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Shtojeni në album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album i ri</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Krejt figurat</translation>
+        <translation>Krejt figurat</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Hap Figurë</translation>
+        <translation>Hap Figurë</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiqe nga albumi</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiqe si të parapëlqyer</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>E parapëlqyer</translation>
     </message>
 </context>
 <context>
@@ -166,10 +153,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>day</source>
-        <translation type="vanished">ditë</translation>
-    </message>
-    <message>
         <source>Back</source>
         <translation>Mbrapsht</translation>
     </message>
@@ -249,6 +232,10 @@
         <source>Image info</source>
         <translation>Të dhëna figure</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>ditë</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -297,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>S’u gjet kartelë figure</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Hap Figurë</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Krejt figurat</translation>
     </message>
 </context>
 </TS>

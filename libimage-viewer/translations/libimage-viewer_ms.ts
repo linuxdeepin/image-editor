@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ms">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ms" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Maklumat asas</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Perincian</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Maklumat asas</translation>
+        <translation>Maklumat asas</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Perincian</translation>
+        <translation>Perincian</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah ke album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album baharu</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Semua imej</translation>
+        <translation>Semua imej</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Buka Imej</translation>
+        <translation>Buka Imej</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Buang dari album</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyahgemar</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Kegemaran</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Undur</translation>
+        <translation>Undur</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Terdahulu</translation>
+        <translation>Terdahulu</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Berikutnya</translation>
+        <translation>Berikutnya</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Saiz 1:1</translation>
+        <translation>Saiz 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Suai muat dengan tetingkap</translation>
+        <translation>Suai muat dengan tetingkap</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekstrak teks</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">Putar lawan jam</translation>
+        <translation>Putar lawan jam</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">Putar ikut jam</translation>
+        <translation>Putar ikut jam</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Padam</translation>
+        <translation>Padam</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Keluar dari skrin penuh</translation>
+        <translation>Keluar dari skrin penuh</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Skrin penuh</translation>
+        <translation>Skrin penuh</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Cetak</translation>
+        <translation>Cetak</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Paparan slaid</translation>
+        <translation>Paparan slaid</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Salin</translation>
+        <translation>Salin</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Nama semula</translation>
+        <translation>Nama semula</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Tunjuk tetingkap navigasi</translation>
+        <translation>Tunjuk tetingkap navigasi</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Sembunyi tetingkap navigasi</translation>
+        <translation>Sembunyi tetingkap navigasi</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Tetapkan sebagai kertas dinding</translation>
+        <translation>Tetapkan sebagai kertas dinding</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Papar dalam pengurus fail</translation>
+        <translation>Papar dalam pengurus fail</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Maklumat imej</translation>
+        <translation>Maklumat imej</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Fail imej tidak ditemui</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Buka Imej</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Semua imej</translation>
     </message>
 </context>
 </TS>

@@ -234,6 +234,10 @@
         <source>Image info</source>
         <translation type="unfinished">Πληροφοριες εικονας</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>

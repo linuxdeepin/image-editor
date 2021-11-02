@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ru">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ru" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Основная информация</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Детали</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Основная информация</translation>
+        <translation>Основная информация</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Детали</translation>
+        <translation>Детали</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в альбом</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый альбом</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Все изображения</translation>
+        <translation>Все изображения</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Открыть  Изображение</translation>
+        <translation>Открыть  Изображение</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить из альбома</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить из избранного</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Избранное</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Назад</translation>
+        <translation>Назад</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Предыдущее</translation>
+        <translation>Предыдущее</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Следующее</translation>
+        <translation>Следующее</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Размер 1:1</translation>
+        <translation>Размер 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">По размеру окна</translation>
+        <translation>По размеру окна</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Извлечь текст</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Повернуть против часовой стрелки</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Повернуть по часовой стрелке</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Выйти из полноэкранного режима</translation>
+        <translation>Выйти из полноэкранного режима</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Полный Экран</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Распечатать</translation>
+        <translation>Распечатать</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Слайд-шоу</translation>
+        <translation>Слайд-шоу</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation>Копировать</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Переименовать</translation>
+        <translation>Переименовать</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Показать окно навигации</translation>
+        <translation>Показать окно навигации</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Скрыть окно навигации</translation>
+        <translation>Скрыть окно навигации</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Установить в качестве обоев</translation>
+        <translation>Установить в качестве обоев</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Отобразить в  файловом менеджере </translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Информация о изображении</translation>
+        <translation>Информация о изображении</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Файл изображения не найден</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Открыть  Изображение</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Все изображения</translation>
     </message>
 </context>
 </TS>

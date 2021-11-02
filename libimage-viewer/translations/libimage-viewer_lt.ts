@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="lt">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="lt" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Pagrindinė informacija</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Išsamiau</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Pagrindinė informacija</translation>
+        <translation>Pagrindinė informacija</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Išsamiau</translation>
+        <translation>Išsamiau</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Pridėti į albumą</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Naujas albumas</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Visi paveikslai</translation>
+        <translation>Visi paveikslai</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Atverti paveikslą</translation>
+        <translation>Atverti paveikslą</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Šalinti iš albumo</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Nebemėgstamas</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Mėgstamas</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Atgal</translation>
+        <translation>Atgal</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Ankstesnis</translation>
+        <translation>Ankstesnis</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Kitas</translation>
+        <translation>Kitas</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Dydis 1:1</translation>
+        <translation>Dydis 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Talpinti į langą</translation>
+        <translation>Talpinti į langą</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">Pasukti prieš laikrodžio rodyklę</translation>
+        <translation>Pasukti prieš laikrodžio rodyklę</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">Pasukti pagal laikrodžio rodyklę</translation>
+        <translation>Pasukti pagal laikrodžio rodyklę</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Ištrinti</translation>
+        <translation>Ištrinti</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Išeiti iš viso ekrano</translation>
+        <translation>Išeiti iš viso ekrano</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Visas ekranas</translation>
+        <translation>Visas ekranas</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Spausdinti</translation>
+        <translation>Spausdinti</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Skaidrių rodymas</translation>
+        <translation>Skaidrių rodymas</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Kopijuoti</translation>
+        <translation>Kopijuoti</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Pervadinti</translation>
+        <translation>Pervadinti</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Rodyti naršymo langą</translation>
+        <translation>Rodyti naršymo langą</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Slėpti naršymo langą</translation>
+        <translation>Slėpti naršymo langą</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Nustatyti kaip darbalaukio foną</translation>
+        <translation>Nustatyti kaip darbalaukio foną</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Rodyti failų tvarkytuvėje</translation>
+        <translation>Rodyti failų tvarkytuvėje</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Paveikslo informacija</translation>
+        <translation>Paveikslo informacija</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -292,18 +283,7 @@
     </message>
     <message>
         <source>Image file not found</source>
-        <translation>Paveikslo failas nerastas</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Atverti paveikslą</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Visi paveikslai</translation>
+        <translation>Paveikslas nerastas</translation>
     </message>
 </context>
 </TS>

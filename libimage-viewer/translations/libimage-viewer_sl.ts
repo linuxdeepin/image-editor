@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sl">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sl" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Osnovni podatki</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Podrobnosti</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Osnovni podatki</translation>
+        <translation>Osnovni podatki</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Podrobnosti</translation>
+        <translation>Podrobnosti</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj v album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Nov album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Vse slike</translation>
+        <translation>Vse slike</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Odpri sliko</translation>
+        <translation>Odpri sliko</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani iz albuma</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstrani iz priljubljenih</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj med priljubljene</translation>
     </message>
 </context>
 <context>
@@ -171,7 +158,7 @@
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Prejšnja</translation>
+        <translation>Prejšnja</translation>
     </message>
     <message>
         <source>Next</source>
@@ -187,7 +174,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekstrahiraj tekst</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -207,7 +194,7 @@
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Celozaslonski način</translation>
     </message>
     <message>
         <source>Print</source>
@@ -243,7 +230,11 @@
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Podatki o sliki</translation>
+        <translation>Podatki o sliki</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>dan</translation>
     </message>
 </context>
 <context>
@@ -254,7 +245,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation>Prekini</translation>
     </message>
     <message>
         <source>Input a new name</source>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Slika ni bila najdena</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Odpri sliko</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Vse slike</translation>
     </message>
 </context>
 </TS>

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="hu">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="hu" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -13,60 +11,49 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Alapvető információk</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Részletek</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Alapvető információk</translation>
+        <translation>Alapvető információk</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Részletek</translation>
+        <translation>Részletek</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Hozzáadás az albumhoz</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Új album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Összes kép</translation>
+        <translation>Összes kép</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Kép megnyitása</translation>
+        <translation>Kép megnyitása</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Eltávolítás az albumból</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Eltávolítás a kedvencekből</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Kedvenc</translation>
     </message>
 </context>
 <context>
@@ -166,10 +153,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>day</source>
-        <translation type="vanished">nap</translation>
-    </message>
-    <message>
         <source>Back</source>
         <translation>Vissza</translation>
     </message>
@@ -249,6 +232,10 @@
         <source>Image info</source>
         <translation>Kép információ</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation>nap</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -297,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>A képfájl nem található</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Kép megnyitása</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Összes kép</translation>
     </message>
 </context>
 </TS>

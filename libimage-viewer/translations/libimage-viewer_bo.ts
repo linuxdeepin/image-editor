@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="bo">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="bo" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">གཞི་རྩའི་ཆ་འཕྲིན། </translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">གཞི་རྩའི་ཆ་འཕྲིན། </translation>
+        <translation>གཞི་རྩའི་ཆ་འཕྲིན། </translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
+        <translation>ཆ་འཕྲིན་ཞིབ་ཕྲ།</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>པར་དེབ་ཏུ་སྣོན་པ། </translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>པར་དེབ་གསར་བཟོ།</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">པར་ཚང་མ།</translation>
+        <translation>པར་ཚང་མ།</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">པར་ཁ་ཕྱེ་བ།</translation>
+        <translation>པར་ཁ་ཕྱེ་བ།</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>པར་དེབ་ནས་སྤོ་འབུད་བྱེད་པ།</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>ཉར་ཚགས་འདོར་བ།</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>ཉར་ཚགས།</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">ཕྱིར་ལོག</translation>
+        <translation>ཕྱིར་ལོག</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">སྔ་མ།</translation>
+        <translation>སྔ་མ།</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">ཕྱི་མ།</translation>
+        <translation>ཕྱི་མ།</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">1:1 ཆེ་ཆུང་།</translation>
+        <translation>1:1 ཆེ་ཆུང་།</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">སྒེའུ་ཁུང་དང་འཚམ་པ།</translation>
+        <translation>སྒེའུ་ཁུང་དང་འཚམ་པ།</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>ཡི་གེ་ངོས་འཛིན།</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">ཕྱི་སྐོར་ལྟར་སྐོར་བ།</translation>
+        <translation>ཕྱི་སྐོར་ལྟར་སྐོར་བ།</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">ནང་སྐོར་ལྟར་སྐོར་བ།</translation>
+        <translation>ནང་སྐོར་ལྟར་སྐོར་བ།</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">སུབ་པ། </translation>
+        <translation>སུབ་པ། </translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">ཡོལ་གང་ལས་ཕྱིར་འཐེན།</translation>
+        <translation>ཡོལ་གང་ལས་ཕྱིར་འཐེན།</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">ཡོལ་གང་།</translation>
+        <translation>ཡོལ་གང་།</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">པར་འདེབས།</translation>
+        <translation>པར་འདེབས།</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">སྒྲོན་བཪྙན་པར་ཤེལ་གཏོང་བ།</translation>
+        <translation>སྒྲོན་བཪྙན་པར་ཤེལ་གཏོང་བ།</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">འདྲ་བཟོ།</translation>
+        <translation>འདྲ་བཟོ།</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">མིང་བསྐྱར་འདོགས།</translation>
+        <translation>མིང་བསྐྱར་འདོགས།</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">ཕྱོགས་སྟོན་སྒེའུ་ཁུང་མངོན་པ།</translation>
+        <translation>ཕྱོགས་སྟོན་སྒེའུ་ཁུང་མངོན་པ།</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">ཕྱོགས་སྟོན་སྒེའུ་ཁུང་ཡིབ་པ།</translation>
+        <translation>ཕྱོགས་སྟོན་སྒེའུ་ཁུང་ཡིབ་པ།</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">རྩིག་ཤོག་བྱེད་པ།</translation>
+        <translation>རྩིག་ཤོག་བྱེད་པ།</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">ཡིག་ཆ་དོ་དམ་ཆས་ནང་དུ་མངོན་པ།</translation>
+        <translation>ཡིག་ཆ་དོ་དམ་ཆས་ནང་དུ་མངོན་པ།</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">པར་གྱི་ཆ་འཕྲིན།</translation>
+        <translation>པར་གྱི་ཆ་འཕྲིན།</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>ཉིན།</translation>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>པར་གྱི་ཡིག་ཆ་ཪྙེད་མ་བྱུང་།</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">པར་ཁ་ཕྱེ་བ།</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">པར་ཚང་མ།</translation>
     </message>
 </context>
 </TS>

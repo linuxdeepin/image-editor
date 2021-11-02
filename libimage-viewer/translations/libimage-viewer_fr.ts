@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Informations de base</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Détails</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Informations de base</translation>
+        <translation>Informations de base</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Détails</translation>
+        <translation>Détails</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter à l&apos;album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvel Album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Toutes les images </translation>
+        <translation>Toutes les images </translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Ouvrir une image</translation>
+        <translation>Ouvrir une image</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Enlever de l&apos;album</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Retirer des favoris</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoris </translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Retour</translation>
+        <translation>Retour</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Précédent </translation>
+        <translation>Précédent </translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Suivant</translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Taille 1:1</translation>
+        <translation>Taille 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Ajuster à la fenêtre</translation>
+        <translation>Ajuster à la fenêtre</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Extraire du texte</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotation dans le sens antihoraire</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotation dans le sens horaire</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Supprimer</translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter le mode plein écran</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Plein écran</translation>
+        <translation>Plein écran</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Imprimer</translation>
+        <translation>Imprimer</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Diaporama</translation>
+        <translation>Diaporama</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Copier</translation>
+        <translation>Copier</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Renommer </translation>
+        <translation>Renommer </translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Afficher la fenêtre de navigation</translation>
+        <translation>Afficher la fenêtre de navigation</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Cacher la fenêtre de navigation</translation>
+        <translation>Cacher la fenêtre de navigation</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Définir comme fond d&apos;écran</translation>
+        <translation>Définir comme fond d&apos;écran</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Afficher dans le gestionnaire de fichier</translation>
+        <translation>Afficher dans le gestionnaire de fichier</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Informations de l&apos;image</translation>
+        <translation>Informations de l&apos;image</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -292,18 +283,7 @@
     </message>
     <message>
         <source>Image file not found</source>
-        <translation>Fichier image introuvable</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Ouvrir une image</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Toutes les images </translation>
+        <translation>Fichier image non trouvé</translation>
     </message>
 </context>
 </TS>

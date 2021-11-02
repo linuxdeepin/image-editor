@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="da">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="da" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Grundlæggende info</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Detaljer</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Grundlæggende info</translation>
+        <translation>Grundlæggende info</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Detaljer</translation>
+        <translation>Detaljer</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj til album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyt album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Alle billeder</translation>
+        <translation>Alle billeder</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Åbn billede</translation>
+        <translation>Åbn billede</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern fra album</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern fra favorit</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Sæt som favorit</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Tilbage</translation>
+        <translation>Tilbage</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Forrige</translation>
+        <translation>Forrige</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Næste</translation>
+        <translation>Næste</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">1:1 størrelse</translation>
+        <translation>1:1 størrelse</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Tilpas til vindue</translation>
+        <translation>Tilpas til vindue</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">Rotér mod uret</translation>
+        <translation>Rotér mod uret</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">Rotér med uret</translation>
+        <translation>Rotér med uret</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Slet</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Forlad fuldskærm</translation>
+        <translation>Forlad fuldskærm</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Fuldskærm</translation>
+        <translation>Fuldskærm</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Udskriv</translation>
+        <translation>Udskriv</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Diasshow</translation>
+        <translation>Diasshow</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Kopiér</translation>
+        <translation>Kopiér</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Omdøb</translation>
+        <translation>Omdøb</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Vis navigationsvindue</translation>
+        <translation>Vis navigationsvindue</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Skjul navigationsvindue</translation>
+        <translation>Skjul navigationsvindue</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Sæt som tapet</translation>
+        <translation>Sæt som tapet</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Vis i filhåndtering</translation>
+        <translation>Vis i filhåndtering</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Billedinfo</translation>
+        <translation>Billedinfo</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Billedfil ikke fundet</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Åbn billede</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Alle billeder</translation>
     </message>
 </context>
 </TS>

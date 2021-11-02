@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ca">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ca" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Informació bàsica</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Detalls</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Informació bàsica</translation>
+        <translation>Informació bàsica</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Detalls</translation>
+        <translation>Detalls</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Afegeix a l&apos;àlbum</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>Àlbum nou</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">Totes les imatges</translation>
+        <translation>Totes les imatges</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Obre la imatge</translation>
+        <translation>Obre la imatge</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina de l&apos;àlbum</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>No favorit</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorit</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Enrere</translation>
+        <translation>Enrere</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Següent</translation>
+        <translation>Següent</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">Mida 1:1</translation>
+        <translation>Mida 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">Ajusta a la finestra</translation>
+        <translation>Ajusta a la finestra</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>Extreu-ne el text</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished">Gira a l&apos;esquerra</translation>
+        <translation>Gira a l&apos;esquerra</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished">Gira a la dreta</translation>
+        <translation>Gira a la dreta</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished">Surt de la pantalla completa</translation>
+        <translation>Surt de la pantalla completa</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished">Pantalla completa</translation>
+        <translation>Pantalla completa</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">Imprimeix</translation>
+        <translation>Imprimeix</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">Presentació de diapositives</translation>
+        <translation>Presentació de diapositives</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Copia</translation>
+        <translation>Copia</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">Canvia&apos;n el nom</translation>
+        <translation>Canvia&apos;n el nom</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">Mostra la finestra de navegació</translation>
+        <translation>Mostra la finestra de navegació</translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">Amaga la finestra de navegació</translation>
+        <translation>Amaga la finestra de navegació</translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">Estableix com a fons d&apos;escriptori</translation>
+        <translation>Estableix com a fons d&apos;escriptori</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">Mostra al gestor de fitxers</translation>
+        <translation>Mostra al gestor de fitxers</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">Informació de la imatge</translation>
+        <translation>Informació de la imatge</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>dia</translation>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>No s&apos;ha trobat cap fitxer d&apos;imatge.</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Obre la imatge</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">Totes les imatges</translation>
     </message>
 </context>
 </TS>

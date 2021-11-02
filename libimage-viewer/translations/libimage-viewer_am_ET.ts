@@ -234,6 +234,10 @@
         <source>Image info</source>
         <translation>የ ምስል መረጃ</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ar">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ar" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">المعلومات الأساسية</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">التفاصيل</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">المعلومات الأساسية</translation>
+        <translation>المعلومات الأساسية</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">التفاصيل</translation>
+        <translation>التفاصيل</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>إضافة  إلى الألبوم</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>ألبوم جديد</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">كل الصور</translation>
+        <translation>كل الصور</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">قتح الصورة.</translation>
+        <translation>قتح الصورة.</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>حذف من اﻷلبوم</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>إزلة من المفضلة</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>إضافة إلى المفضلة</translation>
     </message>
 </context>
 <context>
@@ -167,83 +154,87 @@
     <name>QObject</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">رجوع</translation>
+        <translation>رجوع</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">السابق</translation>
+        <translation>السابق</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">التالي</translation>
+        <translation>التالي</translation>
     </message>
     <message>
         <source>1:1 Size</source>
-        <translation type="unfinished">حجم 1:1</translation>
+        <translation>حجم 1:1</translation>
     </message>
     <message>
         <source>Fit to window</source>
-        <translation type="unfinished">ملء النافذة</translation>
+        <translation>ملء النافذة</translation>
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>تدوير عكس اتجاه عقارب الساعة</translation>
     </message>
     <message>
         <source>Rotate clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>تدوير باتجاه عقارب الساعة</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">حذف</translation>
+        <translation>حذف</translation>
     </message>
     <message>
         <source>Exit fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>الخروج من وضع ملء الشاشة</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>ملء الشاشة</translation>
     </message>
     <message>
         <source>Print</source>
-        <translation type="unfinished">طباعة</translation>
+        <translation>طباعة</translation>
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished">عرض الشرائح</translation>
+        <translation>عرض الشرائح</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">نسخ</translation>
+        <translation>نسخ</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished">إعادة التسمية</translation>
+        <translation>إعادة التسمية</translation>
     </message>
     <message>
         <source>Show navigation window</source>
-        <translation type="unfinished">إظهار نافذة التنقل </translation>
+        <translation>إظهار نافذة التنقل </translation>
     </message>
     <message>
         <source>Hide navigation window</source>
-        <translation type="unfinished">إخفاء نافذة التنقل </translation>
+        <translation>إخفاء نافذة التنقل </translation>
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation type="unfinished">تعيين كخلفية</translation>
+        <translation>تعيين كخلفية</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation type="unfinished">عرض في مدير الملفات</translation>
+        <translation>عرض في مدير الملفات</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation type="unfinished">معلومات الصورة</translation>
+        <translation>معلومات الصورة</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>لم يتم العثور على أي صورة</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">قتح الصورة.</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">كل الصور</translation>
     </message>
 </context>
 </TS>

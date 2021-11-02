@@ -13,17 +13,6 @@
     </message>
 </context>
 <context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">Basic info</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">Details</translation>
-    </message>
-</context>
-<context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
@@ -245,6 +234,10 @@
         <source>Image info</source>
         <translation>Image info</translation>
     </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -293,17 +286,6 @@
     <message>
         <source>Image file not found</source>
         <translation>Image file not found</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">Open Image</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">All images</translation>
     </message>
 </context>
 </TS>

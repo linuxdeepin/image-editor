@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ug">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ug" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -9,64 +7,53 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImageInfoWidget</name>
-    <message>
-        <source>Basic info</source>
-        <translation type="vanished">ئاساسى ئۇچۇر</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation type="vanished">تەپسىلاتلار</translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 <context>
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">ئاساسى ئۇچۇر</translation>
+        <translation>ئاساسى ئۇچۇر</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">تەپسىلاتلار</translation>
+        <translation>تەپسىلاتلار</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>ئالبومغا قوشۇش</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>ئالبوم قۇرۇش</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">بارلىق رەسىملەر</translation>
+        <translation>بارلىق رەسىملەر</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">رەسىمنى ئېچىش</translation>
+        <translation>رەسىمنى ئېچىش</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>ئالبومدىن چىقىرىۋېتىش</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>ياقتۇرمىدىم</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>ساقلاش</translation>
     </message>
 </context>
 <context>
@@ -187,7 +174,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"></translation>
+        <translation>تېكىستنى تونۇتۇش</translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -215,7 +202,7 @@
     </message>
     <message>
         <source>Slide show</source>
-        <translation type="unfinished"></translation>
+        <translation>تام تەسۋىر</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -244,6 +231,10 @@
     <message>
         <source>Image info</source>
         <translation>رەسىم ئۇچۇرى</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>كۈن</translation>
     </message>
 </context>
 <context>
@@ -293,17 +284,6 @@
     <message>
         <source>Image file not found</source>
         <translation>رەسىم ھۆججىتى بايقالمىدى</translation>
-    </message>
-</context>
-<context>
-    <name>ViewPanel</name>
-    <message>
-        <source>Open Image</source>
-        <translation type="vanished">رەسىمنى ئېچىش</translation>
-    </message>
-    <message>
-        <source>All images</source>
-        <translation type="vanished">بارلىق رەسىملەر</translation>
     </message>
 </context>
 </TS>
