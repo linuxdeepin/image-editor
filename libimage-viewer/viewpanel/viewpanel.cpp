@@ -446,7 +446,7 @@ void LibViewPanel::updateMenuContent(QString path)
         //如果图片数量大于0才能有幻灯片
         appendAction(IdStartSlideShow, QObject::tr("Slide show"), ss("Slide show", "F5"));
         //添加到相册
-        if (isAlbum) {
+        if (isAlbum && isReadable) {
             emit ImageEngine::instance()->sigGetAlbumName(ItemInfo.path);
             if (!m_CustomAlbumName.isEmpty()) {
                 m_menu->addSeparator();
@@ -474,7 +474,7 @@ void LibViewPanel::updateMenuContent(QString path)
         }
 
         m_menu->addSeparator();
-        if (isAlbum) {
+        if (isAlbum && isReadable) {
             appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
         }
         if (isReadable) {
@@ -493,12 +493,12 @@ void LibViewPanel::updateMenuContent(QString path)
         //apple phone的delete没有权限,保险箱无法删除,垃圾箱也无法删除,其他需要判断可读权限,todo
         //20211019新增：安卓手机也不进行删除
         DIconButton *TrashButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeTrash);
-        if (imageViewerSpace::PathTypeAPPLE != pathType &&
+        if ((imageViewerSpace::PathTypeAPPLE != pathType &&
                 imageViewerSpace::PathTypeSAFEBOX != pathType &&
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                (isWritable || isAlbum)) { //如果是相册，也应当激活删除
+                isWritable && isReadable) || (isAlbum && isReadable)) { //如果是相册，也应当激活删除
             if (isAlbum) {
                 appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
             } else {
@@ -509,12 +509,12 @@ void LibViewPanel::updateMenuContent(QString path)
             TrashButton->setEnabled(false);
         }
         //IdRemoveFromAlbum
-        if (isAlbum && m_isCustomAlbum) {
+        if (isAlbum && m_isCustomAlbum && isReadable) {
             appendAction(IdRemoveFromAlbum, tr("Remove from album"), ss("Remove from album", ""));
         }
         m_menu->addSeparator();
         //fav
-        if (isAlbum) {
+        if (isAlbum && isReadable) {
             if (m_isFav) {
                 appendAction(IdRemoveFromFavorites, tr("Unfavorite"), ".");    //取消收藏
             } else {
