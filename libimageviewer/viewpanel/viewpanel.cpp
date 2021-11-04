@@ -1365,6 +1365,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
         }
         case IdRemoveFromAlbum: {
             emit ImageEngine::instance()->sigRemoveFromCustom(currentpath, m_CurrentCustomName);
+            //从相册中移除时，本库展示的也需要移除
+            m_bottomToolbar->deleteImage();
             break;
         }
         case IdAddToFavorites: {
