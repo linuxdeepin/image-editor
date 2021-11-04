@@ -2,9 +2,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 设置工程名称
-project(libvisualresult VERSION 0.1.0)
+project(libimagevisualresult VERSION 0.1.0)
 
-set(TARGET_NAME visualresult)
+set(TARGET_NAME imagevisualresult)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -59,21 +59,21 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 include(GNUInstallDirs)
-configure_file(libvisualresult.pc.in  ${PROJECT_BINARY_DIR}/libvisualresult.pc @ONLY)
+configure_file(libimagevisualresult.pc.in  ${PROJECT_BINARY_DIR}/libimagevisualresult.pc @ONLY)
 
 install(TARGETS ${TARGET_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(FILES ${OUT_HEADERS} DESTINATION include/libvisualresult)
+install(FILES ${OUT_HEADERS} DESTINATION include/libimagevisualresult)
 
-install(FILES ${PROJECT_BINARY_DIR}/libvisualresult.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ${PROJECT_BINARY_DIR}/libimagevisualresult.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # CUBE 颜色表文件 安装到usr/share下， 方便其他应用访问
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libvisualresult
+    DESTINATION ${PREFIX}/share/libimagevisualresult
     FILES_MATCHING PATTERN "*.CUBE")
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libvisualresult
+    DESTINATION ${PREFIX}/share/libimagevisualresult
     FILES_MATCHING PATTERN "*.dat")
 
 # 加速编译优化参数

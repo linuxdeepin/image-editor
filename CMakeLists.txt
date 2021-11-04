@@ -29,5 +29,5 @@ endif()
 
 
 add_subdirectory(libimageviewer)
-add_subdirectory(libvisualresult)
+add_subdirectory(libimagevisualresult)
 

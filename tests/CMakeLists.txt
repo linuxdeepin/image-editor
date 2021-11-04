@@ -38,8 +38,8 @@ file(GLOB_RECURSE  SOURCESCURRENT  "*.cpp")
 file (GLOB_RECURSE SOURCES
     "../libimage-viewer/*.cpp"
     "../libimage-viewer/*.h"
-    "../libvisualresult/exposure.cpp"
-    "../libvisualresult/exposure.h"
+    "../libimagevisualresult/exposure.cpp"
+    "../libimagevisualresult/exposure.h"
     )
 file(GLOB_RECURSE SOURCESC "../libimage-viewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")

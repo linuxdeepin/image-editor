@@ -37,7 +37,7 @@ void initFilters(const char* dir)
 {
     std::string path = dir;
     if (path.empty())
-        path = "/usr/share/libvisualresult/filter_cube";
+        path = "/usr/share/libimagevisualresult/filter_cube";
     Libutils::readFilters(path);
 }
 
