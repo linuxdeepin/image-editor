@@ -658,11 +658,37 @@ void LibViewPanel::setWallpaper(const QImage &img)
                     QDBusInterface interface("com.deepin.daemon.Appearance",
                                                  "/com/deepin/daemon/Appearance",
                                                  "com.deepin.daemon.Appearance");
+//                    if (interface.isValid()) {
+//                        //获取鼠标在的位置的桌面
+//                        QString screenname = QGuiApplication::screenAt(QCursor::pos())->name();
+//                        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
+//                        qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
+//                    }
                     if (interface.isValid()) {
-                        //获取鼠标在的位置的桌面
-                        QString screenname = QGuiApplication::screenAt(QCursor::pos())->name();
+                        QString screenname;
+
+                        //判断环境是否是wayland
+                        auto e = QProcessEnvironment::systemEnvironment();
+                        QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
+                        QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
+
+                        bool isWayland = false;
+                        if (XDG_SESSION_TYPE != QLatin1String("wayland") && !WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
+                            isWayland = false;
+                        } else {
+                            isWayland = true;
+                        }
+                        //wayland下设置壁纸使用，2020/09/21
+                        if (isWayland) {
+                            QDBusInterface interfaceWayland("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
+                            screenname = qvariant_cast< QString >(interfaceWayland.property("Primary"));
+                        } else {
+                            screenname = QGuiApplication::primaryScreen()->name();
+                        }
                         QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
                         qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
+                    } else {
+                        qWarning() << "SettingWallpaper failed" << interface.lastError();
                     }
                 }
                 // Remove the tmp file
