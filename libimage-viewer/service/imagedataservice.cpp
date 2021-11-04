@@ -24,6 +24,7 @@
 #include <QDirIterator>
 #include <QStandardPaths>
 #include <QImageReader>
+#include <QDebug>
 
 #include "unionimage/pluginbaseutils.h"
 #include "unionimage/unionimage.h"
@@ -89,7 +90,7 @@ int LibImageDataService::getCount()
 {
     return m_AllImageMap.count();
 }
-#include <QDebug>
+
 bool LibImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake)
 {
 

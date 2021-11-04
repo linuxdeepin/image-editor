@@ -829,7 +829,7 @@ bool LibViewPanel::startChooseFileDialog()
             DFileDialog::getOpenFileNames(this, tr("Open Image"), pictureFolder, filter, nullptr,
                                           DFileDialog::HideNameFilterDetails);
 #else
-        QStringList image_list = QStringList(QApplication::applicationDirPath() + "/test/jpg113.jpg");
+        QStringList image_list = QStringList(QApplication::applicationDirPath() + "/tif.tif");
 #endif
         if (image_list.isEmpty())
             return false;

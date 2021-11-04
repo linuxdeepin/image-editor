@@ -67,7 +67,6 @@ ImageEngine::~ImageEngine()
 
 void ImageEngine::makeImgThumbnail(QString thumbnailSavePath, QStringList paths, int makeCount, bool remake)
 {
-    Q_D(ImageEngine);
     //执行子线程制作缩略图动作
 //    QMetaObject::invokeMethod(d->m_worker, "slotMakeImgThumbnail"
 //                              , Q_ARG(QString, thumbnailSavePath)
