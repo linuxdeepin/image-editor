@@ -858,6 +858,11 @@ void LibImageGraphicsView::slotRotatePixCurrent()
         if (0 != m_rotateAngel) {
             disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             Libutils::image::rotate(m_path, m_rotateAngel);
+            //如果是相册调用，则告知刷新
+            if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
+                emit ImageEngine::instance()->sigRotatePic(m_path);
+            }
+
             QTimer::singleShot(1000, [ = ] {
                 connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             });

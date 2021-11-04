@@ -55,6 +55,9 @@ signals:
     void exitSlideShow();
     //按下ESC键
     void escShortcutActivated(bool isSwitchFullScreen);
+    //通知旋转
+    void sigRotatePic(const QString &path);
+
 private:
 
     static ImageEngine *m_ImageEngine;
