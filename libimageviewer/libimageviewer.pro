@@ -6,7 +6,7 @@
 
 QT       += widgets core gui svg dbus concurrent printsupport
 
-TARGET = image-viewer
+TARGET = imageviewer
 TEMPLATE = lib
 
 CONFIG += c++11 link_pkgconfig
@@ -42,11 +42,11 @@ SOURCES += \
 HEADERS += \
         imageviewer.h \
         imageengine.h \
-        image-viewer_global.h 
+        image-viewer_global.h
 DESTDIR = $$PWD/../../out/
 
 TRANSLATIONS += \
-    translations/libimage-viewer_zh_CN.ts \
+    translations/libimageviewer_zh_CN.ts \
 
 CONFIG(release, debug|release) {
     TRANSLATIONS = $$files($$PWD/translations/*.ts)
@@ -56,7 +56,7 @@ CONFIG(release, debug|release) {
         system(lrelease $$tsfile -qm $$qmfile) | error("Failed to lrelease")
     }
 }
-translations.path = /usr/share/libimage-viewer/translations
+translations.path = /usr/share/libimageviewer/translations
 translations.files = $$PWD/translations/*.qm
 
 

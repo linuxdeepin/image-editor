@@ -1,4 +1,4 @@
-Source: image-editor
+Source: imageeditor
 Section: utils
 Priority: optional
 Maintainer: Deepin Packages Builder <packages@deepin.com>
@@ -11,28 +11,16 @@ Build-Depends: debhelper (>= 11), cmake, qtbase5-dev, pkg-config,libexif-dev, li
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
-Package: libimage-viewer
+Package: libimageeditor
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library.
  Deepin Image Viewer library.
 
-Package: libimage-viewer-dev
+Package: libimageeditor-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libimage-viewer(=${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor(=${binary:Version})
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
-
-package: libvisualresult
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: This provides a real-time optimized Computer Vision library.
- This provides optimized Computer Vision library.
-
-package: libvisualresult-dev
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libvisualresult(=${binary:Version})
-Description: This provides a real-time optimized Computer Vision library.
- This provides optimized Computer Vision library.

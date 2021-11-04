@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(image-editor)
+project(imageeditor)
 
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACH
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -28,6 +28,6 @@ endif()
 
 
 
-add_subdirectory(libimage-viewer)
+add_subdirectory(libimageviewer)
 add_subdirectory(libvisualresult)
 

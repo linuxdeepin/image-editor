@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 SUBDIRS += \
-        libimage-viewer
+        libimageviewer

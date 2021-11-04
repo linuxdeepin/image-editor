@@ -17,7 +17,7 @@
 #include "unionimage/baseutils.h"
 //#include "widgets/toptoolbar.h"
 
-#define PLUGINTRANSPATH "/usr/share/libimage-viewer/translations"
+#define PLUGINTRANSPATH "/usr/share/libimageviewer/translations"
 class ImageViewerPrivate
 {
 public:

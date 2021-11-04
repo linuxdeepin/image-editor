@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 设置工程名字
-project(libimage-viewer VERSION 0.1.0)
+project(libimageviewer VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -13,8 +13,8 @@ set(CMAKE_AUTOUIC ON)
 #Qt需要的包
 set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools)
 
-set(TARGET_NAME image-viewer)
-set(CMD_NAME image-viewer)
+set(TARGET_NAME imageviewer)
+set(CMD_NAME imageviewer)
 
 #先查找到这些qt相关的模块以供链接使用
 find_package(Qt5 REQUIRED ${QtModule})
@@ -31,7 +31,7 @@ add_definitions( -DUSE_UNIONIMAGE )
 add_definitions( -DCMAKE_BUILD )
 
 #库目录
-aux_source_directory(image-viewer allSources)
+aux_source_directory(imageviewer allSources)
 
 
 find_package(PkgConfig REQUIRED)
@@ -63,7 +63,7 @@ link_libraries(freeimage)
 
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
-file(GLOB TS LIST_DIRECTORIES false translations/libimage-viewer*.ts)
+file(GLOB TS LIST_DIRECTORIES false translations/libimageviewer*.ts)
 
 set_source_files_properties(${TS} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/translations)
 
@@ -77,9 +77,9 @@ endif ()
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
 #编译为库
-add_library(image-viewer SHARED ${allHeaders} ${allSources} ${RESOURCES} ${QM})
+add_library(imageviewer SHARED ${allHeaders} ${allSources} ${RESOURCES} ${QM})
 #使用库
-qt5_use_modules(image-viewer ${QtModule})
+qt5_use_modules(imageviewer ${QtModule})
 
 
 #将库安装到指定位置
@@ -90,10 +90,10 @@ set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
-target_link_libraries(image-viewer ${3rd_lib_LIBRARIES} freeimage )
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage )
 
 include(GNUInstallDirs)
-configure_file(libimage-viewer.pc.in ${PROJECT_BINARY_DIR}/libimage-viewer.pc @ONLY)
+configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)
 
 install(TARGETS ${CMD_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
@@ -101,12 +101,12 @@ install(FILES
     imageengine.h
     imageviewer.h
     image-viewer_global.h
-    DESTINATION include/libimage-viewer)
+    DESTINATION include/libimageviewer)
 
-install(FILES ${PROJECT_BINARY_DIR}/libimage-viewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ${PROJECT_BINARY_DIR}/libimageviewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 #translations
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
-    DESTINATION ${PREFIX}/share/libimage-viewer
+    DESTINATION ${PREFIX}/share/libimageviewer
     FILES_MATCHING PATTERN "*.qm")
 
 # 加速编译优化参数

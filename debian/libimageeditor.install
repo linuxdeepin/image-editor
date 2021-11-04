@@ -1,0 +1,5 @@
+usr/lib/*/libimageviewer.so.*
+usr/share/libimageviewer/translations/*.qm
+usr/lib/*/libvisualresult.so.*
+usr/share/libvisualresult/filter_cube/*.CUBE
+usr/share/libvisualresult/filter_cube/*.dat

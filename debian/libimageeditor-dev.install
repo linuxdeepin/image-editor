@@ -1,0 +1,6 @@
+usr/include/libimageviewer/*.h
+usr/lib/*/libimageviewer.so
+usr/lib/*/pkgconfig/libimageviewer.pc
+usr/include/libvisualresult/*.h
+usr/lib/*/libvisualresult.so
+usr/lib/*/pkgconfig/libvisualresult.pc
