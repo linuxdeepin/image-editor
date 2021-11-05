@@ -36,20 +36,20 @@ file(GLOB_RECURSE HEADERSCURRENT "*.h")
 file(GLOB_RECURSE  SOURCESCURRENT  "*.cpp")
 
 file (GLOB_RECURSE SOURCES
-    "../libimage-viewer/*.cpp"
-    "../libimage-viewer/*.h"
+    "../libimageviewer/*.cpp"
+    "../libimageviewer/*.h"
     "../libimagevisualresult/exposure.cpp"
     "../libimagevisualresult/exposure.h"
     )
-file(GLOB_RECURSE SOURCESC "../libimage-viewer/*.c")
+file(GLOB_RECURSE SOURCESC "../libimageviewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")
-file(GLOB_RECURSE FORMS "../libimage-viewer/*.ui")
+file(GLOB_RECURSE FORMS "../libimageviewer/*.ui")
 file(GLOB_RECURSE RESOURCES "../*.qrc")
 
 include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimage-viewer/
+set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimageviewer/
     ${PROJECT_SOURCE_DIR}/../src/src/utils
     )
 
