@@ -287,5 +287,9 @@
         <source>Image file not found</source>
         <translation>Pildifaili ei leitud</translation>
     </message>
+    <message>
+        <source>You have no permission to view the file</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

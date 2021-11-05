@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="ko">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -7,7 +9,7 @@
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -41,7 +43,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -174,7 +176,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -234,7 +236,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -284,6 +286,10 @@
     <message>
         <source>Image file not found</source>
         <translation>이미지 파일을 찾을 수 없음</translation>
+    </message>
+    <message>
+        <source>You have no permission to view the file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

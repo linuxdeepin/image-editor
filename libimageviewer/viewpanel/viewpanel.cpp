@@ -803,7 +803,7 @@ void LibViewPanel::setCurrentWidget(const QString &path)
             m_stack->setCurrentWidget(m_thumbnailWidget);
             //损坏图片不透明
             emit m_view->sigImageOutTitleBar(false);
-            m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
+            m_thumbnailWidget->setThumbnailImageAndText(QPixmap::fromImage(ItemInfo.image), ThumbnailWidget::DamageType);
             if (m_bottomToolbar->getAllFileCount() <= 1) {
                 emit ImageEngine::instance()->sigPicCountIsNull();
             }
@@ -816,7 +816,19 @@ void LibViewPanel::setCurrentWidget(const QString &path)
         }
         //判断是否存在缓存
     } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
-        if (m_lockWidget) {
+        //额外判断是否是因为没有读权限导致裂图
+        QFileInfo info(path);
+        if (!info.permission(QFile::ReadUser)) {
+            if (m_thumbnailWidget) {
+                m_stack->setCurrentWidget(m_thumbnailWidget);
+                //损坏图片不透明
+                emit m_view->sigImageOutTitleBar(false);
+                m_thumbnailWidget->setThumbnailImageAndText(QPixmap(), ThumbnailWidget::CannotReadType);
+                if (m_bottomToolbar->getAllFileCount() <= 1) {
+                    emit ImageEngine::instance()->sigPicCountIsNull();
+                }
+            }
+        } else if (m_lockWidget) {
             m_stack->setCurrentWidget(m_lockWidget);
             //损坏图片不透明
             emit m_view->sigImageOutTitleBar(false);

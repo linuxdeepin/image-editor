@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="hr" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="hr">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -41,7 +43,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -83,7 +85,7 @@
     </message>
     <message>
         <source>Date captured</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exposure mode</source>
@@ -103,7 +105,7 @@
     </message>
     <message>
         <source>Aperture</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Focal length</source>
@@ -115,11 +117,11 @@
     </message>
     <message>
         <source>Max aperture</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Metering mode</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>White balance</source>
@@ -127,7 +129,7 @@
     </message>
     <message>
         <source>Flash compensation</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Lens model</source>
@@ -147,7 +149,7 @@
     </message>
     <message>
         <source>Tag</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -174,7 +176,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -264,7 +266,7 @@
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Next</source>
@@ -284,6 +286,10 @@
     <message>
         <source>Image file not found</source>
         <translation>Slikovna datoteka nije nađena</translation>
+    </message>
+    <message>
+        <source>You have no permission to view the file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

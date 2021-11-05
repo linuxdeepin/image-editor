@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="fr">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -41,7 +43,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -234,7 +236,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -284,6 +286,10 @@
     <message>
         <source>Image file not found</source>
         <translation>Fichier image non trouvé</translation>
+    </message>
+    <message>
+        <source>You have no permission to view the file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

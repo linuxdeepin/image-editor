@@ -44,6 +44,13 @@ public:
     ThumbnailWidget(const QString &darkFile, const QString
                     &lightFile, QWidget *parent = nullptr);
     ~ThumbnailWidget() override;
+
+    enum DisplayType {
+        DamageType = 0,
+        CannotReadType,
+        TypeCount
+    };
+
 signals:
     void mouseHoverMoved();
     void nextRequested();
@@ -57,7 +64,7 @@ signals:
 
 public slots:
     void handleGestureEvent(QGestureEvent *gesture);
-    void setThumbnailImage(const QPixmap thumbnail);
+    void setThumbnailImageAndText(const QPixmap thumbnail, DisplayType type);
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *e) override;
@@ -76,6 +83,8 @@ private:
     QPixmap m_logo;
 #ifndef LITE_DIV
     QLabel *m_tips;
+#else
+    DLabel *m_tips;
 #endif
     QPixmap m_defaultImage;
     QColor m_inBorderColor;

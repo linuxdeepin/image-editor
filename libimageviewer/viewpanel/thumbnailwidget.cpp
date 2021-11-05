@@ -99,11 +99,9 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
     m_tips->setText(tr("No image files found"));
 #else
 
-    DLabel *tips = new DLabel(this);
-    tips->setText(tr("Image file not found"));
-    DFontSizeManager::instance()->bind(tips, DFontSizeManager::T6);
-    tips->setForegroundRole(DPalette::TextTips);
-    tips->show();
+    m_tips = new DLabel(this);
+    m_tips->setText(tr("Image file not found"));
+    m_tips->show();
 
 //    DSuggestButton *button = new DSuggestButton(tr("Open Image"), this);
 //    button->setFixedWidth(302);
@@ -112,8 +110,8 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
 #ifdef OPENACCESSIBLE
     m_thumbnailLabel->setObjectName(Thumbnail_Label);
     m_thumbnailLabel->setAccessibleName(Thumbnail_Label);
-    tips->setObjectName(NOT_FOUND_IMAGE);
-    tips->setAccessibleName(NOT_FOUND_IMAGE);
+    m_tips->setObjectName(NOT_FOUND_IMAGE);
+    m_tips->setAccessibleName(NOT_FOUND_IMAGE);
 //    button->setObjectName(OPEN_IMAGE);
 //    button->setAccessibleName(OPEN_IMAGE);
 #endif
@@ -153,12 +151,7 @@ ThumbnailWidget::ThumbnailWidget(const QString &darkFile, const QString &lightFi
     layout->addStretch();
     layout->addWidget(m_thumbnailLabel, 0, Qt::AlignCenter);
     layout->addSpacing(9);
-#ifndef LITE_DIV
     layout->addWidget(m_tips, 0, Qt::AlignCenter);
-#else
-    layout->addWidget(tips, 0, Qt::AlignCenter);
-//    layout->addWidget(button, 0, Qt::AlignCenter);
-#endif
     layout->addStretch();
     setLayout(layout);
 
@@ -182,34 +175,48 @@ void ThumbnailWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
     update();
 }
 
-void ThumbnailWidget::setThumbnailImage(const QPixmap thumbnail)
+void ThumbnailWidget::setThumbnailImageAndText(const QPixmap thumbnail, DisplayType type)
 {
-    if (thumbnail.isNull()) {
-        if (m_theme) {
+    switch (type) {
+    default:
+        break;
+    case DamageType:
+        if (thumbnail.isNull()) {
             m_defaultImage = m_logo;
+            m_isDefaultThumbnail = true;
         } else {
-            m_defaultImage = m_logo;
+            m_defaultImage = thumbnail;
+            m_isDefaultThumbnail = false;
         }
-        m_isDefaultThumbnail = true;
-    } else {
+        m_tips->setText(tr("Image file not found"));
+        DFontSizeManager::instance()->bind(m_tips, DFontSizeManager::T6);
+        m_tips->setForegroundRole(DPalette::TextTips);
+        break;
+    case CannotReadType:
         m_defaultImage = thumbnail;
         m_isDefaultThumbnail = false;
+        m_tips->setText(tr("You have no permission to view the file"));
+        DFontSizeManager::instance()->bind(m_tips, DFontSizeManager::T6);
+        m_tips->setForegroundRole(DPalette::TextTitle);
+        break;
     }
 
     update();
 }
 
-
 void ThumbnailWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    if (m_defaultImage.isNull()) {
-        if (m_theme) {
-            m_defaultImage = m_logo;
-        } else {
-            m_defaultImage = m_logo;
-        }
-        m_isDefaultThumbnail = true;
+    if (m_defaultImage.isNull() && !m_isDefaultThumbnail) {
+        QPainter painter(this);
+        painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
+        QIcon m_icon(m_defaultImage);
+        m_icon.paint(&painter, QRect(1, 1, 1, 1));
+        return;
+    }
+
+    if (m_defaultImage.isNull() && m_isDefaultThumbnail) {
+        m_defaultImage = m_logo;
     }
 
     if (m_defaultImage.size() != THUMBNAIL_SIZE) {

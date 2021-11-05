@@ -287,5 +287,9 @@
         <source>Image file not found</source>
         <translation>未发现图片文件</translation>
     </message>
+    <message>
+        <source>You have no permission to view the file</source>
+        <translation>您没有权限查看此文件</translation>
+    </message>
 </context>
 </TS>
