@@ -349,6 +349,7 @@ void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
     m_resetAnimation->setStartValue(m_listview->pos());
     m_resetAnimation->setEndValue(QPoint(m_listview->pos().x() + moveX, m_listview->pos().y()));
     m_resetAnimation->start();
+
 }
 
 void MyImageListWidget::stopAnimation()
@@ -402,7 +403,8 @@ void MyImageListWidget::thumbnailIsMoving()
 
 void MyImageListWidget::moveCenterWidget()
 {
-//    stopAnimation();
+    //移动时停止动画
+    stopAnimation();
     int moveX = 0;
     int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
     int itemX = m_listview->x() + m_listview->getCurrentItemX();
