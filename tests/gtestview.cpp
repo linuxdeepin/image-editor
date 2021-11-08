@@ -138,6 +138,8 @@ TEST_F(gtestview, cpFile)
     QFile(QApplication::applicationDirPath() + "/test/jpg.jpg").setPermissions(\
                                                                                QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
                                                                                QFile::ReadOther | QFile::ReadGroup | QFile::WriteGroup);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/errorPic.icns").isFile());
 }
 
 //主窗体
@@ -180,6 +182,8 @@ TEST_F(gtestview, MainWindow)
     QTest::qWait(500);
     m_imageViewer->deleteLater();
     QTest::qWait(500);
+
+    EXPECT_EQ(true, bRet);
 }
 
 //widgets
@@ -295,7 +299,7 @@ TEST_F(gtestview, Widgets)
 
     //top tool bar
     {
-        DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
+        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::DarkType);
         LibTopToolbar toolBar(false, nullptr);
         toolBar.setTitleBarTransparent(false);
 
@@ -307,9 +311,14 @@ TEST_F(gtestview, Widgets)
         e.addDelay(500);
         e.simulate(&toolBar);
 
-        DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::LightType);
+        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::LightType);
         QTest::qWait(200);
     }
+    bool bRet = false;
+    if (DGuiApplicationHelper::instance()->paletteType() == DGuiApplicationHelper::LightType) {
+        bRet = true;
+    }
+    EXPECT_EQ(true, bRet);
 }
 
 TEST_F(gtestview, LibImageDataService)
@@ -325,6 +334,8 @@ TEST_F(gtestview, LibImageDataService)
     LibImageDataService::instance()->deleteLater();
 
     QTest::qWait(500);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/jpg.jpg").isFile());
 }
 
 TEST_F(gtestview, LibBottomToolbar)
@@ -344,6 +355,12 @@ TEST_F(gtestview, LibBottomToolbar)
     e.addMouseRelease(Qt::MouseButton::LeftButton);
     e.addDelay(500);
     e.simulate(toolBar.m_imgListWidget);
+
+    bool bRet = false;
+    if (toolBar.getAllPath().count() > 0) {
+        bRet = true;
+    }
+    EXPECT_EQ(true, bRet);
 }
 
 TEST_F(gtestview, UnionImage)

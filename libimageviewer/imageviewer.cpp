@@ -191,22 +191,6 @@ void ImageViewer::setDropEnabled(bool enable)
 
 void ImageViewer::resizeEvent(QResizeEvent *e)
 {
-    qDebug() << "ImageViewer::resizeEvent = " << e->size();
-//    Q_D(ImageViewer);
-//    if (d->m_topToolbar) {
-//        d->m_topToolbar->resize(width(), TOP_TOOLBAR_HEIGHT);
-
-////        emit dApp->signalM->resizeFileName();
-////        if (e->oldSize()  != e->size()) {
-////            emit m_topToolbar->updateMaxBtn();
-////        }
-
-//        if (window()->isFullScreen()) {
-//            d->m_topToolbar->setVisible(false);
-//        } else {
-//            d-> m_topToolbar->setVisible(true);
-//        }
-//    }
     DWidget::resizeEvent(e);
 }
 

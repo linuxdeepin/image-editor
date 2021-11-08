@@ -36,7 +36,9 @@ TEST_F(gtestview, cp2Image)
         QFile(QApplication::applicationDirPath() + "/test/jpg" + QString::number(i) + ".jpg").setPermissions(\
                                                                                                              QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
                                                                                                              QFile::ReadOther | QFile::ReadGroup | QFile::WriteGroup);
+        EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/test/jpg" + QString::number(i) + ".jpg").isFile());
     }
+
 }
 
 //view panel
@@ -83,6 +85,8 @@ TEST_F(gtestview, LibViewPanel)
     panel = nullptr;
     QTest::qWait(500);
 
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/gif.gif").isFile());
+
 }
 //view panel
 TEST_F(gtestview, LibViewPanel1)
@@ -106,6 +110,8 @@ TEST_F(gtestview, LibViewPanel1)
     panel->deleteLater();
     panel = nullptr;
     QTest::qWait(500);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/gif.gif").isFile());
 }
 TEST_F(gtestview, LibViewPanel_ocr)
 {
@@ -120,6 +126,8 @@ TEST_F(gtestview, LibViewPanel_ocr)
     panel->slotOcrPicture();
     panel->deleteLater();
     panel = nullptr;
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/gif.gif").isFile());
 }
 TEST_F(gtestview, LibViewPanel_startChooseFileDialog1)
 {
@@ -190,13 +198,13 @@ TEST_F(gtestview, LibViewPanel_Menu)
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdHideNavigationWindow);
     panel->onMenuItemClicked(&menuAction);
     QTest::qWait(200);
-    DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
+    DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::DarkType);
     QTest::qWait(500);
-    DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::LightType);
+    DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::LightType);
     QTest::qWait(500);
 
 
-    QTest::keyClick(panel->m_sliderPanel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
     QTest::qWait(200);
 
     //add new
@@ -241,6 +249,8 @@ TEST_F(gtestview, LibViewPanel_Menu)
     view->setImage(QApplication::applicationDirPath() + "/svg2.svg", QImage());
 
     QTest::qWait(500);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/svg2.svg").isFile());
 }
 
 
