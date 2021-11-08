@@ -824,7 +824,7 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                 //损坏图片不透明
                 emit m_view->sigImageOutTitleBar(false);
                 m_thumbnailWidget->setThumbnailImageAndText(QPixmap(), ThumbnailWidget::CannotReadType);
-                if (m_bottomToolbar->getAllFileCount() <= 1) {
+                if (m_bottomToolbar->getAllFileCount() == 0) {
                     emit ImageEngine::instance()->sigPicCountIsNull();
                 }
             }
