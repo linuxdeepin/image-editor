@@ -117,46 +117,16 @@ private:
     bool m_isAnimationIng = false;    //正在播动画
 
 public:
-//    float getFactor()               const
-//    {
-//        return m_factor;
-//    }
-//    QString getImageName1()         const
-//    {
-//        return m_imageName1;
-//    }
-//    QString getImageName2()         const
-//    {
-//        return m_imageName2;
-//    }
-//    QPixmap getPixmap1()            const
-//    {
-//        return m_pixmap1;
-//    }
-//    QPixmap getPixmap2()            const
-//    {
-//        return m_pixmap2;
-//    }
-//    AnimationType getAnimationType()const
-//    {
-//        return m_animationType;
-//    }
+
     void setSlideModel(LibImageAnimation::SlideModel model)
     {
         m_SliderModel = model;
     }
-//    ImageAnimation::SlideModel getSlideModel()
-//    {
-//        return m_SliderModel;
-//    }
+
     void setPlayOrStatue(LibImageAnimation::PlayOrStatue statue)
     {
         m_PlayOrStatue = statue;
     }
-//    ImageAnimation::PlayOrStatue getPlayOrStatue()
-//    {
-//        return m_PlayOrStatue;
-//    }
 
     void setPathList(const QString &first, const QStringList &list);
     void startAnimation();
@@ -737,11 +707,8 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     }
 }
 
-/**
- ****************************************************************************************************************
- *  ImageAnimation
- ****************************************************************************************************************
- */
+//ImageAnimation
+
 LibImageAnimation::LibImageAnimation(QWidget *parent) :
     QWidget(parent), current_target(EffectPlay), d_ptr(new LibImageAnimationPrivate(this))
 {
@@ -828,12 +795,6 @@ const QRect LibImageAnimation::getCurScreenGeometry()
     tempRect.setRect(0, 0, tempRect.width(), tempRect.height());
     return tempRect;
 }
-
-//void ImageAnimation::pauseAndpre()
-//{
-//    setPaintTarget(TurnBackPre);
-//    update();
-//}
 
 void LibImageAnimation::paintEvent(QPaintEvent *e)
 {

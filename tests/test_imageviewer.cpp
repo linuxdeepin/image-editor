@@ -29,6 +29,12 @@ TEST_F(gtestview, imageviewer_startSlideShow)
     list << QApplication::applicationDirPath() + "/gif.gif";
     list << QApplication::applicationDirPath() + "/gif2.gif";
     list << QApplication::applicationDirPath() + "/ico.ico";
+    list << QApplication::applicationDirPath() + "/jpg.jpg";
+    list << QApplication::applicationDirPath() + "/png.png";
+    list << QApplication::applicationDirPath() + "/mng.mng";
+    list << QApplication::applicationDirPath() + "/svg1.svg";
+    list << QApplication::applicationDirPath() + "/svg2.svg";
+    list << QApplication::applicationDirPath() + "/svg3.svg";
     QString path = QApplication::applicationDirPath() + "/gif.gif";
 
     QString CACHE_PATH = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)

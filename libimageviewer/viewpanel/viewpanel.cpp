@@ -1028,7 +1028,7 @@ bool LibViewPanel::slotOcrPicture()
         //替换为了保存为文件,用路径去打开ocr
         QFileInfo info(path);
         qDebug() << info.completeBaseName();
-        QString savePath = IMAGE_TMPPATH + info.completeBaseName() + ".jpg";
+        QString savePath = IMAGE_TMPPATH + info.completeBaseName() + ".png";
         image.save(savePath);
         //采用路径，以防止名字出错
         m_ocrInterface->openFile(savePath);
