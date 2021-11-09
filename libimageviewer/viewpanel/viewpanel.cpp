@@ -53,6 +53,9 @@
 #include "slideshow/slideshowpanel.h"
 #include "service/configsetter.h"
 
+const QString IMAGE_TMPPATH =   QDir::homePath() +
+                                "/.config/deepin/deepin-image-viewer/";
+
 const int BOTTOM_TOOLBAR_HEIGHT = 80;   //底部工具看高
 const int BOTTOM_SPACING = 10;          //底部工具栏与底部边缘距离
 const int RT_SPACING = 20;
@@ -1021,9 +1024,13 @@ bool LibViewPanel::slotOcrPicture()
         if (image.height() > 5000) {
             image = image.scaledToHeight(5000, Qt::SmoothTransformation);
         }
+        //替换为了保存为文件,用路径去打开ocr
         QFileInfo info(path);
+        qDebug() << info.completeBaseName();
+        QString savePath = IMAGE_TMPPATH + info.completeBaseName() + ".jpg";
+        image.save(savePath);
         //采用路径，以防止名字出错
-        m_ocrInterface->openImageAndName(image, path);
+        m_ocrInterface->openFile(savePath);
     }
     return false;
 }
