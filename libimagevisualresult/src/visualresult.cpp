@@ -62,9 +62,9 @@ void imageFilter24(uint8_t *data, int width, int height, const char *filterName,
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             lineNum_24 = i * nRowBytes;
-            uint8_t *R = &(frame[lineNum_24 + j * 3 + 2]);
+            uint8_t *R = &(frame[lineNum_24 + j * 3 + 0]);
             uint8_t *G = &(frame[lineNum_24 + j * 3 + 1]);
-            uint8_t *B = &(frame[lineNum_24 + j * 3 + 0]);
+            uint8_t *B = &(frame[lineNum_24 + j * 3 + 2]);
 
             unsigned int index = static_cast<unsigned int>((*R >> 3) + ((*G >> 3) << 5)  + ((*B >> 3) << 10));
 
