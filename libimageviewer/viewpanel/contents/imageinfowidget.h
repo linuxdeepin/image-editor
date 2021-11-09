@@ -44,7 +44,8 @@ class LibImageInfoWidget : public QFrame
 public:
     explicit LibImageInfoWidget(const QString &darkStyle,
                                 const QString &lightStyle,
-                                QWidget *parent = 0);
+                                QWidget *parent = nullptr);
+    ~LibImageInfoWidget() Q_DECL_OVERRIDE;
     void setImagePath(const QString path);
     void updateInfo();
     int contentHeight() const;

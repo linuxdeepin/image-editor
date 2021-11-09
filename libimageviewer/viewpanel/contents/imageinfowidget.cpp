@@ -160,7 +160,7 @@ protected:
 #include "imageinfowidget.moc"
 
 LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &lightStyle,
-                                 QWidget *parent)
+                                       QWidget *parent)
     : QFrame(parent)
     , m_maxTitleWidth(maxTitleWidth())
     , m_maxFieldWidth(0)
@@ -192,13 +192,13 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     m_exif_details = new QFrame(this);
     m_exif_details->setFixedWidth(280);
 
-    m_exifLayout_base = new QFormLayout();
+    m_exifLayout_base = new QFormLayout(m_exif_base);
     m_exifLayout_base->setVerticalSpacing(7);
     m_exifLayout_base->setHorizontalSpacing(10);
     m_exifLayout_base->setContentsMargins(10, 1, 7, 10);
     m_exifLayout_base->setLabelAlignment(Qt::AlignLeft);
 
-    m_exifLayout_details = new QFormLayout();
+    m_exifLayout_details = new QFormLayout(m_exif_details);
     m_exifLayout_details->setVerticalSpacing(7);
     m_exifLayout_details->setHorizontalSpacing(16);
     m_exifLayout_details->setContentsMargins(10, 1, 7, 10);
@@ -207,7 +207,7 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     m_exif_base->setLayout(m_exifLayout_base);
     m_exif_details->setLayout(m_exifLayout_details);
 
-    m_mainLayout = new QVBoxLayout;
+    m_mainLayout = new QVBoxLayout(this);
 
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
     m_mainLayout->setMargin(0);
@@ -260,6 +260,12 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     connect(m_close, &DDialogCloseButton::clicked, this,
             [ = ] { emit dApp->signalM->hideExtensionPanel(); });
 #endif
+}
+
+LibImageInfoWidget::~LibImageInfoWidget()
+{
+    clearLayout(m_exifLayout_base);
+    clearLayout(m_exifLayout_details);
 }
 
 void LibImageInfoWidget::setImagePath(const QString path)
@@ -346,24 +352,15 @@ void LibImageInfoWidget::paintEvent(QPaintEvent *event)
 
 void LibImageInfoWidget::clearLayout(QLayout *layout)
 {
-    QFormLayout *fl = static_cast<QFormLayout *>(layout);
-    if (fl) {
-        // FIXME fl->rowCount() will always increase
-        for (int i = 0; i < fl->rowCount(); i++) {
-            QLayoutItem *li = fl->itemAt(i, QFormLayout::LabelRole);
-            QLayoutItem *fi = fl->itemAt(i, QFormLayout::FieldRole);
-            if (li) {
-                if (li->widget())
-                    delete li->widget();
-                fl->removeItem(li);
-            }
-            if (fi) {
-                if (fi->widget())
-                    delete fi->widget();
-                fl->removeItem(fi);
-            }
+    QLayoutItem *child;
+    while ((child = layout->takeAt(0)) != nullptr) {
+        if (child->widget()) {
+            child->widget()->setParent(nullptr);
         }
+        delete child;
     }
+
+
 }
 // QSize ImageInfoWidget::sizeHint() const
 //{
