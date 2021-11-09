@@ -798,10 +798,10 @@ QString LibViewPanel::getCurrentPath()
 void LibViewPanel::setCurrentWidget(const QString &path)
 {
     QImage img = m_view->image();
-    bool isFile = QFileInfo(path).isFile();
+    QFileInfo info(path);
     imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
     //判断是否是损坏图片
-    if (!isFile && !path.isEmpty()) {
+    if (!info.isFile() && !path.isEmpty()) {
         if (m_thumbnailWidget) {
             m_stack->setCurrentWidget(m_thumbnailWidget);
             //损坏图片不透明
@@ -811,16 +811,8 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                 emit ImageEngine::instance()->sigPicCountIsNull();
             }
         }
-    } else if (!img.isNull()) {
-        if (m_view) {
-            m_stack->setCurrentWidget(m_view);
-            //判断下是否透明
-            m_view->titleBarControl();
-        }
-        //判断是否存在缓存
-    } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
+    } else if (!info.permission(QFile::ReadUser)) {
         //额外判断是否是因为没有读权限导致裂图
-        QFileInfo info(path);
         if (!info.permission(QFile::ReadUser)) {
             if (m_thumbnailWidget) {
                 m_stack->setCurrentWidget(m_thumbnailWidget);
@@ -831,7 +823,16 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                     emit ImageEngine::instance()->sigPicCountIsNull();
                 }
             }
-        } else if (m_lockWidget) {
+        }
+    } else if (!img.isNull()) {
+        if (m_view) {
+            m_stack->setCurrentWidget(m_view);
+            //判断下是否透明
+            m_view->titleBarControl();
+        }
+        //判断是否存在缓存
+    } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
+        if (m_lockWidget) {
             m_stack->setCurrentWidget(m_lockWidget);
             //损坏图片不透明
             emit m_view->sigImageOutTitleBar(false);
