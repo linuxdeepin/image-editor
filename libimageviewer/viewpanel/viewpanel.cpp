@@ -1024,11 +1024,11 @@ bool LibViewPanel::slotOcrPicture()
     //图片过大，会导致崩溃，超过4K，智能裁剪
     if (m_ocrInterface != nullptr && m_view != nullptr) {
         QImage image = m_view->image();
-        if (image.width() > 5000) {
-            image = image.scaledToWidth(5000, Qt::SmoothTransformation);
+        if (image.width() > 2500) {
+            image = image.scaledToWidth(2500, Qt::SmoothTransformation);
         }
-        if (image.height() > 5000) {
-            image = image.scaledToHeight(5000, Qt::SmoothTransformation);
+        if (image.height() > 2500) {
+            image = image.scaledToHeight(2500, Qt::SmoothTransformation);
         }
         //替换为了保存为文件,用路径去打开ocr
         QFileInfo info(path);
