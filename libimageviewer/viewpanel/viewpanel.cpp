@@ -60,6 +60,7 @@ const int BOTTOM_TOOLBAR_HEIGHT = 80;   //底部工具看高
 const int BOTTOM_SPACING = 10;          //底部工具栏与底部边缘距离
 const int RT_SPACING = 20;
 const int TOP_TOOLBAR_HEIGHT = 50;
+const int DELAY_HIDE_CURSOR_INTERVAL = 3000;
 
 using namespace imageViewerSpace;
 
@@ -567,6 +568,8 @@ void LibViewPanel::toggleFullScreen()
 //    m_view->setFitState(false, false);
     if (window()->isFullScreen()) {
         showNormal();
+        killTimer(m_hideCursorTid);
+        m_hideCursorTid = 0;
         m_view->viewport()->setCursor(Qt::ArrowCursor);
     } else {
         showFullScreen();
@@ -599,6 +602,7 @@ void LibViewPanel::showFullScreen()
 //    });
 
     window()->showFullScreen();
+    m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
 
 }
 
@@ -1253,6 +1257,12 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             //todo,重命名
             QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
             RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
+
+            //打开重命名窗口时关闭定时器
+            killTimer(m_hideCursorTid);
+            m_hideCursorTid = 0;
+            m_view->viewport()->setCursor(Qt::ArrowCursor);
+
 #ifndef USE_TEST
             if (renamedlg->exec()) {
 #else
@@ -1275,6 +1285,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                     }
                 }
             }
+            //开启定时器
+            m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
             break;
         }
         case IdCopy: {
@@ -1602,4 +1614,13 @@ void LibViewPanel::dropEvent(QDropEvent *event)
         paths << path;
     }
     startdragImage(paths);
+}
+
+void LibViewPanel::timerEvent(QTimerEvent *e)
+{
+    if (e->timerId() == m_hideCursorTid && (!m_menu || !m_menu->isVisible())) {
+        m_view->viewport()->setCursor(Qt::BlankCursor);
+    }
+
+    QFrame::timerEvent(e);
 }

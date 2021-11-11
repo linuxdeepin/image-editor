@@ -438,7 +438,8 @@ void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
 
 void LibSlideShowPanel::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == m_hideCursorTid && qApp->modalWindow() == nullptr) {
+    //如果右键菜单存在则菜单不显示
+    if (event->timerId() == m_hideCursorTid && qApp->modalWindow() == nullptr && (!m_menu || !m_menu->isVisible())) {
         this->setCursor(Qt::BlankCursor);
     }
     QWidget::timerEvent(event);

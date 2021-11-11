@@ -176,6 +176,8 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+
+    void timerEvent(QTimerEvent *e) Q_DECL_OVERRIDE;//
 signals:
     void imageChanged(const QString &path);
 
@@ -217,5 +219,7 @@ private:
     //当前打开图片是否从自定义打开，自定义相册名
     bool m_isCustomAlbum = false;
     QString m_CurrentCustomName = "";
+
+    int m_hideCursorTid{0};//隐藏时间
 };
 #endif  // VIEWPANEL_H
