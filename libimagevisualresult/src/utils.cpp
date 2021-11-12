@@ -79,6 +79,8 @@ void Libutils::readFilters(const std::string& dir)
         }
     }
 
+    closedir(dp);
+
     printf("read %d CUBE/dat files...\n", count);
 }
 
