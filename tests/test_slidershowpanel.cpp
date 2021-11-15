@@ -49,9 +49,9 @@ TEST_F(gtestview, SlideShowBottomBar)
 
     panel->startSlideShow(info);
 
-    info.paths = QStringList(path);
+//    info.paths = QStringList(path);
 
-    panel->startSlideShow(info);
+//    panel->startSlideShow(info);
 
     QTest::qWait(1000);
     panel->deleteLater();

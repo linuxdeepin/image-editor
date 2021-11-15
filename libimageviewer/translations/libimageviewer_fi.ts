@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="fi">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fi" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -43,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Vie</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -62,7 +60,7 @@
     <name>LockWidget</name>
     <message>
         <source>You have no permission to view the image</source>
-        <translation>Sinulla ei ole oikeutta tarkastella kuvaa</translation>
+        <translation>Sinulla ei ole oikeutta katsoa kuvaa</translation>
     </message>
 </context>
 <context>
@@ -247,7 +245,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peru</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Input a new name</source>
@@ -289,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinulla ei ole oikeuksia katsoa tiedostoa</translation>
     </message>
 </context>
 </TS>

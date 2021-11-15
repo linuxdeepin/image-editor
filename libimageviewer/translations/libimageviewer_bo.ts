@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="bo">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="bo" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -43,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>ཕྱིར་འདྲེན།</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -289,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"></translation>
+        <translation>ཡིག་ཆ་ལྟ་བའི་དབང་ཚད་མེད།</translation>
     </message>
 </context>
 </TS>

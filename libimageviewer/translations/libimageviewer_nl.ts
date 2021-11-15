@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="nl">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="nl" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -43,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporteren</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -62,7 +60,7 @@
     <name>LockWidget</name>
     <message>
         <source>You have no permission to view the image</source>
-        <translation>Je bent niet gemachtigd om deze afbeelding te bekijken</translation>
+        <translation>Je bent niet bevoegd om deze afbeelding te bekijken</translation>
     </message>
 </context>
 <context>
@@ -289,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"></translation>
+        <translation>Je bent niet bevoegd om dit bestand te bekijken</translation>
     </message>
 </context>
 </TS>

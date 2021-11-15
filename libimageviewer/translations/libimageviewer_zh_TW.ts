@@ -289,7 +289,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation>您沒有權限查看此文件</translation>
+        <translation>無權檢視文件</translation>
     </message>
 </context>
 </TS>

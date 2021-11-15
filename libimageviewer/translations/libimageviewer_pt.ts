@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="pt" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -16,7 +14,7 @@
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Informações básicas</translation>
+        <translation>Informação básica</translation>
     </message>
     <message>
         <source>Details</source>
@@ -43,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -62,7 +60,7 @@
     <name>LockWidget</name>
     <message>
         <source>You have no permission to view the image</source>
-        <translation>Não tem premissões para ver esta imagem</translation>
+        <translation>Não tem permissões para ver a imagem</translation>
     </message>
 </context>
 <context>
@@ -289,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"></translation>
+        <translation>Não tem permissões para ver o ficheiro</translation>
     </message>
 </context>
 </TS>

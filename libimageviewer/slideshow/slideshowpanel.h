@@ -117,7 +117,7 @@ private:
     QShortcut *m_sEsc;
     ViewInfo m_vinfo;
     QColor m_bgColor;
-    bool m_isMaximized;
+    bool m_isMaximized = false;
     int m_hideCursorTid;
     bool m_isf5move = false;
 };
