@@ -352,15 +352,24 @@ void LibImageInfoWidget::paintEvent(QPaintEvent *event)
 
 void LibImageInfoWidget::clearLayout(QLayout *layout)
 {
-    QLayoutItem *child;
-    while ((child = layout->takeAt(0)) != nullptr) {
-        if (child->widget()) {
-            child->widget()->setParent(nullptr);
+    QFormLayout *fl = static_cast<QFormLayout *>(layout);
+    if (fl) {
+        // FIXME fl->rowCount() will always increase
+        for (int i = 0; i < fl->rowCount(); i++) {
+            QLayoutItem *li = fl->itemAt(i, QFormLayout::LabelRole);
+            QLayoutItem *fi = fl->itemAt(i, QFormLayout::FieldRole);
+            if (li) {
+                if (li->widget())
+                    delete li->widget();
+                fl->removeItem(li);
+            }
+            if (fi) {
+                if (fi->widget())
+                    delete fi->widget();
+                fl->removeItem(fi);
+            }
         }
-        delete child;
     }
-
-
 }
 // QSize ImageInfoWidget::sizeHint() const
 //{
