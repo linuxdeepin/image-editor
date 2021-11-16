@@ -448,7 +448,6 @@ void MyImageListWidget::onClicked(const QModelIndex &index)
     if (m_timer->isActive()) {
         m_listview->onClicked(index);
     }
-
     animationStart(true, 0, 400);
 }
 

@@ -932,6 +932,8 @@ bool LibViewPanel::startChooseFileDialog()
             ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
         }
     }
+    //ctrl+o打开后需要居中
+    m_bottomToolbar->thumbnailMoveCenterWidget();
     return bRet;
 }
 
