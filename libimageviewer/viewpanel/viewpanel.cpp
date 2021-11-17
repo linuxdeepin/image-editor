@@ -1249,7 +1249,15 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
+            //打开重命名窗口时关闭定时器
+            killTimer(m_hideCursorTid);
+            m_hideCursorTid = 0;
+            m_view->viewport()->setCursor(Qt::ArrowCursor);
+
             PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
+
+            //开启定时器
+            m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
             break;
         }
         case IdRename: {
