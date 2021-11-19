@@ -28,7 +28,7 @@ class QMovie;
 class LibGraphicsMovieItem : public QGraphicsPixmapItem, QObject
 {
 public:
-    explicit LibGraphicsMovieItem(const QString &fileName, const QString &suffix = NULL, QGraphicsItem *parent = 0);
+    explicit LibGraphicsMovieItem(const QString &fileName, const QString &suffix = nullptr, QGraphicsItem *parent = nullptr);
     ~LibGraphicsMovieItem();
     bool isValid() const;
     void start();
@@ -42,10 +42,12 @@ class LibGraphicsPixmapItem : public QGraphicsPixmapItem
 {
 public:
     explicit LibGraphicsPixmapItem(const QPixmap &pixmap);
-    ~LibGraphicsPixmapItem();
+    ~LibGraphicsPixmapItem() override;
 
     void setPixmap(const QPixmap &pixmap);
-
+protected:
+    //自绘函数
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 private:
     QPair<qreal, QPixmap> cachePixmap;
 };

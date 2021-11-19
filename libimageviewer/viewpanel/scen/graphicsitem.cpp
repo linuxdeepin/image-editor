@@ -88,6 +88,36 @@ void LibGraphicsPixmapItem::setPixmap(const QPixmap &pixmap)
     QGraphicsPixmapItem::setPixmap(pixmap);
 }
 
+void LibGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    const QTransform ts = painter->transform();
 
+    if (ts.type() == QTransform::TxScale && ts.m11() < 1) {
+        QPixmap currentPixmap = pixmap();
+        if (currentPixmap.width() < 10000 && currentPixmap.height() < 10000) {
+            painter->setRenderHint(QPainter::SmoothPixmapTransform,
+                                   (transformationMode() == Qt::SmoothTransformation));
+
+            Q_UNUSED(option);
+            Q_UNUSED(widget);
+
+            QPixmap pixmap;
+
+            if (qIsNull(cachePixmap.first - ts.m11())) {
+                pixmap = cachePixmap.second;
+            } else {
+                pixmap = currentPixmap.transformed(painter->transform(), transformationMode());
+                cachePixmap = qMakePair(ts.m11(), pixmap);
+            }
+
+            pixmap.setDevicePixelRatio(painter->device()->devicePixelRatioF());
+            painter->resetTransform();
+            painter->drawPixmap(offset() + QPointF(ts.dx(), ts.dy()), pixmap);
+            painter->setTransform(ts);
+        }
+    } else {
+        QGraphicsPixmapItem::paint(painter, option, widget);
+    }
+}
 
 
