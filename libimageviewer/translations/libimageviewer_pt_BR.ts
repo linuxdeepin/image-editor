@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exportar</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -287,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"/>
+        <translation>Você não tem permissão para ver o arquivo</translation>
     </message>
 </context>
 </TS>

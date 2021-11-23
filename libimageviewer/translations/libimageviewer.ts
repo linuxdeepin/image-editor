@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="en" version="2.1">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -16,46 +14,46 @@
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation type="unfinished">Basic info</translation>
+        <translation>Basic info</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished">Details</translation>
+        <translation>Details</translation>
     </message>
 </context>
 <context>
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation type="unfinished"></translation>
+        <translation>Add to album</translation>
     </message>
     <message>
         <source>New album</source>
-        <translation type="unfinished"></translation>
+        <translation>New album</translation>
     </message>
     <message>
         <source>All images</source>
-        <translation type="unfinished">All images</translation>
+        <translation>All images</translation>
     </message>
     <message>
         <source>Open Image</source>
-        <translation type="unfinished">Open Image</translation>
+        <translation>Open Image</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Export</translation>
     </message>
     <message>
         <source>Remove from album</source>
-        <translation type="unfinished"></translation>
+        <translation>Remove from album</translation>
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Unfavorite</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Favorite</translation>
     </message>
 </context>
 <context>
@@ -236,7 +234,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="unfinished"></translation>
+        <translation>day</translation>
     </message>
 </context>
 <context>
@@ -289,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"></translation>
+        <translation>You have no permission to view the file</translation>
     </message>
 </context>
 </TS>

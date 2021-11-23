@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Dışa aktar</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -287,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"/>
+        <translation>Dosyayı görüntüleme izniniz yok</translation>
     </message>
 </context>
 </TS>

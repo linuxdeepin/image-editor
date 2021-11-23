@@ -3,7 +3,7 @@
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
-        <translation>Bildinformationen</translation>
+        <translation>Bildinfo</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -60,7 +60,7 @@
     <name>LockWidget</name>
     <message>
         <source>You have no permission to view the image</source>
-        <translation>Sie haben keine Berechtigung zum Betrachten des Bildes</translation>
+        <translation>Sie haben keine Berechtigung zum Ansehen des Bildes</translation>
     </message>
 </context>
 <context>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>Image info</source>
-        <translation>Bildinformationen</translation>
+        <translation>Bildinfo</translation>
     </message>
     <message>
         <source>day</source>
@@ -287,7 +287,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"/>
+        <translation>Sie haben keine Berechtigung zum Ansehen der Datei</translation>
     </message>
 </context>
 </TS>

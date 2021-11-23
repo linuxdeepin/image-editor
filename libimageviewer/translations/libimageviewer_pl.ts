@@ -279,15 +279,15 @@
     <name>ThumbnailWidget</name>
     <message>
         <source>No image files found</source>
-        <translation>Nie odnaleziono plików z obrazami</translation>
+        <translation>Nie odnaleziono obrazów</translation>
     </message>
     <message>
         <source>Image file not found</source>
-        <translation>Nie znaleziono pliku obrazu</translation>
+        <translation>Nie znaleziono obrazu</translation>
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation>Nie masz uprawnień, aby zobaczyć ten plik</translation>
+        <translation>Nie masz uprawnień, aby wyświetlić ten plik</translation>
     </message>
 </context>
 </TS>
