@@ -35,7 +35,10 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
 {
     QDir dir(PLUGINTRANSPATH);
     if (dir.exists()) {
+        qDebug() << QLocale::system().name();
+        qDebug() << QLocale::system();
         QDirIterator qmIt(PLUGINTRANSPATH, QStringList() << QString("*%1.qm").arg(QLocale::system().name()), QDir::Files);
+
         while (qmIt.hasNext()) {
             qmIt.next();
             QFileInfo finfo = qmIt.fileInfo();
@@ -44,7 +47,22 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
                 qApp->installTranslator(translator);
             }
         }
+
+        QStringList parseLocalNameList = QLocale::system().name().split("_", QString::SkipEmptyParts);
+        if (parseLocalNameList.length() > 0) {
+            QString  translateFilename = QString("/libimageviewer_%2.qm")
+                                         .arg(parseLocalNameList.at(0));
+
+            QString translatePath = PLUGINTRANSPATH + translateFilename;
+            if (QFile::exists(translatePath)) {
+                qDebug() << "translatePath after feedback:" << translatePath;
+                auto translator = new QTranslator(qApp);
+                translator->load(translatePath);
+                qApp->installTranslator(translator);
+            }
+        }
     }
+//    }
     Q_Q(ImageViewer);
     m_imgViewerType = imgViewerType;
     //记录当前展示模式
