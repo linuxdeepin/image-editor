@@ -1458,6 +1458,10 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
         m_info->setVisible(false);
         m_extensionPanel->setVisible(false);
     }
+    //打开幻灯片需要隐藏导航窗口
+    if (m_nav->isVisible()) {
+        m_nav->hide();
+    }
 }
 
 void LibViewPanel::resetBottomToolbarGeometry(bool visible)
