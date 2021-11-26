@@ -280,6 +280,7 @@ void LibViewPanel::initNavigation()
     m_nav.setAnchor(Qt::AnchorBottom, this, Qt::AnchorBottom);
 
     connect(this, &LibViewPanel::imageChanged, this, [ = ](const QString & path) {
+        Q_UNUSED(path)
         //BUG#93145 去除对path的判断，直接隐藏导航窗口
         m_nav->setVisible(false);
         QImage img = m_view->image();
@@ -291,12 +292,14 @@ void LibViewPanel::initNavigation()
     connect(m_nav, &NavigationWidget::requestMove, [this](int x, int y) {
         m_view->centerOn(x, y);
     });
-    connect(m_view, &LibImageGraphicsView::transformChanged, [this]() {
+    connect(m_view, &LibImageGraphicsView::transformChanged, this, [ = ]() {
         //如果stackindex不为2，全屏会出现导航窗口
         //如果是正在移动的情况，将不会出现导航栏窗口
         if (m_stack->currentWidget() == m_view) {
             m_nav->setVisible((! m_nav->isAlwaysHidden() && ! m_view->isWholeImageVisible()));
             m_nav->setRectInImage(m_view->visibleImageRect());
+        } else {
+            m_nav->setVisible(false);
         }
     });
 }
@@ -1460,10 +1463,6 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
     if (m_info && m_extensionPanel) {
         m_info->setVisible(false);
         m_extensionPanel->setVisible(false);
-    }
-    //打开幻灯片需要隐藏导航窗口
-    if (m_nav->isVisible()) {
-        m_nav->hide();
     }
 }
 
