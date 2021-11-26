@@ -316,7 +316,6 @@ void LibViewPanel::initRightMenu()
         this->customContextMenuRequested(cursor().pos());
     });
 
-    m_menu = new DMenu;
     connect(this, &LibViewPanel::customContextMenuRequested, this, [ = ] {
         updateMenuContent();
         m_menu->popup(QCursor::pos());
@@ -636,7 +635,7 @@ void LibViewPanel::appendAction(int id, const QString &text, const QString &shor
 {
     if (m_menu && m_menuItemDisplaySwitch.test(static_cast<size_t>(id))) {
         QAction *ac = new QAction(m_menu);
-        addAction(ac);
+//        addAction(ac);
         ac->setText(text);
         ac->setProperty("MenuID", id);
         ac->setShortcut(QKeySequence(shortcut));

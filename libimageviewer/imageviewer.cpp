@@ -22,8 +22,7 @@ class ImageViewerPrivate
 {
 public:
     ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, ImageViewer *parent);
-
-public:
+private:
     ImageViewer     *q_ptr;
     LibViewPanel       *m_panel = nullptr;
     imageViewerSpace::ImgViewerType   m_imgViewerType;
@@ -34,15 +33,14 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     : q_ptr(parent)
 {
     QDir dir(PLUGINTRANSPATH);
+
     if (dir.exists()) {
-        qDebug() << QLocale::system().name();
-        qDebug() << QLocale::system();
         QDirIterator qmIt(PLUGINTRANSPATH, QStringList() << QString("*%1.qm").arg(QLocale::system().name()), QDir::Files);
 
         while (qmIt.hasNext()) {
             qmIt.next();
             QFileInfo finfo = qmIt.fileInfo();
-            QTranslator *translator = new QTranslator;
+            QTranslator *translator = new QTranslator(qApp);
             if (translator->load(finfo.baseName(), finfo.absolutePath())) {
                 qApp->installTranslator(translator);
             }
@@ -77,7 +75,6 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     layout->addWidget(m_panel);
 }
 
-
 ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, QWidget *parent)
     : DWidget(parent)
     , d_ptr(new ImageViewerPrivate(imgViewerType, savePath, customTopToolbar, this))
@@ -91,6 +88,7 @@ ImageViewer::~ImageViewer()
     Q_D(ImageViewer);
     d->m_panel->deleteLater();
     d->m_panel = nullptr;
+    d->q_ptr = nullptr;
 }
 
 bool ImageViewer::startChooseFileDialog()

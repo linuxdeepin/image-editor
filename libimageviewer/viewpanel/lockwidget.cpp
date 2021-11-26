@@ -49,7 +49,7 @@ LockWidget::LockWidget(const QString &darkFile,
         m_picString = ICON_PIXMAP_LIGHT;
         m_theme = false;
     }
-    m_bgLabel = new QLbtoDLabel();
+    m_bgLabel = new DLabel(this);
     m_bgLabel->setFixedSize(151, 151);
     m_bgLabel->setObjectName("BgLabel");
 #ifdef OPENACCESSIBLE
@@ -57,7 +57,7 @@ LockWidget::LockWidget(const QString &darkFile,
     setAccessibleName(Lock_Widget);
     m_bgLabel->setAccessibleName("BgLabel");
 #endif
-    QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
     this, [ = ]() {
         DGuiApplicationHelper::ColorType themeType =
             DGuiApplicationHelper::instance()->themeType();
@@ -71,9 +71,11 @@ LockWidget::LockWidget(const QString &darkFile,
         }
 
         QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
-        m_bgLabel->setPixmap(logo_pix);
+        if (m_bgLabel) {
+            m_bgLabel->setPixmap(logo_pix);
+        }
     });
-    m_lockTips = new QLbtoDLabel();
+    m_lockTips = new DLabel(this);
     m_lockTips->setObjectName("LockTips");
     setContentText(tr("You have no permission to view the image"));
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -183,6 +185,14 @@ void LockWidget::pinchTriggered(QPinchGesture *gesture)
 
 void LockWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 {
+    if (m_bgLabel) {
+        m_bgLabel->deleteLater();
+        m_bgLabel = nullptr;
+    }
+    if (m_lockTips) {
+        m_lockTips->deleteLater();
+        m_lockTips = nullptr;
+    }
     ThemeWidget::onThemeChanged(theme);
     update();
 }

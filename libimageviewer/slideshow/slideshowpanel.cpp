@@ -200,7 +200,7 @@ void LibSlideShowPanel::initConnections()
 void LibSlideShowPanel::initMenu()
 {
     this->setContextMenuPolicy(Qt::CustomContextMenu);
-    m_menu = new DMenu;
+    m_menu = new DMenu(this);
     m_menu->setStyle(QStyleFactory::create("dlight"));
     QString stopSc = LibConfigSetter::instance()->value(SHORTCUTVIEW_GROUP, "Slide show").toString();
     stopSc.replace(" ", "");
@@ -213,7 +213,6 @@ void LibSlideShowPanel::initMenu()
 void LibSlideShowPanel::appendAction(int id, const QString &text, const QString &shortcut)
 {
     QAction *ac = new QAction(m_menu);
-    addAction(ac);
     ac->setText(text);
     ac->setProperty("MenuID", id);
     ac->setShortcut(QKeySequence(shortcut));

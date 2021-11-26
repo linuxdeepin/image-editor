@@ -189,6 +189,26 @@ LibImageGraphicsView::~LibImageGraphicsView()
 //        m_imgFileWatcher->wait();
         m_imgFileWatcher->deleteLater();
     }
+    if (m_imageReader) {
+        delete m_imageReader;
+        m_imageReader = nullptr;
+    }
+    if (m_morePicFloatWidget) {
+        m_morePicFloatWidget->deleteLater();
+        m_morePicFloatWidget = nullptr;
+    }
+    if (m_movieItem) {
+        delete m_movieItem;
+        m_movieItem = nullptr;
+    }
+    if (m_pixmapItem) {
+        delete m_pixmapItem;
+        m_pixmapItem = nullptr;
+    }
+    if (m_imgSvgItem) {
+        delete m_imgSvgItem;
+        m_imgSvgItem = nullptr;
+    }
     //保存旋转状态
     slotRotatePixCurrent();
 }
@@ -245,14 +265,8 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     }
     //ImageTypeDynamic
     if (Type == imageViewerSpace::ImageTypeDynamic) {
-        if (m_pixmapItem != nullptr) {
-            delete m_pixmapItem;
-            m_pixmapItem = nullptr;
-        }
-        if (m_imgSvgItem != nullptr) {
-            delete m_imgSvgItem;
-            m_imgSvgItem = nullptr;
-        }
+        m_pixmapItem = nullptr;
+        m_imgSvgItem = nullptr;
         s->clear();
         resetTransform();
         m_movieItem = new LibGraphicsMovieItem(path, strfixL);
@@ -268,17 +282,17 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         }, Qt::QueuedConnection);
         m_newImageLoadPhase = FullFinish;
     } else if (Type == imageViewerSpace::ImageTypeSvg) {
-        //svg采用svgRender显示
-        m_movieItem = nullptr;
         m_pixmapItem = nullptr;
-
+        m_movieItem = nullptr;
         s->clear();
         resetTransform();
 
-        QSvgRenderer *svgRenderer = new QSvgRenderer;
-        svgRenderer->load(path);
+        if (!m_svgRenderer) {
+            m_svgRenderer = new QSvgRenderer(this);
+        }
+        m_svgRenderer->load(path);
         m_imgSvgItem = new LibImageSvgItem();
-        m_imgSvgItem->setSharedRenderer(svgRenderer);
+        m_imgSvgItem->setSharedRenderer(m_svgRenderer);
         //不会出现锯齿
         m_imgSvgItem->setCacheMode(QGraphicsItem::NoCache);
         setSceneRect(m_imgSvgItem->boundingRect());
@@ -293,7 +307,6 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         //当传入的image无效时，需要重新读取数据
         m_movieItem = nullptr;
         m_imgSvgItem = nullptr;
-
         if (image.isNull()) {
             QImageReader imagreader(path);      //取原图的分辨率
             int w = imagreader.size().width();
@@ -339,7 +352,6 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
                     hScale = info.imgOriginalHeight;
                 }
             }
-            QPixmap pix;
 //            QImage image = CommonService::instance()->getImgByPath(path);
 //            if (image.isNull()) {
 //                pix = QPixmap(path).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
@@ -347,7 +359,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 //                pix = QPixmap::fromImage(image).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
 //            }
 //            pix = QPixmap(path).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
-            pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
+            QPixmap pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
             //存在缩放比问题需要setDevicePixelRatio
             if (wScale < wWindow && hScale < hWindow) {
                 pix.setDevicePixelRatio(devicePixelRatioF());
@@ -355,7 +367,9 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
             // Make sure item show in center of view after reload
-            m_blurEffect = new QGraphicsBlurEffect;
+            if (!m_blurEffect) {
+                m_blurEffect = new QGraphicsBlurEffect(this);
+            }
             m_blurEffect->setBlurRadius(5);
             m_blurEffect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
             m_pixmapItem->setGraphicsEffect(m_blurEffect);

@@ -34,7 +34,6 @@ class QSwipeGesture;
 class QPanGesture;
 
 DWIDGET_USE_NAMESPACE
-typedef DLabel QLbtoDLabel;
 
 class LockWidget : public ThemeWidget
 {
@@ -42,7 +41,7 @@ class LockWidget : public ThemeWidget
 public:
     LockWidget(const QString &darkFile, const QString &lightFile,
                QWidget *parent = nullptr);
-    ~LockWidget();
+    ~LockWidget() override;
 signals:
     void nextRequested();
     void previousRequested();
@@ -62,12 +61,12 @@ private slots:
     void pinchTriggered(QPinchGesture *gesture);
 private:
     void onThemeChanged(DGuiApplicationHelper::ColorType theme);
-    QLbtoDLabel *m_thumbnailLabel;
+//    DLabel *m_thumbnailLabel{nullptr};
     QPixmap m_logo;
     QString m_picString;
     bool m_theme;
-    QLbtoDLabel *m_bgLabel;
-    QLbtoDLabel *m_lockTips;
+    DLabel *m_bgLabel{nullptr};
+    DLabel *m_lockTips{nullptr};
     int m_startx = 0;
     int m_maxTouchPoints = 0;
 

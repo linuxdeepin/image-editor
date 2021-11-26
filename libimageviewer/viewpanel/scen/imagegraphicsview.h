@@ -30,6 +30,7 @@
 #include <QPointer>
 #include <QMap>
 #include <QFileSystemWatcher>
+#include <QSvgRenderer>
 
 #include "image-viewer_global.h"
 #include "service/commonservice.h"
@@ -209,7 +210,7 @@ private:
 
     QPointer<QGraphicsBlurEffect> m_blurEffect;
 //    CFileWatcher *m_imgFileWatcher;
-    QFileSystemWatcher *m_imgFileWatcher;
+    QFileSystemWatcher *m_imgFileWatcher{nullptr};
     QTimer *m_isChangedTimer;
 
     bool m_isFirstPinch = false;
@@ -247,6 +248,8 @@ private:
 
     NewImageLoadPhase m_newImageLoadPhase{FullFinish};
     int m_newImageRotateAngle = 0;
+
+    QSvgRenderer *m_svgRenderer{nullptr};
 };
 
 //class CFileWatcher: public QThread
