@@ -635,7 +635,7 @@ void LibViewPanel::appendAction(int id, const QString &text, const QString &shor
 {
     if (m_menu && m_menuItemDisplaySwitch.test(static_cast<size_t>(id))) {
         QAction *ac = new QAction(m_menu);
-//        addAction(ac);
+        addAction(ac);
         ac->setText(text);
         ac->setProperty("MenuID", id);
         ac->setShortcut(QKeySequence(shortcut));
@@ -1060,11 +1060,7 @@ void LibViewPanel::backImageView(const QString &path)
     }
     //退出幻灯片，应该切换回应该的窗口
     //判断文件是否存在
-    if (!QFileInfo(path).isFile()) {
-        m_stack->setCurrentWidget(m_thumbnailWidget);
-    } else if (m_view->image().isNull()) {
-        m_stack->setCurrentWidget(m_lockWidget);
-    }
+    setCurrentWidget(path);
 
 }
 
