@@ -719,11 +719,11 @@ void LibImageGraphicsView::onIsChangedTimerTimeout()
     if (file.exists()) {
 //        dApp->m_imageloader->updateImageLoader(QStringList(m_path));
         setImage(m_path);
-        m_isChangedTimer->stop();
-    } else {
-        emit sigFIleDelete();
-        m_isChangedTimer->stop();
     }
+    //刷新文件信息
+    emit sigFIleDelete();
+    m_isChangedTimer->stop();
+
 }
 
 void LibImageGraphicsView::slotsUp()

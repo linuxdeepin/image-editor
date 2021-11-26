@@ -800,7 +800,6 @@ QString LibViewPanel::getCurrentPath()
 
 void LibViewPanel::setCurrentWidget(const QString &path)
 {
-    QImage img = m_view->image();
     QFileInfo info(path);
     imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
     //判断是否是损坏图片
@@ -815,6 +814,9 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                 emit ImageEngine::instance()->sigPicCountIsNull();
             }
         }
+        if (m_nav) {
+            m_nav->setVisible(false);
+        }
     } else if (!info.permission(QFile::ReadUser)) {
         //额外判断是否是因为没有读权限导致裂图
         if (!info.permission(QFile::ReadUser)) {
@@ -828,7 +830,10 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                 }
             }
         }
-    } else if (!img.isNull()) {
+        if (m_nav) {
+            m_nav->setVisible(false);
+        }
+    } else if (!m_view->image().isNull()) {
         if (m_view) {
             m_stack->setCurrentWidget(m_view);
             //判断下是否透明
@@ -840,6 +845,9 @@ void LibViewPanel::setCurrentWidget(const QString &path)
             m_stack->setCurrentWidget(m_lockWidget);
             //损坏图片不透明
             emit m_view->sigImageOutTitleBar(false);
+        }
+        if (m_nav) {
+            m_nav->setVisible(false);
         }
     }
 }
