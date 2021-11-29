@@ -122,6 +122,9 @@ signals:
     //ocr信号
     void sigOcr();
 
+    //保存旋转的信号
+    void sigRotateSave();
+
 
 public slots:
     void updateCollectButton();

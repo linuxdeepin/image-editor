@@ -495,6 +495,7 @@ void LibBottomToolbar::thumbnailMoveCenterWidget()
 
 void LibBottomToolbar::onNextButton()
 {
+    emit sigRotateSave();
     if (m_rotateLBtn) {
         m_rotateLBtn->setEnabled(false);
     }
@@ -511,6 +512,7 @@ void LibBottomToolbar::onNextButton()
 
 void LibBottomToolbar::onPreButton()
 {
+    emit sigRotateSave();
     if (m_rotateLBtn) {
         m_rotateLBtn->setEnabled(false);
     }

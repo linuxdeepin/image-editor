@@ -171,6 +171,9 @@ void LibViewPanel::initConnect()
         this->resetBottomToolbarGeometry(true);
     }, Qt::DirectConnection);
 
+    //切换图片需要保存旋转
+    connect(m_bottomToolbar, &LibBottomToolbar::sigRotateSave, m_view, &LibImageGraphicsView::slotRotatePixCurrent);
+
     //适应窗口的状态更新
     connect(m_view, &LibImageGraphicsView::checkAdaptScreenBtn, m_bottomToolbar, &LibBottomToolbar::checkAdaptImageBtn);
     connect(m_view, &LibImageGraphicsView::disCheckAdaptScreenBtn,  m_bottomToolbar, &LibBottomToolbar::disCheckAdaptScreenBtn);
