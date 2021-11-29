@@ -803,54 +803,57 @@ QString LibViewPanel::getCurrentPath()
 
 void LibViewPanel::setCurrentWidget(const QString &path)
 {
-    QFileInfo info(path);
-    imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
-    //判断是否是损坏图片
-    if (!info.isFile() && !path.isEmpty()) {
-        if (m_thumbnailWidget) {
-            m_stack->setCurrentWidget(m_thumbnailWidget);
-            //损坏图片不透明
-            emit m_view->sigImageOutTitleBar(false);
-            m_thumbnailWidget->setThumbnailImageAndText(QPixmap::fromImage(ItemInfo.image), ThumbnailWidget::DamageType);
-            if ((m_bottomToolbar->getAllFileCount() <= 1 && ImgViewerType::ImgViewerTypeAlbum != LibCommonService::instance()->getImgViewerType()) ||
-                    (m_bottomToolbar->getAllFileCount() == 0 && ImgViewerType::ImgViewerTypeAlbum == LibCommonService::instance()->getImgViewerType())) {
-                emit ImageEngine::instance()->sigPicCountIsNull();
-            }
-        }
-        if (m_nav) {
-            m_nav->setVisible(false);
-        }
-    } else if (!info.permission(QFile::ReadUser)) {
-        //额外判断是否是因为没有读权限导致裂图
-        if (!info.permission(QFile::ReadUser)) {
+    //存在切换到幻灯片被切换回去的情况,所以如果是当前界面为幻灯片,则不切换为其他的页面
+    if (m_stack->currentWidget() != m_sliderPanel) {
+        QFileInfo info(path);
+        imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
+        //判断是否是损坏图片
+        if (!info.isFile() && !path.isEmpty()) {
             if (m_thumbnailWidget) {
                 m_stack->setCurrentWidget(m_thumbnailWidget);
                 //损坏图片不透明
                 emit m_view->sigImageOutTitleBar(false);
-                m_thumbnailWidget->setThumbnailImageAndText(QPixmap(), ThumbnailWidget::CannotReadType);
-                if (m_bottomToolbar->getAllFileCount() == 0) {
+                m_thumbnailWidget->setThumbnailImageAndText(QPixmap::fromImage(ItemInfo.image), ThumbnailWidget::DamageType);
+                if ((m_bottomToolbar->getAllFileCount() <= 1 && ImgViewerType::ImgViewerTypeAlbum != LibCommonService::instance()->getImgViewerType()) ||
+                        (m_bottomToolbar->getAllFileCount() == 0 && ImgViewerType::ImgViewerTypeAlbum == LibCommonService::instance()->getImgViewerType())) {
                     emit ImageEngine::instance()->sigPicCountIsNull();
                 }
             }
-        }
-        if (m_nav) {
-            m_nav->setVisible(false);
-        }
-    } else if (!m_view->image().isNull()) {
-        if (m_view) {
-            m_stack->setCurrentWidget(m_view);
-            //判断下是否透明
-            m_view->titleBarControl();
-        }
-        //判断是否存在缓存
-    } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
-        if (m_lockWidget) {
-            m_stack->setCurrentWidget(m_lockWidget);
-            //损坏图片不透明
-            emit m_view->sigImageOutTitleBar(false);
-        }
-        if (m_nav) {
-            m_nav->setVisible(false);
+            if (m_nav) {
+                m_nav->setVisible(false);
+            }
+        } else if (!info.permission(QFile::ReadUser)) {
+            //额外判断是否是因为没有读权限导致裂图
+            if (!info.permission(QFile::ReadUser)) {
+                if (m_thumbnailWidget) {
+                    m_stack->setCurrentWidget(m_thumbnailWidget);
+                    //损坏图片不透明
+                    emit m_view->sigImageOutTitleBar(false);
+                    m_thumbnailWidget->setThumbnailImageAndText(QPixmap(), ThumbnailWidget::CannotReadType);
+                    if (m_bottomToolbar->getAllFileCount() == 0) {
+                        emit ImageEngine::instance()->sigPicCountIsNull();
+                    }
+                }
+            }
+            if (m_nav) {
+                m_nav->setVisible(false);
+            }
+        } else if (!m_view->image().isNull()) {
+            if (m_view) {
+                m_stack->setCurrentWidget(m_view);
+                //判断下是否透明
+                m_view->titleBarControl();
+            }
+            //判断是否存在缓存
+        } else if (ItemInfo.imageType == imageViewerSpace::ImageType::ImageTypeDamaged) {
+            if (m_lockWidget) {
+                m_stack->setCurrentWidget(m_lockWidget);
+                //损坏图片不透明
+                emit m_view->sigImageOutTitleBar(false);
+            }
+            if (m_nav) {
+                m_nav->setVisible(false);
+            }
         }
     }
 }
