@@ -241,7 +241,7 @@ void ThumbnailWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     QWidget::mouseReleaseEvent(e);
     if (e->source() == Qt::MouseEventSynthesizedByQt && m_maxTouchPoints == 1) {
-        int offset = QCursor::pos().x() - m_startx;
+        int offset = e->globalPos().x() - m_startx;
         if (qAbs(offset) > 200) {
             if (offset > 0) {
                 emit previousRequested();
@@ -258,7 +258,7 @@ void ThumbnailWidget::mouseReleaseEvent(QMouseEvent *e)
 void ThumbnailWidget::mousePressEvent(QMouseEvent *e)
 {
     QWidget::mousePressEvent(e);
-    m_startx = QCursor::pos().x();
+    m_startx = e->globalPos().x();
 }
 
 void ThumbnailWidget::mouseMoveEvent(QMouseEvent *event)
