@@ -457,17 +457,18 @@ void LibViewPanel::updateMenuContent(QString path)
         //添加到相册
         if (isAlbum && isReadable) {
             emit ImageEngine::instance()->sigGetAlbumName(ItemInfo.path);
-            if (!m_CustomAlbumName.isEmpty()) {
-                m_menu->addSeparator();
-                DMenu *am = new DMenu(tr("Add to album"));
+            //不管有无自定义相册，均需保留添加到相册
+            m_menu->addSeparator();
+            DMenu *am = new DMenu(tr("Add to album"));
 
-                QAction *ac1 = new QAction(am);
-                ac1->setProperty("MenuID", IdAddToAlbum);
-                ac1->setText(tr("New album"));
-                ac1->setData("Add to new album");
-                ac1->setShortcut(QKeySequence("Ctrl+Shift+N"));
-                am->addAction(ac1);
-                am->addSeparator();
+            QAction *ac1 = new QAction(am);
+            ac1->setProperty("MenuID", IdAddToAlbum);
+            ac1->setText(tr("New album"));
+            ac1->setData("Add to new album");
+            ac1->setShortcut(QKeySequence("Ctrl+Shift+N"));
+            am->addAction(ac1);
+            am->addSeparator();
+            if (!m_CustomAlbumName.isEmpty()) {
                 for (auto iter = m_CustomAlbumName.begin(); iter != m_CustomAlbumName.end(); iter++) {
                     QAction *ac = new QAction(am);
                     ac->setProperty("MenuID", IdAddToAlbum);
@@ -478,8 +479,8 @@ void LibViewPanel::updateMenuContent(QString path)
                         ac->setEnabled(false);
                     }
                 }
-                m_menu->addMenu(am);
             }
+            m_menu->addMenu(am);
         }
 
         m_menu->addSeparator();
