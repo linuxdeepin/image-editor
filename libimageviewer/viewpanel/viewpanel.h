@@ -100,6 +100,9 @@ public:
     //设置壁纸
     void setWallpaper(const QImage &img);
 
+    //设置壁纸
+    void setWallpaper(const QString &imgPath);
+
     //drag事件打开图片
     bool startdragImage(const QStringList &paths, const QString &firstPath = "");
 

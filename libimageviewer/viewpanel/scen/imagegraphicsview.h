@@ -112,6 +112,7 @@ public:
     void initMorePicWidget();
 
     void titleBarControl();
+    int getcurrentImgCount();//获得当前多页图图片的count
 signals:
     void clicked();
     void doubleClicked();

@@ -180,6 +180,15 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Down), this);
 }
 
+int LibImageGraphicsView::getcurrentImgCount()
+{
+    int ret = 0;
+    if (m_imageReader) {
+        ret = m_imageReader->imageCount();
+    }
+    return ret;
+}
+
 LibImageGraphicsView::~LibImageGraphicsView()
 {
     if (m_imgFileWatcher) {
@@ -1295,7 +1304,9 @@ void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
     if (!file.exists()) {
         event->accept();
     } else {
+
         qreal factor = qPow(1.2, event->delta() / 240.0);
+        qDebug() << factor;
         scaleAtPoint(event->pos(), factor);
 
         event->accept();
