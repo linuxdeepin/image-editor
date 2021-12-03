@@ -188,8 +188,10 @@ public:
 //                << "SVG" //svg不再支持旋转
 //                << "JP2"
 //                << "PCD"
-                  << "RAS"
-                  << "WBMP";
+#ifndef  ISSW_64
+                  << "WBMP"
+#endif
+                  << "RAS";
 
         /*
          * 修改：
