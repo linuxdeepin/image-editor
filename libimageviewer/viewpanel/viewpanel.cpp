@@ -120,12 +120,12 @@ LibViewPanel::~LibViewPanel()
 
 void LibViewPanel::loadImage(const QString &path, QStringList paths)
 {
-    //展示图片
-    m_view->setImage(path);
     QFileInfo info(path);
     m_topToolbar->setMiddleContent(info.fileName());
-    m_view->resetTransform();
-    m_stack->setCurrentWidget(m_view);
+    //展示图片
+//    m_view->setImage(path);
+//    m_view->resetTransform();
+//    m_stack->setCurrentWidget(m_view);
     //刷新工具栏,如果paths不含有path,则添加进入paths
     if (!paths.contains(path)) {
         paths << path;
@@ -135,7 +135,6 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     //刷新收藏按钮
     emit ImageEngine::instance()->sigUpdateCollectBtn();
     //重置底部工具栏位置与大小
-    qDebug() << "---" << __FUNCTION__ << "---111111111111111";
     resetBottomToolbarGeometry(true);
 }
 
@@ -286,8 +285,7 @@ void LibViewPanel::initNavigation()
         Q_UNUSED(path)
         //BUG#93145 去除对path的判断，直接隐藏导航窗口
         m_nav->setVisible(false);
-        QImage img = m_view->image();
-        m_nav->setImage(img);
+        m_nav->setImage(m_view->image());
         //转移到中心位置
 //        m_bottomToolbar->thumbnailMoveCenterWidget();
     });
@@ -314,7 +312,6 @@ void LibViewPanel::initRightMenu()
 
     if (!m_menu) {
         m_menu = new DMenu(this);
-        updateMenuContent();
     }
     QShortcut *ctrlm = new QShortcut(QKeySequence("Ctrl+M"), this);
     ctrlm->setContext(Qt::WindowShortcut);
@@ -817,8 +814,12 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         }
         //展示当前图片
         loadImage(loadingPath, image_list);
-        //看图制作全部缩略图
-        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
+
+        QTimer::singleShot(500, [ = ] {
+            //看图制作全部缩略图
+            ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
+        });
+
     } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
         //展示当前图片
         loadImage(firstPath, paths);
@@ -1562,7 +1563,6 @@ void LibViewPanel::openImg(int index, QString path)
     m_currentPath = path;
     //刷新收藏按钮
     emit ImageEngine::instance()->sigUpdateCollectBtn();
-    updateMenuContent(path);
     Q_UNUSED(index);
 }
 

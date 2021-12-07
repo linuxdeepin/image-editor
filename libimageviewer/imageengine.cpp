@@ -97,7 +97,7 @@ bool ImageEngine::isRotatable(const QString &path)
     //由于底层代码判断是否可旋转的依据是文件名后缀所代表的图片是否可保存
     //因此文件是否存在的判断添加在这一层
     QFileInfo info(path);
-    if (!info.isFile() || !info.exists()) {
+    if (!info.isFile() || !info.exists() || !info.isWritable()) {
         return false;
     } else {
         return LibUnionImage_NameSpace::isImageSupportRotate(path);

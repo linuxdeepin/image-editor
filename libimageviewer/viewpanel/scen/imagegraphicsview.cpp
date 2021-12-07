@@ -41,6 +41,7 @@
 #include <QDesktopWidget>
 #include <QShortcut>
 #include <QApplication>
+#include <DSpinner>
 
 #include "graphicsitem.h"
 #include "imagesvgitem.h"
@@ -68,7 +69,7 @@ namespace {
 
 const QColor LIGHT_CHECKER_COLOR = QColor("#FFFFFF");
 const QColor DARK_CHECKER_COLOR = QColor("#CCCCCC");
-
+const QSize SPINNER_SIZE = QSize(40, 40);
 #ifndef tablet_PC
 const qreal MAX_SCALE_FACTOR = 20.0;
 const qreal MIN_SCALE_FACTOR = 0.02;
@@ -248,10 +249,6 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     //检测数据缓存,如果存在,则使用缓存
     imageViewerSpace::ItemInfo info = LibCommonService::instance()->getImgInfoByPath(path);
     m_bRoate = ImageEngine::instance()->isRotatable(path); //是否可旋转
-    //如果不可写则不可旋转
-    if (m_bRoate && !QFileInfo(path).isWritable()) {
-        m_bRoate = false;
-    };
 
     m_loadPath = path;
     // Empty path will cause crash in release-build mode
@@ -275,6 +272,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     //ImageTypeDynamic
     if (Type == imageViewerSpace::ImageTypeDynamic) {
         m_pixmapItem = nullptr;
+        m_movieItem = nullptr;
         m_imgSvgItem = nullptr;
         s->clear();
         resetTransform();
@@ -293,6 +291,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     } else if (Type == imageViewerSpace::ImageTypeSvg) {
         m_pixmapItem = nullptr;
         m_movieItem = nullptr;
+        m_imgSvgItem = nullptr;
         s->clear();
         resetTransform();
 
@@ -314,67 +313,78 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         m_newImageLoadPhase = FullFinish;
     } else {
         //当传入的image无效时，需要重新读取数据
+        m_pixmapItem = nullptr;
         m_movieItem = nullptr;
         m_imgSvgItem = nullptr;
-        if (image.isNull()) {
-            QImageReader imagreader(path);      //取原图的分辨率
-            int w = imagreader.size().width();
-            int h = imagreader.size().height();
-            scene()->clear();
-            resetTransform();
-            int wScale = 0;
-            int hScale = 0;
-            int wWindow = 0;
-            int hWindow = 0;
-            if (QApplication::activeWindow()) {
-                wWindow = QApplication::activeWindow()->width();
-                hWindow = QApplication::activeWindow()->height();
-            } else {
-                wWindow = 1300;
-                hWindow = 848;
-            }
+        scene()->clear();
+        resetTransform();
 
-            if (w >= wWindow) {
-                wScale = wWindow;
-                hScale = wScale * h / w;
-                if (hScale > hWindow) {
-                    hScale = hWindow;
-                    wScale = hScale * w / h;
+        //spinner
+        DSpinner *spinner = new DSpinner;
+        spinner->setFixedSize(SPINNER_SIZE);
+        spinner->start();
+
+        // Make sure item show in center of view after reload
+        setSceneRect(spinner->rect());
+        s->addWidget(spinner);
+
+        if (image.isNull()) {
+            QPixmap pix ;
+            if (!info.image.isNull()) {
+                QImageReader imagreader(path);      //取原图的分辨率
+                int w = imagreader.size().width();
+                int h = imagreader.size().height();
+
+                int wScale = 0;
+                int hScale = 0;
+                int wWindow = 0;
+                int hWindow = 0;
+                if (QApplication::activeWindow()) {
+                    wWindow = QApplication::activeWindow()->width();
+                    hWindow = QApplication::activeWindow()->height();
+                } else {
+                    wWindow = 1300;
+                    hWindow = 848;
                 }
-            } else if (h >= hWindow) {
-                hScale = hWindow;
-                wScale = hScale * w / h;
-                if (wScale >= wWindow) {
+
+                if (w >= wWindow) {
                     wScale = wWindow;
                     hScale = wScale * h / w;
-                }
-            } else {
-                wScale = w;
-                hScale = h;
-            }
-            if (wScale == 0 || wScale == -1) { //进入这个地方说明QImageReader未识别出图片
-                if (info.imgOriginalWidth > wWindow || info.imgOriginalHeight > hWindow) {
-                    wScale = wWindow;
+                    if (hScale > hWindow) {
+                        hScale = hWindow;
+                        wScale = hScale * w / h;
+                    }
+                } else if (h >= hWindow) {
                     hScale = hWindow;
+                    wScale = hScale * w / h;
+                    if (wScale >= wWindow) {
+                        wScale = wWindow;
+                        hScale = wScale * h / w;
+                    }
                 } else {
-                    wScale = info.imgOriginalWidth;
-                    hScale = info.imgOriginalHeight;
+                    wScale = w;
+                    hScale = h;
                 }
-            }
-//            QImage image = CommonService::instance()->getImgByPath(path);
-//            if (image.isNull()) {
-//                pix = QPixmap(path).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
-//            } else {
-//                pix = QPixmap::fromImage(image).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
-//            }
-//            pix = QPixmap(path).scaled(wScale, hScale, Qt::KeepAspectRatio); //缩放到原图大小
-            QPixmap pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
-            //存在缩放比问题需要setDevicePixelRatio
-            if (wScale < wWindow && hScale < hWindow) {
+                if (wScale == 0 || wScale == -1) { //进入这个地方说明QImageReader未识别出图片
+                    if (info.imgOriginalWidth > wWindow || info.imgOriginalHeight > hWindow) {
+                        wScale = wWindow;
+                        hScale = hWindow;
+                    } else {
+                        wScale = info.imgOriginalWidth;
+                        hScale = info.imgOriginalHeight;
+                    }
+                }
+
+                pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
+
+                //存在缩放比问题需要setDevicePixelRatio
+//                if (wScale < wWindow && hScale < hWindow) {
                 pix.setDevicePixelRatio(devicePixelRatioF());
+//                }
             }
             m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
+
             // Make sure item show in center of view after reload
             if (!m_blurEffect) {
                 m_blurEffect = new QGraphicsBlurEffect(this);
@@ -382,8 +392,18 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             m_blurEffect->setBlurRadius(5);
             m_blurEffect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
             m_pixmapItem->setGraphicsEffect(m_blurEffect);
-            setSceneRect(m_pixmapItem->boundingRect());
-            m_loadTimer->start();
+
+            //如果缩略图不为空,则区域变为m_pixmapItem
+            if (!pix.isNull()) {
+                setSceneRect(m_pixmapItem->boundingRect());
+            }
+            //第一次打开直接启动,不使用延时300ms
+            if (m_isFistOpen) {
+                onLoadTimerTimeout();
+                m_isFistOpen = false;
+            } else {
+                m_loadTimer->start();
+            }
             scene()->addItem(m_pixmapItem);
             emit imageChanged(path);
             QMetaObject::invokeMethod(this, [ = ]() {
@@ -870,15 +890,16 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
 
 void LibImageGraphicsView::slotRotatePixCurrent()
 {
-    //20211019修改：特殊位置不执行写入操作
-    imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(m_path);
+    m_rotateAngel =  m_rotateAngel % 360;
+    if (0 != m_rotateAngel) {
+        //20211019修改：特殊位置不执行写入操作
+        imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(m_path);
 
-    if (pathType != imageViewerSpace::PathTypeMTP && pathType != imageViewerSpace::PathTypePTP && //安卓手机
-            pathType != imageViewerSpace::PathTypeAPPLE && //苹果手机
-            pathType != imageViewerSpace::PathTypeSAFEBOX && //保险箱
-            pathType != imageViewerSpace::PathTypeRECYCLEBIN) { //回收站
-        m_rotateAngel =  m_rotateAngel % 360;
-        if (0 != m_rotateAngel) {
+        if (pathType != imageViewerSpace::PathTypeMTP && pathType != imageViewerSpace::PathTypePTP && //安卓手机
+                pathType != imageViewerSpace::PathTypeAPPLE && //苹果手机
+                pathType != imageViewerSpace::PathTypeSAFEBOX && //保险箱
+                pathType != imageViewerSpace::PathTypeRECYCLEBIN) { //回收站
+
             disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             Libutils::image::rotate(m_path, m_rotateAngel);
             //如果是相册调用，则告知刷新

@@ -213,31 +213,8 @@ void LibReadThumbnailThread::readThumbnail(QString path)
 
     itemInfo.path = path;
 
-    //获取路径类型
-    itemInfo.pathType = getPathType(path);
-
-    //获取原图分辨率
-    QImageReader imagreader(path);
-    itemInfo.imgOriginalWidth = imagreader.size().width();
-    itemInfo.imgOriginalHeight = imagreader.size().height();
-
     using namespace LibUnionImage_NameSpace;
     QImage tImg;
-    QString srcPath = path;
-    //缩略图保存路径
-    QString savePath = m_thumbnailPath + path;
-    //保存为jpg格式
-    savePath = m_thumbnailPath.mid(0, savePath.lastIndexOf('.')) + ImageEngine::instance()->makeMD5(path) + ".png";
-    QFileInfo file(savePath);
-    //缩略图已存在，执行下一个路径,如果读取的尺寸为错误,也需要重新读取
-    if (!m_remake && file.exists() && itemInfo.imgOriginalWidth > 0 && itemInfo.imgOriginalHeight > 0) {
-        tImg = QImage(savePath);
-        itemInfo.image = tImg;
-        //获取图片类型
-        itemInfo.imageType = getImageType(path);
-        LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
-        return;
-    }
     QString errMsg;
 
     if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
@@ -260,8 +237,8 @@ void LibReadThumbnailThread::readThumbnail(QString path)
                 tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
             } else if (tImg.height() <= tImg.width()) {
                 cache_exist = true;
-                tImg = tImg.scaledToHeight(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToHeight(200,  Qt::SmoothTransformation);
+                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
             }
         }
         if (!cache_exist) {
@@ -269,17 +246,14 @@ void LibReadThumbnailThread::readThumbnail(QString path)
                 tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
                 tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
             } else {
-                tImg = tImg.scaledToHeight(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToHeight(200,  Qt::SmoothTransformation);
+                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
             }
         }
     }
-    //创建路径
-    pluginUtils::base::mkMutiDir(savePath.mid(0, savePath.lastIndexOf('/')));
-    if (tImg.save(savePath)) {
-        itemInfo.image = tImg;
 
-    }
+    itemInfo.image = tImg;
+
     if (itemInfo.image.isNull()) {
         itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
     } else {
@@ -287,7 +261,6 @@ void LibReadThumbnailThread::readThumbnail(QString path)
         itemInfo.imageType = getImageType(path);
     }
     LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
-//    ImageDataService::instance()->addImage(path, tImg);
 }
 
 void LibReadThumbnailThread::setQuit(bool quit)

@@ -251,40 +251,9 @@ private:
     int m_newImageRotateAngle = 0;
 
     QSvgRenderer *m_svgRenderer{nullptr};
+
+    //是否第一次打开
+    bool m_isFistOpen = true;
 };
 
-//class CFileWatcher: public QThread
-//{
-//    Q_OBJECT
-//public:
-//    enum EFileChangedType {EFileModified, EFileMoved, EFileCount};
-
-//    explicit CFileWatcher(QObject *parent = nullptr);
-//    ~CFileWatcher();
-
-//    bool isVaild();
-
-//    void addWather(const QString &path);
-////    void removePath(const QString &path);
-
-//    void clear();
-
-//signals:
-//    void fileChanged(const QString &path, int tp);
-
-//protected:
-//    void run();
-
-//private:
-//    void doRun();
-
-//    int  _handleId = -1;
-//    bool _running = false;
-
-
-//    QMap<QString, int> watchedFiles;
-//    QMap<int, QString> watchedFilesId;
-
-//    QMutex _mutex;
-//};
 #endif // IMAGEVIEW_H
