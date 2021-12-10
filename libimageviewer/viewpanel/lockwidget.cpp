@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 #include <DGuiApplicationHelper>
 #include <QGestureEvent>
+#include <QDebug>
 
 #include "unionimage/baseutils.h"
 
