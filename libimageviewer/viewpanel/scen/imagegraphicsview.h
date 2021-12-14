@@ -35,6 +35,8 @@
 #include "image-viewer_global.h"
 #include "service/commonservice.h"
 
+#include <DSpinner>
+
 QT_BEGIN_NAMESPACE
 class QWheelEvent;
 class QPaintEvent;
@@ -48,11 +50,14 @@ class QPinchGesture;
 class QSwipeGesture;
 class LibImageSvgItem;
 class MorePicFloatWidget;
+
 QT_END_NAMESPACE
 
 #include "dtkwidget_global.h"
 DWIDGET_BEGIN_NAMESPACE
 DWIDGET_END_NAMESPACE
+
+DWIDGET_USE_NAMESPACE
 
 class CFileWatcher;
 class LibImageGraphicsView : public QGraphicsView
@@ -254,6 +259,9 @@ private:
 
     //是否第一次打开
     bool m_isFistOpen = true;
+
+    //加载旋转
+    DSpinner *m_spinner{nullptr};
 };
 
 #endif // IMAGEVIEW_H

@@ -235,6 +235,10 @@ void LibImageGraphicsView::clear()
 
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
+    if (m_spinner) {
+        m_spinner->deleteLater();
+        m_spinner = nullptr;
+    }
     //默认多页图的按钮显示为false
     if (m_morePicFloatWidget) {
         m_morePicFloatWidget->setVisible(false);
@@ -319,15 +323,6 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         scene()->clear();
         resetTransform();
 
-        //spinner
-        DSpinner *spinner = new DSpinner;
-        spinner->setFixedSize(SPINNER_SIZE);
-        spinner->start();
-
-        // Make sure item show in center of view after reload
-        setSceneRect(spinner->rect());
-        s->addWidget(spinner);
-
         if (image.isNull()) {
             QPixmap pix ;
             if (!info.image.isNull()) {
@@ -381,6 +376,18 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 //                if (wScale < wWindow && hScale < hWindow) {
                 pix.setDevicePixelRatio(devicePixelRatioF());
 //                }
+            }
+            if (pix.isNull()) {
+                //spinner
+                if (!m_spinner) {
+                    m_spinner = new DSpinner;
+                    m_spinner->setFixedSize(SPINNER_SIZE);
+                }
+                m_spinner->start();
+
+                // Make sure item show in center of view after reload
+                setSceneRect(m_spinner->rect());
+                s->addWidget(m_spinner);
             }
             m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
@@ -1100,6 +1107,10 @@ bool LibImageGraphicsView::event(QEvent *event)
 
 void LibImageGraphicsView::onCacheFinish()
 {
+    if (m_spinner) {
+        m_spinner->stop();
+        m_spinner->hide();
+    }
     QVariantList vl = m_watcher.result();
     if (vl.length() == 2) {
         const QString path = vl.first().toString();
