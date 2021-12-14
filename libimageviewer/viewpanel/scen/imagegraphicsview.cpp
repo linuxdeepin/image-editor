@@ -335,8 +335,8 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
                 int wWindow = 0;
                 int hWindow = 0;
                 if (QApplication::activeWindow()) {
-                    wWindow = QApplication::activeWindow()->width();
-                    hWindow = QApplication::activeWindow()->height();
+                    wWindow = QApplication::activeWindow()->width() * devicePixelRatioF();
+                    hWindow = QApplication::activeWindow()->height() * devicePixelRatioF();
                 } else {
                     wWindow = 1300;
                     hWindow = 848;
@@ -698,12 +698,12 @@ void LibImageGraphicsView::titleBarControl()
     qreal realHeight = 0.0;
     //简化image()的使用
     QImage img = image();
-    if (m_movieItem /*|| m_imgSvgItem*/) {
-        realHeight = img.size().height() * imageRelativeScale() * devicePixelRatioF();
+//    if (m_movieItem /*|| m_imgSvgItem*/) {
+//        realHeight = img.size().height() * imageRelativeScale() * devicePixelRatioF();
 
-    } else {
-        realHeight = img.size().height() * imageRelativeScale();
-    }
+//    } else {
+    realHeight = img.size().height() * imageRelativeScale() / devicePixelRatioF();
+//    }
 
     if (realHeight > height() - 100) {
         emit sigImageOutTitleBar(true);
