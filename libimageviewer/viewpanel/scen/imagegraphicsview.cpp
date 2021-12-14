@@ -1109,7 +1109,11 @@ void LibImageGraphicsView::onCacheFinish()
             }
 
             QPixmap pixmap = vl.last().value<QPixmap>();
-            pixmap.setDevicePixelRatio(devicePixelRatioF());
+            QPixmap tmpPixmap = pixmap;
+            tmpPixmap.setDevicePixelRatio(devicePixelRatioF());
+            if (!tmpPixmap.isNull()) {
+                pixmap = tmpPixmap;
+            }
             if (m_newImageRotateAngle != 0) {
                 QMatrix rotate;
                 rotate.rotate(m_newImageRotateAngle);
