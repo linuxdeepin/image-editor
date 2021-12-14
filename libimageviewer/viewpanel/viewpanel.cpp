@@ -1563,6 +1563,7 @@ void LibViewPanel::openImg(int index, QString path)
     m_currentPath = path;
     //刷新收藏按钮
     emit ImageEngine::instance()->sigUpdateCollectBtn();
+    updateMenuContent(path);
     Q_UNUSED(index);
 }
 
