@@ -317,6 +317,28 @@ TEST_F(gtestview, imageviewer_setCustomAlbumName)
     m_imageViewer = nullptr;
 }
 
+TEST_F(gtestview, imageviewer_setCustomAlbumNameAndUID)
+{
+    QString CACHE_PATH = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                         + QDir::separator() + "deepin" + QDir::separator() + "image-view-plugin";
+
+    ImageViewer *m_imageViewer = new ImageViewer(imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum, CACHE_PATH, nullptr);
+
+    QMap<int, std::pair<QString, bool>> map;
+    map.insert(0, std::make_pair("xxx", true));
+    bool isFav = true;
+    m_imageViewer->setCustomAlbumNameAndUID(map, isFav);
+
+    bool bRet = false;
+    if (m_imageViewer) {
+        bRet = true;
+    }
+    EXPECT_EQ(true, bRet);
+
+    m_imageViewer->deleteLater();
+    m_imageViewer = nullptr;
+}
+
 TEST_F(gtestview, imageviewer_setDropEnabled)
 {
     QString CACHE_PATH = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)

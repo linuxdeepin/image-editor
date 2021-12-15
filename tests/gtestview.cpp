@@ -158,8 +158,8 @@ TEST_F(gtestview, MainWindow)
     bRet = m_imageViewer->startdragImage({"gphoto2:host=Apple=bisuhfawe.png"});
     bRet = m_imageViewer->startdragImage({QDir::homePath() + "/.local/share/Trash"});
     bRet = m_imageViewer->startdragImage(paths);
+    bRet = m_imageViewer->startdragImageWithUID(paths);
     if (bRet) {
-
         m_imageViewer->showNormal();
         m_imageViewer->resize(800, 600);
         m_imageViewer->resize(1000, 500);

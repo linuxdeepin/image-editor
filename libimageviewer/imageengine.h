@@ -45,12 +45,14 @@ signals:
     void sigGetAlbumName(const QString &path);
     //添加到已有相册/新建相册
     void sigAddToAlbum(bool isNew, const QString &album, const QString &path);
+    void sigAddToAlbumWithUID(bool isNew, int UID, const QString &path); //采用UID方案的添加至相册
     //收藏/取消收藏
     void sigAddOrRemoveToFav(const QString &path, bool isAdd);
     //导出
     void sigExport(const QString &path);
     //从自定义相册中移除
     void sigRemoveFromCustom(const QString &path, const QString &album);
+    void sigRemoveFromCustomWithUID(const QString &path, int UID); //采用UID方案的从相册中删除
     //退出幻灯片
     void exitSlideShow();
     //按下ESC键

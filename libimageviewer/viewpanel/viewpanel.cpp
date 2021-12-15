@@ -453,33 +453,50 @@ void LibViewPanel::updateMenuContent(QString path)
         appendAction(IdStartSlideShow, QObject::tr("Slide show"), ss("Slide show", "F5"));
         //添加到相册
         if (isAlbum && isReadable) {
+            //这行代码是在向调用程序寻求album name，根据前面的connect，这里会采用回调的形式执行
             emit ImageEngine::instance()->sigGetAlbumName(ItemInfo.path);
-            //不管有无自定义相册，均需保留添加到相册
             m_menu->addSeparator();
-            DMenu *am = new DMenu(tr("Add to album"));
 
+            //为了达到真·ABI兼容，此处需要针对新旧相册分类讨论
+            //不管有无自定义相册，均需保留添加到相册
+            DMenu *am = new DMenu(tr("Add to album"));
             QAction *ac1 = new QAction(am);
             ac1->setProperty("MenuID", IdAddToAlbum);
             ac1->setText(tr("New album"));
-            ac1->setData("Add to new album");
             ac1->setShortcut(QKeySequence("Ctrl+Shift+N"));
             am->addAction(ac1);
             am->addSeparator();
-            if (!m_CustomAlbumName.isEmpty()) {
-                for (auto iter = m_CustomAlbumName.begin(); iter != m_CustomAlbumName.end(); iter++) {
-                    QAction *ac = new QAction(am);
-                    ac->setProperty("MenuID", IdAddToAlbum);
-                    ac->setText(fontMetrics().elidedText(QString(iter.key()).replace("&", "&&"), Qt::ElideMiddle, 200));
-                    ac->setData(iter.key());
-                    am->addAction(ac);
-                    if (iter.value()) {
-                        ac->setEnabled(false);
+            if (!m_useUID) { //采用UID之前的相册
+                ac1->setData("Add to new album");
+                if (!m_CustomAlbumName.isEmpty()) {
+                    for (auto iter = m_CustomAlbumName.begin(); iter != m_CustomAlbumName.end(); iter++) {
+                        QAction *ac = new QAction(am);
+                        ac->setProperty("MenuID", IdAddToAlbum);
+                        ac->setText(fontMetrics().elidedText(QString(iter.key()).replace("&", "&&"), Qt::ElideMiddle, 200));
+                        ac->setData(iter.key());
+                        am->addAction(ac);
+                        if (iter.value()) {
+                            ac->setEnabled(false);
+                        }
+                    }
+                }
+            } else { //其余情况代表采用UID后的相册
+                ac1->setData(-1);
+                if (!m_CustomAlbumAndUID.isEmpty()) {
+                    for (auto iter = m_CustomAlbumAndUID.begin(); iter != m_CustomAlbumAndUID.end(); iter++) {
+                        QAction *ac = new QAction(am);
+                        ac->setProperty("MenuID", IdAddToAlbum);
+                        ac->setText(fontMetrics().elidedText(QString(iter.value().first).replace("&", "&&"), Qt::ElideMiddle, 200));
+                        ac->setData(iter.key());
+                        am->addAction(ac);
+                        if (iter.value().second) {
+                            ac->setEnabled(false);
+                        }
                     }
                 }
             }
             m_menu->addMenu(am);
         }
-
         m_menu->addSeparator();
         if (isAlbum && isReadable) {
             appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
@@ -1077,15 +1094,28 @@ void LibViewPanel::showPrevious()
 
 void LibViewPanel::updateCustomAlbum(const QMap<QString, bool> &map, bool isFav)
 {
-    m_CustomAlbumName.clear();
     m_CustomAlbumName = map;
     m_isFav = isFav;
+}
+
+void LibViewPanel::updateCustomAlbumAndUID(const QMap<int, std::pair<QString, bool> > &map, bool isFav)
+{
+    m_CustomAlbumAndUID = map;
+    m_isFav = isFav;
+    m_useUID = true;
 }
 
 void LibViewPanel::setIsCustomAlbum(bool isCustom, const QString &album)
 {
     m_isCustomAlbum = isCustom;
     m_CurrentCustomName = album;
+}
+
+void LibViewPanel::setIsCustomAlbumWithUID(bool isCustom, const QString &album, int UID)
+{
+    m_isCustomAlbum = isCustom;
+    m_CurrentCustomName = album;
+    m_CurrentCustomUID = UID;
 }
 
 bool LibViewPanel::slotOcrPicture()
@@ -1467,11 +1497,21 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdAddToAlbum: {
-            const QString album = action->data().toString();
-            if (album != "Add to new album") {
-                emit ImageEngine::instance()->sigAddToAlbum(false, album, currentpath);
+            //这一段和新老相册的缩略图右键添加进相册的逻辑差不多
+            if (!m_useUID) {
+                const QString album = action->data().toString();
+                if (album != "Add to new album") {
+                    emit ImageEngine::instance()->sigAddToAlbum(false, album, currentpath);
+                } else {
+                    emit ImageEngine::instance()->sigAddToAlbum(true, "", currentpath);
+                }
             } else {
-                emit ImageEngine::instance()->sigAddToAlbum(true, "", currentpath);
+                int UID = action->data().toInt();
+                if (UID != -1) {
+                    emit ImageEngine::instance()->sigAddToAlbumWithUID(false, UID, currentpath);
+                } else {
+                    emit ImageEngine::instance()->sigAddToAlbumWithUID(true, -1, currentpath);
+                }
             }
             break;
         }
@@ -1480,7 +1520,11 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdRemoveFromAlbum: {
-            emit ImageEngine::instance()->sigRemoveFromCustom(currentpath, m_CurrentCustomName);
+            if (m_CurrentCustomUID == -2) {
+                emit ImageEngine::instance()->sigRemoveFromCustom(currentpath, m_CurrentCustomName);
+            } else {
+                emit ImageEngine::instance()->sigRemoveFromCustomWithUID(currentpath, m_CurrentCustomUID);
+            }
             //从相册中移除时，本库展示的也需要移除
             m_bottomToolbar->deleteImage();
             break;

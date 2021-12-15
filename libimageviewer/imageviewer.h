@@ -26,6 +26,9 @@ public:
     //传入路径加载图片 paths：所有照片 firstPath：第一张 isCustom：是否是自定义相册 album：自定义相册名称
     bool startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "");
 
+    //传入路径加载图片 paths：所有照片 firstPath：第一张 isCustom：是否是自定义相册 album：自定义相册名称 UID：相册的UID
+    bool startdragImageWithUID(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "", int UID = -1);
+
     //启动图片展示入口
     void startImgView(QString currentPath, QStringList paths = QStringList());
 
@@ -51,6 +54,9 @@ public:
 
     //相册-给右键菜单传输自定义相册名称
     void setCustomAlbumName(const QMap<QString, bool> map, bool isFav);
+
+    //相册-给右键菜单传输自定义相册名称的UID方案接口，map的参数依次是UID，相册名，是否在此相册
+    void setCustomAlbumNameAndUID(const QMap<int, std::pair<QString, bool> > &map, bool isFav);
 
     //设置全屏/退出全屏
     void switchFullScreen();

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(deepin-image-viewer-test VERSION 0.1)
+project(imageeditor-test VERSION 0.1)
 
 #"option"用来定义宏，"ON"表示打开，"OFF"表示关闭
 option (LITE_DIV "Use tutorial provided math implementation" ON)
@@ -11,8 +11,8 @@ add_definitions( -DUSE_UNIONIMAGE )
 option (USE_TEST "Use TESTS" ON)
 add_definitions( -DUSE_TEST )
 
-set(TARGET_NAME deepin-image-viewer-test)
-set(CMD_NAME deepin-image-viewer-test)
+set(TARGET_NAME imageeditor-test)
+set(CMD_NAME imageeditor-test)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -80,7 +80,7 @@ pkg_check_modules(3rd_lib REQUIRED
 ## translations
 
 file(GLOB TS LIST_DIRECTORIES false translations/${CMD_NAME}*.ts)
-#file(GLOB TS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/translations/deepin-image-viewer_zh_CN.ts)
+#file(GLOB TS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/translations/imageeditor_zh_CN.ts)
 
 set_source_files_properties(${TS} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/translations)
 

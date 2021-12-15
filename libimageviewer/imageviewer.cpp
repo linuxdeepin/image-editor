@@ -104,6 +104,13 @@ bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstP
     return d->m_panel->startdragImage(paths, firstPath);
 }
 
+bool ImageViewer::startdragImageWithUID(const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album, int UID)
+{
+    Q_D(ImageViewer);
+    d->m_panel->setIsCustomAlbumWithUID(isCustom, album, UID);
+    return d->m_panel->startdragImage(paths, firstPath);
+}
+
 void ImageViewer::startImgView(QString currentPath, QStringList paths)
 {
     Q_D(ImageViewer);
@@ -194,6 +201,14 @@ void ImageViewer::setCustomAlbumName(const QMap<QString, bool> map, bool isFav)
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->updateCustomAlbum(map, isFav);
+    }
+}
+
+void ImageViewer::setCustomAlbumNameAndUID(const QMap<int, std::pair<QString, bool> > &map, bool isFav)
+{
+    Q_D(ImageViewer);
+    if (d->m_panel) {
+        d->m_panel->updateCustomAlbumAndUID(map, isFav);
     }
 }
 
