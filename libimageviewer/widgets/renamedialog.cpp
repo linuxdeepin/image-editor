@@ -39,7 +39,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     , m_filenamepath(filename)
 {
     this->setIcon(QIcon::fromTheme("deepin-image-viewer"));
-    setFixedSize(380, 180);
+    setFixedSize(380, 200);
     DWidget *widet = new DWidget(this);
     addContent(widet);
     m_vlayout = new QVBoxLayout(widet);
@@ -68,6 +68,9 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_edtlayout->addWidget(m_labformat);
     m_vlayout->addLayout(m_edtlayout);
     m_vlayout->addStretch();
+    m_labTips = new DLabel();
+    m_vlayout->addWidget(m_labTips);
+
     m_vlayout->addLayout(m_hlayout);
     widet->setLayout(m_vlayout);
 //    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
@@ -94,8 +97,14 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
         QFile file(fileabname);
         if (file.exists() || arg.isEmpty()) {
             okbtn->setEnabled(false);
+            m_labTips->setVisible(true);
+            m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text());
+            m_labTips->setText(m_tipString);
+            setFixedSize(380, 200);
         } else {
             okbtn->setEnabled(true);
+            m_labTips->setVisible(false);
+            setFixedSize(380, 180);
         }
     });
     connect(m_lineedt, &DLineEdit::textEdited, this, [ = ](const QString & arg) {
@@ -130,6 +139,9 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     cancelbtn->setAccessibleName(CANCEL_BUTTON);
     widet->setObjectName(RENAME_CONTENT);
     widet->setObjectName(RENAME_CONTENT);
+
+    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text());
+    m_labTips->setText(m_tipString);
 }
 
 

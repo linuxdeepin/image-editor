@@ -65,6 +65,7 @@
 
 DWIDGET_USE_NAMESPACE
 
+
 namespace {
 
 const QColor LIGHT_CHECKER_COLOR = QColor("#FFFFFF");
@@ -190,6 +191,15 @@ int LibImageGraphicsView::getcurrentImgCount()
     return ret;
 }
 
+void LibImageGraphicsView::setWindowIsFullScreen(bool bRet)
+{
+    if (bRet) {
+        TITLEBAR_HEIGHT = 0;
+    } else {
+        TITLEBAR_HEIGHT = 50;
+    }
+}
+
 LibImageGraphicsView::~LibImageGraphicsView()
 {
     if (m_imgFileWatcher) {
@@ -235,10 +245,8 @@ void LibImageGraphicsView::clear()
 
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
-    if (m_spinner) {
-        m_spinner->deleteLater();
-        m_spinner = nullptr;
-    }
+    m_spinner = nullptr;
+
     //默认多页图的按钮显示为false
     if (m_morePicFloatWidget) {
         m_morePicFloatWidget->setVisible(false);
@@ -335,8 +343,8 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
                 int wWindow = 0;
                 int hWindow = 0;
                 if (QApplication::activeWindow()) {
-                    wWindow = QApplication::activeWindow()->width() * devicePixelRatioF();
-                    hWindow = QApplication::activeWindow()->height() * devicePixelRatioF();
+                    wWindow = QApplication::activeWindow()->width() * devicePixelRatioF() ;
+                    hWindow = (QApplication::activeWindow()->height() - TITLEBAR_HEIGHT * 2) * devicePixelRatioF() ;
                 } else {
                     wWindow = 1300;
                     hWindow = 848;
@@ -509,7 +517,7 @@ void LibImageGraphicsView::autoFit()
         return;
     QSize image_size = image().size();
     if ((image_size.width() >= width() ||
-            image_size.height() >= height()) &&
+            image_size.height() >= height() - TITLEBAR_HEIGHT * 2) &&
             width() > 0 && height() > 0) {
         fitWindow();
     } else {
@@ -634,8 +642,9 @@ qreal LibImageGraphicsView::imageRelativeScale() const
 qreal LibImageGraphicsView::windowRelativeScale() const
 {
     QRectF bf = sceneRect();
-    if (1.0 * width() / height() > 1.0 * bf.width() / bf.height()) {
-        return 1.0 * height() / bf.height();
+    //新需求,默认适应窗口顶格到标题栏
+    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
+        return 1.0 * (height() - TITLEBAR_HEIGHT * 2) / bf.height();
     } else {
         return 1.0 * width() / bf.width();
     }
@@ -705,7 +714,7 @@ void LibImageGraphicsView::titleBarControl()
     realHeight = img.size().height() * imageRelativeScale() / devicePixelRatioF();
 //    }
 
-    if (realHeight > height() - 100) {
+    if (realHeight > height() - TITLEBAR_HEIGHT * 2 + 1) {
         emit sigImageOutTitleBar(true);
     } else {
         emit sigImageOutTitleBar(false);
@@ -1011,6 +1020,7 @@ void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
     if (!m_isFitWindow) {
         scaleAtPoint(QPoint(0, 0), 1.0);
     }
+
     QGraphicsView::resizeEvent(event);
 //    m_toast->move(width() / 2 - m_toast->width() / 2,
 //                  height() - 80 - m_toast->height() / 2 - 11);

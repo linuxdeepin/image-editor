@@ -51,6 +51,8 @@ private:
     QString m_filename;
     QString m_DirPath;
     QString m_basename;
+    QString m_tipString;
+    DLabel *m_labTips{nullptr};
 };
 
 #endif // RENAMEDIALOG_H

@@ -118,6 +118,8 @@ public:
 
     void titleBarControl();
     int getcurrentImgCount();//获得当前多页图图片的count
+
+    void setWindowIsFullScreen(bool bRet);
 signals:
     void clicked();
     void doubleClicked();
@@ -262,6 +264,7 @@ private:
 
     //加载旋转
     DSpinner *m_spinner{nullptr};
+    int TITLEBAR_HEIGHT = 50;
 };
 
 #endif // IMAGEVIEW_H

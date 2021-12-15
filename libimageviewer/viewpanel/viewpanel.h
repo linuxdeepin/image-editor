@@ -134,6 +134,9 @@ private slots:
 
     //设置当前图片应该的界面
     void setCurrentWidget(const QString &path);
+
+    //图片显示超过标题栏
+    void slotsImageOutTitleBar(bool bRet);
 public slots:
     //刷新底部工具栏大小与位置
     void resetBottomToolbarGeometry(bool visible);
@@ -214,6 +217,7 @@ private:
     LibSlideShowPanel *m_sliderPanel{nullptr};
 
     QPropertyAnimation *m_bottomAnimation{nullptr};
+    QPropertyAnimation *m_topBarAnimation{nullptr};
 
     bool m_isBottomBarVisble = true;
 
@@ -229,5 +233,8 @@ private:
     int m_CurrentCustomUID = -2;//自定义相册名对应的UID，-2表示从老版本相册进入
 
     int m_hideCursorTid{0};//隐藏时间
+
+    //图片是否超过标题栏
+    bool m_ImageOutTitleBar = false;
 };
 #endif  // VIEWPANEL_H

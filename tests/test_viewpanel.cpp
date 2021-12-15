@@ -161,43 +161,38 @@ TEST_F(gtestview, LibViewPanel_Menu)
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdFullScreen);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
+
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
+
+    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdSetAsWallpaper);
+    panel->onMenuItemClicked(&menuAction);
+    QTest::qWait(10000);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRename);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdStartSlideShow);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(2000);
 
     //add new
     QTest::keyClick(panel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    QTest::qWait(200);
-//    e.clear();
-//    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-//    e.simulate(panel->m_sliderPanel);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdCopy);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
-    panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
-    panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdShowNavigationWindow);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdHideNavigationWindow);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
     DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::DarkType);
     QTest::qWait(500);
     DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::LightType);
@@ -205,33 +200,30 @@ TEST_F(gtestview, LibViewPanel_Menu)
 
 
     QTest::keyClick(panel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     //add new
-    QTest::mousePress(panel, Qt::LeftButton, Qt::NoModifier, QPoint(0, 0), 300);
-    QTest::mouseMove(panel, QPoint(20, 20), 300);
-    QTest::mouseRelease(panel, Qt::LeftButton, Qt::NoModifier, QPoint(200, 1020), 300);
-    QTest::qWait(200);
+//    QTest::mousePress(panel, Qt::LeftButton, Qt::NoModifier, QPoint(0, 0), 300);
+//    QTest::mouseMove(panel, QPoint(20, 20), 300);
+//    QTest::mouseRelease(panel, Qt::LeftButton, Qt::NoModifier, QPoint(200, 1020), 300);
+//    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRotateClockwise);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRotateCounterclockwise);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
-    menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdSetAsWallpaper);
-    panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdDisplayInFileManager);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdImageInfo);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdOcr);
     panel->onMenuItemClicked(&menuAction);
@@ -239,18 +231,17 @@ TEST_F(gtestview, LibViewPanel_Menu)
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdMoveToTrash);
     panel->onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
+    QTest::qWait(400);
 
-    //ImageGraphicsView
-    panel->loadImage("", {});
+//    //ImageGraphicsView
+//    panel->loadImage("", {});
 
-    auto view = panel->m_view;
-    view->clear();
-    view->setImage(QApplication::applicationDirPath() + "/svg2.svg", QImage());
+//    auto view = panel->m_view;
+//    view->clear();
+    panel->m_view->setImage(QApplication::applicationDirPath() + "/svg2.svg", QImage());
 
-    QTest::qWait(500);
+    QTest::qWait(1000);
 
-    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/svg2.svg").isFile());
 }
 
 

@@ -791,6 +791,9 @@ const QString LibImageAnimation::currentPath()
 const QRect LibImageAnimation::getCurScreenGeometry()
 {
     int number = QApplication::desktop()->screenNumber(this);
+    if (number < 0) {
+        number = 0;
+    }
     QRect tempRect = QGuiApplication::screens().at(number)->geometry();
     tempRect.setRect(0, 0, tempRect.width(), tempRect.height());
     return tempRect;
