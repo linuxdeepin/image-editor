@@ -208,10 +208,10 @@ TEST_F(gtestview, LibViewPanel_Menu)
     QTest::qWait(200);
 
     //add new
-    QTest::mousePress(panel, Qt::LeftButton, Qt::NoModifier, QPoint(0, 0), 300);
-    QTest::mouseMove(panel, QPoint(20, 20), 300);
-    QTest::mouseRelease(panel, Qt::LeftButton, Qt::NoModifier, QPoint(200, 1020), 300);
-    QTest::qWait(200);
+//    QTest::mousePress(panel, Qt::LeftButton, Qt::NoModifier, QPoint(0, 0), 300);
+//    QTest::mouseMove(panel, QPoint(20, 20), 300);
+//    QTest::mouseRelease(panel, Qt::LeftButton, Qt::NoModifier, QPoint(200, 1020), 300);
+//    QTest::qWait(200);
 
     menuAction.setProperty("MenuID", imageViewerSpace::NormalMenuItemId::IdRotateClockwise);
     panel->onMenuItemClicked(&menuAction);

@@ -235,10 +235,9 @@ void LibImageGraphicsView::clear()
 
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
-    if (m_spinner) {
-        m_spinner->deleteLater();
-        m_spinner = nullptr;
-    }
+    //如果直接delete会出现崩溃的情况
+    m_spinner = nullptr;
+
     //默认多页图的按钮显示为false
     if (m_morePicFloatWidget) {
         m_morePicFloatWidget->setVisible(false);
