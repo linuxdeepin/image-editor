@@ -42,6 +42,11 @@ public:
     QString GetFilePath();
     QString GetFileName();
     void InitDlg();
+
+    void setCurrentTip();
+    QString geteElidedText(QFont font, QString str, int MaxWidth);
+protected:
+    void paintEvent(QPaintEvent *event);
 private:
     QVBoxLayout *m_vlayout;
     QHBoxLayout *m_hlayout;
@@ -53,6 +58,8 @@ private:
     QString m_basename;
     QString m_tipString;
     DLabel *m_labTips{nullptr};
+
+    int m_currentFontSize = 0;
 };
 
 #endif // RENAMEDIALOG_H

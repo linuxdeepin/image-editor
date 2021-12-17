@@ -21,12 +21,14 @@
 #include "renamedialog.h"
 #include "unionimage/baseutils.h"
 #include "unionimage/imageutils.h"
+
 #include "accessibility/ac-desktop-define.h"
 
 #include <DMessageBox>
-#include <QRegExp>
-
 #include <DLabel>
+#include <DFontSizeManager>
+
+#include <QRegExp>
 #include <QDebug>
 
 DWIDGET_USE_NAMESPACE
@@ -39,7 +41,6 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     , m_filenamepath(filename)
 {
     this->setIcon(QIcon::fromTheme("deepin-image-viewer"));
-    setFixedSize(380, 200);
     DWidget *widet = new DWidget(this);
     addContent(widet);
     m_vlayout = new QVBoxLayout(widet);
@@ -68,7 +69,12 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_edtlayout->addWidget(m_labformat);
     m_vlayout->addLayout(m_edtlayout);
     m_vlayout->addStretch();
+
     m_labTips = new DLabel();
+    m_labTips->adjustSize();
+    m_labTips->setWordWrap(true);
+    m_labTips->setIndent(10);
+
     m_vlayout->addWidget(m_labTips);
 
     m_vlayout->addLayout(m_hlayout);
@@ -76,7 +82,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 //    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
     InitDlg();
     m_lineedt->lineEdit()->setFocus();
-    int Dirlen = m_DirPath.size() + 1 + m_labformat->text().size();
+    int Dirlen = /*m_DirPath.size() +*/ 1 + m_labformat->text().size();
     //正则表达式排除文管不支持的字符
     QRegExp rx("[^\\\\//:*?\"<>|]*");
     QRegExpValidator *pReg = new QRegExpValidator(rx, this);
@@ -98,9 +104,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
         if (file.exists() || arg.isEmpty()) {
             okbtn->setEnabled(false);
             m_labTips->setVisible(true);
-            m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text());
-            m_labTips->setText(m_tipString);
-            setFixedSize(380, 200);
+            setCurrentTip();
         } else {
             okbtn->setEnabled(true);
             m_labTips->setVisible(false);
@@ -140,8 +144,9 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     widet->setObjectName(RENAME_CONTENT);
     widet->setObjectName(RENAME_CONTENT);
 
-    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text());
+    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
     m_labTips->setText(m_tipString);
+    setFixedSize(380, 180 + m_labTips->height() * 2);
 }
 
 
@@ -178,4 +183,62 @@ void RenameDialog::InitDlg()
     m_basename = fileinfo.completeBaseName();
     m_lineedt->setText(m_basename);
     m_labformat->setText("." + format);
+}
+
+void RenameDialog::setCurrentTip()
+{
+    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
+    QFont font;
+    int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
+//    int widthString = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
+    int heightString = Libutils::base::stringHeight(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString) + 12;
+
+    double lineCount = double (m_labTips->height()) / double(currentSize);
+
+    if (lineCount >= 1.7) {
+        heightString = heightString * 2;
+
+        m_tipString = tr("The file \"%1\" already exists, please use another name").arg("");
+
+        int width = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
+        int widthC;
+        if (currentSize > 15) {
+            widthC = m_labTips->width() * 2 - width  - 140;
+        } else if (currentSize > 11) {
+            widthC = m_labTips->width() * 2 - width  - 250;
+        } else {
+            widthC = m_labTips->width() * 2 - width  - 270;
+        }
+
+        QString a = geteElidedText(DFontSizeManager::instance()->get(DFontSizeManager::T8),
+                                   m_lineedt->text() + m_labformat->text(), widthC);
+        m_tipString = tr("The file \"%1\" already exists, please use another name").arg(a);
+    }
+    m_labTips->setText(m_tipString);
+    setFixedSize(380, 180 + heightString);
+}
+
+void RenameDialog::paintEvent(QPaintEvent *event)
+{
+    QFont font;
+    int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
+
+    //LMH0609判断与上次自体的大小是否一样，不一样则刷新
+    if (currentSize != m_currentFontSize) {
+        qDebug() << currentSize;
+        m_currentFontSize = currentSize;
+        setCurrentTip();
+    }
+    QWidget::paintEvent(event);
+}
+
+
+QString RenameDialog::geteElidedText(QFont font, QString str, int MaxWidth)
+{
+    QFontMetrics fontWidth(font);
+    int width = fontWidth.horizontalAdvance(str);
+    if (width >= MaxWidth) {
+        str = fontWidth.elidedText(str, Qt::ElideMiddle, MaxWidth);
+    }
+    return str;
 }

@@ -253,6 +253,10 @@
         <source>Input a new name</source>
         <translation>請輸入圖片名稱</translation>
     </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation>檔名“%1”已被佔用，請使用其他名稱</translation>
+    </message>
 </context>
 <context>
     <name>SlideShowBottomBar</name>
