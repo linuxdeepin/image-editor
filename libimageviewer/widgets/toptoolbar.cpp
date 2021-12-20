@@ -151,6 +151,12 @@ void LibTopToolbar::resizeEvent(QResizeEvent *event)
     DBlurEffectWidget::resizeEvent(event);
 }
 
+void LibTopToolbar::leaveEvent(QEvent *event)
+{
+    emit sigLeaveTitle();
+    return AbstractTopToolbar::leaveEvent(event);
+}
+
 void LibTopToolbar::initWidgets()
 {
     m_layout = new QHBoxLayout(this);

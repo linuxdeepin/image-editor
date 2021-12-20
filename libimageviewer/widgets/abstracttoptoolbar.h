@@ -11,7 +11,9 @@ public:
     explicit AbstractTopToolbar(QWidget *parent = nullptr);
 
     virtual void setMiddleContent(const QString &path) = 0;
-
+signals :
+    //leaveTitle
+    void sigLeaveTitle();
 public slots:
     virtual void setTitleBarTransparent(bool a) = 0;
 };

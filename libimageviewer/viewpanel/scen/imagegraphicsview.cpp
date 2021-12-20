@@ -643,9 +643,11 @@ qreal LibImageGraphicsView::windowRelativeScale() const
 {
     QRectF bf = sceneRect();
     //新需求,默认适应窗口顶格到标题栏
-    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
+    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height())) {
+//    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
         return 1.0 * (height() - TITLEBAR_HEIGHT * 2) / bf.height();
     } else {
+        qDebug() << "649";
         return 1.0 * width() / bf.width();
     }
 }

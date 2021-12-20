@@ -52,9 +52,9 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void paintEvent(QPaintEvent *e) override;
     void resizeEvent(QResizeEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 signals:
     void updateMaxBtn();
-
 private:
     enum MenuItemId {
         IdCreateAlbum,

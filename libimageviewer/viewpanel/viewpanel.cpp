@@ -218,6 +218,7 @@ void LibViewPanel::initTopBar()
     //防止在标题栏右键菜单会触发默认的和主窗口的发生
     if (m_topToolbar == nullptr) { //如果调用者没有指定有效的顶部栏，则使用内置方案
         m_topToolbar = new LibTopToolbar(false, dynamic_cast<QWidget *>(this->parent()));
+        connect(m_topToolbar, &LibTopToolbar::sigLeaveTitle, this, &LibViewPanel::slotBottomMove);
     } else {
         m_topToolbar->setParent(dynamic_cast<QWidget *>(this->parent()));
     }
@@ -950,6 +951,7 @@ void LibViewPanel::slotsImageOutTitleBar(bool bRet)
         m_ImageOutTitleBar = bRet;
         slotBottomMove();
     }
+
 }
 
 void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
@@ -1047,15 +1049,15 @@ bool LibViewPanel::startChooseFileDialog()
 void LibViewPanel::slotBottomMove()
 {
     QPoint pos = mapFromGlobal(QCursor::pos());
-//    qDebug() << pos;
+
     int nParentWidth = this->width();
     int nParentHeight = this->height();
 
     if (m_bottomToolbar && m_topToolbar) {
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if ((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || pos.y() < 100) {
-                //
+            if (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() + 2 && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() > 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)) {
+
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
@@ -1085,7 +1087,9 @@ void LibViewPanel::slotBottomMove()
                 });
                 m_topBarAnimation->start();
             } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
-                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y())) {
+                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() + 2 >= nParentHeight || pos.y() <= 0
+                       || pos.x() < 2 || pos.x() > nParentWidth - 2) {
+
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
                 //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
@@ -1738,6 +1742,25 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
         m_extensionPanel->move(p + QPoint(this->window()->width() - m_extensionPanel->width() - 24,
                                           TOP_TOOLBAR_HEIGHT * 2));
     }
+
+    //当view处于适应窗口状态的时候,resize也会继承状态
+    if (m_stack->currentWidget() == m_view) {
+        if (m_view->isFitImage()) {
+            m_view->fitImage();
+        } else if (m_view->isFitWindow()) {
+            m_view->fitWindow();
+        }
+    }
+    if (m_bottomAnimation) {
+        m_bottomAnimation->stop();
+        m_bottomAnimation->deleteLater();
+        m_bottomAnimation = nullptr;
+    }
+    if (m_topBarAnimation) {
+        m_topBarAnimation->stop();
+        m_topBarAnimation->deleteLater();
+        m_topBarAnimation = nullptr;
+    }
     if (this->m_topToolbar) {
 
         if (window()->isFullScreen()) {
@@ -1751,17 +1774,9 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
         if (m_topToolbar->isVisible()) {
             this->m_topToolbar->resize(width(), 50);
+            this->m_topToolbar->move(0, 0);
         }
     }
-    //当view处于适应窗口状态的时候,resize也会继承状态
-    if (m_stack->currentWidget() == m_view) {
-        if (m_view->isFitImage()) {
-            m_view->fitImage();
-        } else if (m_view->isFitWindow()) {
-            m_view->fitWindow();
-        }
-    }
-
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     resetBottomToolbarGeometry(true);
     QFrame::resizeEvent(e);
@@ -1838,4 +1853,10 @@ void LibViewPanel::timerEvent(QTimerEvent *e)
     }
 
     QFrame::timerEvent(e);
+}
+
+void LibViewPanel::leaveEvent(QEvent *event)
+{
+    slotBottomMove();
+    return QFrame::leaveEvent(event);
 }
