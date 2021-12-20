@@ -1354,7 +1354,6 @@ void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
         } else if (event->delta() < 0) {
             emit nextRequested();
         }
-        qDebug() << "control++";
 
     } else {
         QFileInfo file(m_path);

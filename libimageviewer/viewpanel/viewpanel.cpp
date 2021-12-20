@@ -462,7 +462,7 @@ void LibViewPanel::updateMenuContent(QString path)
 
             //为了达到真·ABI兼容，此处需要针对新旧相册分类讨论
             //不管有无自定义相册，均需保留添加到相册
-            DMenu *am = new DMenu(tr("Add to album"));
+            DMenu *am = new DMenu(tr("Add to album"), m_menu);
             QAction *ac1 = new QAction(am);
             ac1->setProperty("MenuID", IdAddToAlbum);
             ac1->setText(tr("New album"));
@@ -1058,7 +1058,7 @@ void LibViewPanel::slotBottomMove()
 
             if (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() + 2 && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() > 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)) {
 
-                m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
+                m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
                 m_bottomAnimation->setDuration(200);
                 //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
@@ -1073,7 +1073,7 @@ void LibViewPanel::slotBottomMove()
                 });
                 m_bottomAnimation->start();
                 //m_topBarAnimation 出来
-                m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
+                m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos", this);
                 m_topBarAnimation->setDuration(200);
                 //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
@@ -1090,7 +1090,7 @@ void LibViewPanel::slotBottomMove()
                         nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() + 2 >= nParentHeight || pos.y() <= 0
                        || pos.x() < 2 || pos.x() > nParentWidth - 2) {
 
-                m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
+                m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
                 m_bottomAnimation->setDuration(200);
                 //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
@@ -1102,7 +1102,7 @@ void LibViewPanel::slotBottomMove()
                 });
                 m_bottomAnimation->start();
 
-                m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
+                m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos", this);
                 m_topBarAnimation->setDuration(200);
                 //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
@@ -1129,7 +1129,7 @@ void LibViewPanel::slotBottomMove()
                 m_bottomToolbar->setVisible(true);
             }
 
-            m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
+            m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
             m_bottomAnimation->setDuration(200);
             //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
             m_bottomAnimation->setStartValue(
@@ -1143,7 +1143,7 @@ void LibViewPanel::slotBottomMove()
             m_bottomAnimation->start();
 
             //m_topBarAnimation 出来
-            m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
+            m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos", this);
             m_topBarAnimation->setDuration(200);
             //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
