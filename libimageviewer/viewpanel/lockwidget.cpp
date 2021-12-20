@@ -202,3 +202,16 @@ void LockWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 
 
 LockWidget::~LockWidget() {}
+
+void LockWidget::wheelEvent(QWheelEvent *event)
+{
+    if ((event->modifiers() == Qt::ControlModifier)) {
+        if (event->delta() > 0) {
+            emit previousRequested();
+        } else if (event->delta() < 0) {
+            emit nextRequested();
+        }
+        qDebug() << "control++";
+
+    }
+}

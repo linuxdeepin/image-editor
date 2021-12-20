@@ -418,7 +418,7 @@ void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
         if (height() - 20 < pos.y() && height() >= pos.y() && height() >= slideshowbottombar->y()) {
             QPropertyAnimation *animation = new QPropertyAnimation(slideshowbottombar, "pos");
             animation->setDuration(200);
-            animation->setEasingCurve(QEasingCurve::NCurveTypes);
+            //animation->setEasingCurve(QEasingCurve::NCurveTypes);
             animation->setStartValue(QPoint((width() - slideshowbottombar->width()) / 2, slideshowbottombar->y()));
             animation->setEndValue(QPoint((width() - slideshowbottombar->width()) / 2, height() - slideshowbottombar->height() - 10));
             animation->start(QAbstractAnimation::DeleteWhenStopped);
@@ -426,7 +426,7 @@ void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
         } else if (height() - slideshowbottombar->height() - 10 > pos.y() && height() - slideshowbottombar->height() - 10 <= slideshowbottombar->y()) {
             QPropertyAnimation *animation = new QPropertyAnimation(slideshowbottombar, "pos");
             animation->setDuration(200);
-            animation->setEasingCurve(QEasingCurve::NCurveTypes);
+            //animation->setEasingCurve(QEasingCurve::NCurveTypes);
             animation->setStartValue(QPoint((width() - slideshowbottombar->width()) / 2, slideshowbottombar->y()));
             animation->setEndValue(QPoint((width() - slideshowbottombar->width()) / 2, height()));
             animation->start(QAbstractAnimation::DeleteWhenStopped);

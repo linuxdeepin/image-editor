@@ -1058,14 +1058,13 @@ void LibViewPanel::slotBottomMove()
                 //
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
-                m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+                //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((nParentWidth - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
 
                 m_bottomAnimation->setEndValue(QPoint((nParentWidth - m_bottomToolbar->width()) / 2,
                                                       nParentHeight - m_bottomToolbar->height() - 10));
-                qDebug() << QPoint((nParentWidth - m_bottomToolbar->width()) / 2,
-                                   nParentHeight - m_bottomToolbar->height() - 10);
+
                 connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_bottomAnimation;
                     m_bottomAnimation = nullptr;
@@ -1074,13 +1073,11 @@ void LibViewPanel::slotBottomMove()
                 //m_topBarAnimation 出来
                 m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
                 m_topBarAnimation->setDuration(200);
-                m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+                //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
                 m_topBarAnimation->setStartValue(
                     QPoint((nParentWidth - m_topToolbar->width()) / 2, m_topToolbar->y()));
                 m_topBarAnimation->setEndValue(QPoint((nParentWidth - m_topToolbar->width()) / 2, 0));
-
-                qDebug() << "xxxxx" << m_topToolbar->y();
 
                 connect(m_topBarAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                     delete m_topBarAnimation;
@@ -1091,7 +1088,7 @@ void LibViewPanel::slotBottomMove()
                         nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y())) {
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
                 m_bottomAnimation->setDuration(200);
-                m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+                //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
                 m_bottomAnimation->setStartValue(
                     QPoint((nParentWidth - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
                 m_bottomAnimation->setEndValue(QPoint((nParentWidth - m_bottomToolbar->width()) / 2, nParentHeight));
@@ -1103,7 +1100,7 @@ void LibViewPanel::slotBottomMove()
 
                 m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
                 m_topBarAnimation->setDuration(200);
-                m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+                //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
                 m_topBarAnimation->setStartValue(
                     QPoint((nParentWidth - m_topToolbar->width()) / 2, m_topToolbar->y()));
@@ -1130,7 +1127,7 @@ void LibViewPanel::slotBottomMove()
 
             m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos");
             m_bottomAnimation->setDuration(200);
-            m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+            //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
             m_bottomAnimation->setStartValue(
                 QPoint((nParentWidth - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
             m_bottomAnimation->setEndValue(QPoint((nParentWidth - m_bottomToolbar->width()) / 2,
@@ -1144,13 +1141,12 @@ void LibViewPanel::slotBottomMove()
             //m_topBarAnimation 出来
             m_topBarAnimation = new QPropertyAnimation(m_topToolbar, "pos");
             m_topBarAnimation->setDuration(200);
-            m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
+            //m_topBarAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
 
             m_topBarAnimation->setStartValue(
                 QPoint((nParentWidth - m_topToolbar->width()) / 2, m_topToolbar->y()));
             m_topBarAnimation->setEndValue(QPoint((nParentWidth - m_topToolbar->width()) / 2, 0));
 
-            qDebug() << "xxxxx" << m_topToolbar->y();
 
             connect(m_topBarAnimation, &QPropertyAnimation::finished, this, [ = ]() {
                 delete m_topBarAnimation;

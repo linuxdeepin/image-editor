@@ -307,3 +307,16 @@ void ThumbnailWidget::pinchTriggered(QPinchGesture *gesture)
 }
 
 ThumbnailWidget::~ThumbnailWidget() {}
+
+void ThumbnailWidget::wheelEvent(QWheelEvent *event)
+{
+    if ((event->modifiers() == Qt::ControlModifier)) {
+        if (event->delta() > 0) {
+            emit previousRequested();
+        } else if (event->delta() < 0) {
+            emit nextRequested();
+        }
+        qDebug() << "control++";
+
+    }
+}

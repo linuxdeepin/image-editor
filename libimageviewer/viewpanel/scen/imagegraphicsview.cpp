@@ -1346,16 +1346,26 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
 
 void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
 {
-    QFileInfo file(m_path);
-    if (!file.exists()) {
-        event->accept();
+    if ((event->modifiers() == Qt::ControlModifier)) {
+        if (event->delta() > 0) {
+            emit previousRequested();
+        } else if (event->delta() < 0) {
+            emit nextRequested();
+        }
+        qDebug() << "control++";
+
     } else {
+        QFileInfo file(m_path);
+        if (!file.exists()) {
+            event->accept();
+        } else {
 
-        qreal factor = qPow(1.2, event->delta() / 240.0);
-        qDebug() << factor;
-        scaleAtPoint(event->pos(), factor);
+            qreal factor = qPow(1.2, event->delta() / 240.0);
+            qDebug() << factor;
+            scaleAtPoint(event->pos(), factor);
 
-        event->accept();
+            event->accept();
+        }
     }
 //    qDebug() << "---" << __FUNCTION__ << "---" << this->sceneRect();
 }

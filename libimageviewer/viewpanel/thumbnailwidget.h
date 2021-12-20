@@ -73,6 +73,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e) override;
 
     bool event(QEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 private slots:
     void pinchTriggered(QPinchGesture *gesture);
 private:

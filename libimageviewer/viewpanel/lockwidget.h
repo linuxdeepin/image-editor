@@ -57,6 +57,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     bool event(QEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 private slots:
     void pinchTriggered(QPinchGesture *gesture);
 private:
