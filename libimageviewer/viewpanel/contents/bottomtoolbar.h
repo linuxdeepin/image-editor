@@ -125,6 +125,9 @@ signals:
     //保存旋转的信号
     void sigRotateSave();
 
+    //移出窗口信号
+    void sigLeaveBottom();
+
 
 public slots:
     void updateCollectButton();
@@ -158,6 +161,7 @@ public slots:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
+    void leaveEvent(QEvent *e) override;
 public:
     QString m_imageType;
 

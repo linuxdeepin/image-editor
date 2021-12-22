@@ -101,10 +101,14 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
         if (len > 255 - Dirlen) return;
         QString fileabname = m_DirPath + "/" + arg + m_labformat->text();
         QFile file(fileabname);
-        if (file.exists() || arg.isEmpty()) {
+        if (file.exists()) {
             okbtn->setEnabled(false);
             m_labTips->setVisible(true);
             setCurrentTip();
+        } else if (arg.isEmpty()) {
+            okbtn->setEnabled(false);
+            m_labTips->setVisible(false);
+            setFixedSize(380, 180);
         } else {
             okbtn->setEnabled(true);
             m_labTips->setVisible(false);
@@ -203,7 +207,7 @@ void RenameDialog::setCurrentTip()
         int width = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
         int widthC;
         if (currentSize > 15) {
-            widthC = m_labTips->width() * 2 - width  - 140;
+            widthC = m_labTips->width() * 2 - width  - 200;
         } else if (currentSize > 11) {
             widthC = m_labTips->width() * 2 - width  - 250;
         } else {
@@ -215,7 +219,12 @@ void RenameDialog::setCurrentTip()
         m_tipString = tr("The file \"%1\" already exists, please use another name").arg(a);
     }
     m_labTips->setText(m_tipString);
-    setFixedSize(380, 180 + heightString);
+    if (m_labTips->isVisible()) {
+        setFixedSize(380, 180 + heightString);
+    } else {
+        setFixedSize(380, 180);
+    }
+
 }
 
 void RenameDialog::paintEvent(QPaintEvent *event)
@@ -223,12 +232,9 @@ void RenameDialog::paintEvent(QPaintEvent *event)
     QFont font;
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
 
-    //LMH0609判断与上次自体的大小是否一样，不一样则刷新
-    if (currentSize != m_currentFontSize) {
-        qDebug() << currentSize;
-        m_currentFontSize = currentSize;
-        setCurrentTip();
-    }
+    m_currentFontSize = currentSize;
+    setCurrentTip();
+
     QWidget::paintEvent(event);
 }
 

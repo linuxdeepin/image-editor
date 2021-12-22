@@ -647,7 +647,6 @@ qreal LibImageGraphicsView::windowRelativeScale() const
 //    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
         return 1.0 * (height() - TITLEBAR_HEIGHT * 2) / bf.height();
     } else {
-        qDebug() << "649";
         return 1.0 * width() / bf.width();
     }
 }

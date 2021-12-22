@@ -180,6 +180,7 @@ void LibViewPanel::initConnect()
     connect(m_view, &LibImageGraphicsView::disCheckAdaptImageBtn, m_bottomToolbar, &LibBottomToolbar::disCheckAdaptImageBtn);
 
     connect(m_bottomToolbar, &LibBottomToolbar::sigOcr, this, &LibViewPanel::slotOcrPicture);
+    connect(m_bottomToolbar, &LibBottomToolbar::sigLeaveBottom, this, &LibViewPanel::slotBottomMove);
 
     connect(m_view, &LibImageGraphicsView::sigImageOutTitleBar, this, &LibViewPanel::slotsImageOutTitleBar);
 
@@ -1054,9 +1055,10 @@ void LibViewPanel::slotBottomMove()
     int nParentHeight = this->height();
 
     if (m_bottomToolbar && m_topToolbar) {
+
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() + 2 && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() > 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)) {
+            if (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)) {
 
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
                 m_bottomAnimation->setDuration(200);
@@ -1087,9 +1089,11 @@ void LibViewPanel::slotBottomMove()
                 });
                 m_topBarAnimation->start();
             } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
-                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() + 2 >= nParentHeight || pos.y() <= 0
-                       || pos.x() < 2 || pos.x() > nParentWidth - 2) {
+                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
+                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)) {
+                qDebug() << "1095";
 
+                //隐藏
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
                 m_bottomAnimation->setDuration(200);
                 //m_bottomAnimation->setEasingCurve(QEasingCurve::NCurveTypes);
@@ -1124,6 +1128,7 @@ void LibViewPanel::slotBottomMove()
                 }
             }
         } else {
+            qDebug() << "1130";
             //如果非全屏，则显示m_bottomToolbar
             if (m_isBottomBarVisble) {
                 m_bottomToolbar->setVisible(true);
@@ -1774,11 +1779,11 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
         if (m_topToolbar->isVisible()) {
             this->m_topToolbar->resize(width(), 50);
-            this->m_topToolbar->move(0, 0);
         }
     }
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     resetBottomToolbarGeometry(true);
+    slotBottomMove();
     QFrame::resizeEvent(e);
     emit m_view->transformChanged();
 }
@@ -1857,6 +1862,8 @@ void LibViewPanel::timerEvent(QTimerEvent *e)
 
 void LibViewPanel::leaveEvent(QEvent *event)
 {
-    slotBottomMove();
+    if (m_menu && !m_menu->isVisible()) {
+        slotBottomMove();
+    }
     return QFrame::leaveEvent(event);
 }

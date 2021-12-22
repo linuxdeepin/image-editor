@@ -544,6 +544,12 @@ void LibBottomToolbar::showEvent(QShowEvent *event)
     m_imgListWidget->moveCenterWidget();
 }
 
+void LibBottomToolbar::leaveEvent(QEvent *e)
+{
+    emit sigLeaveBottom();
+    return DFloatingWidget::leaveEvent(e);
+}
+
 void LibBottomToolbar::setAllFile(QString path, QStringList paths)
 {
     //每次打开清空一下缩略图
