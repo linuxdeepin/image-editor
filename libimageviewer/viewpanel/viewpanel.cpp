@@ -1572,6 +1572,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             }
             m_info->setImagePath(path);
             m_extensionPanel->setContent(m_info);
+            //清除焦点
+            m_extensionPanel->setFocus(Qt::NoFocusReason);
             m_extensionPanel->show();
             if (this->window()->isFullScreen() || this->window()->isMaximized()) {
                 m_extensionPanel->move(this->window()->width() - m_extensionPanel->width() - 24,
