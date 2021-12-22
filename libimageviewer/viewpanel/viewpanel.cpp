@@ -1456,6 +1456,10 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
             RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
 
+            QRect rect = this->geometry();
+            QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
+            renamedlg->move(globalPos.x() + rect.width() / 2 - renamedlg->width() / 2, globalPos.y() + rect.height() / 2 - renamedlg->height() / 2);
+
             //打开重命名窗口时关闭定时器
             killTimer(m_hideCursorTid);
             m_hideCursorTid = 0;
