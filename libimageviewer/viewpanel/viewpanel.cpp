@@ -1797,6 +1797,8 @@ void LibViewPanel::showEvent(QShowEvent *e)
     if (this->m_topToolbar) {
         m_topToolbar->resize(width(), 50);
     }
+    //显示的时候需要判断一次滑动
+    slotBottomMove();
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     QFrame::showEvent(e);
 }
