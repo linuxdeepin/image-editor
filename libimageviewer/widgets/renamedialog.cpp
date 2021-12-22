@@ -84,7 +84,8 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_lineedt->lineEdit()->setFocus();
     int Dirlen = /*m_DirPath.size() +*/ 1 + m_labformat->text().size();
     //正则表达式排除文管不支持的字符
-    QRegExp rx("[^\\\\//:*?\"<>|]*");
+    QRegExp rx("^[^\\.\\\\/\':\\*\\?\"<>|%&][^\\\\/\':\\*\\?\"<>|%&]*"); //屏蔽特殊字符
+//    QRegExp rx("[^\\\\//:*?\"<>|]*");
     QRegExpValidator *pReg = new QRegExpValidator(rx, this);
     m_lineedt->lineEdit()->setValidator(pReg);
     connect(okbtn, &DSuggestButton::clicked, this, [ = ] {
@@ -95,28 +96,21 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     connect(cancelbtn, &DPushButton::clicked, this, [ = ] {
         reject();
     });
+
     connect(m_lineedt, &DLineEdit::textChanged, this, [ = ](const QString & arg) {
         int len = arg.toLocal8Bit().length();
         //修复字符串长度超长会将
         if (len > 255 - Dirlen) return;
-        QString fileabname = m_DirPath + "/" + arg + m_labformat->text();
-        QFile file(fileabname);
-        if (file.exists()) {
-            okbtn->setEnabled(false);
-            m_labTips->setVisible(true);
-            setCurrentTip();
-        } else if (arg.isEmpty()) {
-            okbtn->setEnabled(false);
-            m_labTips->setVisible(false);
-            setFixedSize(380, 180);
-        } else {
-            okbtn->setEnabled(true);
-            m_labTips->setVisible(false);
-            setFixedSize(380, 180);
-        }
+
     });
     connect(m_lineedt, &DLineEdit::textEdited, this, [ = ](const QString & arg) {
-        qDebug() << "textEdited" << arg;
+        if (arg.at(0) == " ") {
+            QString str = arg;
+            str = str.right(str.size() - 1);
+            qDebug() << str;
+            m_lineedt->lineEdit()->setText(str);
+            m_lineedt->lineEdit()->setCursorPosition(0);
+        }
         int len = arg.toLocal8Bit().length();
         QString Interceptstr;
         if (len > 255 - Dirlen) {
@@ -191,6 +185,22 @@ void RenameDialog::InitDlg()
 
 void RenameDialog::setCurrentTip()
 {
+    QString fileabname = m_DirPath + "/" + m_lineedt->text() + m_labformat->text();
+
+    QFile file(fileabname);
+    if (file.exists()) {
+        okbtn->setEnabled(false);
+        m_labTips->setVisible(true);
+    } else if (m_lineedt->text().isEmpty()) {
+        okbtn->setEnabled(false);
+        m_labTips->setVisible(false);
+        setFixedSize(380, 180);
+    } else {
+        okbtn->setEnabled(true);
+        m_labTips->setVisible(false);
+        setFixedSize(380, 180);
+    }
+
     m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
     QFont font;
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
