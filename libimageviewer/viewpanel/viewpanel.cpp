@@ -136,6 +136,9 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     emit ImageEngine::instance()->sigUpdateCollectBtn();
     //重置底部工具栏位置与大小
     resetBottomToolbarGeometry(true);
+
+    m_dirWatcher->removePaths(m_dirWatcher->directories());
+    m_dirWatcher->addPath(QFileInfo(path).dir().path());
 }
 
 void LibViewPanel::initConnect()
@@ -212,6 +215,9 @@ void LibViewPanel::initConnect()
     //上一页，下一页信号连接
     connect(m_view, &LibImageGraphicsView::previousRequested, this, &LibViewPanel::showPrevious);
     connect(m_view, &LibImageGraphicsView::nextRequested, this, &LibViewPanel::showNext);
+
+    m_dirWatcher = new  QFileSystemWatcher(this);
+    connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, this, &LibViewPanel::slotsDirectoryChanged);
 }
 
 void LibViewPanel::initTopBar()
@@ -955,6 +961,18 @@ void LibViewPanel::slotsImageOutTitleBar(bool bRet)
 
 }
 
+void LibViewPanel::slotsDirectoryChanged(const QString &path)
+{
+    Q_UNUSED(path);
+    if (m_view) {
+        if (QFileInfo(m_currentPath).isReadable() && m_stack->currentWidget() != m_view) {
+            m_view->onIsChangedTimerTimeout();
+        } else if (!QFileInfo(m_currentPath).isReadable()) {
+            updateMenuContent();
+        }
+    }
+}
+
 void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
 {
     if (m_bottomToolbar) {
@@ -1128,7 +1146,7 @@ void LibViewPanel::slotBottomMove()
                 }
             }
         } else {
-            qDebug() << "1130";
+//            qDebug() << "1130";
             //如果非全屏，则显示m_bottomToolbar
             if (m_isBottomBarVisble) {
                 m_bottomToolbar->setVisible(true);
@@ -1459,7 +1477,9 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             QRect rect = this->geometry();
             QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
             renamedlg->move(globalPos.x() + rect.width() / 2 - renamedlg->width() / 2, globalPos.y() + rect.height() / 2 - renamedlg->height() / 2);
-
+            if (m_dirWatcher) {
+                connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, renamedlg, &RenameDialog::slotsUpdate);
+            }
             //打开重命名窗口时关闭定时器
             killTimer(m_hideCursorTid);
             m_hideCursorTid = 0;
@@ -1487,6 +1507,11 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                     }
                 }
             }
+            if (m_dirWatcher) {
+                disconnect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, renamedlg, &RenameDialog::slotsUpdate);
+            }
+            renamedlg->deleteLater();
+            renamedlg = nullptr;
             //开启定时器
             m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
             break;

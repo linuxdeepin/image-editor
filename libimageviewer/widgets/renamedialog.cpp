@@ -258,3 +258,8 @@ QString RenameDialog::geteElidedText(QFont font, QString str, int MaxWidth)
     }
     return str;
 }
+
+void RenameDialog::slotsUpdate()
+{
+    setCurrentTip();
+}

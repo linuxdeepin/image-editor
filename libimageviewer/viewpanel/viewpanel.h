@@ -22,6 +22,7 @@
 #define VIEWPANEL_H
 
 #include <QFrame>
+#include <QFileSystemWatcher>
 
 #include <DStackedWidget>
 #include <DAnchors>
@@ -137,6 +138,9 @@ private slots:
 
     //图片显示超过标题栏
     void slotsImageOutTitleBar(bool bRet);
+
+    //文件改变
+    void slotsDirectoryChanged(const QString &path);
 public slots:
     //刷新底部工具栏大小与位置
     void resetBottomToolbarGeometry(bool visible);
@@ -238,5 +242,7 @@ private:
 
     //图片是否超过标题栏
     bool m_ImageOutTitleBar = false;
+
+    QFileSystemWatcher *m_dirWatcher = nullptr;
 };
 #endif  // VIEWPANEL_H

@@ -45,6 +45,8 @@ public:
 
     void setCurrentTip();
     QString geteElidedText(QFont font, QString str, int MaxWidth);
+public:
+    void slotsUpdate();
 protected:
     void paintEvent(QPaintEvent *event);
 private:
