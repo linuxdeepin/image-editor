@@ -292,7 +292,6 @@ void LibSlideShowPanel::showFullScreen()
 void LibSlideShowPanel::startSlideShow(const ViewInfo &vinfo)
 {
     if (vinfo.paths.isEmpty()) {
-        qDebug() << "Start SlideShow failed! Paths is empty!";
         return;
     }
     m_vinfo = vinfo;
@@ -315,6 +314,9 @@ void LibSlideShowPanel::startSlideShow(const ViewInfo &vinfo)
 //        emit dApp->signalM->updatePauseButton();
     }
     int number = QApplication::desktop()->screenNumber(this);
+    if (number < 0) {
+        number = 0;
+    }
     int nParentWidth = QGuiApplication::screens().at(number)->geometry().width();
     int nParentHeight = QGuiApplication::screens().at(number)->geometry().height();
     slideshowbottombar->move((nParentWidth - slideshowbottombar->width()) / 2, nParentHeight);
@@ -412,7 +414,9 @@ void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
         QPoint pos = mapFromGlobal(QCursor::pos());
         // 处理程序界面的初始高度和全屏下幻灯片界面不一致导致底部工具栏位置错误
         int number = QApplication::desktop()->screenNumber(this);
-
+        if (number < 0) {
+            number = 0;
+        }
         if (QGuiApplication::screens().at(number)->geometry().size().height() != height())
             return;
         if (height() - 20 < pos.y() && height() >= pos.y() && height() >= slideshowbottombar->y()) {

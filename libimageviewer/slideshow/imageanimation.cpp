@@ -625,6 +625,9 @@ void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
     QPixmap p1 = QPixmap::fromImage(tImg);
     int beginX = 0, beginY = 0;
     int number = QApplication::desktop()->screenNumber(q_ptr);
+    if (number < 0) {
+        number = 0;
+    }
     // 多屏显示问题，定位当前屏幕
     if (p1.width() >= p1.height()) {
         m_pixmap1 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
@@ -672,6 +675,9 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     // 双屏下或者多屏下
 //    int screenId = QApplication::desktop()->screenNumber(q_ptr);
     int number = QApplication::desktop()->screenNumber(q_ptr);
+    if (number < 0) {
+        number = 0;
+    }
     if (p2.width() >= p2.height()) {
         m_pixmap2 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
         QPainter pa2(&m_pixmap2);

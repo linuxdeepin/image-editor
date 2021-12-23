@@ -1109,7 +1109,6 @@ void LibViewPanel::slotBottomMove()
             } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
                         nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
                        || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)) {
-                qDebug() << "1095";
 
                 //隐藏
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
