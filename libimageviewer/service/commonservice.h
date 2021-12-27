@@ -25,7 +25,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QMap>
-
+#include <QMutex>
 #include "image-viewer_global.h"
 
 class LibCommonService : public QObject
@@ -58,7 +58,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 private:
     static LibCommonService *m_commonService;
-
+    QMutex m_mutex;
     imageViewerSpace::ImgViewerType m_imgViewerType = imageViewerSpace::ImgViewerTypeNull;
     QString       m_imgSavePath;
     QMap<QString, imageViewerSpace::ItemInfo> m_allInfoMap;//图片所有信息map

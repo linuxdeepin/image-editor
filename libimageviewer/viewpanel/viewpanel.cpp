@@ -385,8 +385,11 @@ void LibViewPanel::updateMenuContent(QString path)
             currentPath = m_currentPath;
         }
         QFileInfo info(currentPath);
-        bool isReadable = info.isReadable();//是否可读
-        bool isWritable = info.isWritable();//是否可写
+
+        bool isReadable = info.isReadable() ; //是否可读
+        qDebug() << QFileInfo(info.dir(), info.dir().path()).isWritable();
+        //判断文件是否可写和文件目录是否可写
+        bool isWritable = info.isWritable() && QFileInfo(info.dir(), info.dir().path()).isWritable(); //是否可写
 //        bool isFile = info.isFile(); //是否存在
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
@@ -967,9 +970,9 @@ void LibViewPanel::slotsDirectoryChanged(const QString &path)
     if (m_view) {
         if (QFileInfo(m_currentPath).isReadable() && m_stack->currentWidget() != m_view) {
             m_view->onIsChangedTimerTimeout();
-        } else if (!QFileInfo(m_currentPath).isReadable()) {
-            updateMenuContent();
         }
+        //所有情况都需要刷新
+        updateMenuContent();
     }
 }
 
@@ -1076,7 +1079,7 @@ void LibViewPanel::slotBottomMove()
 
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)) {
+            if (m_stack->currentWidget() != m_sliderPanel && (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2))) {
 
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
                 m_bottomAnimation->setDuration(200);
@@ -1108,7 +1111,8 @@ void LibViewPanel::slotBottomMove()
                 m_topBarAnimation->start();
             } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
                         nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
-                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)) {
+                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)
+                       || m_stack->currentWidget() == m_sliderPanel) {
 
                 //隐藏
                 m_bottomAnimation = new QPropertyAnimation(m_bottomToolbar, "pos", this);
@@ -1687,6 +1691,8 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
     }
     m_sliderPanel->startSlideShow(info);
     m_stack->setCurrentWidget(m_sliderPanel);
+    //打开幻灯片需要隐藏工具栏
+    slotBottomMove();
     //正在滑动缩略图的时候不再显示
     if (m_nav->isVisible()) {
         m_nav->setVisible(false);
