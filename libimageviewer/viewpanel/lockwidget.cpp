@@ -187,6 +187,12 @@ void LockWidget::pinchTriggered(QPinchGesture *gesture)
 
 void LockWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 {
+    ThemeWidget::onThemeChanged(theme);
+    update();
+}
+
+LockWidget::~LockWidget()
+{
     if (m_bgLabel) {
         m_bgLabel->deleteLater();
         m_bgLabel = nullptr;
@@ -195,13 +201,7 @@ void LockWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
         m_lockTips->deleteLater();
         m_lockTips = nullptr;
     }
-    ThemeWidget::onThemeChanged(theme);
-    update();
 }
-
-
-
-LockWidget::~LockWidget() {}
 
 void LockWidget::wheelEvent(QWheelEvent *event)
 {
