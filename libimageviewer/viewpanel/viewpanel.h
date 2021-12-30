@@ -22,6 +22,7 @@
 #define VIEWPANEL_H
 
 #include <QFrame>
+#include <QFileSystemWatcher>
 
 #include <DStackedWidget>
 #include <DAnchors>
@@ -134,6 +135,10 @@ private slots:
 
     //设置当前图片应该的界面
     void setCurrentWidget(const QString &path);
+
+    //文件改变
+    void slotsDirectoryChanged(const QString &path);
+
 public slots:
     //刷新底部工具栏大小与位置
     void resetBottomToolbarGeometry(bool visible);
@@ -224,5 +229,7 @@ private:
     QString m_CurrentCustomName = "";
 
     int m_hideCursorTid{0};//隐藏时间
+
+    QFileSystemWatcher *m_dirWatcher = nullptr;
 };
 #endif  // VIEWPANEL_H

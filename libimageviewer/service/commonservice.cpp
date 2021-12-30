@@ -23,6 +23,7 @@
 #include <QImage>
 #include <QCoreApplication>
 #include <QMouseEvent>
+#include <QMutexLocker>
 
 #include "imageengine.h"
 
@@ -58,7 +59,9 @@ QString LibCommonService::getImgSavePath()
 
 imageViewerSpace::ItemInfo LibCommonService::getImgInfoByPath(QString path)
 {
-    return m_allInfoMap[path];
+    QMutexLocker locker(&m_mutex);
+    QMap<QString, imageViewerSpace::ItemInfo> m_tempInfoMap = m_allInfoMap;
+    return m_tempInfoMap[path];
 }
 
 /*void CommonService::setImgInfoByPat(QString path, imageViewerSpace::ItemInfo itemInfo)
@@ -68,6 +71,7 @@ imageViewerSpace::ItemInfo LibCommonService::getImgInfoByPath(QString path)
 
 void LibCommonService::reName(const QString &oldPath, const QString &newPath)
 {
+    QMutexLocker locker(&m_mutex);
     imageViewerSpace::ItemInfo info = m_allInfoMap[oldPath];
     info.path = newPath;
     m_allInfoMap[newPath] = info;
@@ -77,6 +81,7 @@ void LibCommonService::reName(const QString &oldPath, const QString &newPath)
 
 void LibCommonService::slotSetImgInfoByPath(QString path, imageViewerSpace::ItemInfo itemInfo)
 {
+    QMutexLocker locker(&m_mutex);
     m_allInfoMap[path] = itemInfo;
     emit ImageEngine::instance()->sigOneImgReady(path, itemInfo);
 }

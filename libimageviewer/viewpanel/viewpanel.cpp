@@ -136,6 +136,9 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     emit ImageEngine::instance()->sigUpdateCollectBtn();
     //重置底部工具栏位置与大小
     resetBottomToolbarGeometry(true);
+
+    m_dirWatcher->removePaths(m_dirWatcher->directories());
+    m_dirWatcher->addPath(QFileInfo(path).dir().path());
 }
 
 void LibViewPanel::initConnect()
@@ -209,6 +212,9 @@ void LibViewPanel::initConnect()
     //上一页，下一页信号连接
     connect(m_view, &LibImageGraphicsView::previousRequested, this, &LibViewPanel::showPrevious);
     connect(m_view, &LibImageGraphicsView::nextRequested, this, &LibViewPanel::showNext);
+
+    m_dirWatcher = new  QFileSystemWatcher(this);
+    connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, this, &LibViewPanel::slotsDirectoryChanged);
 }
 
 void LibViewPanel::initTopBar()
@@ -375,8 +381,10 @@ void LibViewPanel::updateMenuContent(QString path)
             currentPath = m_currentPath;
         }
         QFileInfo info(currentPath);
-        bool isReadable = info.isReadable();//是否可读
-        bool isWritable = info.isWritable();//是否可写
+        bool isReadable = info.isReadable() ; //是否可读
+        qDebug() << QFileInfo(info.dir(), info.dir().path()).isWritable();
+        //判断文件是否可写和文件目录是否可写
+        bool isWritable = info.isWritable() && QFileInfo(info.dir(), info.dir().path()).isWritable(); //是否可写
 //        bool isFile = info.isFile(); //是否存在
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
@@ -916,6 +924,17 @@ void LibViewPanel::setCurrentWidget(const QString &path)
     }
 }
 
+void LibViewPanel::slotsDirectoryChanged(const QString &path)
+{
+    Q_UNUSED(path);
+    if (m_view) {
+        if (QFileInfo(m_currentPath).isReadable() && m_stack->currentWidget() != m_view) {
+            m_view->onIsChangedTimerTimeout();
+        }
+        updateMenuContent();
+    }
+}
+
 void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
 {
     if (m_bottomToolbar) {
@@ -1335,6 +1354,10 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             QString oldPath = m_bottomToolbar->getCurrentItemInfo().path;
             RenameDialog *renamedlg =  new RenameDialog(oldPath, this);
 
+            QRect rect = this->geometry();
+            QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
+            renamedlg->move(globalPos.x() + rect.width() / 2 - renamedlg->width() / 2, globalPos.y() + rect.height() / 2 - renamedlg->height() / 2);
+
             //打开重命名窗口时关闭定时器
             killTimer(m_hideCursorTid);
             m_hideCursorTid = 0;
@@ -1447,6 +1470,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             }
             m_info->setImagePath(path);
             m_extensionPanel->setContent(m_info);
+            //清除焦点
+            m_extensionPanel->setFocus(Qt::NoFocusReason);
             m_extensionPanel->show();
             if (this->window()->isFullScreen() || this->window()->isMaximized()) {
                 m_extensionPanel->move(this->window()->width() - m_extensionPanel->width() - 24,
@@ -1522,6 +1547,8 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
     }
     m_sliderPanel->startSlideShow(info);
     m_stack->setCurrentWidget(m_sliderPanel);
+    //打开幻灯片需要隐藏工具栏
+    slotBottomMove();
     //正在滑动缩略图的时候不再显示
     if (m_nav->isVisible()) {
         m_nav->setVisible(false);
