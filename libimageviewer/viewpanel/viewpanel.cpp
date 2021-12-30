@@ -116,6 +116,14 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
 LibViewPanel::~LibViewPanel()
 {
+    if (m_bottomToolbar) {
+        m_bottomToolbar->deleteLater();
+        m_bottomToolbar = nullptr;
+    }
+    if (m_topToolbar) {
+        m_topToolbar->deleteLater();
+        m_topToolbar = nullptr;
+    }
 }
 
 void LibViewPanel::loadImage(const QString &path, QStringList paths)
@@ -253,9 +261,9 @@ void LibViewPanel::initScaleLabel()
     DAnchors<DFloatingWidget> scalePerc = new DFloatingWidget(this);
     scalePerc->setBlurBackgroundEnabled(true);
 
-    QHBoxLayout *layout = new QHBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout(scalePerc);
     scalePerc->setLayout(layout);
-    DLabel *label = new DLabel();
+    DLabel *label = new DLabel(this);
     layout->addWidget(label);
     scalePerc->setAttribute(Qt::WA_TransparentForMouseEvents);
     scalePerc.setAnchor(Qt::AnchorHorizontalCenter, this, Qt::AnchorHorizontalCenter);

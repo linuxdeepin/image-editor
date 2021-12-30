@@ -115,7 +115,8 @@ TEST_F(gtestview, LibViewPanel1)
 }
 TEST_F(gtestview, LibViewPanel_ocr)
 {
-    LibViewPanel *panel = new LibViewPanel();
+    QWidget *widget = new QWidget();
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
     panel->loadImage(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                        QApplication::applicationDirPath() + "/tif.tif",
                                                                        QApplication::applicationDirPath() + "/jpg.jpg",
@@ -126,6 +127,8 @@ TEST_F(gtestview, LibViewPanel_ocr)
     panel->slotOcrPicture();
     panel->deleteLater();
     panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
 
     EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/gif.gif").isFile());
 }
@@ -139,16 +142,25 @@ TEST_F(gtestview, LibViewPanel_startChooseFileDialog1)
     panel->resetBottomToolbarGeometry(true);
     panel->resetBottomToolbarGeometry(false);
     panel->slotRotateImage(90);
-    QTest::qWait(3000);
+    QTest::qWait(1000);
     panel->slotRotateImage(-90);
-    QTest::qWait(3000);
+    QTest::qWait(1000);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
 }
 TEST_F(gtestview, LibViewPanel_Menu)
 {
 //    //键盘与鼠标事件
 //    QTestEventList e;
 
-    LibViewPanel *panel = new LibViewPanel();
+
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+
     panel->loadImage(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                        QApplication::applicationDirPath() + "/tif.tif",
                                                                        QApplication::applicationDirPath() + "/jpg.jpg",
@@ -241,6 +253,11 @@ TEST_F(gtestview, LibViewPanel_Menu)
     panel->m_view->setImage(QApplication::applicationDirPath() + "/svg2.svg", QImage());
 
     QTest::qWait(1000);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
 
 }
 

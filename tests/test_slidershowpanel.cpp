@@ -93,6 +93,9 @@ TEST_F(gtestview, slider_test)
 
     panel->deleteLater();
     panel = nullptr;
+
+    widgetParent->deleteLater();
+    widgetParent = nullptr;
 }
 TEST_F(gtestview, SlideShowBottomBar_test)
 {
