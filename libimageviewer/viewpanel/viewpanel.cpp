@@ -754,6 +754,7 @@ void LibViewPanel::setWallpaper(const QImage &img)
             }
         }
     });
+    connect(th1, &QThread::finished, th1, &QObject::deleteLater);
     th1->start();
 }
 
@@ -807,6 +808,7 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
             }
         }
     });
+    connect(th1, &QThread::finished, th1, &QObject::deleteLater);
     th1->start();
 }
 

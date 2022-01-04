@@ -92,8 +92,8 @@ DCORE_USE_NAMESPACE
     int main(int argc, char *argv[]) \
     { \
         testing::InitGoogleTest(&argc,argv); \
-        DApplication a(argc, argv); \
-        a.setAttribute(Qt::AA_Use96Dpi, true); \
+        DApplication *a = new DApplication(argc, argv); \
+        a->setAttribute(Qt::AA_Use96Dpi, true); \
         QTEST_DISABLE_KEYPAD_NAVIGATION \
         QTEST_ADD_GPU_BLACKLIST_SUPPORT \
         TestObject tc; \
