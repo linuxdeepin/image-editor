@@ -125,6 +125,15 @@ public:
     //获得当前展示图片路径
     QString getCurrentPath();
 
+    //show
+    void showTopBottom();
+
+    void showAnimationTopBottom();
+
+    //hide
+    void hideTopBottom();
+
+    void hideAnimationTopBottom();
 
 
 private slots:
@@ -165,6 +174,8 @@ public slots:
     //刷新底部工具栏在全屏的隐藏与否
     void slotBottomMove();
 
+    void noAnimationBottomMove();
+
     //下一张图片
     void showNext();
 
@@ -177,6 +188,8 @@ public slots:
     //缩略图打开界面是否是从自定义界面打开
     void setIsCustomAlbum(bool isCustom, const QString &album = "");
     void setIsCustomAlbumWithUID(bool isCustom, const QString &album = "", int UID = -1);
+
+    void slotChangeShowTopBottom();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
@@ -244,5 +257,7 @@ private:
     bool m_ImageOutTitleBar = false;
 
     QFileSystemWatcher *m_dirWatcher = nullptr;
+
+    bool m_isShowTopBottom = true;
 };
 #endif  // VIEWPANEL_H

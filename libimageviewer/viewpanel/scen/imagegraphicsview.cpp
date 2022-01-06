@@ -950,9 +950,14 @@ void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
         const QRect &r = visibleImageRect();
         //double left=r.width()+r.x();
         const QRectF &sr = sceneRect();
+        int xpos = e->pos().x() - m_startpointx;
+        qDebug()<<r.width();
+        qDebug()<<r.height();
+        qDebug()<<sr.width();
+        qDebug()<<sr.height();
         //fix 42660 2020/08/14 单指时间在QEvent处理，双指手势通过手势处理。为了解决图片放大后单指滑动手势冲突的问题
-        if ((r.width() >= sr.width() && r.height() >= sr.height())) {
-            int xpos = e->pos().x() - m_startpointx;
+        if ((r.width() >= (sr.width()-1) && r.height() >= (sr.height()-1))) {
+
             if (abs(xpos) > 200 && m_startpointx != 0) {
                 if (xpos > 0) {
                     emit previousRequested();
@@ -960,6 +965,10 @@ void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
                     emit nextRequested();
                 }
             }
+        }
+        if ((QDateTime::currentMSecsSinceEpoch() - m_clickTime) < 200 && abs(xpos) < 50) {
+            m_clickTime = QDateTime::currentMSecsSinceEpoch();
+            emit sigClicked();
         }
     }
     m_startpointx = 0;
@@ -984,6 +993,7 @@ void LibImageGraphicsView::mousePressEvent(QMouseEvent *e)
 #ifndef tablet_PC
     emit clicked();
 #endif
+    m_clickTime = QDateTime::currentMSecsSinceEpoch();
     m_startpointx = e->pos().x();
 }
 

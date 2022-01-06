@@ -150,6 +150,9 @@ signals:
     //手势旋转
     void gestureRotate(int endValue);
 
+    //单击按键
+    void sigClicked();
+
 public slots:
 //    void setHighQualityAntialiasing(bool highQualityAntialiasing);
 
@@ -265,6 +268,9 @@ private:
     //加载旋转
     DSpinner *m_spinner{nullptr};
     int TITLEBAR_HEIGHT = 50;
+
+    //单击时间
+    qint64 m_clickTime{0};
 };
 
 #endif // IMAGEVIEW_H
