@@ -356,6 +356,7 @@ TEST_F(gtestview, LibBottomToolbar)
     e.addDelay(500);
     e.simulate(toolBar.m_imgListWidget);
 
+    toolBar.setPictureDoBtnClicked(true);
     bool bRet = false;
     if (toolBar.getAllPath().count() > 0) {
         bRet = true;

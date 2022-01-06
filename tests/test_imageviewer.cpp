@@ -77,6 +77,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeNext)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -96,6 +97,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeBack)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -115,6 +117,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypePre)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -134,6 +137,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeAdaptImage)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -153,6 +157,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeAdaptScreen)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -172,6 +177,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeCollection)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -191,6 +197,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeOcr)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -210,6 +217,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeRotateLeft)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -229,6 +237,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeRotateRight)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
@@ -248,6 +257,7 @@ TEST_F(gtestview, imageviewer_getBottomtoolbarButton_ButtonTypeTrash)
 
     bool bRet = false;
     if (iconButton) {
+        iconButton->click();
         bRet = true;
     }
     EXPECT_EQ(true, bRet);
