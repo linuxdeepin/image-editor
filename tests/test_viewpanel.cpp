@@ -29,18 +29,6 @@
 #include "viewpanel/viewpanel.h"
 
 
-TEST_F(gtestview, cp2Image)
-{
-    for (int i = 0; i < 200; i++) {
-        QFile::copy(":/jpg.jpg", QApplication::applicationDirPath() + "/test/jpg" + QString::number(i) + ".jpg");
-        QFile(QApplication::applicationDirPath() + "/test/jpg" + QString::number(i) + ".jpg").setPermissions(\
-                                                                                                             QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
-                                                                                                             QFile::ReadOther | QFile::ReadGroup | QFile::WriteGroup);
-        EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/test/jpg" + QString::number(i) + ".jpg").isFile());
-    }
-
-}
-
 //view panel
 TEST_F(gtestview, LibViewPanel)
 {
@@ -151,6 +139,98 @@ TEST_F(gtestview, LibViewPanel_startChooseFileDialog1)
     widget->deleteLater();
     widget = nullptr;
 }
+
+TEST_F(gtestview, LibViewPanel_noAnimationBottomMove)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->noAnimationBottomMove();
+    QTest::qWait(500);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_slotBottomMove)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->slotBottomMove();
+    QTest::qWait(500);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_showTopBottom)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->showTopBottom();
+    QTest::qWait(100);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_showAnimationTopBottom)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->showAnimationTopBottom();
+    QTest::qWait(100);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+
+TEST_F(gtestview, LibViewPanel_hideTopBottom)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->hideTopBottom();
+    QTest::qWait(100);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_hideAnimationTopBottom)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+//    panel->backImageView(QApplication::applicationDirPath() + "/svg.svg");
+    panel->hideAnimationTopBottom();
+    QTest::qWait(100);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
 TEST_F(gtestview, LibViewPanel_Menu)
 {
 //    //键盘与鼠标事件
