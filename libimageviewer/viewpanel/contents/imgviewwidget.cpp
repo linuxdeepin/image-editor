@@ -307,12 +307,12 @@ void MyImageListWidget::animationFinished()
 
 void MyImageListWidget::animationValueChanged(const QVariant value)
 {
-    Q_UNUSED(value)
     if (m_resetAnimation->property("type") != "500") {
         return;
     }
     //惯性滑动
     thumbnailIsMoving();
+    Q_UNUSED(value)
 }
 
 void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
@@ -423,11 +423,11 @@ void MyImageListWidget::moveCenterWidget()
 
 void MyImageListWidget::onScrollBarValueChanged(int value)
 {
-    Q_UNUSED(value);
     QModelIndex index = m_listview->indexAt(QPoint((m_listview->width() - 15), 10));
     if (!index.isValid()) {
         index = m_listview->indexAt(QPoint((m_listview->width() - 20), 10));
     }
+     Q_UNUSED(value);
 }
 
 void MyImageListWidget::openNext()
@@ -453,11 +453,11 @@ void MyImageListWidget::onClicked(const QModelIndex &index)
 
 void MyImageListWidget::ONselectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    Q_UNUSED(deselected);
     qDebug() << "---ONselectionChanged------";
     if (!selected.indexes().isEmpty()) {
         m_listview->onClicked(selected.indexes().first());
         animationStart(true, 0, 400);
     }
+    Q_UNUSED(deselected);
 
 }

@@ -26,6 +26,7 @@
 #include "service/imagedataservice.h"
 #include "viewpanel/navigationwidget.h"
 #define  private public
+#define protected public
 #include "viewpanel/viewpanel.h"
 
 
@@ -169,6 +170,92 @@ TEST_F(gtestview, LibViewPanel_slotBottomMove)
     widget->deleteLater();
     widget = nullptr;
 }
+
+TEST_F(gtestview, LibViewPanel_setWallPaper_image)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+    QImage img(QApplication::applicationDirPath() + "/svg.svg");
+    panel->setWallpaper(img);
+    QTest::qWait(500);
+    QImage img1(QApplication::applicationDirPath() + "/test/jpg100.jpg");
+    panel->setWallpaper(img1);
+    QTest::qWait(500);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_setWallPaper_path)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+    panel->setWallpaper(QApplication::applicationDirPath() + "/svg.svg");
+    QTest::qWait(500);
+    panel->setWallpaper(QApplication::applicationDirPath() + "/test/jpg100.jpg");
+    QTest::qWait(500);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_mimeDataDrag)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+    QMimeData mimedata;
+    QList<QUrl> li;
+    li.append(QUrl(QApplication::applicationDirPath() + "/test/jpg.jpg"));
+    mimedata.setUrls(li);
+    panel->resize(800,600);
+
+    auto dropPos = panel->rect().center();
+    QDragEnterEvent eEnter(dropPos, Qt::IgnoreAction, &mimedata, Qt::LeftButton, Qt::NoModifier);
+    panel->dragEnterEvent(&eEnter);
+
+    QDragMoveEvent emove(dropPos + QPoint(10, 10), Qt::IgnoreAction, &mimedata, Qt::LeftButton, Qt::NoModifier);
+    panel->dragMoveEvent(&emove);
+
+//    QDropEvent e(dropPos, Qt::IgnoreAction, &mimedata, Qt::LeftButton, Qt::NoModifier);
+//    panel->dropEvent(&e);
+
+    QTest::qWait(3000);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
+TEST_F(gtestview, LibViewPanel_leaveEvent)
+{
+    QWidget *widget = new QWidget();
+    //初始化
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
+    QMimeData mimedata;
+    QList<QUrl> li;
+    li.append(QUrl(QApplication::applicationDirPath() + "/test/jpg.jpg"));
+    mimedata.setUrls(li);
+    panel->resize(800,600);
+
+    QEvent event(QEvent::Leave);
+    panel->leaveEvent(&event);
+
+    QTest::qWait(100);
+
+    panel->deleteLater();
+    panel = nullptr;
+    widget->deleteLater();
+    widget = nullptr;
+}
+
 
 TEST_F(gtestview, LibViewPanel_showTopBottom)
 {
