@@ -924,7 +924,7 @@ void LibImageGraphicsView::slotRotatePixCurrent()
                 emit ImageEngine::instance()->sigRotatePic(m_path);
             }
 
-            QTimer::singleShot(1000, [ = ] {
+            QTimer::singleShot(1000, this,[ = ] {
                 connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             });
             m_rotateAngel = 0;

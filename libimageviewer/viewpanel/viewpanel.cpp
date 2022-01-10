@@ -746,10 +746,10 @@ void LibViewPanel::setWallpaper(const QImage &img)
                         qWarning() << "SettingWallpaper failed" << interface.lastError();
                     }
                 }
-                // Remove the tmp file
-                QTimer::singleShot(5000, [ = ] {
-                    QFile(path).remove();
-                });
+//                // Remove the tmp file
+//                QTimer::singleShot(1000,this, [ = ] {
+//                    QFile(path).remove();
+//                });
 
 
             }
@@ -862,7 +862,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         //展示当前图片
         loadImage(loadingPath, image_list);
 
-        QTimer::singleShot(500, [ = ] {
+        QTimer::singleShot(500, this,[ = ] {
             //看图制作全部缩略图
             ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
         });
