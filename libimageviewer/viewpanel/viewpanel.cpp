@@ -862,7 +862,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         //展示当前图片
         loadImage(loadingPath, image_list);
 
-        QTimer::singleShot(500, this,[ = ] {
+        QTimer::singleShot(500, this, [ = ] {
             //看图制作全部缩略图
             ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
         });
@@ -1884,9 +1884,10 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
     }
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     resetBottomToolbarGeometry(true);
-    noAnimationBottomMove();
     QFrame::resizeEvent(e);
     emit m_view->transformChanged();
+
+    slotBottomMove();
 }
 
 void LibViewPanel::showEvent(QShowEvent *e)
