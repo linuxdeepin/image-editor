@@ -29,7 +29,7 @@
 #include <QTime>
 #include <QtMath>
 #include <QMovie>
-#include <QMatrix>
+#include <QTransform>
 #include <QPainter>
 #include <QSvgGenerator>
 #include <QImageReader>
@@ -954,7 +954,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImage(int angel, QImage &image)
     }
     QImage image_copy(image);
     if (!image_copy.isNull()) {
-        QMatrix rotatematrix;
+        QTransform rotatematrix;
         rotatematrix.rotate(angel);
         image = image_copy.transformed(rotatematrix, Qt::SmoothTransformation);
         return true;
@@ -1002,7 +1002,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
     } else if (union_image_private.m_qtrotate.contains(format)) {
         QPixmap image_copy(path);
         if (!image_copy.isNull()) {
-            QMatrix rotatematrix;
+            QTransform rotatematrix;
             rotatematrix.rotate(angel);
             image_copy = image_copy.transformed(rotatematrix, Qt::SmoothTransformation);
             if (image_copy.save(path, format.toLatin1().data(), SAVE_QUAITY_VALUE))

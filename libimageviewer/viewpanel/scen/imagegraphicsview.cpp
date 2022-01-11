@@ -881,7 +881,7 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
 {
     if (!m_pixmapItem) return false;
     QPixmap pixmap = m_pixmapItem->pixmap();
-    QMatrix rotate;
+    QTransform rotate;
     rotate.rotate(nAngel);
 
     pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
@@ -924,7 +924,7 @@ void LibImageGraphicsView::slotRotatePixCurrent()
                 emit ImageEngine::instance()->sigRotatePic(m_path);
             }
 
-            QTimer::singleShot(1000, this,[ = ] {
+            QTimer::singleShot(1000, this, [ = ] {
                 connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             });
             m_rotateAngel = 0;
@@ -951,12 +951,12 @@ void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
         //double left=r.width()+r.x();
         const QRectF &sr = sceneRect();
         int xpos = e->pos().x() - m_startpointx;
-        qDebug()<<r.width();
-        qDebug()<<r.height();
-        qDebug()<<sr.width();
-        qDebug()<<sr.height();
+        qDebug() << r.width();
+        qDebug() << r.height();
+        qDebug() << sr.width();
+        qDebug() << sr.height();
         //fix 42660 2020/08/14 单指时间在QEvent处理，双指手势通过手势处理。为了解决图片放大后单指滑动手势冲突的问题
-        if ((r.width() >= (sr.width()-1) && r.height() >= (sr.height()-1))) {
+        if ((r.width() >= (sr.width() - 1) && r.height() >= (sr.height() - 1))) {
 
             if (abs(xpos) > 200 && m_startpointx != 0) {
                 if (xpos > 0) {
@@ -1147,7 +1147,7 @@ void LibImageGraphicsView::onCacheFinish()
                 pixmap = tmpPixmap;
             }
             if (m_newImageRotateAngle != 0) {
-                QMatrix rotate;
+                QTransform rotate;
                 rotate.rotate(m_newImageRotateAngle);
                 pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
                 m_newImageRotateAngle = 0;
@@ -1327,7 +1327,7 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
     //QStranform旋转到180度有问题，暂未解决，因此动画结束后旋转Pixmap到180
     QPixmap pixmap;
     pixmap = m_pixmapItem->pixmap();
-    QMatrix rotate;
+    QTransform rotate;
     rotate.rotate(m_endvalue);
 
     pixmap = pixmap.transformed(rotate, Qt::FastTransformation);
