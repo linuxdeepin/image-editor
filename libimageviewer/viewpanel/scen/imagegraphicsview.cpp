@@ -1353,6 +1353,8 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
         }
     }
     qDebug() << m_endvalue;
+    //结束需要更改标题栏状态
+    titleBarControl();
 }
 
 void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
