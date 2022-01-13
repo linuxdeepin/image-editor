@@ -104,6 +104,9 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 
     });
     connect(m_lineedt, &DLineEdit::textEdited, this, [ = ](const QString & arg) {
+        if (arg.isEmpty()) {
+            return;
+        }
         if (arg.at(0) == " ") {
             QString str = arg;
             str = str.right(str.size() - 1);
@@ -205,7 +208,7 @@ void RenameDialog::setCurrentTip()
     QFont font;
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
 //    int widthString = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
-    int heightString = Libutils::base::stringHeight(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString) + 12;
+    int heightString = Libutils::base::stringHeight(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString) + 10;
 
     double lineCount = double (m_labTips->height()) / double(currentSize);
 

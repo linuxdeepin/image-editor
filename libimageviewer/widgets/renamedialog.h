@@ -62,6 +62,7 @@ private:
     DLabel *m_labTips{nullptr};
 
     int m_currentFontSize = 0;
+    QSpacerItem *m_verticalSpacer;
 };
 
 #endif // RENAMEDIALOG_H
