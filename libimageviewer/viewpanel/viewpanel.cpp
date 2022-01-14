@@ -1887,7 +1887,10 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
     QFrame::resizeEvent(e);
     emit m_view->transformChanged();
 
-    slotBottomMove();
+    //不需要动画滑动
+    noAnimationBottomMove();
+
+
 }
 
 void LibViewPanel::showEvent(QShowEvent *e)
