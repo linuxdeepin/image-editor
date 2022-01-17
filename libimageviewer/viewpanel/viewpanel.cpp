@@ -677,6 +677,8 @@ void LibViewPanel::showNormal()
     connect(pAn, &QPropertyAnimation::destroyed, this, [ = ] {
         m_bottomToolbar->move((width() - m_bottomToolbar->width()) / 2, height() - m_bottomToolbar->height() - 10);
         m_bottomToolbar->update();
+        //结束时候应该判断一次滑动
+        noAnimationBottomMove();
     });
 }
 
