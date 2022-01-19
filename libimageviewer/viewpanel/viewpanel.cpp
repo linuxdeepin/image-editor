@@ -544,7 +544,7 @@ void LibViewPanel::updateMenuContent(QString path)
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                isWritable && isReadable)) {
+                isWritable && isReadable) || (isAlbum && isWritable)) {
             if (isAlbum) {
                 appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
             } else {
