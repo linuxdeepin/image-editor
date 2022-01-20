@@ -186,6 +186,8 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
     void timerEvent(QTimerEvent *e) Q_DECL_OVERRIDE;//
+
+    void hideEvent(QHideEvent *e) override;
 signals:
     void imageChanged(const QString &path);
 

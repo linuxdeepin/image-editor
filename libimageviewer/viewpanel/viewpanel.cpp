@@ -1734,3 +1734,13 @@ void LibViewPanel::timerEvent(QTimerEvent *e)
 
     QFrame::timerEvent(e);
 }
+
+void LibViewPanel::hideEvent(QHideEvent *e)
+{
+    if (m_info && m_extensionPanel) {
+        m_info->setVisible(false);
+        m_extensionPanel->setVisible(false);
+    }
+
+    QFrame::hideEvent(e);
+}
