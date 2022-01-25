@@ -673,7 +673,6 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     LibUnionImage_NameSpace::loadStaticImageFromFile(imageName2_bar, tImg, errMsg);
     QPixmap p2 = QPixmap::fromImage(tImg);
     // 双屏下或者多屏下
-//    int screenId = QApplication::desktop()->screenNumber(q_ptr);
     int number = QApplication::desktop()->screenNumber(q_ptr);
     if (number < 0) {
         number = 0;
