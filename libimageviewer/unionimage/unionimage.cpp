@@ -335,15 +335,18 @@ UNIONIMAGESHARED_EXPORT QDateTime string2DateTime(const QString &time)
 UNIONIMAGESHARED_EXPORT QMap<QString, QString> getMetaData(FREE_IMAGE_MDMODEL model, FIBITMAP *dib)
 {
     QMap<QString, QString> mdMap;  // key-data
-    FITAG *tag = nullptr;
-    FIMETADATA *mdhandle = nullptr;
-    mdhandle = FreeImage_FindFirstMetadata(model, dib, &tag);
-    if (mdhandle) {
-        do {
-            mdMap.insert(FreeImage_GetTagKey(tag),
-                         FreeImage_TagToString(model, tag));
-        } while (FreeImage_FindNextMetadata(mdhandle, &tag));
-        FreeImage_FindCloseMetadata(mdhandle);
+
+    if (FreeImage_GetMetadataCount(model, dib) > 0) {
+        FITAG *tag = nullptr;
+        FIMETADATA *mdhandle = nullptr;
+        mdhandle = FreeImage_FindFirstMetadata(model, dib, &tag);
+        if (mdhandle) {
+            do {
+                mdMap.insert(FreeImage_GetTagKey(tag),
+                             FreeImage_TagToString(model, tag));
+            } while (FreeImage_FindNextMetadata(mdhandle, &tag));
+            FreeImage_FindCloseMetadata(mdhandle);
+        }
     }
     return mdMap;
 }
