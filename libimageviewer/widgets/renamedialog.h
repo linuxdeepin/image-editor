@@ -51,6 +51,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 private:
     QVBoxLayout *m_vlayout;
+    QVBoxLayout *m_labvlayout;
     QHBoxLayout *m_hlayout;
     QHBoxLayout *m_edtlayout;
     DLabel *m_labformat;

@@ -44,6 +44,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     DWidget *widet = new DWidget(this);
     addContent(widet);
     m_vlayout = new QVBoxLayout(widet);
+    m_labvlayout = new QVBoxLayout();
     m_hlayout = new QHBoxLayout();
     m_edtlayout = new QHBoxLayout();
     m_lineedt = new DLineEdit(widet);
@@ -51,6 +52,8 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     QLbtoDLabel *labtitle = new QLbtoDLabel();
     okbtn = new DSuggestButton(tr("Confirm"), widet);
     cancelbtn = new DPushButton(tr("Cancel"), widet);
+    okbtn->setFixedHeight(35);
+    cancelbtn->setFixedHeight(35);
     m_labformat = new DLabel(widet);
     m_vlayout->setContentsMargins(2, 0, 2, 1);
 //    okbtn->setText();
@@ -61,13 +64,19 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_hlayout->addWidget(line);
     m_hlayout->addWidget(okbtn);
     labtitle->setText(tr("Input a new name"));
+    labtitle->setFixedHeight(40);
     labtitle->setAlignment(Qt::AlignCenter);
-    m_vlayout->addWidget(labtitle);
-    m_vlayout->addStretch();
+    m_labvlayout->addWidget(labtitle);
+//    m_vlayout->addWidget(labtitle);
+//    m_vlayout->addStretch();
+
     m_edtlayout->addWidget(m_lineedt);
+    m_lineedt->setFixedHeight(35);
     m_labformat->setEnabled(false);
     m_edtlayout->addWidget(m_labformat);
-    m_vlayout->addLayout(m_edtlayout);
+    m_labformat->setFixedHeight(35);
+    m_labvlayout->addLayout(m_edtlayout);
+    m_vlayout->addLayout(m_labvlayout);
     m_vlayout->addStretch();
 
     m_labTips = new DLabel();
@@ -78,6 +87,10 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_vlayout->addWidget(m_labTips);
 
     m_vlayout->addLayout(m_hlayout);
+//    m_vlayout->setStretch(0, 5);
+//    m_vlayout->setStretch(1, 1);
+//    m_vlayout->setStretch(2, 1);
+//    m_vlayout->setStretch(3, 1);
     widet->setLayout(m_vlayout);
 //    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
     InitDlg();
@@ -197,11 +210,11 @@ void RenameDialog::setCurrentTip()
     } else if (m_lineedt->text().isEmpty()) {
         okbtn->setEnabled(false);
         m_labTips->setVisible(false);
-        setFixedSize(380, 180);
+        setFixedSize(380, 200);
     } else {
         okbtn->setEnabled(true);
         m_labTips->setVisible(false);
-        setFixedSize(380, 180);
+        setFixedSize(380, 200);
     }
 
     m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
@@ -233,9 +246,14 @@ void RenameDialog::setCurrentTip()
     }
     m_labTips->setText(m_tipString);
     if (m_labTips->isVisible()) {
-        setFixedSize(380, 180 + heightString);
+        if (lineCount >= 1.7) {
+            setFixedSize(380, 180 + heightString);
+        } else {
+            setFixedSize(380, 190 + heightString);
+        }
+
     } else {
-        setFixedSize(380, 180);
+        setFixedSize(380, 200);
     }
 
 }
