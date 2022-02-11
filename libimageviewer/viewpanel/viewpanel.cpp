@@ -864,15 +864,22 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         //展示当前图片
         loadImage(loadingPath, image_list);
 
-        QTimer::singleShot(500, this, [ = ] {
-            //看图制作全部缩略图
-            ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
-        });
+        LibCommonService::instance()->m_listAllPath = image_list;
+        LibCommonService::instance()->m_noLoadingPath = image_list;
+        //看图首先制作显示的图片的缩略图
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(path), 1);
+
+        loadThumbnails(path);
 
     } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
         //展示当前图片
         loadImage(firstPath, paths);
-        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
+        LibCommonService::instance()->m_listAllPath = paths;
+        LibCommonService::instance()->m_noLoadingPath = paths;
+        //看图首先制作显示的图片的缩略图
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(firstPath), 1);
+
+        loadThumbnails(firstPath);
     }
     m_bottomToolbar->thumbnailMoveCenterWidget();
     return bRet;
@@ -990,6 +997,38 @@ void LibViewPanel::hideAnimationTopBottom()
         m_topBarAnimation = nullptr;
     });
     m_topBarAnimation->start();
+}
+
+void LibViewPanel::loadThumbnails(const QString &path)
+{
+//    LibCommonService::instance()->m_listAllPath = pathList;
+//    LibCommonService::instance()->m_noLoadingPath = pathList;
+
+    int index = LibCommonService::instance()->m_listAllPath.indexOf(path);
+    int left = index;
+    int right = index;
+    if (index + 25 > LibCommonService::instance()->m_listAllPath.count()) {
+        right = LibCommonService::instance()->m_listAllPath.count();
+    } else {
+        right = index + 25;
+    }
+    if (index - 25 > 0) {
+        left = index - 25;
+    } else {
+        left = 0;
+    }
+    QStringList loadList;
+    for (int i = left; i < right; i++) {
+        QString loadPath = LibCommonService::instance()->m_listAllPath[i];
+        if (LibCommonService::instance()->m_listLoaded.indexOf(loadPath) < 0) {
+            loadList << loadPath;
+            LibCommonService::instance()->m_listLoaded << loadPath;
+            LibCommonService::instance()->m_noLoadingPath.removeOne(loadPath);
+        }
+
+
+    }
+    ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), loadList, loadList.size());
 }
 
 void LibViewPanel::setCurrentWidget(const QString &path)
@@ -1151,14 +1190,12 @@ bool LibViewPanel::startChooseFileDialog()
         }
         //展示当前图片
         loadImage(loadingPath, image_list);
-        //启动线程制作缩略图
-        if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
-                LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
-            //看图首先制作显示的图片的缩略图
-            ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(path), 1);
-            //看图制作全部缩略图
-            ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), image_list, image_list.size());
-        }
+        LibCommonService::instance()->m_listAllPath = image_list;
+        LibCommonService::instance()->m_noLoadingPath = image_list;
+        //看图首先制作显示的图片的缩略图
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(path), 1);
+
+        loadThumbnails(path);
     }
     //ctrl+o打开后需要居中
     m_bottomToolbar->thumbnailMoveCenterWidget();
@@ -1806,8 +1843,11 @@ void LibViewPanel::openImg(int index, QString path)
     m_topToolbar->setMiddleContent(info.fileName());
     m_currentPath = path;
     //刷新收藏按钮
+//    qDebug() << index;
+    loadThumbnails(path);
     emit ImageEngine::instance()->sigUpdateCollectBtn();
     updateMenuContent(path);
+
     Q_UNUSED(index);
 }
 

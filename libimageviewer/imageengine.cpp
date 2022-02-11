@@ -75,7 +75,9 @@ void ImageEngine::makeImgThumbnail(QString thumbnailSavePath, QStringList paths,
 //                              , Q_ARG(bool, remake)
 //                             );
     Q_UNUSED(makeCount);
-    LibImageDataService::instance()->readThumbnailByPaths(thumbnailSavePath, paths, remake);
+    if (paths.count() > 0) {
+        LibImageDataService::instance()->readThumbnailByPaths(thumbnailSavePath, paths, remake);
+    }
 }
 //判断是否图片格式
 bool ImageEngine::isImage(const QString &path)

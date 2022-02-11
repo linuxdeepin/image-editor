@@ -34,7 +34,8 @@
 TEST_F(gtestview, LibViewPanel)
 {
     //初始化
-    LibViewPanel *panel = new LibViewPanel();
+    QWidget *widget = new QWidget();
+    LibViewPanel *panel = new LibViewPanel(nullptr, widget);
     panel->loadImage(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                        QApplication::applicationDirPath() + "/tif.tif",
                                                                        QApplication::applicationDirPath() + "/jpg.jpg",
@@ -45,30 +46,28 @@ TEST_F(gtestview, LibViewPanel)
     panel->show();
 
     //键盘与鼠标事件
-    QTestEventList e;
 
+    QTest::keyClick(panel, Qt::Key_Right, Qt::NoModifier, 200);
     //动态图
-    e.addKeyClick(Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Left, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    e.addDelay(500);
+    QTest::keyClick(panel, Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Left, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
+
 
     //多页图
-    e.addKeyClick(Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    e.addDelay(500);
+    QTest::keyClick(panel, Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
+    QTest::keyClick(panel, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
 
-    e.simulate(panel);
 
     panel->deleteLater();
     panel = nullptr;
@@ -214,7 +213,7 @@ TEST_F(gtestview, LibViewPanel_mimeDataDrag)
     QList<QUrl> li;
     li.append(QUrl(QApplication::applicationDirPath() + "/test/jpg.jpg"));
     mimedata.setUrls(li);
-    panel->resize(800,600);
+    panel->resize(800, 600);
 
     auto dropPos = panel->rect().center();
     QDragEnterEvent eEnter(dropPos, Qt::IgnoreAction, &mimedata, Qt::LeftButton, Qt::NoModifier);
@@ -243,7 +242,7 @@ TEST_F(gtestview, LibViewPanel_leaveEvent)
     QList<QUrl> li;
     li.append(QUrl(QApplication::applicationDirPath() + "/test/jpg.jpg"));
     mimedata.setUrls(li);
-    panel->resize(800,600);
+    panel->resize(800, 600);
 
     QEvent event(QEvent::Leave);
     panel->leaveEvent(&event);

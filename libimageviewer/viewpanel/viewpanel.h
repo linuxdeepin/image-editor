@@ -135,7 +135,7 @@ public:
 
     void hideAnimationTopBottom();
 
-
+    void loadThumbnails(const QString &path);
 private slots:
     void onMenuItemClicked(QAction *action);
 

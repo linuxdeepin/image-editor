@@ -48,6 +48,11 @@ public:
     //重命名更新缓存
     void reName(const QString &oldPath, const QString &newPath);
 
+public:
+    QStringList m_listAllPath;//全部需要加载的
+    QStringList m_noLoadingPath;//没有加载的地址
+    QStringList m_listLoaded;//已经加载的
+
 signals:
     void sigRightMousePress();
 public slots:
@@ -62,6 +67,8 @@ private:
     imageViewerSpace::ImgViewerType m_imgViewerType = imageViewerSpace::ImgViewerTypeNull;
     QString       m_imgSavePath;
     QMap<QString, imageViewerSpace::ItemInfo> m_allInfoMap;//图片所有信息map
+
+
 };
 
 #endif // COMMONSERVICE_H
