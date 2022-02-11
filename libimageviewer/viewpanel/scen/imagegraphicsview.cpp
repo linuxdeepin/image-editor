@@ -393,9 +393,17 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
                 }
                 m_spinner->start();
 
+                QWidget *w = new QWidget();
+                w->setFixedSize(SPINNER_SIZE);
+                QHBoxLayout *hLayout = new QHBoxLayout;
+                hLayout->setMargin(0);
+                hLayout->setSpacing(0);
+                hLayout->addWidget(m_spinner, 0, Qt::AlignCenter);
+                w->setLayout(hLayout);
+
                 // Make sure item show in center of view after reload
-                setSceneRect(m_spinner->rect());
-                s->addWidget(m_spinner);
+                setSceneRect(w->rect());
+                s->addWidget(w);
             }
             m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);

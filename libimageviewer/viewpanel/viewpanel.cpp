@@ -866,6 +866,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
 
         LibCommonService::instance()->m_listAllPath = image_list;
         LibCommonService::instance()->m_noLoadingPath = image_list;
+        LibCommonService::instance()->m_listLoaded.clear();
         //看图首先制作显示的图片的缩略图
         ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(path), 1);
 
@@ -876,6 +877,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         loadImage(firstPath, paths);
         LibCommonService::instance()->m_listAllPath = paths;
         LibCommonService::instance()->m_noLoadingPath = paths;
+        LibCommonService::instance()->m_listLoaded.clear();
         //看图首先制作显示的图片的缩略图
         ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(firstPath), 1);
 
@@ -1192,6 +1194,7 @@ bool LibViewPanel::startChooseFileDialog()
         loadImage(loadingPath, image_list);
         LibCommonService::instance()->m_listAllPath = image_list;
         LibCommonService::instance()->m_noLoadingPath = image_list;
+        LibCommonService::instance()->m_listLoaded.clear();
         //看图首先制作显示的图片的缩略图
         ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(path), 1);
 
