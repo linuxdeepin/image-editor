@@ -1209,8 +1209,8 @@ void LibViewPanel::slotBottomMove()
     int nParentWidth = this->width();
     int nParentHeight = this->height();
 
-    if (m_bottomToolbar && m_topToolbar) {
-
+    //如果没有显示则不执行动画
+    if (m_bottomToolbar && m_bottomToolbar->isVisible() && m_topToolbar) {
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
             if ((m_stack->currentWidget() != m_sliderPanel && (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
@@ -1788,6 +1788,9 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
     //判断旋转图片本体是否旋转
     if (m_view) {
         m_view->slotRotatePixCurrent();
+    }
+    if (m_bottomToolbar) {
+        m_bottomToolbar->setVisible(false);
     }
     //todo,幻灯片
     if (!m_sliderPanel) {
