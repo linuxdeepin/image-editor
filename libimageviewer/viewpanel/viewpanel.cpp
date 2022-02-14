@@ -1009,13 +1009,13 @@ void LibViewPanel::loadThumbnails(const QString &path)
     int index = LibCommonService::instance()->m_listAllPath.indexOf(path);
     int left = index;
     int right = index;
-    if (index + 25 > LibCommonService::instance()->m_listAllPath.count()) {
+    if (index + 50 > LibCommonService::instance()->m_listAllPath.count()) {
         right = LibCommonService::instance()->m_listAllPath.count();
     } else {
-        right = index + 25;
+        right = index + 50;
     }
-    if (index - 25 > 0) {
-        left = index - 25;
+    if (index - 50 > 0) {
+        left = index - 50;
     } else {
         left = 0;
     }
