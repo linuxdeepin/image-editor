@@ -1899,11 +1899,8 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
     //当view处于适应窗口状态的时候,resize也会继承状态
     if (m_stack->currentWidget() == m_view) {
-        if (m_view->isFitImage()) {
-            m_view->fitImage();
-        } else if (m_view->isFitWindow()) {
-            m_view->fitWindow();
-        }
+        //应该采用autofit判断
+        m_view->autoFit();
     }
     if (m_bottomAnimation) {
         m_bottomAnimation->stop();
