@@ -613,6 +613,7 @@ void LibViewPanel::toggleFullScreen()
         killTimer(m_hideCursorTid);
         m_hideCursorTid = 0;
         m_view->viewport()->setCursor(Qt::ArrowCursor);
+        emit ImageEngine::instance()->exitSlideShow(); //用于触发相册的从哪里来回哪里去，这个API应该改一下名字，但是流程过于麻烦
     } else {
         showFullScreen();
         if (!m_menu || !m_menu->isVisible()) {
