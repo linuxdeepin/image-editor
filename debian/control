@@ -14,6 +14,10 @@ Homepage: http://www.deepin.org
 Package: libimageeditor
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts:
+ libimage-viewer
+Replaces:
+ libimage-viewer
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library.
  Deepin Image Viewer library.
@@ -21,6 +25,10 @@ Description: Image Viewer library.
 Package: libimageeditor-dev
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor(=${binary:Version})
+Conflicts:
+ libimage-viewer-dev
+Replaces:
+ libimage-viewer-dev
 Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
