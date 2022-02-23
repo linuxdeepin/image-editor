@@ -263,9 +263,9 @@ void LibSlideShowPanel::backToLastPanel()
         //todo屏蔽了全局信号
 //        emit dApp->signalM->hideSlidePanel();
     }
-    this->setCursor(Qt::ArrowCursor);
     killTimer(m_hideCursorTid);
     m_hideCursorTid = 0;
+    this->setCursor(Qt::ArrowCursor);
 }
 
 void LibSlideShowPanel::showNormal()

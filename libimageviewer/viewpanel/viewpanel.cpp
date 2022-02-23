@@ -1214,10 +1214,10 @@ void LibViewPanel::slotBottomMove()
     int nParentHeight = this->height();
 
     //如果没有显示则不执行动画
-    if (m_bottomToolbar && m_bottomToolbar->isVisible() && m_topToolbar) {
+    if (m_bottomToolbar && m_bottomToolbar->isVisible() && m_topToolbar && m_stack->currentWidget() != m_sliderPanel) {
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if ((m_stack->currentWidget() != m_sliderPanel && (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
+            if ((/*m_stack->currentWidget() != m_sliderPanel &&*/ (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
                 showAnimationTopBottom();
                 m_isShowTopBottom = true;
             } else if (!m_isShowTopBottom && !window()->isFullScreen()) {
@@ -1225,7 +1225,7 @@ void LibViewPanel::slotBottomMove()
             } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
                         nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
                        || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)
-                       || m_stack->currentWidget() == m_sliderPanel) {
+                       /*|| m_stack->currentWidget() == m_sliderPanel*/) {
                 hideAnimationTopBottom();
                 m_isShowTopBottom = true;
             } else if (m_bottomToolbar->y() < nParentHeight - 100) {
@@ -1512,6 +1512,9 @@ void LibViewPanel::initShortcut()
             }
 //            toggleFullScreen();
             showNormal();
+            //需要关闭定时器
+            killTimer(m_hideCursorTid);
+            m_hideCursorTid = 0;
             m_view->viewport()->setCursor(Qt::ArrowCursor);
             //修复连续点击F5和esc的问题
             if (m_sliderPanel) {
@@ -1553,6 +1556,9 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdStartSlideShow: {
+            if (m_bottomToolbar) {
+                m_bottomToolbar->setVisible(false);
+            }
             ViewInfo vinfo;
             vinfo.fullScreen = window()->isFullScreen();
             vinfo.lastPanel = this;
