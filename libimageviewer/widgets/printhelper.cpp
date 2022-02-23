@@ -188,15 +188,17 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
             QRect wRect  = _printer->pageRect();
             //修复bug98129，打印不完全问题，ratio应该是适应宽或者高，不应该直接适应宽
             qreal ratio = 0.0;
-            if (img.width() > img.height()) {
-                ratio = wRect.width() * 1.0 / img.width();
-                painter.drawImage(QRectF(0, qreal(wRect.height() - img.height() * ratio) / 2,
+            qDebug() << wRect;
+            ratio = wRect.width() * 1.0 / img.width();
+            if (qreal(wRect.height() - img.height() * ratio) > 0) {
+                painter.drawImage(QRectF(0, abs(qreal(wRect.height() - img.height() * ratio)) / 2,
                                          wRect.width(), img.height() * ratio), img);
             } else {
                 ratio = wRect.height() * 1.0 / img.height();
                 painter.drawImage(QRectF(qreal(wRect.width() - img.width() * ratio) / 2, 0,
                                          img.width() * ratio, wRect.height()), img);
             }
+
 
         }
         indexNum++;
