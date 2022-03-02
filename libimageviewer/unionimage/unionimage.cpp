@@ -652,6 +652,10 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
     //解决欧拉版对于raw格式问题判断为PICT的问题
     bool usingQimage = false;
     usingQimage = (f == FIF_RAW || f == FIF_PICT);
+    //如果是pct格式使用freeimage
+    if (f == FIF_PICT && file_info.suffix().toLower() == "pct") {
+        usingQimage = false;
+    }
 
     if (usingQimage || union_image_private.m_qtSupported.contains(file_suffix_upper)) {
         QImageReader reader;
