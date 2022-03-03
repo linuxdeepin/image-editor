@@ -387,8 +387,16 @@ void LibBottomToolbar::onRotateRBtnClicked()
 
 void LibBottomToolbar::onTrashBtnClicked()
 {
-    emit ImageEngine::instance()->sigDel(m_currentpath);
+    //更换删除顺序,相册需要现在显示删除,再删除本体
+    QString path;
+    if (m_imgListWidget) {
+        path = m_imgListWidget->getCurrentPath();
+    }
+    if (path.isEmpty() && m_currentpath.isEmpty()) {
+        path = m_currentpath;
+    }
     deleteImage();
+    emit ImageEngine::instance()->sigDel(path);
     //    emit dApp->signalM->deleteByMenu();
 }
 

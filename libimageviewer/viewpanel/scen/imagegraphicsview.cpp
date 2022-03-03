@@ -1008,7 +1008,7 @@ void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
     }
     titleBarControl();
     if (!m_isFitWindow) {
-        scaleAtPoint(QPoint(0, 0), 1.0);
+        setScaleValue(1.0);
     }
     QGraphicsView::resizeEvent(event);
 //    m_toast->move(width() / 2 - m_toast->width() / 2,

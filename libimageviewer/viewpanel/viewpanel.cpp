@@ -1274,6 +1274,10 @@ void LibViewPanel::initShortcut()
         {
             m_sliderPanel->backToLastPanel();
             emit ImageEngine::instance()->escShortcutActivated(true);
+            //需要关闭定时器
+            killTimer(m_hideCursorTid);
+            m_hideCursorTid = 0;
+            m_view->viewport()->setCursor(Qt::ArrowCursor);
         } else if (window()->isFullScreen())
         {
             if (m_stack->currentWidget() != m_thumbnailWidget && m_stack->currentWidget() != m_lockWidget) {
@@ -1281,6 +1285,9 @@ void LibViewPanel::initShortcut()
             }
 //            toggleFullScreen();
             showNormal();
+            //需要关闭定时器
+            killTimer(m_hideCursorTid);
+            m_hideCursorTid = 0;
             m_view->viewport()->setCursor(Qt::ArrowCursor);
             //修复连续点击F5和esc的问题
             if (m_sliderPanel) {
@@ -1650,11 +1657,8 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
     }
     //当view处于适应窗口状态的时候,resize也会继承状态
     if (m_stack->currentWidget() == m_view) {
-        if (m_view->isFitImage()) {
-            m_view->fitImage();
-        } else if (m_view->isFitWindow()) {
-            m_view->fitWindow();
-        }
+        //应该采用autofit判断
+        m_view->autoFit();
     }
 
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
