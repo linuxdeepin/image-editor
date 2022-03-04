@@ -1050,6 +1050,7 @@ void LibViewPanel::setCurrentWidget(const QString &path)
                 if ((m_bottomToolbar->getAllFileCount() <= 1 && ImgViewerType::ImgViewerTypeAlbum != LibCommonService::instance()->getImgViewerType()) ||
                         (m_bottomToolbar->getAllFileCount() == 0 && ImgViewerType::ImgViewerTypeAlbum == LibCommonService::instance()->getImgViewerType())) {
                     emit ImageEngine::instance()->sigPicCountIsNull();
+                    m_stack->setCurrentWidget(m_view);
                 }
             }
             if (m_nav) {
