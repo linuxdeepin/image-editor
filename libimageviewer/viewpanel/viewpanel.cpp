@@ -865,6 +865,8 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         } else if (image_list.count() > 0) {
             loadingPath = image_list.first();
         }
+        //stack设置正确位置
+        m_stack->setCurrentWidget(m_view);
         //展示当前图片
         loadImage(loadingPath, image_list);
 
@@ -877,6 +879,8 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         loadThumbnails(path);
 
     } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
+        //stack设置正确位置
+        m_stack->setCurrentWidget(m_view);
         //展示当前图片
         loadImage(firstPath, paths);
         LibCommonService::instance()->m_listAllPath = paths;
@@ -1195,6 +1199,8 @@ bool LibViewPanel::startChooseFileDialog()
         } else {
             loadingPath = image_list.first();
         }
+        //stack设置正确位置
+        m_stack->setCurrentWidget(m_view);
         //展示当前图片
         loadImage(loadingPath, image_list);
         LibCommonService::instance()->m_listAllPath = image_list;
