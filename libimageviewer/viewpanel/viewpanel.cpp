@@ -193,6 +193,9 @@ void LibViewPanel::initConnect()
     connect(m_bottomToolbar, &LibBottomToolbar::sigOcr, this, &LibViewPanel::slotOcrPicture);
     connect(m_bottomToolbar, &LibBottomToolbar::sigLeaveBottom, this, &LibViewPanel::slotBottomMove);
 
+    connect(m_bottomToolbar, &LibBottomToolbar::sigResizeBottom, this, &LibViewPanel::slotBottomMove);
+
+
     connect(m_view, &LibImageGraphicsView::sigImageOutTitleBar, this, &LibViewPanel::slotsImageOutTitleBar);
 
 //    connect(m_view, &LibImageGraphicsView::sigImageOutTitleBar, m_topToolbar, &AbstractTopToolbar::setTitleBarTransparent);

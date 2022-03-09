@@ -543,6 +543,7 @@ void LibBottomToolbar::onThumbnailChanged(QPixmap pix, const QSize &originalSize
 void LibBottomToolbar::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
+    emit sigResizeBottom();
     m_imgListWidget->moveCenterWidget();
 }
 

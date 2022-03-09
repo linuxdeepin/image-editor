@@ -128,6 +128,8 @@ signals:
     //移出窗口信号
     void sigLeaveBottom();
 
+    void sigResizeBottom();
+
 
 public slots:
     void updateCollectButton();
