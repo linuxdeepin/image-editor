@@ -432,6 +432,10 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         if (i->key == "FileFormat" && !suffix.isEmpty() && infos.value(i->key).isNull()) {
             value = fi.suffix();
         }
+        //value必须为小写
+        if (i->key == "FileFormat") {
+            value = value.toLower();
+        }
 
         m_isBaseInfo = true;
         SimpleFormField *field = new SimpleFormField;
