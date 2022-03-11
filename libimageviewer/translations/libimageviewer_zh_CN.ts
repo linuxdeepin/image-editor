@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -236,7 +234,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation>天</translation>
+        <translation type="vanished">天</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation>照片信息</translation>
     </message>
 </context>
 <context>

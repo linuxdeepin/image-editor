@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ug" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="ug">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -234,7 +234,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation>كۈن</translation>
+        <translation type="vanished">كۈن</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -250,6 +254,10 @@
     <message>
         <source>Input a new name</source>
         <translation>رەسىم نامىنى كىرگۈزۈڭ</translation>
+    </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="cs">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Export</translation>
     </message>
     <message>
         <source>Remove from album</source>
@@ -127,7 +127,7 @@
     </message>
     <message>
         <source>Flash compensation</source>
-        <translation>Kompenzace blesku</translation>
+        <translation>Náhrada za blesk</translation>
     </message>
     <message>
         <source>Lens model</source>
@@ -234,7 +234,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation>den</translation>
+        <translation type="vanished">den</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -245,11 +249,15 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Storno</translation>
+        <translation>Zrušit</translation>
     </message>
     <message>
         <source>Input a new name</source>
         <translation>Napište nový název</translation>
+    </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -287,7 +295,7 @@
     </message>
     <message>
         <source>You have no permission to view the file</source>
-        <translation type="unfinished"/>
+        <translation>Nemáte oprávnění k zobrazení souboru</translation>
     </message>
 </context>
 </TS>

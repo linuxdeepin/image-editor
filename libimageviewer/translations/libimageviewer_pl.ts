@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -14,7 +14,7 @@
     <name>LibImageInfoWidget</name>
     <message>
         <source>Basic info</source>
-        <translation>Podstawowa informacja</translation>
+        <translation>Podstawowe informacje</translation>
     </message>
     <message>
         <source>Details</source>
@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Type</source>
-        <translation>Rodzaj</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Date modified</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
         <source>Next</source>
-        <translation>Następny</translation>
+        <translation>Następne</translation>
     </message>
     <message>
         <source>1:1 Size</source>
@@ -234,7 +234,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation>dzień</translation>
+        <translation type="vanished">dzień</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -250,6 +254,10 @@
     <message>
         <source>Input a new name</source>
         <translation>Wpisz nową nazwę</translation>
+    </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -268,7 +276,7 @@
     </message>
     <message>
         <source>Next</source>
-        <translation>Następny</translation>
+        <translation>Następne</translation>
     </message>
     <message>
         <source>Exit</source>

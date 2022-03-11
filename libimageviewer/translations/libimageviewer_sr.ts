@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="sr" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="sr">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -234,7 +234,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation>дан</translation>
+        <translation type="vanished">дан</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -250,6 +254,10 @@
     <message>
         <source>Input a new name</source>
         <translation>Унеси ново име</translation>
+    </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

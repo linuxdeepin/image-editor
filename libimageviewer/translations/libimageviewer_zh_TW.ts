@@ -5,7 +5,7 @@
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
-        <translation>圖片資訊</translation>
+        <translation>圖片訊息</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
@@ -27,7 +27,7 @@
     <name>LibViewPanel</name>
     <message>
         <source>Add to album</source>
-        <translation>加到相簿</translation>
+        <translation>添加到相簿</translation>
     </message>
     <message>
         <source>New album</source>
@@ -51,11 +51,11 @@
     </message>
     <message>
         <source>Unfavorite</source>
-        <translation>從我的最愛中移除</translation>
+        <translation>取消收藏</translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation>加到我的最愛</translation>
+        <translation>收藏</translation>
     </message>
 </context>
 <context>
@@ -204,7 +204,7 @@
     </message>
     <message>
         <source>Slide show</source>
-        <translation>開始幻燈片秀</translation>
+        <translation>幻燈片秀</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -224,19 +224,23 @@
     </message>
     <message>
         <source>Set as wallpaper</source>
-        <translation>設定為桌布</translation>
+        <translation>設為桌布</translation>
     </message>
     <message>
         <source>Display in file manager</source>
-        <translation>開啟檔案位置</translation>
+        <translation>在檔案管理器中顯示</translation>
     </message>
     <message>
         <source>Image info</source>
-        <translation>圖片資訊</translation>
+        <translation>圖片訊息</translation>
     </message>
     <message>
         <source>day</source>
-        <translation>天</translation>
+        <translation type="vanished">天</translation>
+    </message>
+    <message>
+        <source>Photo info</source>
+        <translation>照片訊息</translation>
     </message>
 </context>
 <context>
@@ -255,7 +259,7 @@
     </message>
     <message>
         <source>The file &quot;%1&quot; already exists, please use another name</source>
-        <translation>檔名“%1”已被佔用，請使用其他名稱</translation>
+        <translation>檔案名“%1”已被占用，請使用其他名稱</translation>
     </message>
 </context>
 <context>

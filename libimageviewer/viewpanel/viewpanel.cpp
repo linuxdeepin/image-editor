@@ -603,7 +603,12 @@ void LibViewPanel::updateMenuContent(QString path)
         if (isReadable) {
             appendAction(IdDisplayInFileManager, QObject::tr("Display in file manager"),
                          ss("Display in file manager", "Alt+D"));
-            appendAction(IdImageInfo, QObject::tr("Image info"), ss("Image info", "Ctrl+I"));
+
+            if (isAlbum) {
+                appendAction(IdImageInfo, QObject::tr("Photo info"), ss("Image info", "Ctrl+I"));
+            } else {
+                appendAction(IdImageInfo, QObject::tr("Image info"), ss("Image info", "Ctrl+I"));
+            }
         }
     }
 }

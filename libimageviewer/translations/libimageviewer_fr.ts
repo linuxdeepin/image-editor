@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -236,6 +236,10 @@
         <source>day</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Photo info</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>
@@ -250,6 +254,10 @@
     <message>
         <source>Input a new name</source>
         <translation>Entrer un nouveau nom</translation>
+    </message>
+    <message>
+        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
