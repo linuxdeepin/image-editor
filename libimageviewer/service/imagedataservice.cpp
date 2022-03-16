@@ -26,6 +26,8 @@
 #include <QImageReader>
 #include <QDebug>
 
+#include <mutex>
+
 #include "unionimage/pluginbaseutils.h"
 #include "unionimage/unionimage.h"
 #include "unionimage/baseutils.h"
@@ -33,13 +35,16 @@
 #include "commonservice.h"
 
 LibImageDataService *LibImageDataService::s_ImageDataService = nullptr;
+static std::once_flag dataServiceFlag;
 
 LibImageDataService *LibImageDataService::instance(QObject *parent)
 {
     Q_UNUSED(parent);
-    if (!s_ImageDataService) {
+
+    std::call_once(dataServiceFlag, []() {
         s_ImageDataService = new LibImageDataService();
-    }
+    });
+
     return s_ImageDataService;
 }
 
@@ -107,18 +112,12 @@ bool LibImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringLis
         }
         if (needCoreCounts < 1)
             needCoreCounts = 1;
-        QList<QThread *> threads;
         for (int i = 0; i < needCoreCounts; i++) {
             LibReadThumbnailThread *thread = new LibReadThumbnailThread;
             thread->m_thumbnailPath = thumbnailPath;
             thread->m_remake = remake;
             thread->start();
-            threads.append(thread);
         }
-//        for (auto thread : threads) {
-//            thread->wait();
-//            thread->deleteLater();
-//        }
     } else {
         LibImageDataService::instance()->add(files);
     }
@@ -194,13 +193,10 @@ LibImageDataService::LibImageDataService(QObject *parent)
 }
 
 //缩略图读取线程
-LibReadThumbnailThread::LibReadThumbnailThread(QObject *parent): QThread(parent)
+LibReadThumbnailThread::LibReadThumbnailThread(QObject *parent)
+    : QThread(parent)
 {
-}
-
-LibReadThumbnailThread::~LibReadThumbnailThread()
-{
-
+    connect(this, &QThread::finished, this, &QThread::deleteLater);
 }
 
 void LibReadThumbnailThread::readThumbnail(QString path)
@@ -290,5 +286,4 @@ void LibReadThumbnailThread::run()
         }
     }
     emit LibImageDataService::instance()->sigeUpdateListview();
-    this->deleteLater();
 }

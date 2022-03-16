@@ -87,7 +87,7 @@ class LibReadThumbnailThread : public QThread
     Q_OBJECT
 public:
     LibReadThumbnailThread(QObject *parent = nullptr);
-    ~LibReadThumbnailThread() override;
+    ~LibReadThumbnailThread() override = default;
     void readThumbnail(QString m_path);
     void setQuit(bool quit);
     QString m_thumbnailPath = "";
