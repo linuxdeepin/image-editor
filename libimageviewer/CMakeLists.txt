@@ -38,6 +38,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(3rd_lib REQUIRED
     dtkwidget
     dtkcore
+    dtkgui
     )
 
 #需要打开的头文件
