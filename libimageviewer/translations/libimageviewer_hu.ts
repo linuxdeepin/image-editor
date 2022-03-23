@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="hu">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="hu">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -234,7 +236,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">nap</translation>
+        <translation>nap</translation>
     </message>
     <message>
         <source>Photo info</source>
@@ -256,8 +258,8 @@
         <translation>Írjon be egy új nevet</translation>
     </message>
     <message>
-        <source>The file &quot;%1&quot; already exists, please use another name</source>
-        <translation>A &quot;%1&quot; fájl már létezik, kérjük használjon másik nevet </translation>
+        <source>The file already exists, please use another name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

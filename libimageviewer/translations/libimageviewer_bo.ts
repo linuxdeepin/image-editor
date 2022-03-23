@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="bo">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="bo">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -234,11 +236,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">ཉིན།</translation>
+        <translation>ཉིན།</translation>
     </message>
     <message>
         <source>Photo info</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -256,8 +258,8 @@
         <translation>པར་གྱི་མིང་འཇུག་རོགས།</translation>
     </message>
     <message>
-        <source>The file &quot;%1&quot; already exists, please use another name</source>
-        <translation type="unfinished"/>
+        <source>The file already exists, please use another name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -236,7 +236,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">كۈن</translation>
+        <translation>كۈن</translation>
     </message>
     <message>
         <source>Photo info</source>
@@ -258,7 +258,7 @@
         <translation>رەسىم نامىنى كىرگۈزۈڭ</translation>
     </message>
     <message>
-        <source>The file &quot;%1&quot; already exists, please use another name</source>
+        <source>The file already exists, please use another name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

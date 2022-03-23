@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_HK">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_HK">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -234,7 +236,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">天</translation>
+        <translation>天</translation>
     </message>
     <message>
         <source>Photo info</source>
@@ -256,8 +258,8 @@
         <translation>請輸入圖片名稱</translation>
     </message>
     <message>
-        <source>The file &quot;%1&quot; already exists, please use another name</source>
-        <translation>文件名“%1”已被占用，請使用其他名稱</translation>
+        <source>The file already exists, please use another name</source>
+        <translation>文件名已被占用，請使用其他名稱</translation>
     </message>
 </context>
 <context>

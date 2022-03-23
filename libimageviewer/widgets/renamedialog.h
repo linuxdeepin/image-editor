@@ -29,6 +29,7 @@
 #include <DPushButton>
 #include <DSuggestButton>
 #include <DLabel>
+
 DWIDGET_USE_NAMESPACE
 class RenameDialog : public DDialog
 {
@@ -45,25 +46,23 @@ public:
 
     void setCurrentTip();
     QString geteElidedText(QFont font, QString str, int MaxWidth);
+private slots:
+    void slotsFocusChanged(bool onFocus);
 public:
     void slotsUpdate();
 protected:
     void paintEvent(QPaintEvent *event);
 private:
-    QVBoxLayout *m_vlayout;
-    QVBoxLayout *m_labvlayout;
-    QHBoxLayout *m_hlayout;
-    QHBoxLayout *m_edtlayout;
-    DLabel *m_labformat;
+    QVBoxLayout *m_vlayout{nullptr};
+    QVBoxLayout *m_labvlayout{nullptr};
+    QHBoxLayout *m_hlayout{nullptr};
+    QHBoxLayout *m_edtlayout{nullptr};
+    DLabel *m_labformat{nullptr};
     QString m_filenamepath;
     QString m_filename;
     QString m_DirPath;
     QString m_basename;
-    QString m_tipString;
-    DLabel *m_labTips{nullptr};
 
-    int m_currentFontSize = 0;
-    QSpacerItem *m_verticalSpacer;
 };
 
 #endif // RENAMEDIALOG_H

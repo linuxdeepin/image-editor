@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="hr">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="hr">
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -83,7 +85,7 @@
     </message>
     <message>
         <source>Date captured</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exposure mode</source>
@@ -103,7 +105,7 @@
     </message>
     <message>
         <source>Aperture</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Focal length</source>
@@ -115,11 +117,11 @@
     </message>
     <message>
         <source>Max aperture</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Metering mode</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>White balance</source>
@@ -127,7 +129,7 @@
     </message>
     <message>
         <source>Flash compensation</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Lens model</source>
@@ -147,7 +149,7 @@
     </message>
     <message>
         <source>Tag</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -174,7 +176,7 @@
     </message>
     <message>
         <source>Extract text</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rotate counterclockwise</source>
@@ -234,11 +236,11 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">dan</translation>
+        <translation>dan</translation>
     </message>
     <message>
         <source>Photo info</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -256,8 +258,8 @@
         <translation>Unesi novo ime</translation>
     </message>
     <message>
-        <source>The file &quot;%1&quot; already exists, please use another name</source>
-        <translation type="unfinished"/>
+        <source>The file already exists, please use another name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -272,7 +274,7 @@
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Next</source>

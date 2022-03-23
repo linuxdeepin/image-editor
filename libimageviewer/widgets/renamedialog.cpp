@@ -72,6 +72,9 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 
     m_edtlayout->addWidget(m_lineedt);
     m_lineedt->setFixedHeight(35);
+
+//    connect(m_lineedt, &DLineEdit::focusChanged, this, &RenameDialog::slotsFocusChanged);
+
     m_labformat->setEnabled(false);
     m_edtlayout->addWidget(m_labformat);
     m_labformat->setFixedHeight(35);
@@ -79,12 +82,6 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_vlayout->addLayout(m_labvlayout);
     m_vlayout->addStretch();
 
-    m_labTips = new DLabel();
-    m_labTips->adjustSize();
-    m_labTips->setWordWrap(true);
-    m_labTips->setIndent(10);
-
-    m_vlayout->addWidget(m_labTips);
 
     m_vlayout->addLayout(m_hlayout);
 //    m_vlayout->setStretch(0, 5);
@@ -111,9 +108,10 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     });
 
     connect(m_lineedt, &DLineEdit::textChanged, this, [ = ](const QString & arg) {
+        setCurrentTip();
         int len = arg.toLocal8Bit().length();
         //修复字符串长度超长会将
-        if (len > 255 - Dirlen) return;
+        if (len > 256 - Dirlen) return;
 
     });
     connect(m_lineedt, &DLineEdit::textEdited, this, [ = ](const QString & arg) {
@@ -123,20 +121,20 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
         if (arg.at(0) == " ") {
             QString str = arg;
             str = str.right(str.size() - 1);
-            qDebug() << str;
+
             m_lineedt->lineEdit()->setText(str);
             m_lineedt->lineEdit()->setCursorPosition(0);
         }
         int len = arg.toLocal8Bit().length();
         QString Interceptstr;
-        if (len > 255 - Dirlen) {
+        if (len > 256 - Dirlen) {
             int num = 0;
             int i = 0;
             for (; i < arg.size(); i++) {
                 if (arg.at(i) >= 0x4e00 && arg.at(i) <= 0x9fa5) {
                     num += 3;
-                    if (num >= 255 - Dirlen - 1) break;
-                } else if (num < 255 - Dirlen) {
+                    if (num >= 256 - Dirlen - 1) break;
+                } else if (num < 256 - Dirlen) {
                     num += 1;
                 } else {
                     break;
@@ -146,7 +144,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
             m_lineedt->lineEdit()->setText(Interceptstr);
         };
     });
-    okbtn->setEnabled(false);
+    okbtn->setEnabled(true);
     setObjectName(RENAME_WIDGET);
     setAccessibleName(RENAME_WIDGET);
     m_lineedt->setObjectName(INPUT_EDIT);
@@ -158,9 +156,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     widet->setObjectName(RENAME_CONTENT);
     widet->setObjectName(RENAME_CONTENT);
 
-    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
-    m_labTips->setText(m_tipString);
-    setFixedSize(380, 180 + m_labTips->height() * 2);
+    setFixedSize(380, 200);
 }
 
 
@@ -202,70 +198,25 @@ void RenameDialog::InitDlg()
 void RenameDialog::setCurrentTip()
 {
     QString fileabname = m_DirPath + "/" + m_lineedt->text() + m_labformat->text();
-
     QFile file(fileabname);
-    if (file.exists()) {
+    if (m_filenamepath == fileabname) {
+        okbtn->setEnabled(true);
+        m_lineedt->hideAlertMessage();
+    } else if (file.exists()) {
         okbtn->setEnabled(false);
-        m_labTips->setVisible(true);
+        m_lineedt->showAlertMessage(tr("The file already exists, please use another name"), m_lineedt);
     } else if (m_lineedt->text().isEmpty()) {
         okbtn->setEnabled(false);
-        m_labTips->setVisible(false);
-        setFixedSize(380, 200);
+        m_lineedt->hideAlertMessage();
     } else {
         okbtn->setEnabled(true);
-        m_labTips->setVisible(false);
-        setFixedSize(380, 200);
-    }
-
-    m_tipString = tr("The file \"%1\" already exists, please use another name").arg(m_lineedt->text() + m_labformat->text());
-    QFont font;
-    int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
-//    int widthString = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
-    int heightString = Libutils::base::stringHeight(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString) + 10;
-
-    double lineCount = double (m_labTips->height()) / double(currentSize);
-
-    if (lineCount >= 1.7) {
-        heightString = heightString * 2;
-
-        m_tipString = tr("The file \"%1\" already exists, please use another name").arg("");
-
-        int width = Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), m_tipString);
-        int widthC;
-        if (currentSize > 15) {
-            widthC = m_labTips->width() * 2 - width  - 200;
-        } else if (currentSize > 11) {
-            widthC = m_labTips->width() * 2 - width  - 250;
-        } else {
-            widthC = m_labTips->width() * 2 - width  - 270;
-        }
-
-        QString a = geteElidedText(DFontSizeManager::instance()->get(DFontSizeManager::T8),
-                                   m_lineedt->text() + m_labformat->text(), widthC);
-        m_tipString = tr("The file \"%1\" already exists, please use another name").arg(a);
-    }
-    m_labTips->setText(m_tipString);
-    if (m_labTips->isVisible()) {
-        if (lineCount >= 1.7) {
-            setFixedSize(380, 180 + heightString);
-        } else {
-            setFixedSize(380, 190 + heightString);
-        }
-
-    } else {
-        setFixedSize(380, 200);
+        m_lineedt->hideAlertMessage();
     }
 
 }
 
 void RenameDialog::paintEvent(QPaintEvent *event)
 {
-    QFont font;
-    int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
-
-    m_currentFontSize = currentSize;
-    setCurrentTip();
-
     QWidget::paintEvent(event);
 }
 
@@ -278,6 +229,13 @@ QString RenameDialog::geteElidedText(QFont font, QString str, int MaxWidth)
         str = fontWidth.elidedText(str, Qt::ElideMiddle, MaxWidth);
     }
     return str;
+}
+
+void RenameDialog::slotsFocusChanged(bool onFocus)
+{
+    if (!onFocus) {
+        m_lineedt->hideAlertMessage();
+    }
 }
 
 void RenameDialog::slotsUpdate()
