@@ -103,5 +103,9 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
 #COMMAND sudo ln -s ${image-viewer}/libimage-viewer.so ${image-viewer}/libimage-viewer.so.1.0.0
 #)
 
+## dev files
+install (FILES ${allHeaders}
+    DESTINATION ${PREFIX}/include/image-viewer)
+
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
 target_link_libraries(image-viewer ${3rd_lib_LIBRARIES} freeimage )
