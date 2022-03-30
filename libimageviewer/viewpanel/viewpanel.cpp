@@ -1896,7 +1896,7 @@ void LibViewPanel::slotRotateImage(int angle)
         });
     }
     m_tSaveImage->setSingleShot(true);
-    m_tSaveImage->start(2000);
+    m_tSaveImage->start(1000);
 }
 
 void LibViewPanel::slotResetTransform(bool bRet)
