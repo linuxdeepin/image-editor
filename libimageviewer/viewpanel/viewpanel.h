@@ -205,6 +205,8 @@ protected:
     void timerEvent(QTimerEvent *e) Q_DECL_OVERRIDE;//
 
     void leaveEvent(QEvent *event) override;
+
+    void hideEvent(QHideEvent *e) override;
 signals:
     void imageChanged(const QString &path);
 

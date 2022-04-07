@@ -2042,3 +2042,13 @@ void LibViewPanel::leaveEvent(QEvent *event)
     }
     return QFrame::leaveEvent(event);
 }
+
+void LibViewPanel::hideEvent(QHideEvent *e)
+{
+    if (m_info && m_extensionPanel) {
+        m_info->setVisible(false);
+        m_extensionPanel->setVisible(false);
+    }
+
+    QFrame::hideEvent(e);
+}
