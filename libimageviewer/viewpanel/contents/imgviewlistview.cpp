@@ -66,7 +66,7 @@ LibImgViewListView::LibImgViewListView(QWidget *parent)
 
 //    setMouseTracking(true);
 //    this->viewport()->setMouseTracking(true);
-    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibImgViewListView::slotOneImgReady);
+    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibImgViewListView::slotOneImgReady, Qt::QueuedConnection);
 }
 
 LibImgViewListView::~LibImgViewListView()

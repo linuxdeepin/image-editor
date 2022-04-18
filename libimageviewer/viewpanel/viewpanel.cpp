@@ -203,7 +203,7 @@ void LibViewPanel::initConnect()
     connect(m_view, &LibImageGraphicsView::sigMouseMove, this, &LibViewPanel::slotBottomMove);
     connect(m_view, &LibImageGraphicsView::sigClicked, this, &LibViewPanel::slotChangeShowTopBottom);
 
-    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibViewPanel::slotOneImgReady);
+    connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibViewPanel::slotOneImgReady, Qt::QueuedConnection);
 
     connect(m_view, &LibImageGraphicsView::UpdateNavImg, this, [ = ]() {
         m_nav->setImage(m_view->image());
@@ -1718,16 +1718,13 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (!m_info && !m_extensionPanel) {
                 initExtensionPanel();
             }
-            //重新刷新文件信息
-            m_info->updateInfo();
-            m_info->show();
-
             //判断是否有缓存,无缓存,则使用打开路径
             QString path = m_bottomToolbar->getCurrentItemInfo().path;
             if (path.isEmpty()) {
                 path = m_currentPath;
             }
-            m_info->setImagePath(path);
+            m_info->setImagePath(path); //执行强制重刷
+            m_info->show();
             m_extensionPanel->setContent(m_info);
             //清除焦点
             m_extensionPanel->setFocus(Qt::NoFocusReason);

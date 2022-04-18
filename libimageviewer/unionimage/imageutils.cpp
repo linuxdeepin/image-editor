@@ -367,7 +367,7 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
     return infos;
 }
 
-const QString getOrientation(const QString &path)
+int getOrientation(const QString &path)
 {
 #ifdef USE_UNIONIMAGE
     return LibUnionImage_NameSpace::getOrientation(path);

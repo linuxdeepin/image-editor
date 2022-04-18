@@ -270,8 +270,7 @@ LibImageInfoWidget::~LibImageInfoWidget()
 
 void LibImageInfoWidget::setImagePath(const QString path)
 {
-    if (path == m_path)
-        return;
+    //此处不执行path重复判断，可使用本函数进行整个image info弹窗的整体强制重刷
 
     m_path = path;
     m_isBaseInfo = false;
