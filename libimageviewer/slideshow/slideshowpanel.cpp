@@ -202,10 +202,8 @@ void LibSlideShowPanel::initMenu()
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     m_menu = new DMenu(this);
     m_menu->setStyle(QStyleFactory::create("dlight"));
-    QString stopSc = LibConfigSetter::instance()->value(SHORTCUTVIEW_GROUP, "Slide show").toString();
-    stopSc.replace(" ", "");
-    appendAction(IdPlayOrPause, tr(slideshowbottombar->m_playpauseButton->toolTip().toStdString().c_str()), stopSc);
-    appendAction(IdStopslideshow, tr(slideshowbottombar->m_cancelButton->toolTip().toStdString().c_str()), stopSc);
+    appendAction(IdPlayOrPause, tr(slideshowbottombar->m_playpauseButton->toolTip().toStdString().c_str()), "");
+    appendAction(IdStopslideshow, tr(slideshowbottombar->m_cancelButton->toolTip().toStdString().c_str()), "");
     connect(m_menu, &QMenu::triggered, this, &LibSlideShowPanel::onMenuItemClicked);
     connect(this, &LibSlideShowPanel::customContextMenuRequested, this, &LibSlideShowPanel::onCustomContextMenuRequested);
 }
@@ -397,6 +395,7 @@ void LibSlideShowPanel::onShowNext()
 
 void LibSlideShowPanel::onCustomContextMenuRequested()
 {
+    this->setCursor(Qt::ArrowCursor);
     m_menu->popup(QCursor::pos());
 }
 
