@@ -476,7 +476,8 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
                 m_morePicFloatWidget->setVisible(false);
             }
             m_morePicFloatWidget->setLabelText(QString::number(m_imageReader->currentImageNumber() + 1) + "/" + QString::number(m_imageReader->imageCount()));
-            m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 - 50);
+            //由于最小化窗口尺寸过小，会遮盖掉切换栏，抬高30px
+            m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 -80);
         }
     }
     m_firstset = true;
@@ -567,6 +568,7 @@ const QImage LibImageGraphicsView::image()
 void LibImageGraphicsView::fitWindow()
 {
     qreal wrs = windowRelativeScale();
+    qDebug()<<wrs;
     resetTransform();
     //可能存在比例超过20.0的情况，设置为20.0
     if (wrs > 20.0) {
@@ -650,6 +652,10 @@ qreal LibImageGraphicsView::imageRelativeScale() const
 qreal LibImageGraphicsView::windowRelativeScale() const
 {
     QRectF bf = sceneRect();
+    qDebug()<<bf.width();
+    qDebug()<<bf.height();
+    qDebug()<<width();
+    qDebug()<<height();
     //新需求,默认适应窗口顶格到标题栏
     if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height())) {
 //    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
@@ -1033,7 +1039,8 @@ void LibImageGraphicsView::resizeEvent(QResizeEvent *event)
     qDebug() << "---" << __FUNCTION__ << "---" << event->size();
     //20201027曾在右侧浮动窗口，关于多图片
     if (m_morePicFloatWidget) {
-        m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 - 50);
+        //由于最小化窗口尺寸过小，会遮盖掉切换栏，抬高30px
+        m_morePicFloatWidget->move(this->width() - 80, this->height() / 2 - 80);
     }
     titleBarControl();
     if (!m_isFitWindow) {
