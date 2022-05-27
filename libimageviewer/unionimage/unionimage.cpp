@@ -683,7 +683,7 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                     try_res = QImage(path);
                 }
                 if (try_res.isNull()) {
-                    errorMsg = "load image by qt faild, use format:" + reader.format() + " ,path:" + path;
+                    errorMsg = "load image by qt failed, use format:" + reader.format() + " ,path:" + path;
                     res = QImage();
                     return false;
                 }
@@ -703,13 +703,13 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
             if (f == FREE_IMAGE_FORMAT::FIF_UNKNOWN)
                 f = FREE_IMAGE_FORMAT(union_image_private.m_freeimage_formats[file_suffix_upper]);
             if (f == FREE_IMAGE_FORMAT::FIF_JP2 && file_info.size() > 40960000) {
-                errorMsg = "image load faild, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
+                errorMsg = "image load failed, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
                 res = QImage();
                 return false;
             }
             FIBITMAP *dib = FreeImage_Load(f, temp_path.data());
             if (nullptr == dib) {
-                errorMsg = "image load faild, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
+                errorMsg = "image load failed, format:" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
                 //FreeImage_Unload(dib);
                 res = QImage();
                 return false;
@@ -719,7 +719,7 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
             //32位以上图片qImage不支持,强行读取和转换可能会乱码
             res = QImage(FIBitmap2QImage(dib));
             if (res.isNull()) {
-                errorMsg = "convert to QImage faild" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
+                errorMsg = "convert to QImage failed" + union_image_private.m_freeimage_formats.key(f) + " ,path:" + temp_path;
                 FreeImage_Unload(dib);
                 res = QImage();
                 return false;
@@ -1016,7 +1016,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
     if (format == "SVG") {
         QImage image_copy;
         if (!loadStaticImageFromFile(path, image_copy, erroMsg)) {
-            erroMsg = "rotate load QImage faild, path:" + path + "  ,format:+" + format;
+            erroMsg = "rotate load QImage failed, path:" + path + "  ,format:+" + format;
             return false;
         }
         QSvgGenerator generator;
@@ -1092,7 +1092,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
     }
     ;
     if (!writeFIBITMAPToFile(rotateRes, path)) {
-        erroMsg = "rotate image save faild, unkown format";
+        erroMsg = "rotate image save failed, unknown format";
         FreeImage_Unload(dib);
         FreeImage_Unload(rotateRes);
         return false;
@@ -1178,7 +1178,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIleWithImage(int angel, QImage &img, co
     }
     img = FIBitmap2QImage(rotateRes);
     if (!writeFIBITMAPToFile(rotateRes, path)) {
-        erroMsg = "rotate image save faild, unkown format";
+        erroMsg = "rotate image save failed, unknown format";
         FreeImage_Unload(dib);
         FreeImage_Unload(rotateRes);
         return false;
