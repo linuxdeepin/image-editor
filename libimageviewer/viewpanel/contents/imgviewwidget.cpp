@@ -134,7 +134,7 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
         //目的为了获取moveX的值,中心离当前位置的差值
         int moveX = 0;
         int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
-        int itemX = m_listview->x() + m_listview->getCurrentItemX();
+        int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
         int rowWidth = m_listview->getRowWidth();
         if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
             moveX = this->geometry().width() - rowWidth - m_listview->x() ;
@@ -324,7 +324,7 @@ void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
     //目的为了获取moveX的值,中心离当前位置的差值
     int moveX = 0;
     int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
-    int itemX = m_listview->x() + m_listview->getCurrentItemX();
+    int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
     if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
         moveX = this->geometry().width() - rowWidth - m_listview->x() ;
@@ -374,7 +374,7 @@ void MyImageListWidget::thumbnailIsMoving()
     //目的为了获取moveX的值,中心离当前位置的差值
     int moveX = 0;
     int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
-    int itemX = m_listview->x() + m_listview->getCurrentItemX();
+    int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
     if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
         moveX = this->geometry().width() - rowWidth - m_listview->x() ;
@@ -407,7 +407,7 @@ void MyImageListWidget::moveCenterWidget()
     stopAnimation();
     int moveX = 0;
     int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
-    int itemX = m_listview->x() + m_listview->getCurrentItemX();
+    int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
     if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
         moveX = this->geometry().width() - rowWidth - m_listview->x() ;

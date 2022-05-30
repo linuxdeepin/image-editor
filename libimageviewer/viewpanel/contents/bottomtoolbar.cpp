@@ -50,7 +50,7 @@ namespace {
 /////////////
 const int LEFT_MARGIN = 10;
 const QSize ICON_SIZE = QSize(50, 50);
-const int ICON_SPACING = 10;
+const int ICON_SPACING = 9;
 const int FILENAME_MAX_LENGTH = 600;
 const int RIGHT_TITLEBAR_WIDTH = 100;
 const QString LOCMAP_SELECTED_DARK = ":/dark/images/58 drak.svg";
@@ -733,7 +733,7 @@ void LibBottomToolbar::initUI()
 
     //增加缩略图左侧空隙
     m_spaceWidget_thumbnailLeft = new QWidget(this);
-    m_spaceWidget_thumbnailLeft->setFixedWidth(1);
+    m_spaceWidget_thumbnailLeft->setFixedWidth(0);
     hb->addWidget(m_spaceWidget_thumbnailLeft);
 
     //缩略图列表
