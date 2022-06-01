@@ -70,7 +70,7 @@ const int THUMBNAIL_WIDTH = 32;
 const int THUMBNAIL_ADD_WIDTH = 32;
 const int THUMBNAIL_LIST_ADJUST = 9;
 const int THUMBNAIL_VIEW_DVALUE = 668;
-
+const int MAINWINDOW_MIN_WIDTH = 630;
 const int LOAD_LEFT_RIGHT = 25;     //前后加载图片数（动态）
 
 }  // namespace
@@ -543,6 +543,18 @@ void LibBottomToolbar::onThumbnailChanged(QPixmap pix, const QSize &originalSize
 void LibBottomToolbar::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
+
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum
+            && m_imgListWidget->isVisible()) {
+        if ((topLevelWidget()->width() - MAINWINDOW_MIN_WIDTH) < (ICON_SIZE.width() * 2)) {
+            m_rotateRBtn->setVisible(false);
+            m_rotateLBtn->setVisible(false);
+        } else {
+            m_rotateRBtn->setVisible(true);
+            m_rotateLBtn->setVisible(true);
+        }
+    }
+
     emit sigResizeBottom();
     m_imgListWidget->moveCenterWidget();
 }
@@ -550,6 +562,18 @@ void LibBottomToolbar::resizeEvent(QResizeEvent *event)
 void LibBottomToolbar::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
+
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum
+            && m_imgListWidget->isVisible()) {
+        if ((topLevelWidget()->width() - MAINWINDOW_MIN_WIDTH) < (ICON_SIZE.width() * 2)) {
+            m_rotateRBtn->setVisible(false);
+            m_rotateLBtn->setVisible(false);
+        } else {
+            m_rotateRBtn->setVisible(true);
+            m_rotateLBtn->setVisible(true);
+        }
+    }
+
     m_imgListWidget->moveCenterWidget();
 }
 
