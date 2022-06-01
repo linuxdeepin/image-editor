@@ -63,6 +63,10 @@ public:
     //
     void setVisualIndex(int row);
     int getVisualIndex();
+
+    //取消图片加载
+    void stopReadThumbnail();
+
 private slots:
 signals:
     void sigeUpdateListview();
@@ -78,6 +82,9 @@ private:
     QMap<QString, QString> m_movieDurationStrMap;
     QQueue<QString> m_imageKeys;
     int m_visualIndex = 0;//用户查找视图中的model index
+
+    //图片读取线程
+    std::vector<LibReadThumbnailThread *> readThreadGroup;
 };
 
 
@@ -100,7 +107,7 @@ public:
 protected:
     void run() override;
 private:
-    bool m_quit = false;
+    std::atomic_bool m_quit;
 
 };
 #endif // IMAGEDATASERVICE_H

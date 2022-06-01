@@ -50,6 +50,7 @@ LibImageDataService *LibImageDataService::instance(QObject *parent)
 
 LibImageDataService::~LibImageDataService()
 {
+    stopReadThumbnail();
 }
 
 bool LibImageDataService::add(const QStringList &paths)
@@ -98,28 +99,23 @@ int LibImageDataService::getCount()
 
 bool LibImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake)
 {
-
     qDebug() << "------------files.size = " << files.size();
-    bool empty = isRequestQueueEmpty();
 
-    if (empty) {
+    LibImageDataService::instance()->add(files);
 
-        LibImageDataService::instance()->add(files);
-        int needCoreCounts = static_cast<int>(std::thread::hardware_concurrency());
-        needCoreCounts = needCoreCounts / 2;
-        if (files.size() < needCoreCounts) {
-            needCoreCounts = files.size();
-        }
-        if (needCoreCounts < 1)
-            needCoreCounts = 1;
-        for (int i = 0; i < needCoreCounts; i++) {
-            LibReadThumbnailThread *thread = new LibReadThumbnailThread;
-            thread->m_thumbnailPath = thumbnailPath;
-            thread->m_remake = remake;
-            thread->start();
-        }
-    } else {
-        LibImageDataService::instance()->add(files);
+    int needCoreCounts = static_cast<int>(std::thread::hardware_concurrency());
+    needCoreCounts = needCoreCounts / 2;
+    if (files.size() < needCoreCounts) {
+        needCoreCounts = files.size();
+    }
+    if (needCoreCounts < 1)
+        needCoreCounts = 1;
+    for (int i = 0; i < needCoreCounts; i++) {
+        LibReadThumbnailThread *thread = new LibReadThumbnailThread;
+        thread->m_thumbnailPath = thumbnailPath;
+        thread->m_remake = remake;
+        thread->start();
+        readThreadGroup.push_back(thread);
     }
     return true;
 }
@@ -192,11 +188,25 @@ LibImageDataService::LibImageDataService(QObject *parent)
     Q_UNUSED(parent);
 }
 
+void LibImageDataService::stopReadThumbnail()
+{
+    for (auto &thread : readThreadGroup) {
+        thread->setQuit(true);
+    }
+
+    for (auto &thread : readThreadGroup) {
+        while (thread->isRunning());
+        thread->deleteLater();
+    }
+
+    readThreadGroup.clear();
+}
+
 //缩略图读取线程
 LibReadThumbnailThread::LibReadThumbnailThread(QObject *parent)
     : QThread(parent)
 {
-    connect(this, &QThread::finished, this, &QThread::deleteLater);
+    m_quit = false;
 }
 
 void LibReadThumbnailThread::readThumbnail(QString path)
