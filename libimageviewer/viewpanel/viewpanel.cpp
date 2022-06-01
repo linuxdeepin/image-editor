@@ -52,6 +52,7 @@
 #include "service/ocrinterface.h"
 #include "slideshow/slideshowpanel.h"
 #include "service/configsetter.h"
+#include "service/imagedataservice.h"
 
 const QString IMAGE_TMPPATH =   QDir::homePath() +
                                 "/.config/deepin/deepin-image-viewer/";
@@ -2046,6 +2047,8 @@ void LibViewPanel::hideEvent(QHideEvent *e)
         m_info->setVisible(false);
         m_extensionPanel->setVisible(false);
     }
+
+    LibImageDataService::instance()->stopReadThumbnail();
 
     QFrame::hideEvent(e);
 }
