@@ -113,7 +113,6 @@ static QAction *hookToolBarActionIcons(QToolBar *bar, QAction **pageSetupAction 
 */
 void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 {
-    Q_UNUSED(parent)
     m_re->m_paths.clear();
     m_re->m_imgs.clear();
 
@@ -139,8 +138,8 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
         tempExsitPaths << paths;
 
     }
-    //看图采用同步,因为只有一张图片
-    DPrintPreviewDialog printDialog2(nullptr);
+    //看图采用同步,因为只有一张图片，传入父指针
+    DPrintPreviewDialog printDialog2(parent);
 #if (DTK_VERSION_MAJOR > 5 \
     || (DTK_VERSION_MAJOR >=5 && DTK_VERSION_MINOR > 4) \
     || (DTK_VERSION_MAJOR >= 5 && DTK_VERSION_MINOR >= 4 && DTK_VERSION_PATCH >= 10))//5.4.4暂时没有合入

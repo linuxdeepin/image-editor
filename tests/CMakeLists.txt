@@ -117,7 +117,6 @@ target_link_libraries(
     Qt5::X11Extras
     Qt5::PrintSupport
     Qt5::OpenGL
-    Qt5::WidgetsPrivate
     Qt5::Test
     dtkwidget
     dtkcore
