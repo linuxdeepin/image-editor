@@ -209,7 +209,14 @@ UNIONIMAGESHARED_EXPORT imageViewerSpace::ImageType getImageType(const QString &
  */
 UNIONIMAGESHARED_EXPORT imageViewerSpace::PathType getPathType(const QString &imagepath);
 
-
+/**
+ * @brief CropThumbnail
+ * @param pixmap
+ * @author LMH
+ * @return pixmap
+ * 获得缩略图
+ */
+UNIONIMAGESHARED_EXPORT QPixmap cropThumbnail(const QPixmap &pix , int size = 200);
 
 QT_BEGIN_NAMESPACE
 

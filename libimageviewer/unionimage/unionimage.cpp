@@ -1592,6 +1592,30 @@ QString PrivateDetectImageFormat(const QString &filepath)
     return "";
 }
 
+QPixmap cropThumbnail(const QPixmap &pix , int size){
+    QPixmap rePixmap;
+    if (0 != pix.height() && 0 != pix.width() && (pix.height() / pix.width()) < 10 && (pix.width() / pix.height()) < 10) {
+        bool cache_exist = false;
+        if (pix.height() != size && pix.width() != size) {
+            if (pix.height() >= pix.width()) {
+                cache_exist = true;
+                rePixmap = pix.scaledToWidth(size,  Qt::FastTransformation);
+            } else if (pix.height() <= pix.width()) {
+                cache_exist = true;
+                rePixmap = pix.scaledToHeight(size,  Qt::FastTransformation);
+            }
+        }
+        if (!cache_exist) {
+            if (static_cast<float>(pix.height()) / static_cast<float>(pix.width()) > 3) {
+                rePixmap = pix.scaledToWidth(size,  Qt::FastTransformation);
+            } else {
+                rePixmap = pix.scaledToHeight(size,  Qt::FastTransformation);
+            }
+        }
+    }
+    return rePixmap;
+}
+
 };
 
 
