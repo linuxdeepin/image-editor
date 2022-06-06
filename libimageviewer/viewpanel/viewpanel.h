@@ -261,5 +261,9 @@ private:
     QFileSystemWatcher *m_dirWatcher = nullptr;
 
     bool m_isShowTopBottom = true;
+
+    QSize m_windowSize;
+    int m_windowX = 0;
+    int m_windowY = 0;
 };
 #endif  // VIEWPANEL_H
