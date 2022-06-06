@@ -209,8 +209,6 @@ UNIONIMAGESHARED_EXPORT imageViewerSpace::ImageType getImageType(const QString &
  */
 UNIONIMAGESHARED_EXPORT imageViewerSpace::PathType getPathType(const QString &imagepath);
 
-
-
 QT_BEGIN_NAMESPACE
 
 class UnionMovieImagePrivate;

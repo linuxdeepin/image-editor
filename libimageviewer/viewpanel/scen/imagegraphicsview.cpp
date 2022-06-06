@@ -55,7 +55,6 @@
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
 
-
 #ifndef QT_NO_OPENGL
 //#include <QGLWidget>
 #endif
@@ -914,7 +913,27 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
     autoFit();
     m_rotateAngel += nAngel;
 
-    emit currentThumbnailChanged(pixmap, pixmap.size());
+    QPixmap thumbnailPixmap;
+    if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
+        bool cache_exist = false;
+        if (pixmap.height() != 200 && pixmap.width() != 200) {
+            if (pixmap.height() >= pixmap.width()) {
+                cache_exist = true;
+                thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+            } else if (pixmap.height() <= pixmap.width()) {
+                cache_exist = true;
+                thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+            }
+        }
+        if (!cache_exist) {
+            if (static_cast<float>(pixmap.height()) / static_cast<float>(pixmap.width()) > 3) {
+                thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+            } else {
+                thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+            }
+        }
+    }
+    emit currentThumbnailChanged(thumbnailPixmap, pixmap.size());
     emit imageChanged(m_path);
     return true;
 }
@@ -1154,7 +1173,6 @@ void LibImageGraphicsView::onCacheFinish()
             if (!m_pixmapItem) {
                 return;
             }
-
             QPixmap pixmap = vl.last().value<QPixmap>();
             QPixmap tmpPixmap = pixmap;
             tmpPixmap.setDevicePixelRatio(devicePixelRatioF());
@@ -1167,7 +1185,6 @@ void LibImageGraphicsView::onCacheFinish()
                 pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
                 m_newImageRotateAngle = 0;
             }
-
             m_pixmapItem->setGraphicsEffect(nullptr);
             m_pixmapItem->setPixmap(pixmap);
             setSceneRect(m_pixmapItem->boundingRect());
@@ -1175,10 +1192,29 @@ void LibImageGraphicsView::onCacheFinish()
             emit imageChanged(path);
             this->update();
             m_newImageLoadPhase = FullFinish;
-
             //刷新缩略图
             if (!pixmap.isNull()) {
-                emit currentThumbnailChanged(pixmap, pixmap.size());
+                QPixmap thumbnailPixmap;
+                if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
+                    bool cache_exist = false;
+                    if (pixmap.height() != 200 && pixmap.width() != 200) {
+                        if (pixmap.height() >= pixmap.width()) {
+                            cache_exist = true;
+                            thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+                        } else if (pixmap.height() <= pixmap.width()) {
+                            cache_exist = true;
+                            thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+                        }
+                    }
+                    if (!cache_exist) {
+                        if (static_cast<float>(pixmap.height()) / static_cast<float>(pixmap.width()) > 3) {
+                            thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+                        } else {
+                            thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+                        }
+                    }
+                }
+                emit currentThumbnailChanged(thumbnailPixmap, pixmap.size());
             }
 
         }
@@ -1327,6 +1363,7 @@ void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
 
 void LibImageGraphicsView::OnFinishPinchAnimal()
 {
+
     m_rotateflag = true;
     m_bnextflag = true;
     m_rotateAngelTouch = 0;
@@ -1363,7 +1400,27 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
         m_rotateAngel += m_endvalue;
         if (m_endvalue > 0) {
             emit gestureRotate(static_cast<int>(0));
-            emit currentThumbnailChanged(pixmap, pixmap.size());
+            QPixmap thumbnailPixmap;
+            if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
+                bool cache_exist = false;
+                if (pixmap.height() != 200 && pixmap.width() != 200) {
+                    if (pixmap.height() >= pixmap.width()) {
+                        cache_exist = true;
+                        thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+                    } else if (pixmap.height() <= pixmap.width()) {
+                        cache_exist = true;
+                        thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+                    }
+                }
+                if (!cache_exist) {
+                    if (static_cast<float>(pixmap.height()) / static_cast<float>(pixmap.width()) > 3) {
+                        thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
+                    } else {
+                        thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
+                    }
+                }
+            }
+            emit currentThumbnailChanged(thumbnailPixmap, pixmap.size());
             emit UpdateNavImg();
         }
     }
