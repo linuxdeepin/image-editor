@@ -113,6 +113,20 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
     QObject::connect(m_view, &LibImageGraphicsView::currentThumbnailChanged, m_bottomToolbar, &LibBottomToolbar::onThumbnailChanged,Qt::DirectConnection);
     QObject::connect(m_view, &LibImageGraphicsView::gestureRotate, this, &LibViewPanel::slotRotateImage);
+
+    //删除完了图片需要返回原状bug137195
+    QObject::connect(ImageEngine::instance(), &ImageEngine::sigPicCountIsNull, this,[=]{
+        if (ImgViewerType::ImgViewerTypeAlbum != LibCommonService::instance()->getImgViewerType()) {
+            if(window()->isFullScreen()){
+                window()->showNormal();
+                window()->resize(m_windowSize);
+                window()->move(m_windowX,m_windowY);
+                QTimer::singleShot(50,[=]{
+                    window()->move(m_windowX,m_windowY);
+                });
+            }
+        }
+    });
 }
 
 LibViewPanel::~LibViewPanel()
@@ -633,6 +647,10 @@ void LibViewPanel::toggleFullScreen()
 
 void LibViewPanel::showFullScreen()
 {
+    m_windowSize = window()->size();
+    m_windowX = window()->x();
+    m_windowY = window()->y();
+
     if (m_view) {
         m_view->setWindowIsFullScreen(true);
     }
