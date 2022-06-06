@@ -55,7 +55,6 @@
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
 
-
 #ifndef QT_NO_OPENGL
 //#include <QGLWidget>
 #endif
@@ -914,7 +913,7 @@ bool LibImageGraphicsView::slotRotatePixmap(int nAngel)
     autoFit();
     m_rotateAngel += nAngel;
 
-    emit currentThumbnailChanged(pixmap, pixmap.size());
+    emit currentThumbnailChanged(LibUnionImage_NameSpace::cropThumbnail(pixmap), pixmap.size());
     emit imageChanged(m_path);
     return true;
 }
@@ -1154,7 +1153,6 @@ void LibImageGraphicsView::onCacheFinish()
             if (!m_pixmapItem) {
                 return;
             }
-
             QPixmap pixmap = vl.last().value<QPixmap>();
             QPixmap tmpPixmap = pixmap;
             tmpPixmap.setDevicePixelRatio(devicePixelRatioF());
@@ -1167,7 +1165,6 @@ void LibImageGraphicsView::onCacheFinish()
                 pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
                 m_newImageRotateAngle = 0;
             }
-
             m_pixmapItem->setGraphicsEffect(nullptr);
             m_pixmapItem->setPixmap(pixmap);
             setSceneRect(m_pixmapItem->boundingRect());
@@ -1175,10 +1172,9 @@ void LibImageGraphicsView::onCacheFinish()
             emit imageChanged(path);
             this->update();
             m_newImageLoadPhase = FullFinish;
-
             //刷新缩略图
             if (!pixmap.isNull()) {
-                emit currentThumbnailChanged(pixmap, pixmap.size());
+                emit currentThumbnailChanged(LibUnionImage_NameSpace::cropThumbnail(pixmap), pixmap.size());
             }
 
         }
@@ -1327,6 +1323,7 @@ void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
 
 void LibImageGraphicsView::OnFinishPinchAnimal()
 {
+
     m_rotateflag = true;
     m_bnextflag = true;
     m_rotateAngelTouch = 0;
@@ -1363,7 +1360,7 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
         m_rotateAngel += m_endvalue;
         if (m_endvalue > 0) {
             emit gestureRotate(static_cast<int>(0));
-            emit currentThumbnailChanged(pixmap, pixmap.size());
+            emit currentThumbnailChanged(LibUnionImage_NameSpace::cropThumbnail(pixmap), pixmap.size());
             emit UpdateNavImg();
         }
     }
