@@ -331,7 +331,6 @@ TEST_F(gtestview, LibImageDataService)
     LibImageDataService::instance()->getCount();
     LibImageDataService::instance()->setVisualIndex(0);
     LibImageDataService::instance()->addMovieDurationStr("", "");
-    LibImageDataService::instance()->deleteLater();
 
     QTest::qWait(500);
 
