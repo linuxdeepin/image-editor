@@ -190,16 +190,18 @@ LibImageDataService::LibImageDataService(QObject *parent)
 
 void LibImageDataService::stopReadThumbnail()
 {
-    for (auto &thread : readThreadGroup) {
-        thread->setQuit(true);
-    }
+    if (!readThreadGroup.empty()) {
+        for (auto &thread : readThreadGroup) {
+            thread->setQuit(true);
+        }
 
-    for (auto &thread : readThreadGroup) {
-        while (thread->isRunning());
-        thread->deleteLater();
-    }
+        for (auto &thread : readThreadGroup) {
+            while (thread->isRunning());
+            thread->deleteLater();
+        }
 
-    readThreadGroup.clear();
+        readThreadGroup.clear();
+    }
 }
 
 //缩略图读取线程
