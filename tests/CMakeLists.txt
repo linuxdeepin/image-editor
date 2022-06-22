@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(deepin-image-viewer-test VERSION 0.1)
+project(image-editor-test VERSION 0.1)
 
 #"option"用来定义宏，"ON"表示打开，"OFF"表示关闭
 option (LITE_DIV "Use tutorial provided math implementation" ON)
@@ -11,8 +11,8 @@ add_definitions( -DUSE_UNIONIMAGE )
 option (USE_TEST "Use TESTS" ON)
 add_definitions( -DUSE_TEST )
 
-set(TARGET_NAME deepin-image-viewer-test)
-set(CMD_NAME deepin-image-viewer-test)
+set(TARGET_NAME image-editor-test)
+set(CMD_NAME image-editor-test)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -36,18 +36,20 @@ file(GLOB_RECURSE HEADERSCURRENT "*.h")
 file(GLOB_RECURSE  SOURCESCURRENT  "*.cpp")
 
 file (GLOB_RECURSE SOURCES
-    "../libimage-viewer/*.cpp"
-    "../libimage-viewer/*.h"
+    "../libimageviewer/*.cpp"
+    "../libimageviewer/*.h"
+    "../libimagevisualresult/exposure.cpp"
+    "../libimagevisualresult/exposure.h"
     )
-file(GLOB_RECURSE SOURCESC "../libimage-viewer/*.c")
+file(GLOB_RECURSE SOURCESC "../libimageviewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")
-file(GLOB_RECURSE FORMS "../libimage-viewer/*.ui")
+file(GLOB_RECURSE FORMS "../libimageviewer/*.ui")
 file(GLOB_RECURSE RESOURCES "../*.qrc")
 
 include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimage-viewer/
+set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimageviewer/
     ${PROJECT_SOURCE_DIR}/../src/src/utils
     )
 
@@ -78,7 +80,7 @@ pkg_check_modules(3rd_lib REQUIRED
 ## translations
 
 file(GLOB TS LIST_DIRECTORIES false translations/${CMD_NAME}*.ts)
-#file(GLOB TS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/translations/deepin-image-viewer_zh_CN.ts)
+#file(GLOB TS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/translations/image-editor_zh_CN.ts)
 
 set_source_files_properties(${TS} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/translations)
 
@@ -93,6 +95,11 @@ add_executable( ${TARGET_NAME} ${SOURCES} ${SOURCESC}
     ${RESOURCES} ${HEADERSCURRENT}
     ${SOURCESCURRENT} ${QM}
     )
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+link_directories(${OpenCV_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE})
 target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} )
@@ -110,7 +117,6 @@ target_link_libraries(
     Qt5::X11Extras
     Qt5::PrintSupport
     Qt5::OpenGL
-    Qt5::WidgetsPrivate
     Qt5::Test
     dtkwidget
     dtkcore

@@ -138,6 +138,8 @@ TEST_F(gtestview, cpFile)
     QFile(QApplication::applicationDirPath() + "/test/jpg.jpg").setPermissions(\
                                                                                QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
                                                                                QFile::ReadOther | QFile::ReadGroup | QFile::WriteGroup);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/errorPic.icns").isFile());
 }
 
 //主窗体
@@ -148,6 +150,7 @@ TEST_F(gtestview, MainWindow)
 
     ImageViewer *m_imageViewer = new ImageViewer(imageViewerSpace::ImgViewerType::ImgViewerTypeLocal, CACHE_PATH, nullptr);
     QStringList paths{QApplication::applicationDirPath() + "/svg.svg", QApplication::applicationDirPath() + "/test/jpg.jpg"};
+    m_imageViewer->startChooseFileDialog();
     bool bRet = m_imageViewer->startdragImage({});
     bRet = m_imageViewer->startdragImage({"smb-share:server=bisuhfawe.png"});
     bRet = m_imageViewer->startdragImage({"mtp:host=bisuhfawe.png"});
@@ -155,8 +158,8 @@ TEST_F(gtestview, MainWindow)
     bRet = m_imageViewer->startdragImage({"gphoto2:host=Apple=bisuhfawe.png"});
     bRet = m_imageViewer->startdragImage({QDir::homePath() + "/.local/share/Trash"});
     bRet = m_imageViewer->startdragImage(paths);
+    bRet = m_imageViewer->startdragImageWithUID(paths);
     if (bRet) {
-
         m_imageViewer->showNormal();
         m_imageViewer->resize(800, 600);
         m_imageViewer->resize(1000, 500);
@@ -179,6 +182,8 @@ TEST_F(gtestview, MainWindow)
     QTest::qWait(500);
     m_imageViewer->deleteLater();
     QTest::qWait(500);
+
+    EXPECT_EQ(true, bRet);
 }
 
 //widgets
@@ -294,8 +299,8 @@ TEST_F(gtestview, Widgets)
 
     //top tool bar
     {
-        DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
-        TopToolbar toolBar(false, nullptr);
+        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::DarkType);
+        LibTopToolbar toolBar(false, nullptr);
         toolBar.setTitleBarTransparent(false);
 
         toolBar.show();
@@ -306,174 +311,35 @@ TEST_F(gtestview, Widgets)
         e.addDelay(500);
         e.simulate(&toolBar);
 
-        DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::LightType);
+        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::LightType);
         QTest::qWait(200);
     }
+    bool bRet = false;
+    if (DGuiApplicationHelper::instance()->paletteType() == DGuiApplicationHelper::LightType) {
+        bRet = true;
+    }
+    EXPECT_EQ(true, bRet);
 }
 
-//view panel
-TEST_F(gtestview, ViewPanel)
-{
-    //初始化
-    ViewPanel panel;
-    panel.loadImage(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
-                                                                      QApplication::applicationDirPath() + "/tif.tif",
-                                                                      QApplication::applicationDirPath() + "/jpg.jpg",
-                                                                      QApplication::applicationDirPath() + "/jpg.jpg",
-                                                                      QApplication::applicationDirPath() + "/svg.svg"
-                                                                     });
-    panel.initFloatingComponent();
-    panel.show();
-
-    //键盘与鼠标事件
-    QTestEventList e;
-
-    //动态图
-    e.addKeyClick(Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Left, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    e.addDelay(500);
-
-    //多页图
-    e.addKeyClick(Qt::Key_Right, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Up, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Plus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_0, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Minus, Qt::KeyboardModifier::ControlModifier, 200);
-    e.addKeyClick(Qt::Key_Down, Qt::KeyboardModifier::NoModifier, 200);
-    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    e.addDelay(500);
-
-    e.simulate(&panel);
-
-    //基本函数遍历
-    panel.toggleFullScreen();
-    panel.slotBottomMove();
-    panel.toggleFullScreen();
-    panel.slotBottomMove();
-    panel.startChooseFileDialog();
-    panel.getBottomtoolbarButton(imageViewerSpace::ButtonType::ButtonTypeOcr);
-    panel.slotOcrPicture();
-    panel.backImageView(QApplication::applicationDirPath() + "/svg.svg");
-    panel.initSlidePanel();
-    panel.resetBottomToolbarGeometry(true);
-    panel.resetBottomToolbarGeometry(false);
-    panel.slotRotateImage(90);
-    QTest::qWait(3000);
-    panel.slotRotateImage(-90);
-    QTest::qWait(3000);
-
-    //菜单
-    //还剩IdPrint会崩
-    QAction menuAction;
-
-    menuAction.setProperty("MenuID", ViewPanel::IdFullScreen);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdRename);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdStartSlideShow);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-    e.clear();
-    e.addKeyClick(Qt::Key_Escape, Qt::KeyboardModifier::NoModifier, 200);
-    e.simulate(panel.m_sliderPanel);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdCopy);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdShowNavigationWindow);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdHideNavigationWindow);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-    DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::DarkType);
-    QTest::qWait(500);
-    DGuiApplicationHelper::instance()->setThemeType(DGuiApplicationHelper::LightType);
-    QTest::qWait(500);
-    e.clear();
-    e.addMousePress(Qt::MouseButton::LeftButton);
-    e.addMouseMove(QPoint(20, 20), 200);
-    e.addMouseRelease(Qt::MouseButton::LeftButton);
-    e.addDelay(200);
-    e.simulate(panel.m_nav.widget());
-
-    menuAction.setProperty("MenuID", ViewPanel::IdRotateClockwise);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdRotateCounterclockwise);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdSetAsWallpaper);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdDisplayInFileManager);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdImageInfo);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdOcr);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(500);
-
-    menuAction.setProperty("MenuID", ViewPanel::IdMoveToTrash);
-    panel.onMenuItemClicked(&menuAction);
-    QTest::qWait(200);
-
-    //ImageGraphicsView
-    panel.loadImage("", {});
-
-    auto view = panel.m_view;
-    view->clear();
-    view->setImage(QApplication::applicationDirPath() + "/svg2.svg", QImage());
-
-    QTest::qWait(500);
-}
-
-TEST_F(gtestview, ImageDataService)
+TEST_F(gtestview, LibImageDataService)
 {
     auto testPath = QApplication::applicationDirPath() + "/jpg.jpg";
-    ImageDataService::instance()->imageIsLoaded(testPath);
-    ImageDataService::instance()->addImage(testPath, ImageDataService::instance()->getThumnailImageByPath(testPath));
-    ImageDataService::instance()->getMovieDurationStrByPath(testPath);
-    ImageDataService::instance()->getVisualIndex();
-    ImageDataService::instance()->getCount();
-    ImageDataService::instance()->setVisualIndex(0);
-    ImageDataService::instance()->addMovieDurationStr("", "");
-    ImageDataService::instance()->deleteLater();
+    LibImageDataService::instance()->imageIsLoaded(testPath);
+    LibImageDataService::instance()->addImage(testPath, LibImageDataService::instance()->getThumnailImageByPath(testPath));
+    LibImageDataService::instance()->getMovieDurationStrByPath(testPath);
+    LibImageDataService::instance()->getVisualIndex();
+    LibImageDataService::instance()->getCount();
+    LibImageDataService::instance()->setVisualIndex(0);
+    LibImageDataService::instance()->addMovieDurationStr("", "");
 
     QTest::qWait(500);
+
+    EXPECT_EQ(true, QFileInfo(QApplication::applicationDirPath() + "/jpg.jpg").isFile());
 }
 
-TEST_F(gtestview, BottomToolbar)
+TEST_F(gtestview, LibBottomToolbar)
 {
-    BottomToolbar toolBar;
+    LibBottomToolbar toolBar;
     toolBar.setAllFile(QApplication::applicationDirPath() + "/gif.gif", {QApplication::applicationDirPath() + "/gif.gif",
                                                                          QApplication::applicationDirPath() + "/tif.tif",
                                                                          QApplication::applicationDirPath() + "/jpg.jpg",
@@ -488,45 +354,52 @@ TEST_F(gtestview, BottomToolbar)
     e.addMouseRelease(Qt::MouseButton::LeftButton);
     e.addDelay(500);
     e.simulate(toolBar.m_imgListWidget);
+
+    toolBar.setPictureDoBtnClicked(true);
+    bool bRet = false;
+    if (toolBar.getAllPath().count() > 0) {
+        bRet = true;
+    }
+    EXPECT_EQ(true, bRet);
 }
 
 TEST_F(gtestview, UnionImage)
 {
     //base utils
-    utils::base::hash("12345");
-    utils::base::mountDeviceExist("/media/uos/");
-    utils::base::mountDeviceExist("/run/media/uos/");
-    utils::base::onMountDevice("12345");
-    utils::base::showInFileManager(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::base::stringToDateTime("1970-01-01 00:00:00");
-    utils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), true);
-    utils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), false);
+    Libutils::base::hash("12345");
+    Libutils::base::mountDeviceExist("/media/uos/");
+    Libutils::base::mountDeviceExist("/run/media/uos/");
+    Libutils::base::onMountDevice("12345");
+    Libutils::base::showInFileManager(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::base::stringToDateTime("1970-01-01 00:00:00");
+    Libutils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), true);
+    Libutils::base::timeToString(QDateTime::fromString("1970-01-01 00:00:00"), false);
 
     //image utils
-    utils::image::scaleImage(QApplication::applicationDirPath() + "/f827t3r9qwheo.icns");
-    utils::image::scaleImage(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::getCreateDateTime(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::imageSupportSave(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::scaleImage(QApplication::applicationDirPath() + "/f827t3r9qwheo.icns");
+    Libutils::image::scaleImage(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getCreateDateTime(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::imageSupportSave(QApplication::applicationDirPath() + "/jpg.jpg");
 
-    auto pix = utils::image::cachePixmap(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::cutSquareImage(pix);
-    utils::image::cutSquareImage(pix, {200, 200});
+    auto pix = Libutils::image::cachePixmap(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::cutSquareImage(pix);
+    Libutils::image::cutSquareImage(pix, {200, 200});
 
-    utils::image::getImagesInfo(QApplication::applicationDirPath(), false);
-    utils::image::getImagesInfo(QApplication::applicationDirPath(), true);
-    utils::image::getOrientation(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::getRotatedImage(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getImagesInfo(QApplication::applicationDirPath(), false);
+    Libutils::image::getImagesInfo(QApplication::applicationDirPath(), true);
+    Libutils::image::getOrientation(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::getRotatedImage(QApplication::applicationDirPath() + "/jpg.jpg");
 
-    utils::image::generateThumbnail(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::generateThumbnail(QApplication::applicationDirPath() + "/errorPic.icns");
-    utils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", true);
-    utils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", false);
+    Libutils::image::generateThumbnail(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::generateThumbnail(QApplication::applicationDirPath() + "/errorPic.icns");
+    Libutils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", true);
+    Libutils::image::getThumbnail(QApplication::applicationDirPath() + "/jpg.jpg", false);
 
-    utils::image::isCanRemove(QApplication::applicationDirPath() + "/jpg.jpg");
-    utils::image::isCanRemove("ngw8uhrt8owjfpowsj");
+    Libutils::image::isCanRemove(QApplication::applicationDirPath() + "/jpg.jpg");
+    Libutils::image::isCanRemove("ngw8uhrt8owjfpowsj");
 
     //Img Operate
-    ImgOperate worker;
+    LibImgOperate worker;
     worker.slotMakeImgThumbnail(QApplication::applicationDirPath(), {QApplication::applicationDirPath() + "/jpg.jpg"}, 1, true);
     worker.slotMakeImgThumbnail(QApplication::applicationDirPath(), {QApplication::applicationDirPath() + "/jpg.jpg"}, 1, false);
 
@@ -544,28 +417,28 @@ TEST_F(gtestview, UnionImage)
     DetectImageFormat(QApplication::applicationDirPath() + "/tga.tga");
 
     //union image detial
-    UnionImage_NameSpace::supportStaticFormat();
-    UnionImage_NameSpace::supportMovieFormat();
+    LibUnionImage_NameSpace::supportStaticFormat();
+    LibUnionImage_NameSpace::supportMovieFormat();
     QImage res;
-    UnionImage_NameSpace::creatNewImage(res);
-    UnionImage_NameSpace::detectImageFormat(QApplication::applicationDirPath() + "/jpg.jpg");
-    ASSERT_EQ(UnionImage_NameSpace::isNoneQImage(QImage()), true);
-    UnionImage_NameSpace::rotateImage(90, res);
-    UnionImage_NameSpace::rotateImage(80, res);
+    LibUnionImage_NameSpace::creatNewImage(res);
+    LibUnionImage_NameSpace::detectImageFormat(QApplication::applicationDirPath() + "/jpg.jpg");
+    ASSERT_EQ(LibUnionImage_NameSpace::isNoneQImage(QImage()), true);
+    LibUnionImage_NameSpace::rotateImage(90, res);
+    LibUnionImage_NameSpace::rotateImage(80, res);
     res = QImage(QApplication::applicationDirPath() + "/jpg.jpg");
-    UnionImage_NameSpace::rotateImage(90, res);
+    LibUnionImage_NameSpace::rotateImage(90, res);
     QString err;
-    UnionImage_NameSpace::rotateImageFIle(80, "", err);
-    UnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/dds.dds", err);
-    UnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/dds.dds", err);
-    UnionImage_NameSpace::unionImageVersion();
-    UnionImage_NameSpace::rotateImageFIleWithImage(-80, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
-    UnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/svg.svg", res, err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(90, res, QApplication::applicationDirPath() + "/svg.svg", err);
-    UnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/tga.tga", res, err);
-    UnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/tga.tga", err);
+    LibUnionImage_NameSpace::rotateImageFIle(80, "", err);
+    LibUnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIle(90, QApplication::applicationDirPath() + "/dds.dds", err);
+    LibUnionImage_NameSpace::rotateImageFIle(-90, QApplication::applicationDirPath() + "/dds.dds", err);
+    LibUnionImage_NameSpace::unionImageVersion();
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-80, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/jpg.jpg", err);
+    LibUnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/svg.svg", res, err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(90, res, QApplication::applicationDirPath() + "/svg.svg", err);
+    LibUnionImage_NameSpace::loadStaticImageFromFile(QApplication::applicationDirPath() + "/tga.tga", res, err);
+    LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, res, QApplication::applicationDirPath() + "/tga.tga", err);
 }
