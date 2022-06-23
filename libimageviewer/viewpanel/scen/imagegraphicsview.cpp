@@ -1214,6 +1214,9 @@ void LibImageGraphicsView::onCacheFinish()
                         }
                     }
                 }
+                else {
+                    thumbnailPixmap = pixmap.scaled(200,200);
+                }
                 emit currentThumbnailChanged(thumbnailPixmap, pixmap.size());
             }
 
