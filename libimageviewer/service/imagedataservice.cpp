@@ -259,6 +259,9 @@ void LibReadThumbnailThread::readThumbnail(QString path)
             }
         }
     }
+    else {
+        tImg = tImg.scaled(200,200);
+    }
 
     itemInfo.image = tImg;
 
