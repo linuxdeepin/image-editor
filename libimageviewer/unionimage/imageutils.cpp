@@ -474,6 +474,8 @@ const QImage loadTga(QString filePath, bool &success)
             img = QImage(1, 1, QImage::Format_RGB32);
             img.fill(Qt::red);
             success = false;
+
+            delete vui8Pixels;
             return img;
         }
 
