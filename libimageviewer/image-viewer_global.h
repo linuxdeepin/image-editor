@@ -96,7 +96,7 @@ struct ItemInfo {
     int imgWidth = 0;
     int imgHeight = 0;
     QString remainDays = QObject::tr("day");
-    bool isSelected;
+    bool isSelected = false;
     ItemInfoType itemType = ItemTypePic;//类型，空白，图片，视频
     QImage image = QImage();
     QImage damagedPixmap = QImage();
@@ -105,6 +105,8 @@ struct ItemInfo {
 
     QString date;
     QString num;
+
+    ItemInfo() {}
 
     friend bool operator== (const ItemInfo &left, const ItemInfo &right)
     {
