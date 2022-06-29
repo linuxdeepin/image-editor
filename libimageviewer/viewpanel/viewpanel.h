@@ -207,6 +207,10 @@ protected:
     void leaveEvent(QEvent *event) override;
 
     void hideEvent(QHideEvent *e) override;
+
+    // 捕获窗口的状态变更事件
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 signals:
     void imageChanged(const QString &path);
 

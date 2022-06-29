@@ -128,6 +128,11 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
             }
         }
     });
+
+    // 添加过滤处理，当窗口出现状态变更时(最大化、全屏)，处理标题栏隐藏、显示
+    if (window()) {
+        window()->installEventFilter(this);
+    }
 }
 
 LibViewPanel::~LibViewPanel()
@@ -2070,4 +2075,24 @@ void LibViewPanel::hideEvent(QHideEvent *e)
     LibImageDataService::instance()->stopReadThumbnail();
 
     QFrame::hideEvent(e);
+}
+
+bool LibViewPanel::eventFilter(QObject *o, QEvent *e)
+{
+    // 判断是否为窗口的状态变化
+    if (window() == o
+            && QEvent::WindowStateChange == e->type()) {
+        if (m_topToolbar) {
+            if (window()->isFullScreen()) {
+                // 全屏状态下隐藏标题栏
+                m_topToolbar->setVisible(false);
+            } else {
+                if (!m_topToolBarIsAlwaysHide) {
+                    m_topToolbar->setVisible(true);
+                }
+            }
+        }
+    }
+
+    return QFrame::eventFilter(o, e);
 }
