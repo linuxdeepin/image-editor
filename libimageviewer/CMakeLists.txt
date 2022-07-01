@@ -39,6 +39,9 @@ pkg_check_modules(3rd_lib REQUIRED
     dtkwidget
     dtkcore
     dtkgui
+    glib-2.0
+    gstreamer-1.0
+    libmediainfo
     )
 
 #需要打开的头文件
@@ -102,6 +105,7 @@ install(FILES
     imageengine.h
     imageviewer.h
     image-viewer_global.h
+    movieservice.h
     DESTINATION include/libimageviewer)
 
 install(FILES ${PROJECT_BINARY_DIR}/libimageviewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
