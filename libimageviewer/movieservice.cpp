@@ -121,16 +121,7 @@ MovieInfo MovieService::getMovieInfo(const QUrl &url)
     if (url.isLocalFile()) {
         QFileInfo fi(url.toLocalFile());
         if (fi.exists() && fi.permission(QFile::Permission::ReadOwner)) { //存在且有读权限才能导入
-            if (!m_ffmpegExist) { //ffmpeg不存在，只读取基本信息
-                result.valid = true;
-                result.filePath = fi.absoluteFilePath();
-                result.fileSize = fi.size();
-                result.fileType = fi.suffix().toLower();
-                result.duration = "-";
-            } else { //ffmpeg存在，执行标准流程
-                auto filePath = fi.filePath();
-                result = parseFromFile(fi);
-            }
+            result = parseFromFile(fi);
         }
     }
 
@@ -204,7 +195,14 @@ MovieInfo MovieService::parseFromFile(const QFileInfo &fi)
 {
     auto info = getMovieInfo_mediainfo(fi);
     if(!info.valid) {
-        info = getMovieInfo_ffmpeg(fi);
+        if(m_ffmpegExist) {
+            info = getMovieInfo_ffmpeg(fi);
+        } else {
+            info.filePath = fi.absoluteFilePath();
+            info.fileType = fi.suffix().toLower();
+            info.fileSize = fi.size();
+            info.valid = true;
+        }
     }
 
     return info;
@@ -213,7 +211,7 @@ MovieInfo MovieService::parseFromFile(const QFileInfo &fi)
 QImage MovieService::getMovieCover(const QUrl &url, const QString &savePath)
 {
     auto image = getMovieCover_gstreamer(url);
-    if(image.isNull()) {
+    if(image.isNull() && m_ffmpegthumbnailerExist) {
         image = getMovieCover_ffmpegthumbnailer(url, savePath);
     }
     return image;
@@ -422,7 +420,6 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
     QStringList infoList = strData.split("\n");
 
     //2.解析数据
-    mi.valid = true;
 
     //2.1.文件信息
     mi.filePath = fi.absoluteFilePath();
@@ -431,6 +428,13 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
 
     //2.2.视频流数据
     auto videoGroup = searchGroupFromKey("Video", infoList);
+    
+    if(!videoGroup.empty()) {
+        mi.valid = true;
+    } else {
+        mi.valid = false;
+        return mi;
+    }
 
     //编码格式
     for(auto &eachPair : videoGroup) {
