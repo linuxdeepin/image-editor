@@ -260,6 +260,11 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
 {
     struct MovieInfo mi;
 
+    if(!m_ffmpegExist) {
+        mi.valid = false;
+        return mi;
+    }
+
     //使用命令行读取ffmpeg的输出
     auto filePath = fi.absoluteFilePath();
     QByteArray output;
