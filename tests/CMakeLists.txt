@@ -74,6 +74,8 @@ pkg_check_modules(3rd_lib REQUIRED
     gio-qt
     gio-unix-2.0
     gsettings-qt
+    gstreamer-1.0
+    libmediainfo
 #    freeimage
         )
 
@@ -102,7 +104,7 @@ link_directories(${OpenCV_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE})
-target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} )
+target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} -ldl)
 
 
 target_link_libraries(

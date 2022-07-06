@@ -57,6 +57,11 @@ gtestview::gtestview()
 }
 TEST_F(gtestview, cpFile)
 {
+    QFile::copy(":/500Kavi.avi", QApplication::applicationDirPath() + "/500Kavi.avi");
+    QFile(QApplication::applicationDirPath() + "/500Kavi.avi").setPermissions(\
+                                                                              QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
+                                                                              QFile::ReadOther | QFile::ReadGroup | QFile::WriteGroup);
+
     QFile::copy(":/gif.gif", QApplication::applicationDirPath() + "/gif.gif");
     QFile(QApplication::applicationDirPath() + "/gif.gif").setPermissions(\
                                                                           QFile::WriteUser | QFile::ReadUser | QFile::WriteOther | \
