@@ -483,7 +483,7 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
 
     //码率
     for(auto &eachPair : videoGroup) {
-        if(eachPair.first == "Bit rate") {
+        if(eachPair.first.indexOf("bit rate", Qt::CaseInsensitive) != -1) {
             auto codeRate = eachPair.second.toInt();
             if(codeRate > 0) {
                 mi.vCodeRate = codeRate / 1000;
@@ -507,7 +507,7 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
     for(auto &eachPair : videoGroup) {
         if(eachPair.first == "Duration") {
             auto list = eachPair.second.split(".");
-            if(list.size() == 2) {
+            if(list.size() == 2 && std::count(list[0].begin(), list[0].end(), ':') >= 2) {
                 mi.duration = list[0];
                 break;
             }
