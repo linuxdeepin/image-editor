@@ -41,10 +41,4 @@ TEST(movieservice, movieCover)
     //简单判断
     ASSERT_EQ(image_1.isNull(), false);
     ASSERT_EQ(image_2.isNull(), false);
-
-    if(!MovieService::instance()->m_ffmpegthumbnailerExist) {
-        ASSERT_EQ(image_3.isNull(), true);
-    } else {
-        ASSERT_EQ(image_3.isNull(), false);
-    }
 }
