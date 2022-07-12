@@ -111,4 +111,11 @@ private:
     QString fpsPattern;
 };
 
+//C-Style API
+extern "C" {
+
+void getMovieCover(const QUrl &url, const QString &savePath, QImage *imageRet);
+
+}
+
 #endif // MOVIESERVICE_H
