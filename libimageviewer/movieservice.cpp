@@ -208,6 +208,11 @@ MovieInfo MovieService::parseFromFile(const QFileInfo &fi)
     return info;
 }
 
+void getMovieCover(const QUrl &url, const QString &savePath, QImage *imageRet)
+{
+    *imageRet = MovieService::instance()->getMovieCover(url, savePath);
+}
+
 QImage MovieService::getMovieCover(const QUrl &url, const QString &savePath)
 {
     auto image = getMovieCover_gstreamer(url);
