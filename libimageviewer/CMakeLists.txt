@@ -39,8 +39,7 @@ pkg_check_modules(3rd_lib REQUIRED
     dtkwidget
     dtkcore
     dtkgui
-    glib-2.0
-    gstreamer-1.0
+    gobject-2.0
     libmediainfo
     )
 

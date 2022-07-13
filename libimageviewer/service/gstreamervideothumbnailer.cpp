@@ -18,19 +18,131 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include <glib/gstdio.h>
-#include <glib/gi18n.h>
-#include <gst/gst.h>
-
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
 
 #include <QUrl>
 #include <QImage>
+#include <QLibrary>
+#include <QLibraryInfo>
+#include <QDir>
+
+#include "gsttransplant.h"
 
 //参考自totem项目
+
+//基础函数指针
+static guint(*gst_caps_get_size)(const GstCaps *) = nullptr;
+static GstStructure*(*gst_caps_get_structure)(const GstCaps *, guint) = nullptr;
+static gboolean(*gst_structure_has_name)(const GstStructure* structure, const gchar* name) = nullptr;
+static GstElement* (*gst_element_factory_make)(const gchar *factoryname, const gchar *name) = nullptr;
+static void (*gst_object_unref)(gpointer object) = nullptr;
+static GstElement* (*gst_pipeline_new)(const gchar *name) = nullptr;
+static void (*gst_bin_add_many)(GstBin *bin, GstElement *element_1, ...) = nullptr;
+static gboolean (*gst_element_link_many)(GstElement *element_1, GstElement *element_2, ...) = nullptr;
+static GType (*gst_bin_get_type)(void) = nullptr;
+static GstBuffer* (*gst_sample_get_buffer)(GstSample *sample) = nullptr;
+static GstCaps* (*gst_sample_get_caps)(GstSample *sample) = nullptr;
+static GstCaps* (*gst_caps_new_empty)(void) = nullptr;
+static GstStructure* (*gst_structure_copy)(const GstStructure  * structure) = nullptr;
+static void (*gst_structure_remove_field)(GstStructure* structure, const gchar* fieldname) = nullptr;
+static void (*gst_caps_append_structure)(GstCaps *caps, GstStructure  *structure) = nullptr;
+static GstStateChangeReturn (*gst_element_set_state)(GstElement *element, GstState state) = nullptr;
+static void (*gst_mini_object_unref)(GstMiniObject *mini_object) = nullptr;
+static GstBus* (*gst_element_get_bus)(GstElement * element) = nullptr;
+static GstMessage* (*gst_bus_timed_pop_filtered)(GstBus * bus, GstClockTime timeout, GstMessageType types) = nullptr;
+static void (*gst_message_parse_error)(GstMessage *message, GError **gerror, gchar **debug) = nullptr;
+static GstElement* (*gst_bin_get_by_name)(GstBin *bin, const gchar *name) = nullptr;
+static gboolean (*gst_structure_get_int)(const GstStructure* structure, const gchar* fieldname, gint* value) = nullptr;
+static GstMemory* (*gst_buffer_get_memory)(GstBuffer *buffer, guint idx) = nullptr;
+static void (*gst_memory_unmap)(GstMemory *mem, GstMapInfo *info) = nullptr;
+static gboolean (*gst_element_seek)(GstElement *element, gdouble rate, GstFormat format, GstSeekFlags flags, GstSeekType start_type, gint64 start, GstSeekType stop_type, gint64 stop) = nullptr;
+static GstStateChangeReturn (*gst_element_get_state)(GstElement* element, GstState* state, GstState* pending, GstClockTime timeout) = nullptr;
+static gboolean (*gst_element_query_duration)(GstElement* element, GstFormat format, gint64* duration) = nullptr;
+static void (*gst_init)(int *argc, char **argv[]) = nullptr;
+static gboolean (*gst_memory_map)(GstMemory *mem, GstMapInfo *info, GstMapFlags flags) = nullptr;
+static gboolean (*gst_tag_list_get_string_index)(const GstTagList* list, const gchar* tag, guint index, gchar** value) = nullptr;
+static GstCaps* (*gst_caps_new_simple)(const char* media_type, const char* fieldname, ...) = nullptr;
+
+//大作用域变量 潜在崩溃风险,需要多观察
+static GType* _gst_fraction_type;
+
+//解析成功标记
+static bool resolveSuccessed = false;
+
+//自动解析模板
+template<typename FuncPointer>
+bool resolveSymbol(QLibrary &lib, const char *symbolName, FuncPointer* pointerRet)
+{
+    *pointerRet = reinterpret_cast<FuncPointer>(lib.resolve(symbolName));
+    return *pointerRet != nullptr;
+}
+
+QString libPath(const QString &strlib)
+{
+    QDir dir;
+    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+    dir.setPath(path);
+    QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+    if (list.contains(strlib)) {
+        return strlib;
+    } else {
+        list.sort();
+    }
+
+    if(list.size() > 0) {
+        return list.last();
+    } else {
+        return QString();
+    }
+}
+
+//解析错误判断
+#define checkIfFalse(func) if((func) == false)break
+
+bool resolveSymbols()
+{
+    QLibrary gstLib(libPath("libgstreamer-1.0.so"));
+
+    do {
+        checkIfFalse(resolveSymbol(gstLib, "gst_init", &gst_init));
+        checkIfFalse(resolveSymbol(gstLib, "gst_caps_get_size", &gst_caps_get_size));
+        checkIfFalse(resolveSymbol(gstLib, "gst_caps_get_structure", &gst_caps_get_structure));
+        checkIfFalse(resolveSymbol(gstLib, "gst_structure_has_name", &gst_structure_has_name));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_factory_make", &gst_element_factory_make));
+        checkIfFalse(resolveSymbol(gstLib, "gst_object_unref", &gst_object_unref));
+        checkIfFalse(resolveSymbol(gstLib, "gst_pipeline_new", &gst_pipeline_new));
+        checkIfFalse(resolveSymbol(gstLib, "gst_bin_add_many", &gst_bin_add_many));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_link_many", &gst_element_link_many));
+        checkIfFalse(resolveSymbol(gstLib, "gst_bin_get_type", &gst_bin_get_type));
+        checkIfFalse(resolveSymbol(gstLib, "gst_sample_get_buffer", &gst_sample_get_buffer));
+        checkIfFalse(resolveSymbol(gstLib, "gst_sample_get_caps", &gst_sample_get_caps));
+        checkIfFalse(resolveSymbol(gstLib, "gst_caps_new_empty", &gst_caps_new_empty));
+        checkIfFalse(resolveSymbol(gstLib, "gst_structure_copy", &gst_structure_copy));
+        checkIfFalse(resolveSymbol(gstLib, "gst_structure_remove_field", &gst_structure_remove_field));
+        checkIfFalse(resolveSymbol(gstLib, "gst_caps_append_structure", &gst_caps_append_structure));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_set_state", &gst_element_set_state));
+        checkIfFalse(resolveSymbol(gstLib, "gst_mini_object_unref", &gst_mini_object_unref));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_get_bus", &gst_element_get_bus));
+        checkIfFalse(resolveSymbol(gstLib, "gst_bus_timed_pop_filtered", &gst_bus_timed_pop_filtered));
+        checkIfFalse(resolveSymbol(gstLib, "gst_message_parse_error", &gst_message_parse_error));
+        checkIfFalse(resolveSymbol(gstLib, "gst_bin_get_by_name", &gst_bin_get_by_name));
+        checkIfFalse(resolveSymbol(gstLib, "gst_structure_get_int", &gst_structure_get_int));
+        checkIfFalse(resolveSymbol(gstLib, "gst_buffer_get_memory", &gst_buffer_get_memory));
+        checkIfFalse(resolveSymbol(gstLib, "gst_memory_unmap", &gst_memory_unmap));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_seek", &gst_element_seek));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_get_state", &gst_element_get_state));
+        checkIfFalse(resolveSymbol(gstLib, "gst_element_query_duration", &gst_element_query_duration));
+        checkIfFalse(resolveSymbol(gstLib, "gst_memory_map", &gst_memory_map));
+        checkIfFalse(resolveSymbol(gstLib, "gst_tag_list_get_string_index", &gst_tag_list_get_string_index));
+        checkIfFalse(resolveSymbol(gstLib, "gst_caps_new_simple", &gst_caps_new_simple));
+        checkIfFalse(resolveSymbol(gstLib, "_gst_fraction_type", &_gst_fraction_type));
+        resolveSuccessed = true;
+    }while(0);
+
+    return resolveSuccessed;
+}
 
 struct ThumbApp {
 	GstElement *play;
@@ -55,7 +167,7 @@ static bool capsAreRaw(const GstCaps * caps)
 
 static bool createElement(const gchar *factoryName, GstElement **element)
 {
-    *element = gst_element_factory_make (factoryName, nullptr);
+    *element = gst_element_factory_make(factoryName, nullptr);
     return *element != nullptr;
 }
 
@@ -125,9 +237,6 @@ static GstElement *buildPipeline(FrameType captureType, GstElement **srcElement,
         gst_object_unref(vscale);
         g_clear_pointer(&dl, gst_object_unref);
         gst_object_unref(sink);
-        if (err) {
-            *err = g_error_new(GST_CORE_ERROR, GST_CORE_ERROR_FAILED, "Could not convert video frame: no pipeline (unknown error)");
-        }
         return nullptr;
     }
 
@@ -148,9 +257,6 @@ static GstElement *buildPipeline(FrameType captureType, GstElement **srcElement,
 
     if (!ret) {
         gst_object_unref(pipeline);
-        if (err) {
-            *err = g_error_new(GST_CORE_ERROR, GST_CORE_ERROR_NEGOTIATION, "Could not convert video frame: failed to link elements");
-        }
         return nullptr;
     }
 
@@ -193,7 +299,7 @@ static GstSample *getVideoSample(FrameType captureType, GstSample *sample,
     GstElement *src;
     GstElement *pipeline = buildPipeline(captureType, &src, &sink, fromCaps, toCapsCopy, &err);
     if (!pipeline || gst_element_set_state(pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
-        gst_caps_unref (toCapsCopy);
+        gst_mini_object_unref(GST_MINI_OBJECT_CAST(toCapsCopy));
         if (error) {
             *error = err;
         } else {
@@ -232,18 +338,13 @@ static GstSample *getVideoSample(FrameType captureType, GstSample *sample,
         default:
             g_return_val_if_reached(nullptr);
         }
-        gst_message_unref (msg);
-    } else {
-        if (error) {
-            *error = g_error_new (GST_CORE_ERROR, GST_CORE_ERROR_FAILED,
-                                  "Could not convert video frame: timeout during conversion");
-        }
+        gst_mini_object_unref(GST_MINI_OBJECT_CAST(msg));
     }
 
     gst_element_set_state (pipeline, GST_STATE_NULL);
     gst_object_unref (bus);
     gst_object_unref (pipeline);
-    gst_caps_unref (toCapsCopy);
+    gst_mini_object_unref(GST_MINI_OBJECT_CAST(toCapsCopy));
 
     return result;
 }
@@ -256,7 +357,7 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
 
     GstCaps *toCaps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING,
                                            captureType == RAW ? "RGB" : "RGBA",
-                                           "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1, nullptr);
+                                           "pixel-aspect-ratio", *_gst_fraction_type, 1, 1, nullptr);
 
     GstSample *lastSample = nullptr;
     g_object_get(G_OBJECT (play), "sample", &lastSample, nullptr);
@@ -264,8 +365,8 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
         return result;
     }
     GstSample *sample = getVideoSample(captureType, lastSample, toCaps, 25 * GST_SECOND, error);
-    gst_sample_unref(lastSample);
-    gst_caps_unref(toCaps);
+    gst_mini_object_unref(GST_MINI_OBJECT_CAST(lastSample));
+    gst_mini_object_unref(GST_MINI_OBJECT_CAST(toCaps));
 
     if (!sample) {
         return result;
@@ -288,11 +389,11 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
 
         result = QImage(info.data, outwidth, outheight, QImage::Format_RGB888);
         gst_memory_unmap(memory, &info);
-        gst_memory_unref(memory);
+        gst_mini_object_unref(GST_MINI_OBJECT_CAST(memory));
     }
 
     if (result.isNull()) {
-        gst_sample_unref(sample);
+        gst_mini_object_unref(GST_MINI_OBJECT_CAST(sample));
     }
 
     int rotation = 0;
@@ -302,7 +403,7 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
         g_signal_emit_by_name(G_OBJECT (play), "get-video-tags", 0, &tags);
         if (tags) {
             char *orientation_str;
-            bool ret = gst_tag_list_get_string_index(tags, GST_TAG_IMAGE_ORIENTATION, 0, &orientation_str);
+            bool ret = gst_tag_list_get_string_index(tags, "image-orientation", 0, &orientation_str);
             if (!ret || !orientation_str) {
                 rotation = 0;
             } else if (g_str_equal(orientation_str, "rotate-90")) {
@@ -312,7 +413,7 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
             } else if (g_str_equal(orientation_str, "rotate-270")) {
                 rotation = 270;
             }
-            gst_tag_list_unref (tags);
+            gst_mini_object_unref(GST_MINI_OBJECT_CAST(tags));
         }
 
         g_object_set_data(G_OBJECT (play), "orientation-checked", GINT_TO_POINTER(1));
@@ -348,8 +449,8 @@ static bool startApp(ThumbApp *app)
 			break;
 		default:
             break;
-		}
-        gst_message_unref (message);
+        }
+        gst_mini_object_unref(GST_MINI_OBJECT_CAST(message));
 	}
     gst_object_unref (bus);
     return asyncHaveReceived;
@@ -434,6 +535,10 @@ QImage runGstreamerVideoThumbnailer(const QUrl &videoUrl)
 {
     QImage result;
 
+    if(!resolveSuccessed) {
+        return result;
+    }
+
     //读取输入视频路径和输出图像路径
     //视频路径需要用URL格式，图像路径需要用一般绝对路径格式
     ThumbApp app;
@@ -470,7 +575,9 @@ QImage runGstreamerVideoThumbnailer(const QUrl &videoUrl)
 
 void initGstreamerVideoThumbnailer()
 {
-    int argc = 0;
-    char **argv = {};
-    gst_init(&argc, &argv);
+    if(resolveSymbols()) {
+        int argc = 0;
+        char **argv = {};
+        gst_init(&argc, &argv);
+    }
 }
