@@ -1619,8 +1619,9 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
 
             PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
 
-            //开启定时器
-            m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
+            // 全屏时，开启定时器，3秒后隐藏鼠标
+            if (window()->isFullScreen())
+                m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
             break;
         }
         case IdRename: {
