@@ -2051,7 +2051,8 @@ void LibViewPanel::dropEvent(QDropEvent *event)
 void LibViewPanel::timerEvent(QTimerEvent *e)
 {
     if (e->timerId() == m_hideCursorTid && (!m_menu || !m_menu->isVisible())) {
-        m_view->viewport()->setCursor(Qt::BlankCursor);
+        if (!QApplication::activeModalWidget())
+            m_view->viewport()->setCursor(Qt::BlankCursor);
     }
 
     QFrame::timerEvent(e);
