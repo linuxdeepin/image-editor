@@ -1,5 +1,4 @@
 usr/include/libimageviewer/*.h
-usr/lib/*/libimageviewer.so
 usr/lib/*/pkgconfig/libimageviewer.pc
 usr/include/libimagevisualresult/*.h
 usr/lib/*/libimagevisualresult.so
