@@ -53,7 +53,6 @@ set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 add_library(${TARGET_NAME} SHARED ${SRCS} ${allHeaders} ${allSource})
 
 #将库安装到指定位置
-set(PREFIX /usr)
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
@@ -69,11 +68,11 @@ install(FILES ${PROJECT_BINARY_DIR}/libimagevisualresult.pc DESTINATION ${CMAKE_
 
 # CUBE 颜色表文件 安装到usr/share下， 方便其他应用访问
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libimagevisualresult
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libimagevisualresult
     FILES_MATCHING PATTERN "*.CUBE")
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libimagevisualresult
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libimagevisualresult
     FILES_MATCHING PATTERN "*.dat")
 
 # 加速编译优化参数
