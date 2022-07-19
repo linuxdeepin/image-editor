@@ -31,6 +31,7 @@
 #include <QStandardPaths>
 #include <mutex>
 #include <QDir>
+#include <QJsonObject>
 
 #include "image-viewer_global.h"
 
@@ -81,6 +82,9 @@ public:
     //获取视频信息
     MovieInfo getMovieInfo(const QUrl &url);
 
+    //获取视频信息，基于JSON的可扩展版本
+    QJsonObject getMovieInfoByJson(const QUrl &url);
+
     //获取视频首帧图片
     QImage getMovieCover(const QUrl &url, const QString &savePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator());
 
@@ -113,9 +117,8 @@ private:
 
 //C-Style API
 extern "C" {
-
-void getMovieCover(const QUrl &url, const QString &savePath, QImage *imageRet);
-
+    void getMovieCover(const QUrl &url, const QString &savePath, QImage *imageRet);
+    void getMovieInfoByJson(const QUrl &url, QJsonObject *jsonRet);
 }
 
 #endif // MOVIESERVICE_H
