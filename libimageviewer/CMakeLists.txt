@@ -86,7 +86,6 @@ qt5_use_modules(imageviewer ${QtModule})
 
 
 #将库安装到指定位置
-set(PREFIX /usr)
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
@@ -110,7 +109,7 @@ install(FILES
 install(FILES ${PROJECT_BINARY_DIR}/libimageviewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 #translations
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
-    DESTINATION ${PREFIX}/share/libimageviewer
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/libimageviewer
     FILES_MATCHING PATTERN "*.qm")
 
 # 加速编译优化参数
