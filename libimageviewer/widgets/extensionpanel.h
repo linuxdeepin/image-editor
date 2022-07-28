@@ -30,13 +30,11 @@
 #include <DTitlebar>
 #include <QShortcut>
 
-//#include "controller/viewerthememanager.h"
 #include "widgets/blureframe.h"
 #include <DWidget>
 DWIDGET_USE_NAMESPACE
 typedef DWidget QWdToDWidget;
 
-// class ExtensionPanel : public DFloatingWidget
 class ExtensionPanel : public DAbstractDialog
 {
     Q_OBJECT
