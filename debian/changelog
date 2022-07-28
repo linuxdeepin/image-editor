@@ -1,3 +1,9 @@
+image-editor (1.0.19) unstable; urgency=medium
+
+  * Add movie information interface
+
+ -- Deepin Packages Builder <packages@linuxdeepin.com>  Wed, 24 Feb 2022 14:15:54 +0800
+
 image-editor (1.0.0) unstable; urgency=medium
 
   * Initial release 
