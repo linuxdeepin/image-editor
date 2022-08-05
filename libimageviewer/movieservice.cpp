@@ -478,7 +478,7 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
     mi.fileType = fi.suffix().toLower();
     mi.fileSize = fi.size();
 
-    //2.2.视频流数据
+    //2.3.视频流数据
     auto videoGroup = searchGroupFromKey("Video", infoList);
 
     if (!videoGroup.empty()) {
@@ -487,6 +487,9 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
         mi.valid = false;
         return mi;
     }
+
+    //全局数据备用
+    auto generalGroup = searchGroupFromKey("General", infoList);
 
     //编码格式
     for (auto &eachPair : videoGroup) {
@@ -499,6 +502,15 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
                 mi.vCodecID = str.toLower();
             }
             break;
+        }
+    }
+
+    if (mi.vCodecID == "-") {
+        for (auto &eachPair : videoGroup) {
+            if (eachPair.first == "Format") {
+                mi.vCodecID = eachPair.second;
+                break;
+            }
         }
     }
 
@@ -550,7 +562,19 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
         }
     }
 
-    //2.3.时长数据
+    if (mi.fps == 0) {
+        for (auto &eachPair : generalGroup) {
+            if (eachPair.first == "Frame rate") {
+                double fps = eachPair.second.toDouble();
+                if (fps > 0) {
+                    mi.fps = static_cast<int>(fps);
+                    break;
+                }
+            }
+        }
+    }
+
+    //2.4.时长数据
     for (auto &eachPair : videoGroup) {
         if (eachPair.first == "Duration") {
             auto list = eachPair.second.split(".");
@@ -561,7 +585,19 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
         }
     }
 
-    //2.4.创建时间
+    if (mi.duration == "-") {
+        for (auto &eachPair : generalGroup) {
+            if (eachPair.first == "Duration") {
+                auto list = eachPair.second.split(".");
+                if (list.size() == 2 && std::count(list[0].begin(), list[0].end(), ':') >= 2) {
+                    mi.duration = list[0];
+                    break;
+                }
+            }
+        }
+    }
+
+    //2.5.创建时间
     auto geGroup = searchGroupFromKey("General", infoList);
     for (auto &eachPair : geGroup) {
         if (eachPair.first == "Recorded date") {
@@ -570,7 +606,7 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
         }
     }
 
-    //2.5.音频数据
+    //2.6.音频数据
     auto audioGroup = searchGroupFromKey("Audio", infoList);
 
     //编码格式
