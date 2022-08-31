@@ -47,6 +47,9 @@
 const QString DATETIME_FORMAT_NORMAL = "yyyy.MM.dd";
 const QString DATETIME_FORMAT_EXIF = "yyyy:MM:dd HH:mm";
 
+// 提供用于非线程安全函数 FreeImage_TagToString() 访问限制的锁
+Q_GLOBAL_STATIC(QMutex, g_freeImageTagToStringMutex);
+
 namespace LibUnionImage_NameSpace {
 
 //    enum SupportFormat {
@@ -343,8 +346,15 @@ UNIONIMAGESHARED_EXPORT QMap<QString, QString> getMetaData(FREE_IMAGE_MDMODEL mo
         mdhandle = FreeImage_FindFirstMetadata(model, dib, &tag);
         if (mdhandle) {
             do {
-                mdMap.insert(FreeImage_GetTagKey(tag),
-                             FreeImage_TagToString(model, tag));
+                QString value;
+                // FreeImage_TagToString非线程安全，使用前加锁保护
+                if (g_freeImageTagToStringMutex.exists()) {
+                    g_freeImageTagToStringMutex->lock();
+                    value = QString(FreeImage_TagToString(model, tag));
+                    g_freeImageTagToStringMutex->unlock();
+                }
+
+                mdMap.insert(FreeImage_GetTagKey(tag), value);
             } while (FreeImage_FindNextMetadata(mdhandle, &tag));
             FreeImage_FindCloseMetadata(mdhandle);
         }
