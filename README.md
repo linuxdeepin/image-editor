@@ -54,7 +54,7 @@ _Package name may be different between distros, if image-editor is available fro
 Assume you are using [Deepin](https://distrowatch.com/table.php?distribution=deepin) or other debian-based distro which got image-editor delivered:
 
 ``` shell
-$ sudo apt-get build-dep deepin-draw
+$ sudo apt-get build-dep image-editor
 ```
 or
 ``` shell

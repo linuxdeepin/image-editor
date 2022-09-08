@@ -54,7 +54,7 @@ _不同发行版的软件包名称可能不同，如果您的发行版提供了i
 如果你使用的是 [Deepin](https://distrowatch.com/table.php?distribution=deepin) 或者其它提供了image-editor的发行版:
 
 ``` shell
-$ sudo apt-get build-dep deepin-draw
+$ sudo apt-get build-dep image-editor
 ```
 或者手动安装
 ``` shell

@@ -4,12 +4,12 @@ Source: https://github.com/linuxdeepin/image-editor
 
 # ci
 Files: .github/*
-Copyright: UnionTech Software Technology Co., Ltd.
+Copyright: None
 License: CC0-1.0
 
 # gitignore
 Files: .gitignore 
-Copyright: UnionTech Software Technology Co., Ltd.
+Copyright: None
 License: CC0-1.0
 
 # xml toml json conf yaml sh
