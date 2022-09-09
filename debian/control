@@ -34,8 +34,8 @@ Build-Depends:
  libgio-qt-dev,
  libudisks2-qt5-dev,
  libopencv-dev, 
- libmediainfo-dev, 
- libgstreamer1.0-dev
+ libmediainfo-dev,
+ libffmpegthumbnailer-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 

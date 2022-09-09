@@ -19,6 +19,10 @@
 
 #include "image-viewer_global.h"
 
+#ifdef __aarch64__
+#define EnableFFmpegLib 1
+#endif
+
 struct MovieInfo {
     bool valid = false;
     QString filePath = "-";  //文件路径
@@ -84,6 +88,7 @@ private:
     MovieInfo getMovieInfo_mediainfo(const QFileInfo &fi);
 
     bool checkCommandExist(const QString &command);
+    bool isCrashFormat(const QUrl &url);
 
     QMutex m_queuqMutex;
     static MovieService *m_movieService;
@@ -92,6 +97,11 @@ private:
     bool m_ffmpegthumbnailerExist = false;
     QMutex m_bufferMutex;
     std::deque<std::pair<QUrl, MovieInfo>> m_movieInfoBuffer;
+
+#ifdef EnableFFmpegLib
+    bool m_ffmpegThumLibExist = false;
+    QImage getMovieCover_ffmpegthumbnailerlib(const QUrl &url);
+#endif
 
     //ffmpeg用
     QString resolutionPattern;
