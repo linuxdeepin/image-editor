@@ -13,6 +13,10 @@
 #include <QJsonDocument>
 #include "service/gstreamervideothumbnailer.h"
 
+#ifdef EnableFFmpegLib
+#include "service/ffmpegvideothumbnailer.h"
+#endif
+
 #include <iostream>
 
 #define SEEK_TIME "00:00:01"
@@ -63,6 +67,13 @@ MovieService::MovieService(QObject *parent)
     if (checkCommandExist("ffmpegthumbnailer")) {
         m_ffmpegthumbnailerExist = true;
     }
+
+    //检查ffmpegthumbnailerlib是否存在
+#ifdef EnableFFmpegLib
+    if (initFFmpegVideoThumbnailer()) {
+        m_ffmpegThumLibExist = true;
+    }
+#endif
 }
 
 bool MovieService::checkCommandExist(const QString &command)
@@ -195,12 +206,38 @@ MovieInfo MovieService::parseFromFile(const QFileInfo &fi)
 
 QImage MovieService::getMovieCover(const QUrl &url, const QString &savePath)
 {
-    auto image = getMovieCover_gstreamer(url);
+    QImage image;
+
+#ifdef EnableFFmpegLib
+    if (m_ffmpegThumLibExist) {
+        image = getMovieCover_ffmpegthumbnailerlib(url);
+        if (!image.isNull()) {
+            return image;
+        }
+    }
+#endif
+
+    image = getMovieCover_gstreamer(url);
     if (image.isNull() && m_ffmpegthumbnailerExist) {
         image = getMovieCover_ffmpegthumbnailer(url, savePath);
     }
     return image;
 }
+
+#ifdef EnableFFmpegLib
+
+QImage MovieService::getMovieCover_ffmpegthumbnailerlib(const QUrl &url)
+{
+    QImage image;
+
+    if (!m_ffmpegThumLibExist) {
+        return image;
+    }
+
+    return runFFmpegVideoThumbnailer(url);
+}
+
+#endif
 
 QImage MovieService::getMovieCover_ffmpegthumbnailer(const QUrl &url, const QString &bufferPath)
 {
@@ -236,8 +273,97 @@ QImage MovieService::getMovieCover_ffmpegthumbnailer(const QUrl &url, const QStr
     return image;
 }
 
+std::vector<std::pair<QString, QString>> searchGroupFromKey(const QString &key, const QStringList &datas)
+{
+    std::vector<std::pair<QString, QString>> result;
+
+    int i = 0;
+
+    //搜索起始位置
+    for (; i != datas.size(); ++i) {
+        if (datas[i] == key) {
+            ++i;
+            break;
+        }
+    }
+
+    //读取数据
+    for (; i != datas.size(); ++i) {
+        if (datas[i].isEmpty()) {
+            break;
+        }
+
+        auto tokens = datas[i].split(",");
+        if (tokens.size() < 2) { //数据异常
+            continue;
+        }
+        result.push_back(std::make_pair(tokens[0], tokens[1]));
+    }
+
+    return result;
+}
+
+bool MovieService::isCrashFormat(const QUrl &url)
+{
+    QFileInfo fi(url.toLocalFile());
+    MediaInfoDLL::MediaInfo info;
+    info.Open(fi.absoluteFilePath().toStdString());
+    info.Option("Complete", "1"); //解析全部数据
+    info.Option("Inform", "CSV"); //CSV格式输出
+    QString strData(info.Inform().c_str());
+
+    //至此视频信息已保存在infoList中，每条数据以key开头，以冒号分隔
+    QStringList infoList = strData.split("\n");
+
+    //1.搜索特征数据
+    auto videoGroup = searchGroupFromKey("Video", infoList);
+    if (videoGroup.empty()) {
+        return true;
+    }
+
+    //1.1 code format = mpv
+    QString codeID;
+    for (auto &eachPair : videoGroup) {
+        if (eachPair.first == "Internet media type") {
+            auto str = eachPair.second;
+            auto list = str.split("/");
+            if (list.size() == 2) {
+                codeID = list[1].toLower();
+            } else {
+                codeID = str.toLower();
+            }
+            break;
+        }
+    }
+
+    //1.2 package format = mkv
+    auto generalGroup = searchGroupFromKey("General", infoList);
+    QStringList packageIds;
+    for (auto &eachPair : generalGroup) {
+        if (eachPair.first == "Format/Extensions usually used") {
+            auto str = eachPair.second;
+            packageIds = str.split(" ");
+            break;
+        }
+    }
+
+    //2.特征比对
+    if (codeID == "mpv" && packageIds.contains("mkv")) {
+        return true;
+    }
+
+    return false;
+}
+
 QImage MovieService::getMovieCover_gstreamer(const QUrl &url)
 {
+    //ARM环境需要额外判断以规避崩溃问题
+#ifdef EnableFFmpegLib
+    if (isCrashFormat(url)) {
+        return QImage();
+    }
+#endif
+
     return runGstreamerVideoThumbnailer(url);
 }
 
@@ -364,36 +490,6 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
 
     //返回最终解析结果
     return mi;
-}
-
-std::vector<std::pair<QString, QString>> searchGroupFromKey(const QString &key, const QStringList &datas)
-{
-    std::vector<std::pair<QString, QString>> result;
-
-    int i = 0;
-
-    //搜索起始位置
-    for (; i != datas.size(); ++i) {
-        if (datas[i] == key) {
-            ++i;
-            break;
-        }
-    }
-
-    //读取数据
-    for (; i != datas.size(); ++i) {
-        if (datas[i].isEmpty()) {
-            break;
-        }
-
-        auto tokens = datas[i].split(",");
-        if (tokens.size() < 2) { //数据异常
-            continue;
-        }
-        result.push_back(std::make_pair(tokens[0], tokens[1]));
-    }
-
-    return result;
 }
 
 template <typename T>

@@ -18,52 +18,52 @@
 
 //基础函数指针
 static guint(*gst_caps_get_size)(const GstCaps *) = nullptr;
-static GstStructure*(*gst_caps_get_structure)(const GstCaps *, guint) = nullptr;
-static gboolean(*gst_structure_has_name)(const GstStructure* structure, const gchar* name) = nullptr;
-static GstElement* (*gst_element_factory_make)(const gchar *factoryname, const gchar *name) = nullptr;
+static GstStructure *(*gst_caps_get_structure)(const GstCaps *, guint) = nullptr;
+static gboolean(*gst_structure_has_name)(const GstStructure *structure, const gchar *name) = nullptr;
+static GstElement *(*gst_element_factory_make)(const gchar *factoryname, const gchar *name) = nullptr;
 static void (*gst_object_unref)(gpointer object) = nullptr;
-static GstElement* (*gst_pipeline_new)(const gchar *name) = nullptr;
+static GstElement *(*gst_pipeline_new)(const gchar *name) = nullptr;
 static void (*gst_bin_add_many)(GstBin *bin, GstElement *element_1, ...) = nullptr;
 static gboolean (*gst_element_link_many)(GstElement *element_1, GstElement *element_2, ...) = nullptr;
 static GType (*gst_bin_get_type)(void) = nullptr;
-static GstBuffer* (*gst_sample_get_buffer)(GstSample *sample) = nullptr;
-static GstCaps* (*gst_sample_get_caps)(GstSample *sample) = nullptr;
-static GstCaps* (*gst_caps_new_empty)(void) = nullptr;
-static GstStructure* (*gst_structure_copy)(const GstStructure  * structure) = nullptr;
-static void (*gst_structure_remove_field)(GstStructure* structure, const gchar* fieldname) = nullptr;
+static GstBuffer *(*gst_sample_get_buffer)(GstSample *sample) = nullptr;
+static GstCaps *(*gst_sample_get_caps)(GstSample *sample) = nullptr;
+static GstCaps *(*gst_caps_new_empty)(void) = nullptr;
+static GstStructure *(*gst_structure_copy)(const GstStructure   *structure) = nullptr;
+static void (*gst_structure_remove_field)(GstStructure *structure, const gchar *fieldname) = nullptr;
 static void (*gst_caps_append_structure)(GstCaps *caps, GstStructure  *structure) = nullptr;
 static GstStateChangeReturn (*gst_element_set_state)(GstElement *element, GstState state) = nullptr;
 static void (*gst_mini_object_unref)(GstMiniObject *mini_object) = nullptr;
-static GstBus* (*gst_element_get_bus)(GstElement * element) = nullptr;
-static GstMessage* (*gst_bus_timed_pop_filtered)(GstBus * bus, GstClockTime timeout, GstMessageType types) = nullptr;
+static GstBus *(*gst_element_get_bus)(GstElement *element) = nullptr;
+static GstMessage *(*gst_bus_timed_pop_filtered)(GstBus *bus, GstClockTime timeout, GstMessageType types) = nullptr;
 static void (*gst_message_parse_error)(GstMessage *message, GError **gerror, gchar **debug) = nullptr;
-static GstElement* (*gst_bin_get_by_name)(GstBin *bin, const gchar *name) = nullptr;
-static gboolean (*gst_structure_get_int)(const GstStructure* structure, const gchar* fieldname, gint* value) = nullptr;
-static GstMemory* (*gst_buffer_get_memory)(GstBuffer *buffer, guint idx) = nullptr;
+static GstElement *(*gst_bin_get_by_name)(GstBin *bin, const gchar *name) = nullptr;
+static gboolean (*gst_structure_get_int)(const GstStructure *structure, const gchar *fieldname, gint *value) = nullptr;
+static GstMemory *(*gst_buffer_get_memory)(GstBuffer *buffer, guint idx) = nullptr;
 static void (*gst_memory_unmap)(GstMemory *mem, GstMapInfo *info) = nullptr;
 static gboolean (*gst_element_seek)(GstElement *element, gdouble rate, GstFormat format, GstSeekFlags flags, GstSeekType start_type, gint64 start, GstSeekType stop_type, gint64 stop) = nullptr;
-static GstStateChangeReturn (*gst_element_get_state)(GstElement* element, GstState* state, GstState* pending, GstClockTime timeout) = nullptr;
-static gboolean (*gst_element_query_duration)(GstElement* element, GstFormat format, gint64* duration) = nullptr;
+static GstStateChangeReturn (*gst_element_get_state)(GstElement *element, GstState *state, GstState *pending, GstClockTime timeout) = nullptr;
+static gboolean (*gst_element_query_duration)(GstElement *element, GstFormat format, gint64 *duration) = nullptr;
 static void (*gst_init)(int *argc, char **argv[]) = nullptr;
 static gboolean (*gst_memory_map)(GstMemory *mem, GstMapInfo *info, GstMapFlags flags) = nullptr;
-static gboolean (*gst_tag_list_get_string_index)(const GstTagList* list, const gchar* tag, guint index, gchar** value) = nullptr;
-static GstCaps* (*gst_caps_new_simple)(const char* media_type, const char* fieldname, ...) = nullptr;
+static gboolean (*gst_tag_list_get_string_index)(const GstTagList *list, const gchar *tag, guint index, gchar **value) = nullptr;
+static GstCaps *(*gst_caps_new_simple)(const char *media_type, const char *fieldname, ...) = nullptr;
 
 //大作用域变量 潜在崩溃风险,需要多观察
-static GType* _gst_fraction_type;
+static GType *_gst_fraction_type;
 
 //解析成功标记
 static bool resolveSuccessed = false;
 
 //自动解析模板
 template<typename FuncPointer>
-bool resolveSymbol(QLibrary &lib, const char *symbolName, FuncPointer* pointerRet)
+bool resolveSymbol(QLibrary &lib, const char *symbolName, FuncPointer *pointerRet)
 {
     *pointerRet = reinterpret_cast<FuncPointer>(lib.resolve(symbolName));
     return *pointerRet != nullptr;
 }
 
-QString libPath(const QString &strlib)
+static QString libPath(const QString &strlib)
 {
     QDir dir;
     QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
@@ -75,7 +75,7 @@ QString libPath(const QString &strlib)
         list.sort();
     }
 
-    if(list.size() > 0) {
+    if (list.size() > 0) {
         return list.last();
     } else {
         return QString();
@@ -85,7 +85,7 @@ QString libPath(const QString &strlib)
 //解析错误判断
 #define checkIfFalse(func) if((func) == false)break
 
-bool resolveSymbols()
+static bool resolveSymbols()
 {
     QLibrary gstLib(libPath("libgstreamer-1.0.so"));
 
@@ -123,13 +123,13 @@ bool resolveSymbols()
         checkIfFalse(resolveSymbol(gstLib, "gst_caps_new_simple", &gst_caps_new_simple));
         checkIfFalse(resolveSymbol(gstLib, "_gst_fraction_type", &_gst_fraction_type));
         resolveSuccessed = true;
-    }while(0);
+    } while (0);
 
     return resolveSuccessed;
 }
 
 struct ThumbApp {
-	GstElement *play;
+    GstElement *play;
     gint64 duration;
 };
 
@@ -138,7 +138,7 @@ enum FrameType {
     GL
 };
 
-static bool capsAreRaw(const GstCaps * caps)
+static bool capsAreRaw(const GstCaps *caps)
 {
     unsigned int len = gst_caps_get_size(caps);
     for (unsigned int i = 0; i < len; i++) {
@@ -189,9 +189,9 @@ static GstElement *buildPipeline(FrameType captureType, GstElement **srcElement,
                 break;
             }
         }
-    }while(0);
+    } while (0);
 
-    if(noElements) {
+    if (noElements) {
         if (src) {
             gst_object_unref(src);
         }
@@ -252,19 +252,19 @@ static GstElement *buildPipeline(FrameType captureType, GstElement **srcElement,
 }
 
 static GstSample *getVideoSample(FrameType captureType, GstSample *sample,
-                                  const GstCaps *toCaps, GstClockTime timeout, GError **error)
+                                 const GstCaps *toCaps, GstClockTime timeout, GError **error)
 {
-    if(sample == nullptr || toCaps == nullptr) {
+    if (sample == nullptr || toCaps == nullptr) {
         return nullptr;
     }
 
     GstBuffer *buf = gst_sample_get_buffer(sample);
-    if(buf == nullptr) {
+    if (buf == nullptr) {
         return nullptr;
     }
 
     GstCaps *fromCaps = gst_sample_get_caps(sample);
-    if(fromCaps == nullptr) {
+    if (fromCaps == nullptr) {
         return nullptr;
     }
 
@@ -340,8 +340,8 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
     FrameType captureType = gst_bin_get_by_name(GST_BIN (play), "glcolorbalance0") ? GL : RAW;
 
     GstCaps *toCaps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING,
-                                           captureType == RAW ? "RGB" : "RGBA",
-                                           "pixel-aspect-ratio", *_gst_fraction_type, 1, 1, nullptr);
+                                          captureType == RAW ? "RGB" : "RGBA",
+                                          "pixel-aspect-ratio", *_gst_fraction_type, 1, 1, nullptr);
 
     GstSample *lastSample = nullptr;
     g_object_get(G_OBJECT (play), "sample", &lastSample, nullptr);
@@ -413,29 +413,29 @@ static QImage getImageFromPlayer(GstElement *play, GError **error)
 
 static bool startApp(ThumbApp *app)
 {
-	gst_element_set_state (app->play, GST_STATE_PAUSED);
+    gst_element_set_state (app->play, GST_STATE_PAUSED);
     GstBus *bus = gst_element_get_bus (app->play);
     GstMessageType events = static_cast<GstMessageType>(GST_MESSAGE_ASYNC_DONE | GST_MESSAGE_ERROR);
     bool needStop = false;
     bool asyncHaveReceived = false;
-    while(!needStop) {
+    while (!needStop) {
         GstMessage *message = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, events); //主要耗时点
-        GstElement *src = (GstElement*)GST_MESSAGE_SRC (message);
-		switch (GST_MESSAGE_TYPE (message)) {
-		case GST_MESSAGE_ASYNC_DONE:
-			if (src == app->play) {
+        GstElement *src = (GstElement *)GST_MESSAGE_SRC (message);
+        switch (GST_MESSAGE_TYPE (message)) {
+        case GST_MESSAGE_ASYNC_DONE:
+            if (src == app->play) {
                 asyncHaveReceived = true;
                 needStop = true;
-			}
-			break;
+            }
+            break;
         case GST_MESSAGE_ERROR:
             needStop = true;
-			break;
-		default:
+            break;
+        default:
             break;
         }
         gst_mini_object_unref(GST_MINI_OBJECT_CAST(message));
-	}
+    }
     gst_object_unref (bus);
     return asyncHaveReceived;
 }
@@ -460,7 +460,7 @@ static bool testImage(const QImage &image)
     //算法原理：通过统计整个图片像素点的方差来确认图片的鲜艳程度，方差越大图片整体色彩越鲜艳，也就越适合做缩略图
 
     //1.提取像素点
-    const uchar* buffer = image.bits();
+    const uchar *buffer = image.bits();
     int pixelCount = image.bytesPerLine() * image.height();
     float meanValue = 0.0f;
     float variance = 0.0f;
@@ -489,7 +489,7 @@ static QImage getImage(ThumbApp *app)
     //1.如果无法读取视频的长度，则直接取第一帧作为结果
     if (app->duration == -1) {
         return getImageFromPlayer(app->play, nullptr);
-	}
+    }
 
     //2.设置备选点位
     const double pos[] = { 0.1, 1.0 / 3.0, 0.5, 2.0 / 3.0, 0.9 };
@@ -507,9 +507,9 @@ static QImage getImage(ThumbApp *app)
 
         //3.3如果截图成功且截图满足要求
         if (!image.isNull() && testImage(image)) {
-			break;
+            break;
         }
-	}
+    }
 
     //4.返回图片
     return image;
@@ -519,7 +519,7 @@ QImage runGstreamerVideoThumbnailer(const QUrl &videoUrl)
 {
     QImage result;
 
-    if(!resolveSuccessed) {
+    if (!resolveSuccessed) {
         return result;
     }
 
@@ -559,7 +559,7 @@ QImage runGstreamerVideoThumbnailer(const QUrl &videoUrl)
 
 void initGstreamerVideoThumbnailer()
 {
-    if(resolveSymbols()) {
+    if (resolveSymbols()) {
         int argc = 0;
         char **argv = {};
         gst_init(&argc, &argv);
