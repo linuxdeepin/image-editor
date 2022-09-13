@@ -2,7 +2,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 设置工程名字
-project(libimageviewer VERSION 0.1.0)
+project (libimageviewer
+  VERSION ${VERSION}
+  DESCRIPTION "libimageviewer is a public library for deepin-image-viewer and deepin-album"
+  HOMEPAGE_URL "https://github.com/linuxdeepin/image-editor"
+  LANGUAGES CXX C
+)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

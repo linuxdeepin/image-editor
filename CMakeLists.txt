@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 
 project(imageeditor)
+set (VERSION "1.0.20" CACHE STRING "define project version")
 
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACH
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
