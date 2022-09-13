@@ -53,27 +53,30 @@ set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 add_library(${TARGET_NAME} SHARED ${SRCS} ${allHeaders} ${allSource})
 
 #将库安装到指定位置
-set(PREFIX /usr)
+include(GNUInstallDirs)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX /usr)
+endif ()
+
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
-include(GNUInstallDirs)
 configure_file(libimagevisualresult.pc.in  ${PROJECT_BINARY_DIR}/libimagevisualresult.pc @ONLY)
 
 install(TARGETS ${TARGET_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(FILES ${OUT_HEADERS} DESTINATION include/libimagevisualresult)
+install(FILES ${OUT_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libimagevisualresult)
 
 install(FILES ${PROJECT_BINARY_DIR}/libimagevisualresult.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # CUBE 颜色表文件 安装到usr/share下， 方便其他应用访问
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libimagevisualresult
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/libimagevisualresult
     FILES_MATCHING PATTERN "*.CUBE")
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/filter_cube
-    DESTINATION ${PREFIX}/share/libimagevisualresult
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/libimagevisualresult
     FILES_MATCHING PATTERN "*.dat")
 
 # 加速编译优化参数

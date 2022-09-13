@@ -86,7 +86,11 @@ qt5_use_modules(imageviewer ${QtModule})
 
 
 #将库安装到指定位置
-set(PREFIX /usr)
+include(GNUInstallDirs)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX /usr)
+endif ()
+
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
@@ -95,7 +99,6 @@ set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
 target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage )
 
-include(GNUInstallDirs)
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)
 
 install(TARGETS ${CMD_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -105,12 +108,12 @@ install(FILES
     imageviewer.h
     image-viewer_global.h
     movieservice.h
-    DESTINATION include/libimageviewer)
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libimageviewer)
 
 install(FILES ${PROJECT_BINARY_DIR}/libimageviewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 #translations
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
-    DESTINATION ${PREFIX}/share/libimageviewer
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/libimageviewer
     FILES_MATCHING PATTERN "*.qm")
 
 # 加速编译优化参数
