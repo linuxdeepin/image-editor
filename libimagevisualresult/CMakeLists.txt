@@ -59,7 +59,9 @@ endif ()
 
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
-set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
+set_target_properties(${TARGET_NAME} PROPERTIES
+                    VERSION "${PROJECT_VERSION}"
+                    SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 
 configure_file(libimagevisualresult.pc.in  ${PROJECT_BINARY_DIR}/libimagevisualresult.pc @ONLY)
 

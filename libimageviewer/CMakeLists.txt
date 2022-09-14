@@ -50,8 +50,6 @@ add_definitions( -DCMAKE_BUILD )
 aux_source_directory(imageviewer allSources)
 
 
-
-
 #需要打开的头文件
 FILE (GLOB allHeaders "*.h" "*/*.h" "*/*/*.h")
 #需要打开的代码文件
@@ -95,7 +93,9 @@ endif ()
 
 set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
-set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
+set_target_properties(${TARGET_NAME} PROPERTIES
+                    VERSION "${PROJECT_VERSION}"
+                    SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 
 
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS})
