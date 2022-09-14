@@ -15,14 +15,25 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-#Qt需要的包
-set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools)
-
 set(TARGET_NAME imageviewer)
 set(CMD_NAME imageviewer)
 
+# include custom Modules
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+#Qt需要的包
+set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools)
 #先查找到这些qt相关的模块以供链接使用
 find_package(Qt5 REQUIRED ${QtModule})
+find_package(freeimage REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(3rd_lib REQUIRED
+    dtkwidget
+    dtkcore
+    dtkgui
+    gobject-2.0
+    libmediainfo
+    libffmpegthumbnailer
+    )
 
 #设置输出目录
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../deepin-album/lib)
@@ -39,14 +50,7 @@ add_definitions( -DCMAKE_BUILD )
 aux_source_directory(imageviewer allSources)
 
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(3rd_lib REQUIRED
-    dtkwidget
-    dtkcore
-    dtkgui
-    gobject-2.0
-    libmediainfo
-    )
+
 
 #需要打开的头文件
 FILE (GLOB allHeaders "*.h" "*/*.h" "*/*/*.h")
@@ -60,13 +64,6 @@ file(GLOB_RECURSE RESOURCES "*.qrc")
 
 #------------------添加第三方库begins--------------------------#
 #使用第三方库需要用到的一个包
-
-set(INC_DIR /usr/include/)
-set(LINK_DIR /usr/lib/)
-
-include_directories(${INC_DIR})
-link_directories(${LINK_DIR})
-
 link_libraries(freeimage)
 
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
@@ -101,8 +98,8 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
-target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
-target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage )
+target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS})
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage::FreeImage)
 
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)
 

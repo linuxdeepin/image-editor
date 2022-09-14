@@ -16,8 +16,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
-find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(PkgConfig REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -37,12 +37,6 @@ set(SRCS
 file (GLOB_RECURSE OUT_HEADERS ${CMAKE_CURRENT_LIST_DIR}/src/visualresult.h)
 
 #-------------添加第三方库begins-----------------------#
-set(INC_DIR /usr/include/)
-set(LINK_DIR /usr/lib/)
-
-include_directories(${INC_DIR})
-link_directories(${LINK_DIR})
-
 add_executable(${PROJECT_NAME} ${SRCS})
 
 # 设置不删除生成的文件夹内容文件
