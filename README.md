@@ -41,7 +41,8 @@ _The **master** branch is current development branch, build dependencies may cha
 * libudisks2-qt5-dev,
 * libopencv-dev,
 * libmediainfo-dev,
-* libgstreamer1.0-dev
+* libgstreamer1.0-dev,
+* libtiff-dev
 
 ## Installation
 

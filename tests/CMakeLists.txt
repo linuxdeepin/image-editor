@@ -45,6 +45,9 @@ file(GLOB_RECURSE SOURCESC "../libimageviewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")
 file(GLOB_RECURSE FORMS "../libimageviewer/*.ui")
 file(GLOB_RECURSE RESOURCES "../*.qrc")
+# 三方库 tiff-tools tiffcp.c
+file(GLOB tiffToolsSources ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.c
+                           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.h)
 
 include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -54,6 +57,7 @@ set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimageviewer/
     )
 
 find_package(PkgConfig REQUIRED)
+find_package(TIFF)
 
 find_package(Qt5Core)
 find_package(Qt5Test)
@@ -95,7 +99,7 @@ endif ()
 add_executable( ${TARGET_NAME} ${SOURCES} ${SOURCESC}
     ${HEADERS} ${AllTestQRC}
     ${RESOURCES} ${HEADERSCURRENT}
-    ${SOURCESCURRENT} ${QM}
+    ${SOURCESCURRENT} ${QM} ${tiffToolsSources}
     )
 
 find_package(OpenCV REQUIRED)
@@ -103,8 +107,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 link_directories(${OpenCV_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
-target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE})
-target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} -ldl)
+target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE} ${TIFF_INCLUDE_DIRS})
+target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} -ldl ${TIFF_LIBRARIES})
 
 
 target_link_libraries(

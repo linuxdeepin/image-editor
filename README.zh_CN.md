@@ -41,7 +41,8 @@ _**master**分支是当前开发分支，编译依赖可能在未更新README.md
 * libudisks2-qt5-dev,
 * libopencv-dev,
 * libmediainfo-dev,
-* libgstreamer1.0-dev
+* libgstreamer1.0-dev,
+* libtiff-dev
 
 ## 安装
 
