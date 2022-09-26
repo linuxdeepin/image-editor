@@ -72,6 +72,14 @@ bool                                isVaultFile(const QString &path);
 //增加该地址能否被删除的api
 bool                                isCanRemove(const QString &path);
 
+// 取得缓存图像文件路径
+QString                             getCacheImagePath();
+// 初始化缓存图像文件夹
+bool                                initCacheImageFolder();
+// 清空图像缓存文件夹内容
+bool                                clearCacheImageFolder();
+// 检测缓存文件夹中是否存在 fileName 文件
+bool                                checkCacheImage(const QString &fileName);
 }  // namespace image
 
 }  // namespace utils

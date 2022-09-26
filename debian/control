@@ -35,7 +35,8 @@ Build-Depends:
  libudisks2-qt5-dev,
  libopencv-dev, 
  libmediainfo-dev,
- libffmpegthumbnailer-dev
+ libffmpegthumbnailer-dev,
+ libtiff-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
