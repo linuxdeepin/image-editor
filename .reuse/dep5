@@ -59,6 +59,11 @@ Files: tests/*
 Copyright: UnionTech Software Technology Co., Ltd.
 License: GPL-3.0-or-later
 
+# tests
+Files: tests/testqrc/*
+Copyright: UnionTech Software Technology Co., Ltd.
+License: CC-BY-4.0
+
 # config files
 Files: *.pc.in
 Copyright: UnionTech Software Technology Co., Ltd.
