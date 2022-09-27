@@ -37,6 +37,7 @@
 #include "slideshow/slideshowpanel.h"
 #include "service/configsetter.h"
 #include "service/imagedataservice.h"
+#include "unionimage/imageutils.h"
 
 const QString IMAGE_TMPPATH =   QDir::homePath() +
                                 "/.config/deepin/deepin-image-viewer/";
@@ -121,6 +122,9 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
 LibViewPanel::~LibViewPanel()
 {
+    // 清空图像缓存目录
+    Libutils::image::clearCacheImageFolder();
+
     if (m_bottomToolbar) {
         m_bottomToolbar->deleteLater();
         m_bottomToolbar = nullptr;
@@ -133,6 +137,10 @@ LibViewPanel::~LibViewPanel()
 
 void LibViewPanel::loadImage(const QString &path, QStringList paths)
 {
+    // 初始化图像缓存目录
+    Libutils::image::clearCacheImageFolder();
+    Libutils::image::initCacheImageFolder();
+
     QFileInfo info(path);
     m_topToolbar->setMiddleContent(info.fileName());
     //展示图片

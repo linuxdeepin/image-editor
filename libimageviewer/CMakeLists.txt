@@ -35,6 +35,7 @@ aux_source_directory(imageviewer allSources)
 
 
 find_package(PkgConfig REQUIRED)
+find_package(TIFF)
 pkg_check_modules(3rd_lib REQUIRED
     dtkwidget
     dtkcore
@@ -54,6 +55,8 @@ FILE (GLOB allSources
 file(GLOB_RECURSE RESOURCES "*.qrc")
 
 #------------------添加第三方库begins--------------------------#
+file(GLOB tiffToolsSources ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.c
+                           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.h)
 #使用第三方库需要用到的一个包
 
 set(INC_DIR /usr/include/)
@@ -80,7 +83,7 @@ endif ()
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
 #编译为库
-add_library(imageviewer SHARED ${allHeaders} ${allSources} ${RESOURCES} ${QM})
+add_library(imageviewer SHARED ${allHeaders} ${allSources} ${RESOURCES} ${QM} ${tiffToolsSources})
 #使用库
 qt5_use_modules(imageviewer ${QtModule})
 
@@ -92,8 +95,8 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
-target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  )
-target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage )
+target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS})
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES})
 
 include(GNUInstallDirs)
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)

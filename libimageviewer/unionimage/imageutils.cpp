@@ -881,6 +881,46 @@ bool isCanRemove(const QString &path)
     }
     return bRet;
 }
+
+/**
+ * @brief 取得图像缓存文件夹路径
+ */
+QString getCacheImagePath()
+{
+    return QDir::homePath() + "/.cache/deepin/deepin-image-viewer/cache_image";
+}
+
+/**
+ * @brief 初始化图像缓存文件夹并返回是否初始化成功
+ */
+bool initCacheImageFolder()
+{
+    QDir homeDir(QDir::homePath());
+    return homeDir.mkpath(".cache/deepin/deepin-image-viewer/cache_image");
+}
+
+/**
+ * @brief 清空图像缓存文件夹并返回是否清理成功，
+ *  在程序启动或打开文件时调用
+ */
+bool clearCacheImageFolder()
+{
+    QDir cacheDir(getCacheImagePath());
+    if (cacheDir.exists()) {
+        return cacheDir.removeRecursively();
+    }
+    return false;
+}
+
+/**
+ * @brief 返回图像缓存中是否缓存 \a fileName 文件
+ */
+bool checkCacheImage(const QString &fileName)
+{
+    QDir cacheDir(getCacheImagePath());
+    return cacheDir.exists(fileName);
+}
+
 }  // namespace image
 
 }  //namespace utils

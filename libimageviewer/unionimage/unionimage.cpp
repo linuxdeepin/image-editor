@@ -21,8 +21,12 @@
 #include <QtSvg/QSvgRenderer>
 #include <QDir>
 #include <QDebug>
+#include <QUuid>
 
 #include "unionimage/imageutils.h"
+extern "C" {
+#include "3rdparty/tiff-tools/converttiff.h"
+}
 
 #include <cstring>
 
@@ -676,6 +680,40 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                     errorMsg = "can't read image:" + readerF.errorString() + format;
                     try_res = QImage(path);
                 }
+
+                // 单独处理TIF格式情况
+                if (try_res.isNull() && (file_suffix_upper == "TIF" || file_suffix_upper == "TIFF")) {
+                    // 读取失败，tif需要单独处理，尝试通过转换函数处理
+                    QFileInfo imageFile(path);
+                    QString cacheFile = Libutils::image::getCacheImagePath() + QDir::separator() + imageFile.fileName();
+                    // 判断是否存在缓存图片数据
+                    if (Libutils::image::checkCacheImage(imageFile.fileName())) {
+                        try_res = QImage(cacheFile);
+                    } else {
+                        // 由于多线程调用，可能同时访问文件，使用临时文件处理，防止部分线程读取未转码完成的图片文件
+                        QString tempFile = Libutils::image::getCacheImagePath() + QDir::separator()
+                                + QUuid::createUuid().toString() + imageFile.fileName();
+                        qDebug() << "convert" << imageFile.absoluteFilePath() << cacheFile << tempFile;
+
+                        // 转换图像编码格式
+                        int nRet = convertOldStyleImage(imageFile.absoluteFilePath().toUtf8().data(), tempFile.toUtf8().data());
+                        // 转换成功标识
+                        static const int s_nFlagSucc = 0;
+                        if (s_nFlagSucc == nRet) {
+                            if (QFile::exists(tempFile)) {
+                                try_res = QImage(tempFile);
+
+                                // 判断缓存文件是否已存在，保存缓存数据
+                                if (QFile::exists(cacheFile)) {
+                                    QFile::remove(tempFile);
+                                } else {
+                                    QFile::rename(tempFile, cacheFile);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (try_res.isNull()) {
                     errorMsg = "load image by qt failed, use format:" + reader.format() + " ,path:" + path;
                     res = QImage();
