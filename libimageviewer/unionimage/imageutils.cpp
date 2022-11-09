@@ -775,56 +775,15 @@ QStringList supportedImageFormats()
 #endif
 }
 
-
-
-
+//直接搬运文管代码
 bool imageSupportWallPaper(const QString &path)
 {
-    bool iRet = false;
-    QStringList listsupportWallPaper;
-    listsupportWallPaper << "bmp"
-//                         << "cod"
-                         << "png"
-                         << "gif"
-                         << "ief"
-                         << "jpe"
-                         << "jpeg"
-                         << "jpg"
-                         << "jfif"
-//                         << "svg"
-                         << "tif"
-                         << "tiff"
-//                         << "ras"
-//                         << "cmx"
-//                         << "ico"
-//                         << "pnm"
-//                         << "pbm"
-//                         << "pgm"
-//                         << "ppm"
-//                         << "rgb"
-//                         << "xbm"
-//                         << "xpm"
-//                         << "xwd"
-                         ;
-    //
-    QImageReader reader(path);
-    if (reader.imageCount() > 0) {
-
-        //2020/11/12 bug54279
-        if (listsupportWallPaper.contains(reader.format().toLower()) && listsupportWallPaper.contains(QFileInfo(path).suffix().toLower())) {
-            iRet = true;
-        }
-        //20201012 lmh ico不支持设置壁纸
-//        else {
-//            const QString suffix = QFileInfo(path).suffix();
-//            if(suffix=="ico")
-//            {
-//                iRet=true;
-//            }
-//        }
-    }
-
-    return iRet;
+    QMimeDatabase db;
+    QMimeType mt = db.mimeTypeForFile(path, QMimeDatabase::MatchDefault);
+    return mt.name().startsWith("image")
+           && !mt.name().endsWith("svg+xml")
+           && !mt.name().endsWith("raf")
+           && !mt.name().endsWith("crw");
 }
 
 //bool suffixisImage(const QString &path)
