@@ -11,6 +11,9 @@ LibGraphicsMovieItem::LibGraphicsMovieItem(const QString &fileName, const QStrin
     : QGraphicsPixmapItem(fileName, parent)
 {
     Q_UNUSED(suffix);
+
+    setTransformationMode(Qt::SmoothTransformation);
+
     m_movie = new QMovie(fileName);
     QObject::connect(m_movie, &QMovie::frameChanged, this, [ = ] {
         if (m_movie.isNull()) return;
