@@ -9,6 +9,8 @@
 #include <QStandardPaths>
 #include <QImageReader>
 #include <QDebug>
+#include <QSvgRenderer>
+#include <QPainter>
 
 #include <mutex>
 
@@ -205,55 +207,71 @@ void LibReadThumbnailThread::readThumbnail(QString path)
 
     itemInfo.path = path;
 
-    using namespace LibUnionImage_NameSpace;
     QImage tImg;
     QString errMsg;
 
-    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
-        qDebug() << errMsg;
-        //损坏图片也需要缓存更新
-        itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
-        LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
-        return;
-    }
-    //读取图片,给长宽重新赋值
-    itemInfo.imgOriginalWidth = tImg.width();
-    itemInfo.imgOriginalHeight = tImg.height();
-
-    if (0 != tImg.height() && 0 != tImg.width() && (tImg.height() / tImg.width()) < 10 && (tImg.width() / tImg.height()) < 10) {
-        bool cache_exist = false;
-        if (tImg.height() != 200 && tImg.width() != 200) {
-            if (tImg.height() >= tImg.width()) {
-                cache_exist = true;
-                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
-            } else if (tImg.height() <= tImg.width()) {
-                cache_exist = true;
-                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
-            }
-        }
-        if (!cache_exist) {
-            if (static_cast<float>(tImg.height()) / static_cast<float>(tImg.width()) > 3) {
-                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
-            } else {
-                tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
-                tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
-            }
-        }
-    }
-    else {
-        tImg = tImg.scaled(200,200);
+    //SVG需要和常规图片分开处理
+    auto imageInfo = LibCommonService::instance()->getImgInfoByPath(path);
+    auto imageType = imageInfo.imageType;
+    if (imageType == imageViewerSpace::ImageTypeBlank) {
+        imageType = LibUnionImage_NameSpace::getImageType(path);
     }
 
-    itemInfo.image = tImg;
+    if (imageType == imageViewerSpace::ImageTypeSvg) {
+        QSvgRenderer renderer(path);
+        QImage tImg(128, 128, QImage::Format_ARGB32);
+        tImg.fill(0);
+        QPainter painter(&tImg);
+        renderer.render(&painter);
+        itemInfo.imgOriginalWidth = 128;
+        itemInfo.imgOriginalHeight = 128;
+        itemInfo.image = tImg;
+    } else {
+        if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
+            qDebug() << errMsg;
+            //损坏图片也需要缓存更新
+            itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
+            LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
+            return;
+        }
+        //读取图片,给长宽重新赋值
+        itemInfo.imgOriginalWidth = tImg.width();
+        itemInfo.imgOriginalHeight = tImg.height();
+
+        if (0 != tImg.height() && 0 != tImg.width() && (tImg.height() / tImg.width()) < 10 && (tImg.width() / tImg.height()) < 10) {
+            bool cache_exist = false;
+            if (tImg.height() != 200 && tImg.width() != 200) {
+                if (tImg.height() >= tImg.width()) {
+                    cache_exist = true;
+                    tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                    tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
+                } else if (tImg.height() <= tImg.width()) {
+                    cache_exist = true;
+                    tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                    tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
+                }
+            }
+            if (!cache_exist) {
+                if (static_cast<float>(tImg.height()) / static_cast<float>(tImg.width()) > 3) {
+                    tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                    tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
+                } else {
+                    tImg = tImg.scaledToWidth(800,  Qt::FastTransformation);
+                    tImg = tImg.scaledToWidth(200,  Qt::SmoothTransformation);
+                }
+            }
+        } else {
+            tImg = tImg.scaled(200, 200);
+        }
+
+        itemInfo.image = tImg;
+    }
 
     if (itemInfo.image.isNull()) {
         itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
     } else {
         //获取图片类型
-        itemInfo.imageType = getImageType(path);
+        itemInfo.imageType = imageType;
     }
     LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
 }
