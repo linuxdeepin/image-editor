@@ -61,7 +61,7 @@ const int LOAD_LEFT_RIGHT = 25;     //前后加载图片数（动态）
 
 LibBottomToolbar::LibBottomToolbar(QWidget *parent) : DFloatingWidget(parent)
 {
-    //m_ocrIsExists = Libutils::base::checkCommandExist("deepin-ocr");
+    m_ocrIsExists = Libutils::base::checkCommandExist("deepin-ocr");
     this->setBlurBackgroundEnabled(true);
     initUI();
     initConnection();
