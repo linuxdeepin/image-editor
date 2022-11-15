@@ -87,7 +87,6 @@ private:
     MovieInfo getMovieInfo_ffmpeg(const QFileInfo &fi);
     MovieInfo getMovieInfo_mediainfo(const QFileInfo &fi);
 
-    bool checkCommandExist(const QString &command);
     bool isCrashFormat(const QUrl &url);
 
     QMutex m_queuqMutex;

@@ -177,6 +177,7 @@ private:
     bool badaptImageBtnChecked = false;
     bool badaptScreenBtnChecked = false;
     QString m_currentpath = "";
+    bool m_ocrIsExists = false;
 };
 
 #endif // BOTTOMTOOBAR_H

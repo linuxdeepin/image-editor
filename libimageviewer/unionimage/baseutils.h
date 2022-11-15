@@ -144,6 +144,7 @@ bool        trashFile(const QString &file);
 
 bool        onMountDevice(const QString &path);
 bool        mountDeviceExist(const QString &path);
+bool checkCommandExist(const QString &command);
 //bool        isCommandExist(const QString &command);
 }  // namespace base
 
