@@ -480,11 +480,13 @@ void LibViewPanel::updateMenuContent(QString path)
 
         //ocr按钮,是否是动态图,todo
         DIconButton *OcrButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeOcr);
-        if (imageViewerSpace::ImageTypeDynamic != imageType && isPic && isReadable) {
-            appendAction(IdOcr, QObject::tr("Extract text"), ss("Extract text", "Alt+O"));
-            OcrButton->setEnabled(true);
-        } else {
-            OcrButton->setEnabled(false);
+        if (OcrButton != nullptr) {
+            if (imageViewerSpace::ImageTypeDynamic != imageType && isPic && isReadable) {
+                appendAction(IdOcr, QObject::tr("Extract text"), ss("Extract text", "Alt+O"));
+                OcrButton->setEnabled(true);
+            } else {
+                OcrButton->setEnabled(false);
+            }
         }
 
         //如果图片数量大于0才能有幻灯片

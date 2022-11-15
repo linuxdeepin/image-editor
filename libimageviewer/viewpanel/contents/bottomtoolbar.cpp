@@ -61,12 +61,8 @@ const int LOAD_LEFT_RIGHT = 25;     //前后加载图片数（动态）
 
 LibBottomToolbar::LibBottomToolbar(QWidget *parent) : DFloatingWidget(parent)
 {
+    //m_ocrIsExists = Libutils::base::checkCommandExist("deepin-ocr");
     this->setBlurBackgroundEnabled(true);
-//    this->blurBackground()->setRadius(30);
-//    this->blurBackground()->setBlurEnabled(true);
-//    this->blurBackground()->setMode(DBlurEffectWidget::GaussianBlur);
-//    QColor backMaskColor(255, 255, 255, 140);
-//    this->blurBackground()->setMaskColor(backMaskColor);
     initUI();
     initConnection();
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
@@ -127,7 +123,7 @@ int LibBottomToolbar::getToolbarWidth()
     if (m_rotateLBtn->isVisible()) {
         width += m_rotateLBtn->width() + ICON_SPACING;//左旋
     }
-    if (m_ocrBtn->isVisible()) {
+    if (m_ocrIsExists && m_ocrBtn->isVisible()) {
         width += m_ocrBtn->width() + ICON_SPACING;//OCR
     }
     if (m_rotateRBtn->isVisible()) {
@@ -176,7 +172,7 @@ void LibBottomToolbar::setRotateBtnClicked(const bool &bRet)
 
 void LibBottomToolbar::setPictureDoBtnClicked(const bool &bRet)
 {
-    if (m_ocrBtn) {
+    if (m_ocrIsExists && m_ocrBtn) {
         m_ocrBtn->setEnabled(bRet);
     }
     if (m_adaptImageBtn) {
@@ -218,7 +214,9 @@ DIconButton *LibBottomToolbar::getBottomtoolbarButton(imageViewerSpace::ButtonTy
         button = m_clBT;
         break;
     case imageViewerSpace::ButtonTypeOcr:
-        button = m_ocrBtn;
+        if (m_ocrIsExists) {
+            button = m_ocrBtn;
+        }
         break;
     case imageViewerSpace::ButtonTypeRotateLeft:
         button = m_rotateLBtn;
@@ -408,7 +406,11 @@ void LibBottomToolbar::slotThemeChanged(int type)
         DApplicationHelper::instance()->setPalette(m_adaptImageBtn, pa);
         DApplicationHelper::instance()->setPalette(m_adaptScreenBtn, pa);
         DApplicationHelper::instance()->setPalette(m_clBT, pa);
-        DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+
+        if (m_ocrIsExists) {
+            DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+        }
+
         DApplicationHelper::instance()->setPalette(m_rotateLBtn, pa);
         DApplicationHelper::instance()->setPalette(m_rotateRBtn, pa);
         DApplicationHelper::instance()->setPalette(m_trashBtn, pa);
@@ -433,7 +435,11 @@ void LibBottomToolbar::slotThemeChanged(int type)
         DApplicationHelper::instance()->setPalette(m_adaptImageBtn, pa);
         DApplicationHelper::instance()->setPalette(m_adaptScreenBtn, pa);
         DApplicationHelper::instance()->setPalette(m_clBT, pa);
-        DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+
+        if (m_ocrIsExists) {
+            DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+        }
+
         DApplicationHelper::instance()->setPalette(m_rotateLBtn, pa);
         DApplicationHelper::instance()->setPalette(m_rotateRBtn, pa);
         DApplicationHelper::instance()->setPalette(m_trashBtn, pa);
@@ -462,12 +468,18 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
         m_adaptImageBtn->setChecked(false);
         m_adaptScreenBtn->setEnabled(false);
         m_trashBtn->setEnabled(false);
-        m_ocrBtn->setEnabled(false);
+
+        if (m_ocrIsExists) {
+            m_ocrBtn->setEnabled(false);
+        }
     } else {
         m_adaptImageBtn->setEnabled(true);
         m_adaptScreenBtn->setEnabled(true);
         m_trashBtn->setEnabled(true);
-        m_ocrBtn->setEnabled(true);
+
+        if (m_ocrIsExists) {
+            m_ocrBtn->setEnabled(true);
+        }
     }
 }
 
@@ -494,7 +506,7 @@ void LibBottomToolbar::onNextButton()
     if (m_rotateRBtn) {
         m_rotateRBtn->setEnabled(false);
     }
-    if (m_ocrBtn) {
+    if (m_ocrIsExists && m_ocrBtn) {
         m_ocrBtn->setEnabled(false);
     }
     if (m_imgListWidget) {
@@ -511,7 +523,7 @@ void LibBottomToolbar::onPreButton()
     if (m_rotateRBtn) {
         m_rotateRBtn->setEnabled(false);
     }
-    if (m_ocrBtn) {
+    if (m_ocrIsExists && m_ocrBtn) {
         m_ocrBtn->setEnabled(false);
     }
     if (m_imgListWidget) {
@@ -712,12 +724,14 @@ void LibBottomToolbar::initUI()
     hb->addWidget(m_clBT);
 
     //ocr
-    m_ocrBtn = new DIconButton(this);
-    m_ocrBtn->setFixedSize(ICON_SIZE);
-    m_ocrBtn->setIcon(QIcon::fromTheme("dcc_ocr"));
-    m_ocrBtn->setIconSize(QSize(36, 36));
-    m_ocrBtn->setToolTip(QObject::tr("Extract text"));
-    hb->addWidget(m_ocrBtn);
+    if (m_ocrIsExists) {
+        m_ocrBtn = new DIconButton(this);
+        m_ocrBtn->setFixedSize(ICON_SIZE);
+        m_ocrBtn->setIcon(QIcon::fromTheme("dcc_ocr"));
+        m_ocrBtn->setIconSize(QSize(36, 36));
+        m_ocrBtn->setToolTip(QObject::tr("Extract text"));
+        hb->addWidget(m_ocrBtn);
+    }
 
     //向左旋转
     m_rotateLBtn = new DIconButton(this);
@@ -788,7 +802,9 @@ void LibBottomToolbar::initConnection()
     //删除
     connect(m_trashBtn, &DIconButton::clicked, this, &LibBottomToolbar::onTrashBtnClicked);
     //ocr
-    connect(m_ocrBtn, &DIconButton::clicked, this, &LibBottomToolbar::sigOcr);
+    if (m_ocrIsExists) {
+        connect(m_ocrBtn, &DIconButton::clicked, this, &LibBottomToolbar::sigOcr);
+    }
 }
 
 void LibBottomToolbar::setButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
