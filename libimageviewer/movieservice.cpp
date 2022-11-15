@@ -12,6 +12,7 @@
 #include <QtDebug>
 #include <QJsonDocument>
 #include "service/gstreamervideothumbnailer.h"
+#include "unionimage/baseutils.h"
 
 #ifdef EnableFFmpegLib
 #include "service/ffmpegvideothumbnailer.h"
@@ -56,7 +57,7 @@ MovieService::MovieService(QObject *parent)
     : QObject(parent)
 {
     //检查ffmpeg是否存在
-    if (checkCommandExist("ffmpeg")) {
+    if (Libutils::base::checkCommandExist("ffmpeg")) {
         resolutionPattern = "[0-9]+x[0-9]+";
         codeRatePattern = "[0-9]+\\skb/s";
         fpsPattern = "[0-9]+\\sfps";
@@ -64,7 +65,7 @@ MovieService::MovieService(QObject *parent)
     }
 
     //检查ffmpegthumbnailer是否存在
-    if (checkCommandExist("ffmpegthumbnailer")) {
+    if (Libutils::base::checkCommandExist("ffmpegthumbnailer")) {
         m_ffmpegthumbnailerExist = true;
     }
 
@@ -74,30 +75,6 @@ MovieService::MovieService(QObject *parent)
         m_ffmpegThumLibExist = true;
     }
 #endif
-}
-
-bool MovieService::checkCommandExist(const QString &command)
-{
-    try {
-        QProcess bash;
-        bash.start("bash");
-        bash.waitForStarted();
-        bash.write(("command -v " + command).toUtf8());
-        bash.closeWriteChannel();
-        if (!bash.waitForFinished()) {
-            qWarning() << bash.errorString();
-            return false;
-        }
-        auto output = bash.readAllStandardOutput();
-        if (output.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
-    } catch (std::logic_error &e) {
-        qWarning() << e.what();
-        return false;
-    }
 }
 
 MovieInfo MovieService::getMovieInfo(const QUrl &url)

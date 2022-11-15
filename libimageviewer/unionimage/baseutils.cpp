@@ -457,20 +457,31 @@ bool mountDeviceExist(const QString &path)
 
     return QFileInfo(mountPoint).exists();
 }
-//bool        isCommandExist(const QString &command)
-//{
-//    QProcess *proc = new QProcess;
-//    QString cm = QString("which %1\n").arg(command);
-//    proc->start(cm);
-//    proc->waitForFinished(1000);
 
-//    if (proc->exitCode() == 0) {
-//        return true;
-//    } else {
-//        return false;
-//    }
+bool checkCommandExist(const QString &command)
+{
+    try {
+        QProcess bash;
+        bash.start("bash");
+        bash.waitForStarted();
+        bash.write(("command -v " + command).toUtf8());
+        bash.closeWriteChannel();
+        if (!bash.waitForFinished()) {
+            qWarning() << bash.errorString();
+            return false;
+        }
+        auto output = bash.readAllStandardOutput();
+        if (output.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    } catch (std::logic_error &e) {
+        qWarning() << e.what();
+        return false;
+    }
+}
 
-//}
 }  // namespace base
 
 }  // namespace utils
