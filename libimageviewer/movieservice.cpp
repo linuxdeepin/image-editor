@@ -11,12 +11,8 @@
 #include <QProcess>
 #include <QtDebug>
 #include <QJsonDocument>
-#include "service/gstreamervideothumbnailer.h"
 #include "unionimage/baseutils.h"
-
-#ifdef EnableFFmpegLib
 #include "service/ffmpegvideothumbnailer.h"
-#endif
 
 #include <iostream>
 
@@ -48,7 +44,6 @@ MovieService *MovieService::instance(QObject *parent)
     //线程安全单例
     std::call_once(instanceFlag, [&]() {
         m_movieService = new MovieService;
-        initGstreamerVideoThumbnailer();
     });
     return m_movieService;
 }
@@ -70,11 +65,9 @@ MovieService::MovieService(QObject *parent)
     }
 
     //检查ffmpegthumbnailerlib是否存在
-#ifdef EnableFFmpegLib
     if (initFFmpegVideoThumbnailer()) {
         m_ffmpegThumLibExist = true;
     }
-#endif
 }
 
 MovieInfo MovieService::getMovieInfo(const QUrl &url)
@@ -185,23 +178,19 @@ QImage MovieService::getMovieCover(const QUrl &url, const QString &savePath)
 {
     QImage image;
 
-#ifdef EnableFFmpegLib
     if (m_ffmpegThumLibExist) {
         image = getMovieCover_ffmpegthumbnailerlib(url);
         if (!image.isNull()) {
             return image;
         }
     }
-#endif
 
-    image = getMovieCover_gstreamer(url);
     if (image.isNull() && m_ffmpegthumbnailerExist) {
         image = getMovieCover_ffmpegthumbnailer(url, savePath);
     }
+
     return image;
 }
-
-#ifdef EnableFFmpegLib
 
 QImage MovieService::getMovieCover_ffmpegthumbnailerlib(const QUrl &url)
 {
@@ -213,8 +202,6 @@ QImage MovieService::getMovieCover_ffmpegthumbnailerlib(const QUrl &url)
 
     return runFFmpegVideoThumbnailer(url);
 }
-
-#endif
 
 QImage MovieService::getMovieCover_ffmpegthumbnailer(const QUrl &url, const QString &bufferPath)
 {
@@ -278,70 +265,6 @@ std::vector<std::pair<QString, QString>> searchGroupFromKey(const QString &key, 
     }
 
     return result;
-}
-
-bool MovieService::isCrashFormat(const QUrl &url)
-{
-    QFileInfo fi(url.toLocalFile());
-    MediaInfoDLL::MediaInfo info;
-    info.Open(fi.absoluteFilePath().toStdString());
-    info.Option("Complete", "1"); //解析全部数据
-    info.Option("Inform", "CSV"); //CSV格式输出
-    QString strData(info.Inform().c_str());
-
-    //至此视频信息已保存在infoList中，每条数据以key开头，以冒号分隔
-    QStringList infoList = strData.split("\n");
-
-    //1.搜索特征数据
-    auto videoGroup = searchGroupFromKey("Video", infoList);
-    if (videoGroup.empty()) {
-        return true;
-    }
-
-    //1.1 code format = mpv
-    QString codeID;
-    for (auto &eachPair : videoGroup) {
-        if (eachPair.first == "Internet media type") {
-            auto str = eachPair.second;
-            auto list = str.split("/");
-            if (list.size() == 2) {
-                codeID = list[1].toLower();
-            } else {
-                codeID = str.toLower();
-            }
-            break;
-        }
-    }
-
-    //1.2 package format = mkv
-    auto generalGroup = searchGroupFromKey("General", infoList);
-    QStringList packageIds;
-    for (auto &eachPair : generalGroup) {
-        if (eachPair.first == "Format/Extensions usually used") {
-            auto str = eachPair.second;
-            packageIds = str.split(" ");
-            break;
-        }
-    }
-
-    //2.特征比对
-    if (codeID == "mpv" && packageIds.contains("mkv")) {
-        return true;
-    }
-
-    return false;
-}
-
-QImage MovieService::getMovieCover_gstreamer(const QUrl &url)
-{
-    //ARM环境需要额外判断以规避崩溃问题
-#ifdef EnableFFmpegLib
-    if (isCrashFormat(url)) {
-        return QImage();
-    }
-#endif
-
-    return runGstreamerVideoThumbnailer(url);
 }
 
 MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
