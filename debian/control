@@ -26,7 +26,6 @@ Build-Depends:
  libudev-dev, 
  libfontconfig1-dev, 
  libfreetype6-dev, 
- libglib2.0-dev,
  libxrender-dev, 
  libdtkwidget-dev, 
  libdtkwidget5-bin,
