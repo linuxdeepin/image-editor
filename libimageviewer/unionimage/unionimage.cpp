@@ -336,10 +336,11 @@ UNIONIMAGESHARED_EXPORT QMap<QString, QString> getMetaData(FREE_IMAGE_MDMODEL mo
             do {
                 QString value;
                 // FreeImage_TagToString非线程安全，使用前加锁保护
-                if (g_freeImageTagToStringMutex.exists()) {
-                    g_freeImageTagToStringMutex->lock();
+                QMutex *mutex = g_freeImageTagToStringMutex;
+                if (mutex) {
+                    mutex->lock();
                     value = QString(FreeImage_TagToString(model, tag));
-                    g_freeImageTagToStringMutex->unlock();
+                    mutex->unlock();
                 }
 
                 mdMap.insert(FreeImage_GetTagKey(tag), value);
