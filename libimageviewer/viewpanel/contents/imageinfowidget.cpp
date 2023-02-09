@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -252,19 +252,25 @@ LibImageInfoWidget::~LibImageInfoWidget()
     clearLayout(m_exifLayout_details);
 }
 
-void LibImageInfoWidget::setImagePath(const QString path)
+void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
 {
-    //此处不执行path重复判断，可使用本函数进行整个image info弹窗的整体强制重刷
+    // 根据forceUpdate标志判断使用本函数进行整个image info弹窗的整体强制重刷
+    if (!forceUpdate && m_path == path) {
+        // 检测数据是否存在变更
+        if (m_metaData == Libutils::image::getAllMetaData(path)) {
+            return;
+        }
+    } else {
+        m_path = path;
+        m_metaData = Libutils::image::getAllMetaData(path);
+    }
 
-    m_path = path;
     m_isBaseInfo = false;
     m_isDetailsInfo = false;
     updateInfo();
 
     QStringList titleList;
-    //    QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(m_scrollArea->widget()->layout());
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->layout());
-    // clear old expandwidget
     if (nullptr != layout) {
         QLayoutItem *child;
         while ((child = layout->takeAt(0)) != nullptr) {
@@ -290,23 +296,13 @@ void LibImageInfoWidget::setImagePath(const QString path)
         m_expandGroup.at(1)->setContent(m_exif_details);
         m_expandGroup.at(1)->setExpand(true);
 
-    } /*else if (m_isBaseInfo == false && m_isDetailsInfo == true) {
-        titleList << tr("Details");
-        m_expandGroup = addExpandWidget(titleList);
-        m_expandGroup.at(0)->setContent(m_exif_details);
-        m_expandGroup.at(0)->setExpand(true);
-    }*/ else if (m_isBaseInfo == true && m_isDetailsInfo == false) {
+    } else if (m_isBaseInfo == true && m_isDetailsInfo == false) {
         titleList << tr("Basic info");
         m_expandGroup = addExpandWidget(titleList);
         m_expandGroup.at(0)->setContent(m_exif_base);
         m_expandGroup.at(0)->setExpand(true);
     }
 
-    //    for (auto i = 0; i < m_expandGroup.count(); ++i) {
-    //        layout->addWidget(m_expandGroup.at(i));
-    //    }
-
-    //    if (m_expandGroup.count() > 1)
     layout->addStretch(1);
 }
 
@@ -365,9 +361,6 @@ const QString LibImageInfoWidget::trLabel(const char *str)
 
 void LibImageInfoWidget::updateInfo()
 {
-    using namespace Libutils::image;
-    using namespace Libutils::base;
-    auto mds = getAllMetaData(m_path);
     // Minus layout margins
     //    m_maxFieldWidth = width() - m_maxTitleWidth - 20*2;
     //solve bug 1623 根据中英文系统语言设置Title宽度  shuwenzhi   20200313
@@ -381,8 +374,9 @@ void LibImageInfoWidget::updateInfo()
         m_maxFieldWidth = width() - TITLE_MAXOTHERWIDETH/* - 20 * 2 */ - 10 * 2 - 10;
         CNflag = false;
     }
-    updateBaseInfo(mds, CNflag);
-    updateDetailsInfo(mds, CNflag);
+
+    updateBaseInfo(m_metaData, CNflag);
+    updateDetailsInfo(m_metaData, CNflag);
 }
 
 void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, bool CNflag)
@@ -523,6 +517,7 @@ QList<DDrawer *> LibImageInfoWidget::addExpandWidget(const QStringList &titleLis
 
     return group;
 }
+
 void LibImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
 {
     expand->setFixedHeight(ArrowLineExpand_HIGHT);
@@ -542,18 +537,6 @@ void LibImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
         emit extensionPanelHeight(contentHeight() /*+ ArrowLineExpand_SPACING*/);
     });
 }
-
-//void ImageInfoWidget::onExpandChanged(const bool &e)
-//{
-//    DArrowLineDrawer *expand = qobject_cast<DArrowLineDrawer *>(sender());
-//    if (expand) {
-//        if (e) {
-//            expand->setSeparatorVisible(false);
-//        } else {
-//            QTimer::singleShot(200, expand, [ = ] { expand->setSeparatorVisible(true); });
-//        }
-//    }
-//}
 
 int LibImageInfoWidget::contentHeight() const
 {
