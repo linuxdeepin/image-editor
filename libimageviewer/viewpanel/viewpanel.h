@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -65,7 +65,7 @@ public:
     //初始化快捷键
     void initShortcut();
     //更新右键菜单
-    void updateMenuContent(QString path = "");
+    void updateMenuContent(const QString &path = "");
     //控制全屏和返回全屏
     void toggleFullScreen();
     //全屏

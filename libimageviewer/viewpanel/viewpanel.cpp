@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -378,7 +378,7 @@ void LibViewPanel::initExtensionPanel()
     }
 }
 
-void LibViewPanel::updateMenuContent(QString path)
+void LibViewPanel::updateMenuContent(const QString &path)
 {
     //判断是否为相册调用
     bool isAlbum = false;
@@ -424,33 +424,8 @@ void LibViewPanel::updateMenuContent(QString path)
         setCurrentWidget(currentPath);
 
         if (m_info) {
-            m_info->setImagePath(currentPath);
+            m_info->setImagePath(currentPath, false);
         }
-//        if (!isFile && !currentPath.isEmpty()) {
-//            if (m_thumbnailWidget) {
-//                m_stack->setCurrentWidget(m_thumbnailWidget);
-//                //损坏图片不透明
-//                emit m_view->sigImageOutTitleBar(false);
-//                m_thumbnailWidget->setThumbnailImage(QPixmap::fromImage(ItemInfo.image));
-//            }
-//        } else if (isPic) {
-//            m_stack->setCurrentWidget(m_view);
-//            //判断下是否透明
-//            m_view->titleBarControl();
-//        } else if (!currentPath.isEmpty() && ItemInfo.pathType == pathType && ItemInfo.imageType == imageType) {
-//            if (m_lockWidget) {
-//                m_stack->setCurrentWidget(m_lockWidget);
-//                //损坏图片不透明
-//                emit m_view->sigImageOutTitleBar(false);
-//            }
-//        }
-
-        //如果是图片，按钮恢复，否则按钮置灰
-//        if (isPic) {
-//            m_bottomToolbar->setPictureDoBtnClicked(true);
-//        } else {
-//            m_bottomToolbar->setPictureDoBtnClicked(false);
-//        }
 
         if (imageViewerSpace::ImageTypeDamaged == imageType) {
             return;
