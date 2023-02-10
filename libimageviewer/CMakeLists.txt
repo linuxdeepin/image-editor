@@ -10,6 +10,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(CMAKE_C_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-fPIC")
+
 #Qt需要的包
 set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools)
 

@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0.0)
 
 project(imageeditor)
 
+set(CMAKE_C_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-fPIC")
+
 execute_process(COMMAND uname -m OUTPUT_VARIABLE MACH
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
