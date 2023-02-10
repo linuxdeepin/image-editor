@@ -96,7 +96,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS})
-target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES})
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES} dl)
 
 include(GNUInstallDirs)
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)
