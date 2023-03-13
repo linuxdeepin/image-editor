@@ -30,7 +30,6 @@ public:
     //是否是可选转的图片
     bool isRotatable(const QString &path);
 
-
     //根据文件路径制作md5
     QString makeMD5(const QString &path);
 
@@ -53,14 +52,14 @@ signals:
     void sigGetAlbumName(const QString &path);
     //添加到已有相册/新建相册
     void sigAddToAlbum(bool isNew, const QString &album, const QString &path);
-    void sigAddToAlbumWithUID(bool isNew, int UID, const QString &path); //采用UID方案的添加至相册
+    void sigAddToAlbumWithUID(bool isNew, int UID, const QString &path);  //采用UID方案的添加至相册
     //收藏/取消收藏
     void sigAddOrRemoveToFav(const QString &path, bool isAdd);
     //导出
     void sigExport(const QString &path);
     //从自定义相册中移除
     void sigRemoveFromCustom(const QString &path, const QString &album);
-    void sigRemoveFromCustomWithUID(const QString &path, int UID); //采用UID方案的从相册中删除
+    void sigRemoveFromCustomWithUID(const QString &path, int UID);  //采用UID方案的从相册中删除
     //退出幻灯片
     void exitSlideShow();
     //按下ESC键
@@ -68,12 +67,14 @@ signals:
     //通知旋转
     void sigRotatePic(const QString &path);
 
-private:
+    // 授权操作通知信号
+    void sigAuthoriseNotify(const QJsonObject &data);
 
+private:
     static ImageEngine *m_ImageEngine;
 
     QScopedPointer<ImageEnginePrivate> d_ptr;
     Q_DECLARE_PRIVATE_D(qGetPtrHelper(d_ptr), ImageEngine)
 };
 
-#endif // IMAGEENGINE_H
+#endif  // IMAGEENGINE_H

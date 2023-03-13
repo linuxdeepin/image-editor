@@ -25,6 +25,7 @@
 #include "unionimage/baseutils.h"
 #include "unionimage/imageutils.h"
 #include "unionimage/unionimage.h"
+#include "service/permissionconfig.h"
 #include "service/commonservice.h"
 #include "imageengine.h"
 #include "image-viewer_global.h"
@@ -173,8 +174,10 @@ void LibBottomToolbar::setRotateBtnClicked(const bool &bRet)
 
 void LibBottomToolbar::setPictureDoBtnClicked(const bool &bRet)
 {
+    bool enableCopy = PermissionConfig::instance()->isCopyable();
+
     if (m_ocrIsExists && m_ocrBtn) {
-        m_ocrBtn->setEnabled(bRet);
+        m_ocrBtn->setEnabled(bRet && enableCopy);
     }
     if (m_adaptImageBtn) {
         m_adaptImageBtn->setEnabled(bRet);
@@ -314,11 +317,12 @@ void LibBottomToolbar::deleteImage()
             if (m_imgListWidget->getCurrentCount() == 0) {
                 m_preButton->setEnabled(false);
             }
-//        qDebug() << m_imgListWidget->getCurrentPath();
-//        qDebug() << m_imgListWidget->getCurrentCount();
+
             emit removed();     //删除数据库图片
-//        setIsConnectDel(true);
+
             m_imgListWidget->moveCenterWidget();
+
+            PermissionConfig::instance()->triggerDelete(path);
         }
     }
 
@@ -477,23 +481,39 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
 
     //BUG#93143
     QFileInfo info(path);
+    PermissionConfig::instance()->setCurrentImagePath(info.absoluteFilePath());
+    m_trashBtn->setVisible(!PermissionConfig::instance()->isCurrentIsTargetImage());
+
+    bool isCopyable = PermissionConfig::instance()->isCopyable();
+    if (m_ocrIsExists) {
+        if (isCopyable) {
+            m_ocrBtn->setToolTip(QObject::tr("Extract text"));
+        } else {
+            m_ocrBtn->setToolTip(QObject::tr("Extract text") + QObject::tr("(Disabled)"));
+        } 
+    } 
+
     //左转右转的控制不在这里
     if (!info.isFile() || !info.exists()) {
         m_adaptImageBtn->setEnabled(false);
         m_adaptImageBtn->setChecked(false);
         m_adaptScreenBtn->setEnabled(false);
-        m_trashBtn->setEnabled(false);
 
+        m_trashBtn->setEnabled(false);
         if (m_ocrIsExists) {
             m_ocrBtn->setEnabled(false);
         }
     } else {
         m_adaptImageBtn->setEnabled(true);
         m_adaptScreenBtn->setEnabled(true);
-        m_trashBtn->setEnabled(true);
 
+        if (!PermissionConfig::instance()->isEditable()) {
+            return;
+        }
+
+        m_trashBtn->setEnabled(true);
         if (m_ocrIsExists) {
-            m_ocrBtn->setEnabled(true);
+            m_ocrBtn->setEnabled(isCopyable);
         }
     }
 }
@@ -791,6 +811,17 @@ void LibBottomToolbar::initUI()
     m_trashBtn->setIconSize(QSize(36, 36));
     m_trashBtn->setToolTip(QObject::tr("Delete"));
     hb->addWidget(m_trashBtn);
+
+    if (PermissionConfig::instance()->isValid() && m_imgListWidget) {
+        auto authIns = PermissionConfig::instance();
+
+        if (m_ocrBtn) {
+            m_ocrBtn->setEnabled(authIns->isEditable());
+        }
+        bool isDeletable = authIns->isDeletable();
+        m_trashBtn->setVisible(isDeletable);
+        m_trashBtn->setEnabled(isDeletable);
+    }
 }
 
 void LibBottomToolbar::initConnection()

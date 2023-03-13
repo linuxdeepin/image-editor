@@ -240,7 +240,15 @@
     </message>
     <message>
         <source>Photo info</source>
-        <translation type="unfinished"></translation>
+        <translation>Photo info</translation>
+    </message>
+    <message>
+        <source>(Disabled)</source>
+        <translation>(Disabled)</translation>
+    </message>
+    <message>
+        <source>(Remaining %1 times)</source>
+        <translation>(Remaining %1 times)</translation>
     </message>
 </context>
 <context>
