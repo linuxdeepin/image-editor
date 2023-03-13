@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "printhelper.h"
+#include "service/permissionconfig.h"
 
 #include <QPrintDialog>
 #include <QPrintPreviewDialog>
@@ -15,6 +16,7 @@
 #include <QDebug>
 
 #include <DApplication>
+#include <dprintpreviewsettinginfo.h>
 
 #ifdef USE_UNIONIMAGE
 #include "printhelper.h"
@@ -97,12 +99,15 @@ static QAction *hookToolBarActionIcons(QToolBar *bar, QAction **pageSetupAction 
 */
 void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 {
+    if (!PermissionConfig::instance()->isPrintable()) {
+        return;
+    }
+
     m_re->m_paths.clear();
     m_re->m_imgs.clear();
 
     m_re->m_paths = paths;
     QStringList tempExsitPaths;//保存存在的图片路径
-    QImage imgTemp;
     for (const QString &path : paths) {
         QString errMsg;
         QImageReader imgReadreder(path);
@@ -120,10 +125,10 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
             }
         }
         tempExsitPaths << paths;
-
     }
+
     //看图采用同步,因为只有一张图片，传入父指针
-    DPrintPreviewDialog printDialog2(parent);
+    DPrintPreviewDialog printDialog2(parent);    
 #if (DTK_VERSION_MAJOR > 5 \
     || (DTK_VERSION_MAJOR >=5 && DTK_VERSION_MINOR > 4) \
     || (DTK_VERSION_MAJOR >= 5 && DTK_VERSION_MINOR >= 4 && DTK_VERSION_PATCH >= 10))//5.4.4暂时没有合入
@@ -134,15 +139,58 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
             printDialog2.setDocName(QFileInfo(tempExsitPaths.at(0)).absoluteFilePath());
         }
     }
+
+#ifndef DISABLE_WATERMARK
+    // 更新打印水印设置
+    if (PermissionConfig::instance()->isValid()) {
+        auto data = PermissionConfig::instance()->printWaterMarkData();
+
+        DPrintPreviewSettingInfo *baseInfo = printDialog2.createDialogSettingInfo(DPrintPreviewWatermarkInfo::PS_Watermark);
+        if (baseInfo) {
+            DPrintPreviewWatermarkInfo *info = dynamic_cast<DPrintPreviewWatermarkInfo *>(baseInfo);
+            if (info) {
+                info->opened = true;
+                info->angle = static_cast<int>(data.rotation);
+                info->transparency = static_cast<int>(data.opacity * 255);
+                QFontMetrics fm(data.font);
+                QSize textSize = fm.size(Qt::TextSingleLine, data.text);
+                info->rowSpacing = (data.lineSpacing + textSize.height()) / textSize.height();
+                info->columnSpacing = (data.spacing + textSize.width()) / textSize.width();
+                info->layout = data.layout == WaterMarkLayout::Center ? DPrintPreviewWatermarkInfo::Center : DPrintPreviewWatermarkInfo::Tiled;
+                info->currentWatermarkType = (data.type == WaterMarkType::Text) ? DPrintPreviewWatermarkInfo::TextWatermark : DPrintPreviewWatermarkInfo::ImageWatermark;
+                info->textType = DPrintPreviewWatermarkInfo::Custom;
+                info->customText = data.text;
+                info->textColor = data.color;
+                info->fontList.append(data.font.family());
+                info->size = int(data.font.pixelSize() / 20.0f * 100);
+                printDialog2.updateDialogSettingInfo(info);
+            } else {
+                qWarning() << qPrintable("Can't convert DPrintPreviewDialog watermark info.") << baseInfo->type();
+            }
+
+            delete baseInfo;
+        } else {
+            qWarning() << qPrintable("Can't get DPrintPreviewDialog watermark info.");
+        }
+    }
+#endif
+
 #endif
     connect(&printDialog2, SIGNAL(paintRequested(DPrinter *)),
             m_re, SLOT(paintRequestSync(DPrinter *)));
 
 #ifndef USE_TEST
-    printDialog2.exec();
+    int ret = printDialog2.exec();
 #else
-    printDialog2.show();
+    int ret = printDialog2.show();
 #endif
+
+   if (QDialog::Accepted == ret) {
+        if (!tempExsitPaths.isEmpty()) {
+            PermissionConfig::instance()->triggerPrint(tempExsitPaths.first());
+        }
+    }
+
     m_re->m_paths.clear();
     m_re->m_imgs.clear();
 }

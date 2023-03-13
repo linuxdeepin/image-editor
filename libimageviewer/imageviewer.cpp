@@ -16,10 +16,15 @@
 
 #include "imageengine.h"
 #include "viewpanel/viewpanel.h"
+#include "service/permissionconfig.h"
 #include "service/commonservice.h"
 #include "service/mtpfileproxy.h"
 #include "unionimage/imageutils.h"
 #include "unionimage/baseutils.h"
+
+#ifndef DISABLE_WATERMARK
+#include <DWaterMarkHelper>
+#endif
 
 #define PLUGINTRANSPATH "/usr/share/libimageviewer/translations"
 class ImageViewerPrivate
@@ -36,8 +41,10 @@ private:
 ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, ImageViewer *parent)
     : q_ptr(parent)
 {
-    QDir dir(PLUGINTRANSPATH);
+    // 在界面前初始化授权配置
+    PermissionConfig::instance()->initFromArguments();
 
+    QDir dir(PLUGINTRANSPATH);
     if (dir.exists()) {
         QDirIterator qmIt(PLUGINTRANSPATH, QStringList() << QString("*%1.qm").arg(QLocale::system().name()), QDir::Files);
 
@@ -64,7 +71,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
             }
         }
     }
-//    }
+
     Q_Q(ImageViewer);
     m_imgViewerType = imgViewerType;
     //记录当前展示模式
@@ -77,6 +84,15 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     q->setLayout(layout);
     m_panel = new LibViewPanel(customTopToolbar, q);
     layout->addWidget(m_panel);
+
+#ifndef DISABLE_WATERMARK
+    // 设置看图水印，目前仅在主要展示区域显示
+    if (PermissionConfig::instance()->isValid()) {
+        auto data = PermissionConfig::instance()->readWaterMarkData();
+        DWaterMarkHelper::instance()->setData(data);
+        DWaterMarkHelper::instance()->registerWidget(m_panel);
+    }
+#endif
 }
 
 ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, QWidget *parent)

@@ -35,6 +35,7 @@
 #include "widgets/renamedialog.h"
 #include "service/ocrinterface.h"
 #include "slideshow/slideshowpanel.h"
+#include "service/permissionconfig.h"
 #include "service/configsetter.h"
 #include "service/imagedataservice.h"
 #include "service/mtpfileproxy.h"
@@ -151,6 +152,9 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
 LibViewPanel::~LibViewPanel()
 {
+    // 析构时通知图片窗口关闭
+    PermissionConfig::instance()->triggerClose(m_currentPath);
+
     // 清空图像缓存目录
     Libutils::image::clearCacheImageFolder();
 
@@ -189,6 +193,15 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
 
     m_dirWatcher->removePaths(m_dirWatcher->directories());
     m_dirWatcher->addPath(QFileInfo(path).dir().path());
+
+    // 判断是否授权状态更新
+    QFileInfo targetImageInfo(PermissionConfig::instance()->targetImage());
+    if (info.absoluteDir() != targetImageInfo.absoluteDir()) {
+        if (!paths.contains(targetImageInfo.absoluteFilePath())) {
+            // 不含授权文件，提示文件关闭
+            PermissionConfig::instance()->triggerClose(PermissionConfig::instance()->targetImage());
+        }
+    }
 }
 
 void LibViewPanel::initConnect()
@@ -468,8 +481,8 @@ void LibViewPanel::updateMenuContent(const QString &path)
 
         QFileInfo info(currentPath);
 
-        bool isReadable = info.isReadable() ; //是否可读
-        // 判断文件是否可写和文件目录是否可写
+        bool isReadable = info.isReadable(); //是否可读
+        //判断文件是否可写和文件目录是否可写
         bool isWritable = info.isWritable() && QFileInfo(info.dir(), info.dir().path()).isWritable(); //是否可写
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
         imageViewerSpace::PathType pathType; // 路径类型
@@ -481,6 +494,10 @@ void LibViewPanel::updateMenuContent(const QString &path)
         }
 
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
+
+        auto authIns = PermissionConfig::instance();
+        bool isEditable = authIns->isEditable(currentPath);
+        bool isCopyable = authIns->isCopyable(currentPath);
 
         //判断是否是损坏图片
         setCurrentWidget(currentPath);
@@ -513,15 +530,23 @@ void LibViewPanel::updateMenuContent(const QString &path)
             appendAction(IdFullScreen, QObject::tr("Fullscreen"), ss("Fullscreen", "F11"));
         }
 
-        appendAction(IdPrint, QObject::tr("Print"), ss("Print", "Ctrl+P"));
+        if (authIns->isCurrentIsTargetImage() && !authIns->isUnlimitPrint()) {
+            appendAction(IdPrint, QObject::tr("Print") + QObject::tr("(Remaining %1 times)").arg(authIns->printCount()),
+                         ss("Print", "Ctrl+P"), authIns->isPrintable());
+        } else {
+            appendAction(IdPrint, QObject::tr("Print"), ss("Print", "Ctrl+P"));
+        }
 
         //ocr按钮,是否是动态图,todo
         DIconButton *OcrButton = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeOcr);
         if (OcrButton != nullptr) {
-            if (imageViewerSpace::ImageTypeDynamic != imageType && isPic && isReadable) {
+            if (imageViewerSpace::ImageTypeDynamic != imageType && isPic && isReadable && isCopyable) {
                 appendAction(IdOcr, QObject::tr("Extract text"), ss("Extract text", "Alt+O"));
                 OcrButton->setEnabled(true);
             } else {
+                if (!isCopyable) {
+                    appendAction(IdOcr, QObject::tr("Extract text") + QObject::tr("(Disabled)"), ss("Extract text", "Alt+O"), false);
+                }
                 OcrButton->setEnabled(false);
             }
         }
@@ -587,11 +612,15 @@ void LibViewPanel::updateMenuContent(const QString &path)
         // 添加AI模型选项，仅处理静态图
         addAIMenu();
 
-        if (isAlbum && isReadable && !enhanceImage) {
+        if (isAlbum && isReadable && !enhanceImage && isCopyable) {
             appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
         }
         if (isReadable) {
-            appendAction(IdCopy, QObject::tr("Copy"), ss("Copy", "Ctrl+C"));
+            if (isCopyable) {
+                appendAction(IdCopy, QObject::tr("Copy"), ss("Copy", "Ctrl+C"));
+            } else {
+                appendAction(IdCopy, QObject::tr("Copy") + QObject::tr("(Disabled)"), ss("Copy", "Ctrl+C"), false);
+            }
         }
 
         //如果程序有可读可写的权限,才能重命名,todo
@@ -599,7 +628,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
         if (isReadable && isWritable &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                imageViewerSpace::PathTypeAPPLE != pathType && !isAlbum) {
+                imageViewerSpace::PathTypeAPPLE != pathType && !isAlbum && authIns->isRenamable()) {
             appendAction(IdRename, QObject::tr("Rename"), ss("Rename", "F2"));
         }
 
@@ -611,7 +640,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                isWritable && isReadable) || (isAlbum && isWritable)) {
+                isWritable && isReadable && authIns->isDeletable()) || (isAlbum && isWritable)) {
             if (isAlbum) {
                 appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
             } else {
@@ -761,7 +790,7 @@ void LibViewPanel::showNormal()
     });
 }
 
-QAction *LibViewPanel::appendAction(int id, const QString &text, const QString &shortcut)
+QAction *LibViewPanel::appendAction(int id, const QString &text, const QString &shortcut, bool enable)
 {
     if (m_menu && m_menuItemDisplaySwitch.test(static_cast<size_t>(id))) {
         QAction *ac = new QAction(m_menu);
@@ -769,6 +798,7 @@ QAction *LibViewPanel::appendAction(int id, const QString &text, const QString &
         ac->setText(text);
         ac->setProperty("MenuID", id);
         ac->setShortcut(QKeySequence(shortcut));
+        ac->setEnabled(enable);
         m_menu->addAction(ac);
 
         return ac;
@@ -1454,6 +1484,9 @@ bool LibViewPanel::slotOcrPicture()
     QString path = m_bottomToolbar->getCurrentItemInfo().path;
     //图片过大，会导致崩溃，超过4K，智能裁剪
     if (m_ocrInterface != nullptr && m_view != nullptr) {
+        // 提示授权控制拷贝图片
+        PermissionConfig::instance()->triggerCopy(path);
+
         QImage image = m_view->image();
         if (image.width() > 2500) {
             image = image.scaledToWidth(2500, Qt::SmoothTransformation);
@@ -1746,6 +1779,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                         m_bottomToolbar->setCurrentPath(filepath);
                         openImg(0, filepath);
                     }
+
+                    PermissionConfig::instance()->triggerRename(oldPath);
                 }
             }
             if (m_dirWatcher) {
@@ -1769,6 +1804,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                 Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
             }
 
+            PermissionConfig::instance()->triggerCopy(m_bottomToolbar->getCurrentItemInfo().path);
             break;
         }
         case IdMoveToTrash: {
