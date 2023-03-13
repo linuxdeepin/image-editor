@@ -38,6 +38,7 @@
 #include "imageengine.h"
 #include "service/mtpfileproxy.h"
 #include "service/aimodelservice.h"
+#include "service/permissionconfig.h"
 
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
@@ -656,10 +657,7 @@ qreal LibImageGraphicsView::imageRelativeScale() const
 qreal LibImageGraphicsView::windowRelativeScale() const
 {
     QRectF bf = sceneRect();
-    qDebug()<<bf.width();
-    qDebug()<<bf.height();
-    qDebug()<<width();
-    qDebug()<<height();
+
     //新需求,默认适应窗口顶格到标题栏
     if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height())) {
 //    if (1.0 * width() / (height() - TITLEBAR_HEIGHT * 2) > 1.0 * bf.width() / (bf.height() - TITLEBAR_HEIGHT * 2)) {
@@ -965,6 +963,12 @@ void LibImageGraphicsView::slotRotatePixCurrent()
                 pathType != imageViewerSpace::PathTypeSAFEBOX && //保险箱
                 pathType != imageViewerSpace::PathTypeRECYCLEBIN) { //回收站
 
+            // 图片信息不一定同步，需做二次判断
+            if (!PermissionConfig::instance()->isEditable(m_path)) {
+                m_rotateAngel = 0;
+                return;
+            }
+
             disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             Libutils::image::rotate(m_path, m_rotateAngel);
 
@@ -980,6 +984,9 @@ void LibImageGraphicsView::slotRotatePixCurrent()
                 connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             });
             m_rotateAngel = 0;
+
+            // 通知授权控制图片编辑完成
+            PermissionConfig::instance()->triggerEdit(m_path);
         }
     }
 }
