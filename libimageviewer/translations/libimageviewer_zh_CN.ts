@@ -320,6 +320,14 @@
         <translation>照片信息</translation>
     </message>
     <message>
+        <source>(Disabled)</source>
+        <translation>（已禁用）</translation>
+    </message>
+    <message>
+        <source>(Remaining %1 times)</source>
+        <translation>（剩余 %1 次）</translation>
+    </message>
+    <message>
         <source>Retry</source>
         <translation type="unfinished">重 试</translation>
     </message>

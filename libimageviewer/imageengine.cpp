@@ -15,6 +15,7 @@
 #include "service/commonservice.h"
 #include "unionimage/imgoperate.h"
 #include "unionimage/unionimage.h"
+#include "service/permissionconfig.h"
 #include "service/imagedataservice.h"
 class ImageEnginePrivate
 {
@@ -32,6 +33,8 @@ public:
 ImageEnginePrivate::ImageEnginePrivate(ImageEngine *parent): q_ptr(parent)
 {
     Q_Q(ImageEngine);
+    // 关联授权操作通知信号
+    QObject::connect(PermissionConfig::instance(), &PermissionConfig::authoriseNotify, q, &ImageEngine::sigAuthoriseNotify);
 
     QThread *workerThread = new QThread(q_ptr);
     m_worker = new LibImgOperate(workerThread);
