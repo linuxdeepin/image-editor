@@ -152,6 +152,10 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 
 LibViewPanel::~LibViewPanel()
 {
+    // 关闭前保存旋转状态
+    if (m_view) {
+        m_view->slotRotatePixCurrent();
+    }
     // 析构时通知图片窗口关闭
     PermissionConfig::instance()->triggerClose(m_currentPath);
 
@@ -198,6 +202,10 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
     QFileInfo targetImageInfo(PermissionConfig::instance()->targetImage());
     if (info.absoluteDir() != targetImageInfo.absoluteDir()) {
         if (!paths.contains(targetImageInfo.absoluteFilePath())) {
+            // 关闭前保存旋转状态
+            if (m_view) {
+                m_view->slotRotatePixCurrent();
+            }
             // 不含授权文件，提示文件关闭
             PermissionConfig::instance()->triggerClose(PermissionConfig::instance()->targetImage());
         }

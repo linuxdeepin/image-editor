@@ -142,27 +142,34 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 
 #ifndef DISABLE_WATERMARK
     // 更新打印水印设置
-    if (PermissionConfig::instance()->isValid()) {
+    if (PermissionConfig::instance()->hasPrintWaterMark()) {
         auto data = PermissionConfig::instance()->printWaterMarkData();
 
         DPrintPreviewSettingInfo *baseInfo = printDialog2.createDialogSettingInfo(DPrintPreviewWatermarkInfo::PS_Watermark);
         if (baseInfo) {
             DPrintPreviewWatermarkInfo *info = dynamic_cast<DPrintPreviewWatermarkInfo *>(baseInfo);
             if (info) {
+                // 打印水印实现方式同阅读水印略有不同，调整参数以使得效果一致。
                 info->opened = true;
                 info->angle = static_cast<int>(data.rotation);
-                info->transparency = static_cast<int>(data.opacity * 255);
+                info->transparency = static_cast<int>(data.opacity * 100);
                 QFontMetrics fm(data.font);
                 QSize textSize = fm.size(Qt::TextSingleLine, data.text);
-                info->rowSpacing = (data.lineSpacing + textSize.height()) / textSize.height();
-                info->columnSpacing = (data.spacing + textSize.width()) / textSize.width();
+                if (textSize.height() > 0) {
+                    info->rowSpacing = qreal(data.lineSpacing + textSize.height()) / textSize.height();
+                }
+                if (textSize.width() > 0) {
+                    info->columnSpacing = qreal(data.spacing + textSize.width()) / textSize.width();
+                }
                 info->layout = data.layout == WaterMarkLayout::Center ? DPrintPreviewWatermarkInfo::Center : DPrintPreviewWatermarkInfo::Tiled;
                 info->currentWatermarkType = (data.type == WaterMarkType::Text) ? DPrintPreviewWatermarkInfo::TextWatermark : DPrintPreviewWatermarkInfo::ImageWatermark;
                 info->textType = DPrintPreviewWatermarkInfo::Custom;
                 info->customText = data.text;
                 info->textColor = data.color;
                 info->fontList.append(data.font.family());
-                info->size = int(data.font.pixelSize() / 20.0f * 100);
+                static const float sc_defaultFontSize = 65.0f;
+                // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
+                info->size = int(data.font.pixelSize() / sc_defaultFontSize * 100);
                 printDialog2.updateDialogSettingInfo(info);
             } else {
                 qWarning() << qPrintable("Can't convert DPrintPreviewDialog watermark info.") << baseInfo->type();
