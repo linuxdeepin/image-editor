@@ -376,7 +376,7 @@ void PermissionConfig::initFromArguments()
                 triggerOpen(targetImagePath);
             }
 
-            qInfo() << qPrintable("Current Enable permission") << authFlags);
+            qInfo() << qPrintable("Current Enable permission") << authFlags;
         } else {
             qWarning()
                 << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
