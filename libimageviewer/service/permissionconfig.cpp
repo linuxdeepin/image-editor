@@ -125,7 +125,7 @@ bool PermissionConfig::isSwitchable() const
 }
 
 /**
-   @return
+   @return 是否允许打印图片，无授权控制时默认返回 true
    @note -1 表示无限制;0 表示无打印次数;1~表示剩余可打印次数
  */
 bool PermissionConfig::isPrintable(const QString &fileName) const
@@ -135,6 +135,22 @@ bool PermissionConfig::isPrintable(const QString &fileName) const
     }
 
     return !!printLimitCount;
+}
+
+/**
+   @return 是否存在阅读水印
+ */
+bool PermissionConfig::hasReadWaterMark() const
+{
+    return authFlags.testFlag(EnableReadWaterMark);
+}
+
+/**
+   @return 是否存在打印水印
+ */
+bool PermissionConfig::hasPrintWaterMark() const
+{
+    return authFlags.testFlag(EnablePrintWaterMark);
 }
 
 /**
@@ -483,6 +499,8 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
     readWaterMark.lineSpacing = param.value("rowSpacing").toInt();
     readWaterMark.spacing = param.value("columnSpacing").toInt();
     readWaterMark.text = param.value("text").toString();
+
+    authFlags.setFlag(EnableReadWaterMark, true);
 #endif
 }
 
@@ -512,6 +530,8 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
     printWaterMark.lineSpacing = param.value("rowSpacing").toInt();
     printWaterMark.spacing = param.value("columnSpacing").toInt();
     printWaterMark.text = param.value("text").toString();
+
+    authFlags.setFlag(EnablePrintWaterMark, true);
 #endif
 }
 

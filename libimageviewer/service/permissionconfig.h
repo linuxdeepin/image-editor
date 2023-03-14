@@ -37,6 +37,9 @@ public:
         EnableDelete = 0x4,
         EnableRename = 0x8,
         EnableSwitch = 0x10,
+
+        EnableReadWaterMark = 0x1000,
+        EnablePrintWaterMark = 0x2000,
     };
     Q_DECLARE_FLAGS(Authorises, Authorise)
 
@@ -46,6 +49,8 @@ public:
     bool isRenamable() const;
     bool isSwitchable() const;
     bool isPrintable(const QString &fileName = QString()) const;
+    bool hasReadWaterMark() const;
+    bool hasPrintWaterMark() const;
 
     void triggerOpen(const QString &fileName);
     void triggerEdit(const QString &fileName);
@@ -94,7 +99,7 @@ private:
     QString currentImagePath;  // 当前展示的图片文件路径
     QString targetImagePath;   // 权限控制指向的文件路径
     bool valid = false;
-    int printLimitCount = -1;
+    int printLimitCount = 0;
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
 #ifndef DISABLE_WATERMARK

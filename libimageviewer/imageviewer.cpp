@@ -87,7 +87,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
 
 #ifndef DISABLE_WATERMARK
     // 设置看图水印，目前仅在主要展示区域显示
-    if (PermissionConfig::instance()->isValid()) {
+    if (PermissionConfig::instance()->hasReadWaterMark()) {
         auto data = PermissionConfig::instance()->readWaterMarkData();
         DWaterMarkHelper::instance()->setData(data);
         DWaterMarkHelper::instance()->registerWidget(m_panel);
