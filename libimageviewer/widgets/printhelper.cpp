@@ -139,8 +139,10 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
             printDialog2.setDocName(QFileInfo(tempExsitPaths.at(0)).absoluteFilePath());
         }
     }
+#endif
 
 #ifndef DISABLE_WATERMARK
+    // 定制分支，水印功能不依赖DTK版本
     // 更新打印水印设置
     if (PermissionConfig::instance()->hasPrintWaterMark()) {
         auto data = PermissionConfig::instance()->printWaterMarkData();
@@ -182,7 +184,6 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
     }
 #endif
 
-#endif
     connect(&printDialog2, SIGNAL(paintRequested(DPrinter *)),
             m_re, SLOT(paintRequestSync(DPrinter *)));
 
