@@ -182,6 +182,10 @@ void showInFileManager(const QString &path)
 
 void copyImageToClipboard(const QStringList &paths)
 {
+    if (paths.isEmpty()) {
+        return;
+    }
+
     //  Get clipboard
 //    QClipboard *cb = QApplication::clipboard();
     QClipboard *cb = qApp->clipboard();
@@ -210,13 +214,14 @@ void copyImageToClipboard(const QStringList &paths)
     gnomeFormat.remove(gnomeFormat.length() - 1, 1);
     newMimeData->setData("x-special/gnome-copied-files", gnomeFormat);
 
-    // Copy Image Date
-//    QImage img(paths.first());
-//    Q_ASSERT(!img.isNull());
-//    newMimeData->setImageData(img);
+    // Copy Image Data
+    QImage img;
+    QString errMsg;
+    if (LibUnionImage_NameSpace::loadStaticImageFromFile(paths.first(), img, errMsg)) {
+        newMimeData->setImageData(img);
+    }
 
     // Set the mimedata
-//    cb->setMimeData(newMimeData);
     cb->setMimeData(newMimeData, QClipboard::Clipboard);
 }
 
