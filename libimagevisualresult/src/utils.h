@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <map>
+#include <cstdint>
 #include <string>
 
 typedef std::vector<std::vector<uint8_t>>       lutData;
