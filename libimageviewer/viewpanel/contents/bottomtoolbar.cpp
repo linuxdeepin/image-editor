@@ -16,6 +16,7 @@
 #include <DImageButton>
 #include <DThumbnailProvider>
 #include <DApplicationHelper>
+#include <QMetaObject>
 #include <DSpinner>
 
 #include "imgviewlistview.h"
@@ -377,9 +378,13 @@ void LibBottomToolbar::onTrashBtnClicked()
     if (path.isEmpty() && m_currentpath.isEmpty()) {
         path = m_currentpath;
     }
+
+#ifdef DELETE_CONFIRM
+    emit ImageEngine::instance()->sigConfirmDel(path);
+#else
     deleteImage();
     emit ImageEngine::instance()->sigDel(path);
-    //    emit dApp->signalM->deleteByMenu();
+#endif
 }
 
 void LibBottomToolbar::slotThemeChanged(int type)
@@ -801,6 +806,9 @@ void LibBottomToolbar::initConnection()
     connect(m_imgListWidget, &MyImageListWidget::openImg, this, &LibBottomToolbar::slotOpenImage);
     //删除
     connect(m_trashBtn, &DIconButton::clicked, this, &LibBottomToolbar::onTrashBtnClicked);
+#ifdef DELETE_CONFIRM
+    connect(ImageEngine::instance(), &ImageEngine::sigDeleteImage, this, &LibBottomToolbar::deleteImage);
+#endif
     //ocr
     if (m_ocrIsExists) {
         connect(m_ocrBtn, &DIconButton::clicked, this, &LibBottomToolbar::sigOcr);
