@@ -5,12 +5,13 @@
 #ifndef IMAGEENGINE_H
 #define IMAGEENGINE_H
 
+#define DELETE_CONFIRM
+
 #include "image-viewer_global.h"
 
 #include <DWidget>
 #include <QtCore/qglobal.h>
 #include <QImage>
-
 DWIDGET_USE_NAMESPACE
 
 class ImageEnginePrivate;
@@ -44,7 +45,11 @@ signals:
     //更新收藏按钮
     void sigUpdateCollectBtn();
     //删除
-    void sigDel(QString path);
+#ifdef DELETE_CONFIRM
+    void sigConfirmDel(const QString &path); // 通知相册，准备删除图片，并让相册弹出删除确认弹窗
+    void sigDeleteImage(); // 相册确认删除图片，通知看图执行删除图片后的业务逻辑
+#endif
+    void sigDel(QString path); // 通知相册，删除图片
     //获取自定义相册
     void sigGetAlbumName(const QString &path);
     //添加到已有相册/新建相册
