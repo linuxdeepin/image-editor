@@ -1,3 +1,10 @@
+image-editor (1.0.27) unstable; urgency=medium
+
+  * fix: 修复相册-大图模式删除图片，没有显示删除确认弹窗的问题 (#68)(Bug: 157033)
+  * chore: Add OBS workflows.
+
+ -- Deepin Packages Builder <packages@deepin.org>  Thu, 20 Apr 2023 15:11:29 +0800
+
 image-editor (1.0.26) unstable; urgency=medium
 
   * Update version to distinguish pro/community.
