@@ -380,7 +380,14 @@ void LibBottomToolbar::onTrashBtnClicked()
     }
 
 #ifdef DELETE_CONFIRM
-    emit ImageEngine::instance()->sigConfirmDel(path);
+    // 相册浏览大图-删除图片，才给出删除确认弹窗
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum)
+        emit ImageEngine::instance()->sigConfirmDel(path);
+    else {
+        //本地图片浏览-删除图片，直接删除
+        deleteImage();
+        emit ImageEngine::instance()->sigDel(path);
+    }
 #else
     deleteImage();
     emit ImageEngine::instance()->sigDel(path);
