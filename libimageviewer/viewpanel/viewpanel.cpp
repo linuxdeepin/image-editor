@@ -43,8 +43,8 @@ const QString IMAGE_TMPPATH =   QDir::homePath() +
                                 "/.config/deepin/deepin-image-viewer/";
 
 const int BOTTOM_TOOLBAR_HEIGHT = 80;   //底部工具看高
-const int BOTTOM_SPACING = 10;          //底部工具栏与底部边缘距离
-const int RT_SPACING = 20;
+const int BOTTOM_SPACING = 5;          //底部工具栏与底部边缘距离
+const int RT_SPACING = 11;
 const int TOP_TOOLBAR_HEIGHT = 50;
 const int DELAY_HIDE_CURSOR_INTERVAL = 3000;
 
@@ -678,7 +678,7 @@ void LibViewPanel::showNormal()
     }
     //增加切换全屏和默认大小下方工具栏的移动
     connect(pAn, &QPropertyAnimation::destroyed, this, [ = ] {
-        m_bottomToolbar->move((width() - m_bottomToolbar->width()) / 2, height() - m_bottomToolbar->height() - 10);
+        m_bottomToolbar->move((width() - m_bottomToolbar->width()) / 2, height() - m_bottomToolbar->height() - BOTTOM_SPACING);
         m_bottomToolbar->update();
         //结束时候应该判断一次滑动
         noAnimationBottomMove();
@@ -928,7 +928,7 @@ void LibViewPanel::showTopBottom()
 {
     int nParentWidth = this->width();
     int nParentHeight = this->height();
-    m_bottomToolbar->move(QPoint((nParentWidth - m_bottomToolbar->width()) / 2, nParentHeight - m_bottomToolbar->height() - 10));
+    m_bottomToolbar->move(QPoint((nParentWidth - m_bottomToolbar->width()) / 2, nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING));
     m_topToolbar->move(QPoint((nParentWidth - m_topToolbar->width()) / 2, 0));
 }
 
@@ -944,7 +944,7 @@ void LibViewPanel::showAnimationTopBottom()
         QPoint((nParentWidth - m_bottomToolbar->width()) / 2, m_bottomToolbar->y()));
 
     m_bottomAnimation->setEndValue(QPoint((nParentWidth - m_bottomToolbar->width()) / 2,
-                                          nParentHeight - m_bottomToolbar->height() - 10));
+                                          nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING));
 
     connect(m_bottomAnimation, &QPropertyAnimation::finished, this, [ = ]() {
         delete m_bottomAnimation;
@@ -1226,14 +1226,14 @@ void LibViewPanel::slotBottomMove()
     if (m_bottomToolbar && m_bottomToolbar->isVisible() && m_topToolbar && m_stack->currentWidget() != m_sliderPanel) {
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if ((/*m_stack->currentWidget() != m_sliderPanel &&*/ (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
+            if ((/*m_stack->currentWidget() != m_sliderPanel &&*/ (((nParentHeight - (BOTTOM_SPACING + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
                 showAnimationTopBottom();
                 m_isShowTopBottom = true;
             } else if (!m_isShowTopBottom && !window()->isFullScreen()) {
                 showAnimationTopBottom();
-            } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
-                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
-                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)
+            } else if ((nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING > pos.y() &&
+                        nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
+                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING)
                        /*|| m_stack->currentWidget() == m_sliderPanel*/) {
                 hideAnimationTopBottom();
                 m_isShowTopBottom = true;
@@ -1265,14 +1265,14 @@ void LibViewPanel::noAnimationBottomMove()
 
         if (window()->isFullScreen() || m_ImageOutTitleBar) {
 
-            if ((m_stack->currentWidget() != m_sliderPanel && (((nParentHeight - (10 + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
+            if ((m_stack->currentWidget() != m_sliderPanel && (((nParentHeight - (BOTTOM_SPACING + m_bottomToolbar->height()) < pos.y() && nParentHeight > pos.y() && nParentHeight == m_bottomToolbar->y()) || (pos.y() < 50 && pos.y() >= 0)) && ((pos.x() > 2)) && (pos.x() < nParentWidth - 2)))) {
                 showTopBottom();
                 m_isShowTopBottom = true;
             } else if (!m_isShowTopBottom && !window()->isFullScreen()) {
                 showTopBottom();
-            } else if ((nParentHeight - m_bottomToolbar->height() - 10 > pos.y() &&
-                        nParentHeight - m_bottomToolbar->height() - 10 == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
-                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - 10)
+            } else if ((nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING > pos.y() &&
+                        nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING == m_bottomToolbar->y()) || pos.y() >= nParentHeight || pos.y() <= 0
+                       || pos.x() < 2 || pos.x() > nParentWidth - 2 || (pos.y() > 50 && pos.y() <= nParentHeight - m_bottomToolbar->height() - BOTTOM_SPACING)
                        || m_stack->currentWidget() == m_sliderPanel) {
                 hideTopBottom();
                 m_isShowTopBottom = true;
