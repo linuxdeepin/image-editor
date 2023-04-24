@@ -80,7 +80,7 @@ public:
      * @param text          按钮名称
      * @param shortcut      按钮快捷键
      */
-    void appendAction(int id, const QString &text, const QString &shortcut = "");
+    QAction *appendAction(int id, const QString &text, const QString &shortcut = "");
 
     //设置壁纸
     void setWallpaper(const QImage &img);
