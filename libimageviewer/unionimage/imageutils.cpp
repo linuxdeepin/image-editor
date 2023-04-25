@@ -783,7 +783,8 @@ bool imageSupportWallPaper(const QString &path)
     return mt.name().startsWith("image")
            && !mt.name().endsWith("svg+xml")
            && !mt.name().endsWith("raf")
-           && !mt.name().endsWith("crw");
+           && !mt.name().endsWith("crw")
+           && !mt.name().endsWith("x-portable-anymap");
 }
 
 //bool suffixisImage(const QString &path)

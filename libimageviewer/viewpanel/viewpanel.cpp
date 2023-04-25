@@ -589,7 +589,8 @@ void LibViewPanel::updateMenuContent(const QString &path)
         //需要判断图片是否支持设置壁纸，若不支持则置灰设置壁纸菜单项
         if (isPic) {
             QAction *ac = appendAction(IdSetAsWallpaper, QObject::tr("Set as wallpaper"), ss("Set as wallpaper", "Ctrl+F9"));
-            ac->setEnabled(Libutils::image::imageSupportWallPaper(ItemInfo.path));
+            if (ac)
+                ac->setEnabled(Libutils::image::imageSupportWallPaper(ItemInfo.path));
         }
         if (isReadable) {
             appendAction(IdDisplayInFileManager, QObject::tr("Display in file manager"),
@@ -695,7 +696,11 @@ QAction *LibViewPanel::appendAction(int id, const QString &text, const QString &
         ac->setProperty("MenuID", id);
         ac->setShortcut(QKeySequence(shortcut));
         m_menu->addAction(ac);
+
+        return ac;
     }
+
+    return nullptr;
 }
 
 void LibViewPanel::setContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible)
