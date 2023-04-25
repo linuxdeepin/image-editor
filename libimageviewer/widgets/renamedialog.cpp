@@ -188,6 +188,7 @@ void RenameDialog::setCurrentTip()
         m_lineedt->hideAlertMessage();
     } else if (file.exists()) {
         okbtn->setEnabled(false);
+        m_lineedt->setAlert(true);
         m_lineedt->showAlertMessage(tr("The file already exists, please use another name"), m_lineedt);
     } else if (m_lineedt->text().isEmpty()) {
         okbtn->setEnabled(false);
