@@ -379,19 +379,21 @@ void LibBottomToolbar::onTrashBtnClicked()
         path = m_currentpath;
     }
 
+    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
+        // 相册浏览图片-删除按钮逻辑处理
 #ifdef DELETE_CONFIRM
-    // 相册浏览大图-删除图片，才给出删除确认弹窗
-    if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum)
-        emit ImageEngine::instance()->sigConfirmDel(path);
-    else {
+        // 新流程，相册会弹出删除确认提示框，点击确认，相册才给imageeditor发送sigDeleteImage信号删除图片
+        emit ImageEngine::instance()->sigDel(path);
+#else
+        // 老流程，直接删除
+        deleteImage();
+        emit ImageEngine::instance()->sigDel(path);
+#endif
+    } else {
         //本地图片浏览-删除图片，直接删除
         deleteImage();
         emit ImageEngine::instance()->sigDel(path);
     }
-#else
-    deleteImage();
-    emit ImageEngine::instance()->sigDel(path);
-#endif
 }
 
 void LibBottomToolbar::slotThemeChanged(int type)

@@ -46,7 +46,6 @@ signals:
     void sigUpdateCollectBtn();
     //删除
 #ifdef DELETE_CONFIRM
-    void sigConfirmDel(const QString &path); // 通知相册，准备删除图片，并让相册弹出删除确认弹窗
     void sigDeleteImage(); // 相册确认删除图片，通知看图执行删除图片后的业务逻辑
 #endif
     void sigDel(QString path); // 通知相册，删除图片
