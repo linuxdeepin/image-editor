@@ -44,7 +44,7 @@ const QString IMAGE_TMPPATH =   QDir::homePath() +
 
 const int BOTTOM_TOOLBAR_HEIGHT = 80;   //底部工具看高
 const int BOTTOM_SPACING = 5;          //底部工具栏与底部边缘距离
-const int RT_SPACING = 11;
+const int RT_SPACING = 10;
 const int TOP_TOOLBAR_HEIGHT = 50;
 const int DELAY_HIDE_CURSOR_INTERVAL = 3000;
 
@@ -311,8 +311,9 @@ void LibViewPanel::initScaleLabel()
 void LibViewPanel::initNavigation()
 {
     m_nav = new NavigationWidget(this);
-    m_nav.setBottomMargin(100);
-    m_nav.setLeftMargin(10);
+    // 导航窗口左下对齐，间距10px
+    m_nav.setBottomMargin(80);
+    m_nav.setLeftMargin(6);
     m_nav.setAnchor(Qt::AnchorLeft, this, Qt::AnchorLeft);
     m_nav.setAnchor(Qt::AnchorBottom, this, Qt::AnchorBottom);
 

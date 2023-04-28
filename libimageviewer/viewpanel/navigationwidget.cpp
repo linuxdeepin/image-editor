@@ -45,8 +45,8 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     ImageButton *closeBtn_light = new ImageButton(ICON_CLOSE_NORMAL_LIGHT, ICON_CLOSE_HOVER_LIGHT, ICON_CLOSE_PRESS_LIGHT, " ", this);
     closeBtn_light->setTooltipVisible(true);
     closeBtn_light->setFixedSize(32, 32);
-    closeBtn_light->move(QPoint(this->x() + this->width() - 27 - 6,
-                                rect().topRight().y() + 4 - 6));
+    closeBtn_light->move(QPoint(this->x() + this->width() - 27 - 10,
+                                rect().topRight().y() + 4 - 3));
     DPalette palette1 ;
     palette1.setColor(DPalette::Background, QColor(0, 0, 0, 1));
     closeBtn_light->setPalette(palette1);
@@ -58,8 +58,8 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     ImageButton *closeBtn_dark = new ImageButton(ICON_CLOSE_NORMAL_DARK, ICON_CLOSE_HOVER_DARK, ICON_CLOSE_PRESS_DARK, " ", this);
     closeBtn_dark->setTooltipVisible(true);
     closeBtn_dark->setFixedSize(32, 32);
-    closeBtn_dark->move(QPoint(this->x() + this->width() - 27 - 6,
-                               rect().topRight().y() + 4 - 6));
+    closeBtn_dark->move(QPoint(this->x() + this->width() - 27 - 10,
+                               rect().topRight().y() + 4 - 3));
     DPalette palette2 ;
     palette2.setColor(DPalette::Background, QColor(0, 0, 0, 1));
     closeBtn_dark->setPalette(palette2);
@@ -291,11 +291,14 @@ void NavigationWidget::paintEvent(QPaintEvent *)
     if (checkbgisdark(img)) {
         p.setPen(QPen(Qt::gray));
     } else {
-        p.setPen(QColor(0, 0, 0, 0));
+        p.setPen(QColor(Qt::white));
     }
 
-//    p.setPen(QPen(Qt::green));
-    p.drawRect(m_r);
+    // 遮罩框白色描边
+    if (m_r.right() >= img.width())
+        p.drawRect(m_r.adjusted(0, 0, -1, 0));
+    else
+        p.drawRect(m_r);
     p.end();
     p.begin(this);
     QImage background(m_bgImgUrl);
