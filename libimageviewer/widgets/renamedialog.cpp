@@ -26,13 +26,19 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 {
     this->setIcon(QIcon::fromTheme("deepin-image-viewer"));
     DWidget *widet = new DWidget(this);
+    this->setContentsMargins(0,0,0,0);
+    layout()->setSpacing(0); // 标题栏和内容部件间隙设为0，在视觉上缩短标题栏间隙
     addContent(widet);
     m_vlayout = new QVBoxLayout(widet);
     m_labvlayout = new QVBoxLayout();
+    m_labvlayout->setContentsMargins(0, 0, 0, 10);
+    m_labvlayout->setSpacing(5);
     m_hlayout = new QHBoxLayout();
     m_edtlayout = new QHBoxLayout();
     m_lineedt = new DLineEdit(widet);
     QFrame *line = new QFrame(widet);
+    line->setLineWidth(2);
+    line->setFixedHeight(25);// 垂直分割线短于按钮高度
     QLbtoDLabel *labtitle = new QLbtoDLabel();
     okbtn = new DSuggestButton(tr("Confirm"), widet);
     cancelbtn = new DPushButton(tr("Cancel"), widet);
@@ -44,11 +50,12 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 //    cancelbtn->setText();
     m_hlayout->addWidget(cancelbtn);
     line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Sunken);
+    line->setFrameShadow(QFrame::Plain); // 垂直分割线颜色应为浅灰
     m_hlayout->addWidget(line);
     m_hlayout->addWidget(okbtn);
+    m_hlayout->setSpacing(7);// 保证按钮间距20px
     labtitle->setText(tr("Input a new name"));
-    labtitle->setFixedHeight(40);
+    labtitle->setFixedHeight(40); //增加标签区域显示高度，在视觉上缩短标题栏间隙
     labtitle->setAlignment(Qt::AlignCenter);
     m_labvlayout->addWidget(labtitle);
 //    m_vlayout->addWidget(labtitle);
@@ -140,7 +147,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     widet->setObjectName(RENAME_CONTENT);
     widet->setObjectName(RENAME_CONTENT);
 
-    setFixedSize(380, 200);
+    setFixedSize(380, 190);
 }
 
 
