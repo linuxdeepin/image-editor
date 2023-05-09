@@ -1,3 +1,10 @@
+image-editor (1.0.32) unstable; urgency=medium
+
+  * fix: 【UI】导航窗口样式调整(Bug: 194661)
+  * fix: 【UI】重命名弹窗样式调整(Bug: 194651)
+
+ -- Deepin Packages Builder <packages@deepin.org>  Tue, 09 May 2023 17:47:14 +0800
+
 image-editor (1.0.31) unstable; urgency=medium
 
   * Update version to 1.0.31 community
