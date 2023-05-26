@@ -27,16 +27,35 @@
 DWIDGET_USE_NAMESPACE
 
 namespace {
-
-//const int TOP_TOOLBAR_HEIGHT = 50;
-//const int ICON_MARGIN = 6;
-
 const QColor DARK_TOP_BORDERCOLOR = QColor(255, 255, 255, 0);
 const QColor LIGHT_TOP_BORDERCOLOR = QColor(255, 255, 255, 0);
 
 const QColor DARK_BOTTOM_BORDERCOLOR = QColor(0, 0, 0, 51);
 const QColor LIGHT_BOTTOM_BORDERCOLOR = QColor(0, 0, 0, 26);
+
+// 不同模式下绘制纹理的高度，74 为纹理文件默认高度，紧凑模式下，标题栏高度由50->40，
+// 因此纹理高度调整 74 * 40 / 50 = 59.4 (~60)
+const int BRUSH_TEXTURE_HEIGHT = 74;
+const int COMPACT_BURSH_TEXTURE_HEIGHT = 60;
 }  // namespace
+
+/**
+   @return 返回不同模式下的绘制纹理高度
+ */
+int paintBrushHeight()
+{
+    // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
+#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
+    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
+    if (checkVersion <= dtkVersion() && DGuiApplicationHelper::isCompactMode()) {
+        return COMPACT_BURSH_TEXTURE_HEIGHT;
+    } else {
+        return BRUSH_TEXTURE_HEIGHT;
+    }
+#else
+    return BRUSH_TEXTURE_HEIGHT;
+#endif
+}
 
 LibTopToolbar::LibTopToolbar(bool manager, QWidget *parent)
     : AbstractTopToolbar(parent)
@@ -114,7 +133,7 @@ void LibTopToolbar::paintEvent(QPaintEvent *e)
     QPainter p(this);
     QPixmap pixmap(":/icons/deepin/builtin/actions/imgView_titlebar.svg");
     const QPalette pal = QGuiApplication::palette();
-    QBrush bgColor = QBrush(pixmap.scaled(size().width(), 74));
+    QBrush bgColor = QBrush(pixmap.scaled(size().width(), paintBrushHeight()));
     QRectF bgRect;
     bgRect.setSize(size());
     QPainterPath pp;

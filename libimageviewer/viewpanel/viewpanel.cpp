@@ -48,6 +48,11 @@ const int RT_SPACING = 10;
 const int TOP_TOOLBAR_HEIGHT = 50;
 const int DELAY_HIDE_CURSOR_INTERVAL = 3000;
 
+// 标题栏高度
+const int TITLEBAR_HEIGHT = 50;
+// 紧凑模式下标题栏高度
+const int COMPACT_TITLEBAR_HEIGHT = 40;
+
 using namespace imageViewerSpace;
 
 bool compareByFileInfo(const QFileInfo &str1, const QFileInfo &str2)
@@ -65,6 +70,24 @@ QString ss(const QString &text, const QString &defaultValue)
     QString str = defaultValue;
     str.replace(" ", "");
     return defaultValue;
+}
+
+/**
+   @return 返回当前标题栏高度，紧凑模式和普通模式下的标题栏高度不同
+ */
+int titleBarHeight()
+{
+    // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
+#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
+    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
+    if (checkVersion <= dtkVersion() && DGuiApplicationHelper::isCompactMode()) {
+        return COMPACT_TITLEBAR_HEIGHT;
+    } else {
+        return TITLEBAR_HEIGHT;
+    }
+#else
+    return TITLEBAR_HEIGHT;
+#endif
 }
 
 LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
@@ -243,18 +266,34 @@ void LibViewPanel::initConnect()
 
     m_dirWatcher = new  QFileSystemWatcher(this);
     connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, this, &LibViewPanel::slotsDirectoryChanged);
+
+    // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
+#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
+    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
+    if (checkVersion <= dtkVersion()) {
+        connect(DGuiApplicationHelper::instance(),
+                &DGuiApplicationHelper::sizeModeChanged,
+                this,
+                [this](DGuiApplicationHelper::SizeMode) {
+                    m_topToolbar->resize(width(), titleBarHeight());
+                    m_topToolbar->move(0, 0);
+                    m_topToolbar->update();
+                });
+    }
+#endif
 }
 
 void LibViewPanel::initTopBar()
 {
     //防止在标题栏右键菜单会触发默认的和主窗口的发生
-    if (m_topToolbar == nullptr) { //如果调用者没有指定有效的顶部栏，则使用内置方案
+    if (m_topToolbar == nullptr) {  //如果调用者没有指定有效的顶部栏，则使用内置方案
         m_topToolbar = new LibTopToolbar(false, dynamic_cast<QWidget *>(this->parent()));
         connect(m_topToolbar, &LibTopToolbar::sigLeaveTitle, this, &LibViewPanel::slotBottomMove);
     } else {
         m_topToolbar->setParent(dynamic_cast<QWidget *>(this->parent()));
     }
-    m_topToolbar->resize(width(), 50);
+
+    m_topToolbar->resize(width(), titleBarHeight());
     m_topToolbar->move(0, 0);
     m_topToolbar->setTitleBarTransparent(false);
 }
@@ -1945,7 +1984,7 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
         }
 
         if (m_topToolbar->isVisible()) {
-            this->m_topToolbar->resize(width(), 50);
+            this->m_topToolbar->resize(width(), titleBarHeight());
         }
     }
 //    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
@@ -1962,7 +2001,7 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 void LibViewPanel::showEvent(QShowEvent *e)
 {
     if (this->m_topToolbar) {
-        m_topToolbar->resize(width(), 50);
+        m_topToolbar->resize(width(), titleBarHeight());
     }
     //显示的时候需要判断一次滑动
     noAnimationBottomMove();
