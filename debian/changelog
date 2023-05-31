@@ -1,3 +1,10 @@
+image-editor (1.0.33) unstable; urgency=medium
+
+  * Fix build using gcc13: add missing include cstdint.
+  * fix: Adapt compact mode. (#84)(Bug: 199309)(Influence: TitleBar CompactMode)
+
+ -- Deepin Packages Builder <packages@deepin.org>  Wed, 31 May 2023 13:48:06 +0800
+
 image-editor (1.0.32) unstable; urgency=medium
 
   * fix: 【UI】导航窗口样式调整(Bug: 194661)
