@@ -697,12 +697,14 @@ void LibViewPanel::updateMenuContent(const QString &path)
 
         }
 
-        //需要判断图片是否支持设置壁纸，若不支持则置灰设置壁纸菜单项
-        if (isPic) {
+        // 需要判断图片是否支持设置壁纸，若不支持则置灰设置壁纸菜单项
+        // 当配置权限控制时，屏蔽设置壁纸接口
+        if (isPic && !authIns->isValid()) {
             QAction *ac = appendAction(IdSetAsWallpaper, QObject::tr("Set as wallpaper"), ss("Set as wallpaper", "Ctrl+F9"));
             if (ac)
                 ac->setEnabled(Libutils::image::imageSupportWallPaper(ItemInfo.path));
         }
+        
         if (isReadable) {
             appendAction(IdDisplayInFileManager, QObject::tr("Display in file manager"),
                          ss("Display in file manager", "Alt+D"));

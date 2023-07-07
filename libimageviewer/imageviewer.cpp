@@ -13,6 +13,7 @@
 #include <QDirIterator>
 #include <QTranslator>
 #include <DFileDialog>
+#include <dtkwidget_config.h>
 
 #include "imageengine.h"
 #include "viewpanel/viewpanel.h"
@@ -22,7 +23,7 @@
 #include "unionimage/imageutils.h"
 #include "unionimage/baseutils.h"
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
 #endif
 
@@ -85,7 +86,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     m_panel = new LibViewPanel(customTopToolbar, q);
     layout->addWidget(m_panel);
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     // 设置看图水印，目前仅在主要展示区域显示
     if (PermissionConfig::instance()->hasReadWaterMark()) {
         auto data = PermissionConfig::instance()->readWaterMarkData();
