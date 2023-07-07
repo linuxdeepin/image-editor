@@ -17,6 +17,7 @@
 
 #include <DApplication>
 #include <dprintpreviewsettinginfo.h>
+#include <dtkwidget_config.h>
 
 #ifdef USE_UNIONIMAGE
 #include "printhelper.h"
@@ -141,7 +142,7 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
     }
 #endif
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     // 定制分支，水印功能不依赖DTK版本
     // 更新打印水印设置
     if (PermissionConfig::instance()->hasPrintWaterMark()) {

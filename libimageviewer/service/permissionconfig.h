@@ -8,9 +8,9 @@
 #include <QObject>
 #include <QJsonObject>
 
-// #define DISABLE_WATERMARK
+#include <dtkwidget_config.h>
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
 #include <dprintpreviewsettinginfo.h>
 
@@ -68,7 +68,7 @@ public:
     void setCurrentImagePath(const QString &fileName);
     QString targetImage() const;
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMarkData() const;
     WaterMarkData printWaterMarkData() const;
 #endif
@@ -102,7 +102,7 @@ private:
     int printLimitCount = 0;
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMark;
     WaterMarkData printWaterMark;
 #endif

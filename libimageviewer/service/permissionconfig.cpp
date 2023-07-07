@@ -29,7 +29,7 @@ const QString g_KeyRemaining = "remainingPrintCount";
 PermissionConfig::PermissionConfig(QObject *parent)
     : QObject(parent)
 {
-#ifdef DISABLE_WATERMARK
+#ifndef DTKWIDGET_CLASS_DWaterMarkHelper
     qWarning() << qPrintable("Current version is not support read watermark");
 #endif
 }
@@ -325,7 +325,7 @@ QString PermissionConfig::targetImage() const
     return targetImagePath;
 }
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
    @return 返回从配置中读取的阅读水印配置，用于图片展示时显示
@@ -483,7 +483,7 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     readWaterMark.type = WaterMarkType::Text;
     readWaterMark.font.setFamily(param.value("font").toString());
     readWaterMark.font.setPixelSize(param.value("fontSize").toInt());
@@ -514,7 +514,7 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifndef DISABLE_WATERMARK
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     printWaterMark.type = WaterMarkType::Text;
     printWaterMark.font.setFamily(param.value("font").toString());
     printWaterMark.font.setPixelSize(param.value("fontSize").toInt());
