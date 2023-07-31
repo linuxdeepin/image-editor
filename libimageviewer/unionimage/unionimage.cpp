@@ -1086,10 +1086,10 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
             QMatrix rotatematrix;
             rotatematrix.rotate(angel);
             image_copy = image_copy.transformed(rotatematrix, Qt::SmoothTransformation);
-            if (image_copy.save(path, format.toLatin1().data(), SAVE_QUAITY_VALUE))
+
+            // 调整图片质量，不再默认使用满质量 SAVE_QUAITY_VALUE
+            if (image_copy.save(path, format.toLatin1().data(), -1)) {
                 return true;
-            else {
-                return false;
             }
         }
         erroMsg = "rotate by qt failed";
