@@ -1233,17 +1233,20 @@ bool LibViewPanel::startChooseFileDialog()
                 }
             }
         }
-        if (image_list.count() > 0) {
-            bRet = true;
-        } else {
-            bRet = false;
+
+        // Note: 即使传入文件路径，但文件可能被管控无法读取数据，列表为空。
+        if (image_list.isEmpty()) {
+            return false;
         }
+        bRet = true;
+
         QString loadingPath;
         if (image_list.contains(path)) {
             loadingPath = path;
         } else {
             loadingPath = image_list.first();
         }
+
         //stack设置正确位置
         m_stack->setCurrentWidget(m_view);
         //展示当前图片
