@@ -1,3 +1,10 @@
+image-editor (1.0.34) unstable; urgency=medium
+
+  * fix: Reading out of bounds while file access denied.(Bug: 206425)(Influence: FileAccess)
+  * fix: The image becomes larger after rotation.(Bug: 208685)(Influence: RotateImage)
+
+ -- Deepin Packages Builder <packages@deepin.org>  Thu, 03 Aug 2023 16:27:44 +0800
+
 image-editor (1.0.33) unstable; urgency=medium
 
   * Fix build using gcc13: add missing include cstdint.
