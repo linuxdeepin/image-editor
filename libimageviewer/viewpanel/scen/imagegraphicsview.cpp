@@ -35,6 +35,7 @@
 #include "accessibility/ac-desktop-define.h"
 #include "../contents/morepicfloatwidget.h"
 #include "imageengine.h"
+#include "service/mtpfileproxy.h"
 
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
@@ -127,6 +128,24 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
     m_isChangedTimer = new QTimer(this);
     QObject::connect(m_isChangedTimer, &QTimer::timeout, this, &LibImageGraphicsView::onIsChangedTimerTimeout);
+
+    // MTP文件加载完成通知, 使用 QueuedConnection 确保不在 setImage 时触发，保证先后顺序。
+    QObject::connect(MtpFileProxy::instance(), &MtpFileProxy::createProxyFileFinished, this, [ this ](const QString &proxyFile, bool){
+        if (proxyFile == m_loadPath) {
+            // SVG/TIF/GIF 需重新加载
+            imageViewerSpace::ImageType Type = LibUnionImage_NameSpace::getImageType(m_loadPath);
+            if (imageViewerSpace::ImageTypeDynamic == Type
+                    || imageViewerSpace::ImageTypeSvg == Type
+                    || imageViewerSpace::ImageTypeMulti == Type) {
+                setImage(m_loadPath);
+            } else {
+                this->onLoadTimerTimeout();
+            }
+
+            m_imgFileWatcher->addPath(m_path);
+            m_imgFileWatcher->addPath(MtpFileProxy::instance()->mapToOriginFile(m_path));
+        }
+    }, Qt::QueuedConnection);
 
     //让默认的快捷键失效，默认会滑动窗口
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsUp);
@@ -228,6 +247,7 @@ void LibImageGraphicsView::clear()
 
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
+    // m_spinner 生命周期由 scene() 管理
     m_spinner = nullptr;
 
     //默认多页图的按钮显示为false
@@ -239,10 +259,16 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         delete m_imageReader;
         m_imageReader = nullptr;
     }
-    //重新生成数据缓存
-//    ImageEngine::instance()->makeImgThumbnail(CommonService::instance()->getImgSavePath(), QStringList(path), 1, true);
+
+    // 判断是否需要等待 MTP 代理文件加载完成，失败同样无需等待加载
+    MtpFileProxy::FileState state = MtpFileProxy::instance()->state(path);
+    bool needProxyLoad = MtpFileProxy::instance()->contains(path) && (MtpFileProxy::Loading == state);
+
     //检测数据缓存,如果存在,则使用缓存
-    imageViewerSpace::ItemInfo info = LibCommonService::instance()->getImgInfoByPath(path);
+    imageViewerSpace::ItemInfo info;
+    if (!needProxyLoad) {
+        info = LibCommonService::instance()->getImgInfoByPath(path);
+    }
     m_bRoate = ImageEngine::instance()->isRotatable(path); //是否可旋转
 
     m_loadPath = path;
@@ -250,9 +276,16 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     if (path.isEmpty()) {
         return;
     }
+
+    // 同时移除 MTP 代理文件的观察
+    m_imgFileWatcher->removePath(MtpFileProxy::instance()->mapToOriginFile(m_path));
     m_imgFileWatcher->removePath(m_path);
     m_path = path;
-    m_imgFileWatcher->addPath(m_path);
+    if (!needProxyLoad) {
+        // MTP 代理文件等待创建完成后再添加观察
+        m_imgFileWatcher->addPath(m_path);
+    }
+
     QString strfixL = QFileInfo(path).suffix().toUpper();
     QGraphicsScene *s = scene();
     QFileInfo fi(path);
@@ -261,9 +294,13 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     //the judge way to solve the problem
 
     imageViewerSpace::ImageType Type = info.imageType;
-    if (Type == imageViewerSpace::ImageTypeBlank) {
+    if (needProxyLoad) {
+        // MTP代理文件默认为空，后续加载处理
+        Type = imageViewerSpace::ImageTypeBlank;
+    } else if (Type == imageViewerSpace::ImageTypeBlank) {
         Type = LibUnionImage_NameSpace::getImageType(path);
     }
+
     //ImageTypeDynamic
     if (Type == imageViewerSpace::ImageTypeDynamic) {
         m_pixmapItem = nullptr;
@@ -403,13 +440,18 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             if (!pix.isNull()) {
                 setSceneRect(m_pixmapItem->boundingRect());
             }
+
+            // 使用 MTP 代理文件时，需等待代理文件创建完成 createProxyFileFinished() ，完成后调用 onLoadTimerTimeout()
             //第一次打开直接启动,不使用延时300ms
-            if (m_isFistOpen) {
-                onLoadTimerTimeout();
-                m_isFistOpen = false;
-            } else {
-                m_loadTimer->start();
+            if (!needProxyLoad) {
+                if (m_isFistOpen) {
+                    onLoadTimerTimeout();
+                    m_isFistOpen = false;
+                } else {
+                    m_loadTimer->start();
+                }
             }
+
             scene()->addItem(m_pixmapItem);
             emit imageChanged(path);
             QMetaObject::invokeMethod(this, [ = ]() {
@@ -727,7 +769,9 @@ void LibImageGraphicsView::slotSavePic()
 
 void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
 {
-    Q_UNUSED(ddfFile)
+    // 判断是否为MTP原始路径文件，若为则同步更新代理文件状态
+    MtpFileProxy::instance()->triggerOriginFileChanged(ddfFile);
+
     m_isChangedTimer->start(200);
 }
 
@@ -936,6 +980,10 @@ void LibImageGraphicsView::slotRotatePixCurrent()
 
             disconnect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
             Libutils::image::rotate(m_path, m_rotateAngel);
+
+            // 如果是 MTP 文件，则将缓存文件的变更提交到 MTP 目录下
+            MtpFileProxy::instance()->submitChangesToMTP(m_path);
+
             //如果是相册调用，则告知刷新
             if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
                 emit ImageEngine::instance()->sigRotatePic(m_path);
