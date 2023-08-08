@@ -37,6 +37,7 @@
 #include "slideshow/slideshowpanel.h"
 #include "service/configsetter.h"
 #include "service/imagedataservice.h"
+#include "service/mtpfileproxy.h"
 #include "unionimage/imageutils.h"
 
 const QString IMAGE_TMPPATH =   QDir::homePath() +
@@ -452,12 +453,17 @@ void LibViewPanel::updateMenuContent(const QString &path)
         QFileInfo info(currentPath);
 
         bool isReadable = info.isReadable() ; //是否可读
-        qDebug() << QFileInfo(info.dir(), info.dir().path()).isWritable();
-        //判断文件是否可写和文件目录是否可写
+        // 判断文件是否可写和文件目录是否可写
         bool isWritable = info.isWritable() && QFileInfo(info.dir(), info.dir().path()).isWritable(); //是否可写
-//        bool isFile = info.isFile(); //是否存在
         bool isRotatable = ImageEngine::instance()->isRotatable(currentPath);//是否可旋转
-        imageViewerSpace::PathType pathType = LibUnionImage_NameSpace::getPathType(currentPath);//路径类型
+        imageViewerSpace::PathType pathType = imageViewerSpace::PathType::PathTypeLOCAL;//路径类型
+        // 判断是否为MTP文件，现MTP文件将使用代理文件加载
+        if (MtpFileProxy::instance()->contains(currentPath)) {
+            pathType = imageViewerSpace::PathType::PathTypeMTP;
+        } else {
+            pathType = LibUnionImage_NameSpace::getPathType(currentPath);
+        }
+
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
 
         //判断是否是损坏图片
@@ -866,8 +872,13 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
 
 bool LibViewPanel::startdragImage(const QStringList &paths, const QString &firstPath)
 {
+    // 若为 MTP 挂载文件，转换为目录加载
+    QStringList realPaths = paths;
+    QString realPath = firstPath;
+    bool isMtpProxy = MtpFileProxy::instance()->checkAndCreateProxyFile(realPaths, realPath);
+
     bool bRet = false;
-    QStringList image_list = paths;
+    QStringList image_list = realPaths;
     if (image_list.isEmpty())
         return false;
 
@@ -879,6 +890,8 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
             if (ImageEngine::instance()->isImage(path)) {
                 image_list << path;
             }
+        } else if (isMtpProxy) {
+            // 无需处理，使用默认 image_list
         } else {
             QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
             QDir _dirinit(DirPath);
@@ -927,14 +940,14 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         //stack设置正确位置
         m_stack->setCurrentWidget(m_view);
         //展示当前图片
-        loadImage(firstPath, paths);
-        LibCommonService::instance()->m_listAllPath = paths;
-        LibCommonService::instance()->m_noLoadingPath = paths;
+        loadImage(realPath, realPaths);
+        LibCommonService::instance()->m_listAllPath = realPaths;
+        LibCommonService::instance()->m_noLoadingPath = realPaths;
         LibCommonService::instance()->m_listLoaded.clear();
         //看图首先制作显示的图片的缩略图
-        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(firstPath), 1);
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(realPath), 1);
 
-        loadThumbnails(firstPath);
+        loadThumbnails(realPath);
     }
     m_bottomToolbar->thumbnailMoveCenterWidget();
     return bRet;
@@ -1088,6 +1101,11 @@ void LibViewPanel::loadThumbnails(const QString &path)
 
 void LibViewPanel::setCurrentWidget(const QString &path)
 {
+    // MTP 挂载文件且在加载中则不进入此判断(加载完成后调用)
+    if (MtpFileProxy::Loading == MtpFileProxy::instance()->state(path)) {
+        return;
+    }
+
     //存在切换到幻灯片被切换回去的情况,所以如果是当前界面为幻灯片,则不切换为其他的页面
     if (m_stack->currentWidget() != m_sliderPanel) {
         QFileInfo info(path);
@@ -1205,6 +1223,9 @@ bool LibViewPanel::startChooseFileDialog()
             return false;
 
         QString path = image_list.first();
+        // 若为MTP挂载图片，将使用临时目录
+        MtpFileProxy::instance()->checkAndCreateProxyFile(image_list, path);
+
         QFileInfo firstFileInfo(path);
         LibConfigSetter::instance()->setValue(cfgGroupName, cfgLastOpenPath, firstFileInfo.path());
 
@@ -1750,8 +1771,12 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
+            QString path = m_bottomToolbar->getCurrentItemInfo().path;
+            // MTP文件需调整文件路径
+            path = MtpFileProxy::instance()->mapToOriginFile(path);
+
             //todo显示在文管
-            Libutils::base::showInFileManager(m_bottomToolbar->getCurrentItemInfo().path);
+            Libutils::base::showInFileManager(path);
             break;
         }
         case IdImageInfo: {
@@ -1767,6 +1792,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (path.isEmpty()) {
                 path = m_currentPath;
             }
+
             m_info->setImagePath(path); //执行强制重刷
             m_info->show();
             m_extensionPanel->setContent(m_info);

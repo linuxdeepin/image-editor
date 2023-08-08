@@ -47,6 +47,15 @@ pkg_check_modules(3rd_lib REQUIRED
     libmediainfo
     )
 
+# 查找 dfm-io 但不进行链接(动态加载)
+pkg_check_modules(dfm-io_lib dfm-io)
+if(${dfm-io_lib_FOUND})
+    message("Found dfm-io, enable MTP file copy optimization.")
+    add_definitions(-DUSE_DFM_IO)
+else()
+    message("Not found dfm-io, use base api copy MTP file.")
+endif()
+
 #需要打开的头文件
 FILE (GLOB allHeaders "*.h" "*/*.h" "*/*/*.h")
 #需要打开的代码文件
@@ -98,8 +107,8 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 
-target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS})
-target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES} dl)
+target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS} ${dfm-io_lib_INCLUDE_DIRS})
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES} ${dfm-io_lib_LIBRARIES} dl)
 
 include(GNUInstallDirs)
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)

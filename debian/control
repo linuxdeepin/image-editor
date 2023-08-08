@@ -2,6 +2,7 @@ Source: image-editor
 Section: utils
 Priority: optional
 Maintainer: Deepin Packages Builder <packages@deepin.com>
+Build-Depends-Indep: libdfm-io-dev(>= 1.2.1)
 Build-Depends: 
  debhelper (>= 11), 
  cmake, 
@@ -46,7 +47,7 @@ Conflicts:
  libimage-viewer
 Replaces:
  libimage-viewer
-Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr, ffmpegthumbnailer, ffmpeg
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr, ffmpegthumbnailer, ffmpeg, dfm-io(>= 1.2.12)
 Description: Image Viewer library.
  Deepin Image Viewer library.
 
@@ -57,6 +58,6 @@ Conflicts:
  libimage-viewer-dev
 Replaces:
  libimage-viewer-dev
-Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
