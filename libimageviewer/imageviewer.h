@@ -34,7 +34,7 @@ public:
     bool startdragImageWithUID(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "", int UID = -1);
 
     //启动图片展示入口
-    void startImgView(QString currentPath, QStringList paths = QStringList());
+    void startImgView(const QString &currentPath, const QStringList &paths = QStringList());
 
     //设置topbar的显示和隐藏
     void setTopBarVisible(bool visible);

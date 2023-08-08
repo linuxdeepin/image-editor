@@ -17,9 +17,9 @@
 #include "imageengine.h"
 #include "viewpanel/viewpanel.h"
 #include "service/commonservice.h"
+#include "service/mtpfileproxy.h"
 #include "unionimage/imageutils.h"
 #include "unionimage/baseutils.h"
-//#include "widgets/toptoolbar.h"
 
 #define PLUGINTRANSPATH "/usr/share/libimageviewer/translations"
 class ImageViewerPrivate
@@ -115,18 +115,24 @@ bool ImageViewer::startdragImageWithUID(const QStringList &paths, const QString 
     return d->m_panel->startdragImage(paths, firstPath);
 }
 
-void ImageViewer::startImgView(QString currentPath, QStringList paths)
+void ImageViewer::startImgView(const QString &currentPath, const QStringList &paths)
 {
     Q_D(ImageViewer);
+
+    QStringList realPaths = paths;
+    QString realPath = currentPath;
+    MtpFileProxy::instance()->checkAndCreateProxyFile(realPaths, realPath);
+
     //展示当前图片
-    d->m_panel->loadImage(currentPath, paths);
+    d->m_panel->loadImage(realPath, realPaths);
+
     //启动线程制作缩略图
     if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
             LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
         //首先生成当前图片的缓存
-        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(currentPath), 1);
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(realPath), 1);
         //看图制作全部缩略图
-        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), paths, paths.size());
+        ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), realPaths, realPaths.size());
     }
 }
 
@@ -139,11 +145,14 @@ void ImageViewer::switchFullScreen()
 void ImageViewer::startSlideShow(const QStringList &paths, const QString &firstPath)
 {
     Q_D(ImageViewer);
+
     ViewInfo info;
     info.fullScreen = window()->isFullScreen();
     info.lastPanel = this;
     info.path = firstPath;
     info.paths = paths;
+    MtpFileProxy::instance()->checkAndCreateProxyFile(info.paths, info.path);
+
     info.viewMainWindowID = 0;
     d->m_panel->startSlideShow(info);
 }

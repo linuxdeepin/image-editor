@@ -8,6 +8,7 @@
 #include "widgets/formlabel.h"
 #include "accessibility/ac-desktop-define.h"
 #include "service/commonservice.h"
+#include "service/mtpfileproxy.h"
 
 #include <DApplicationHelper>
 #include <DArrowLineDrawer>
@@ -252,17 +253,40 @@ LibImageInfoWidget::~LibImageInfoWidget()
     clearLayout(m_exifLayout_details);
 }
 
+void updateFileTime(QMap<QString, QString> &data, const QString &path)
+{
+    QFileInfo info(path);
+    if (data.contains("DateTime")) {
+        QDateTime time = QDateTime::fromString(data["DateTime"], "yyyy:MM:dd hh:mm:ss");
+        data["DateTimeOriginal"] = time.toString("yyyy/MM/dd hh:mm");
+    } else {
+        data.insert("DateTimeOriginal",  info.lastModified().toString("yyyy/MM/dd HH:mm"));
+    }
+    data.insert("DateTimeDigitized",  info.lastModified().toString("yyyy/MM/dd HH:mm"));
+}
+
 void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
 {
+    // MTP文件需调整文件路径
+    bool needMtpProxy = MtpFileProxy::instance()->contains(path);
+
     // 根据forceUpdate标志判断使用本函数进行整个image info弹窗的整体强制重刷
     if (!forceUpdate && m_path == path) {
+        auto metaData = Libutils::image::getAllMetaData(path);
+        if (needMtpProxy) {
+            updateFileTime(metaData, MtpFileProxy::instance()->mapToOriginFile(path));
+        }
+
         // 检测数据是否存在变更
-        if (m_metaData == Libutils::image::getAllMetaData(path)) {
+        if (m_metaData == metaData) {
             return;
         }
     } else {
         m_path = path;
         m_metaData = Libutils::image::getAllMetaData(path);
+        if (needMtpProxy) {
+            updateFileTime(m_metaData, MtpFileProxy::instance()->mapToOriginFile(path));
+        }
     }
 
     m_isBaseInfo = false;
