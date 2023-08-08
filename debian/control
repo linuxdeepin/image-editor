@@ -35,7 +35,9 @@ Build-Depends:
  libopencv-dev, 
  libmediainfo-dev,
  libffmpegthumbnailer-dev,
- libtiff-dev
+ libtiff-dev,
+# Enable use dfm io to copy MTP mount file.
+ libdfm-io-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
@@ -57,6 +59,6 @@ Conflicts:
  libimage-viewer-dev
 Replaces:
  libimage-viewer-dev
-Recommends: libqt5libqgtk2, kimageformat-plugins ,deepin-ocr
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
