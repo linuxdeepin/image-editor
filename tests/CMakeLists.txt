@@ -13,6 +13,8 @@ add_definitions( -DUSE_UNIONIMAGE )
 option (USE_TEST "Use TESTS" ON)
 add_definitions( -DUSE_TEST )
 
+ADD_COMPILE_OPTIONS(-fno-access-control)
+
 set(TARGET_NAME image-editor-test)
 set(CMD_NAME image-editor-test)
 set(CMAKE_AUTOMOC ON)

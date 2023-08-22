@@ -963,8 +963,8 @@ void LibImageGraphicsView::slotRotatePixCurrent()
                 pathType != imageViewerSpace::PathTypeSAFEBOX && //保险箱
                 pathType != imageViewerSpace::PathTypeRECYCLEBIN) { //回收站
 
-            // 图片信息不一定同步，需做二次判断
-            if (!PermissionConfig::instance()->isEditable(m_path)) {
+            // 图片信息不一定同步，需做二次判断，根据权限配置是否回写文件
+            if (!PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableEdit, m_path)) {
                 m_rotateAngel = 0;
                 return;
             }
@@ -986,7 +986,7 @@ void LibImageGraphicsView::slotRotatePixCurrent()
             m_rotateAngel = 0;
 
             // 通知授权控制图片编辑完成
-            PermissionConfig::instance()->triggerEdit(m_path);
+            PermissionConfig::instance()->triggerAction(PermissionConfig::TidEdit, m_path);
         }
     }
 }

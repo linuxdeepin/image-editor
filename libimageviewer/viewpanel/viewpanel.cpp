@@ -157,7 +157,7 @@ LibViewPanel::~LibViewPanel()
         m_view->slotRotatePixCurrent();
     }
     // 析构时通知图片窗口关闭
-    PermissionConfig::instance()->triggerClose(m_currentPath);
+    PermissionConfig::instance()->triggerAction(PermissionConfig::TidClose, m_currentPath);
 
     // 清空图像缓存目录
     Libutils::image::clearCacheImageFolder();
@@ -207,7 +207,8 @@ void LibViewPanel::loadImage(const QString &path, QStringList paths)
                 m_view->slotRotatePixCurrent();
             }
             // 不含授权文件，提示文件关闭
-            PermissionConfig::instance()->triggerClose(PermissionConfig::instance()->targetImage());
+            PermissionConfig::instance()->triggerAction(PermissionConfig::TidClose, 
+                                                        PermissionConfig::instance()->targetImage());
         }
     }
 }
@@ -504,8 +505,8 @@ void LibViewPanel::updateMenuContent(const QString &path)
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
 
         auto authIns = PermissionConfig::instance();
-        bool isEditable = authIns->isEditable(currentPath);
-        bool isCopyable = authIns->isCopyable(currentPath);
+        bool isEditable = authIns->checkAuthFlag(PermissionConfig::EnableEdit, currentPath);
+        bool isCopyable = authIns->checkAuthFlag(PermissionConfig::EnableCopy, currentPath);
 
         //判断是否是损坏图片
         setCurrentWidget(currentPath);
@@ -636,7 +637,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
         if (isReadable && isWritable &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                imageViewerSpace::PathTypeAPPLE != pathType && !isAlbum && authIns->isRenamable()) {
+                imageViewerSpace::PathTypeAPPLE != pathType && !isAlbum && authIns->checkAuthFlag(PermissionConfig::EnableRename)) {
             appendAction(IdRename, QObject::tr("Rename"), ss("Rename", "F2"));
         }
 
@@ -648,7 +649,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
                 imageViewerSpace::PathTypeRECYCLEBIN != pathType &&
                 imageViewerSpace::PathTypeMTP != pathType &&
                 imageViewerSpace::PathTypePTP != pathType &&
-                isWritable && isReadable && authIns->isDeletable()) || (isAlbum && isWritable)) {
+                isWritable && isReadable && authIns->checkAuthFlag(PermissionConfig::EnableDelete)) || (isAlbum && isWritable)) {
             if (isAlbum) {
                 appendAction(IdMoveToTrash, QObject::tr("Delete"), ss("Throw to trash", ""));
             } else {
@@ -699,7 +700,8 @@ void LibViewPanel::updateMenuContent(const QString &path)
 
         // 需要判断图片是否支持设置壁纸，若不支持则置灰设置壁纸菜单项
         // 当配置权限控制时，屏蔽设置壁纸接口
-        if (isPic && !authIns->isValid()) {
+        bool enableWallpaper = authIns->checkAuthFlag(PermissionConfig::EnableWallpaper, currentPath);
+        if (isPic && enableWallpaper) {
             QAction *ac = appendAction(IdSetAsWallpaper, QObject::tr("Set as wallpaper"), ss("Set as wallpaper", "Ctrl+F9"));
             if (ac)
                 ac->setEnabled(Libutils::image::imageSupportWallPaper(ItemInfo.path));
@@ -927,6 +929,9 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
                         }
                         QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
                         qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
+
+                        // 通知触发设置壁纸动作（属于拷贝动作）
+                        PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, path);
                     } else {
                         qWarning() << "SettingWallpaper failed" << interface.lastError();
                     }
@@ -950,9 +955,26 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
     if (image_list.isEmpty())
         return false;
 
+    // 判断是否允许切换图片 (首次进入同样判断)
+    bool enableSwitch = PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableSwitch, image_list.first());
+    if (!enableSwitch) {
+        if (image_list.first() != PermissionConfig::instance()->targetImage()) {
+            return false;
+        }
+    }
+    bool permissionValid = PermissionConfig::instance()->isValid();
+
     if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal) {
         QString path = image_list.first();
-        if ((path.indexOf("smb-share:server=") != -1 || path.indexOf("mtp:host=") != -1 || path.indexOf("gphoto2:host=") != -1)) {
+
+        // 判断是否允许切换图片，不切换图片时，将仅使用首张图片
+        if (permissionValid && !enableSwitch) {
+            image_list.clear();
+            if (ImageEngine::instance()->isImage(path)) {
+                image_list << path;
+            }
+
+        } else if ((path.indexOf("smb-share:server=") != -1 || path.indexOf("mtp:host=") != -1 || path.indexOf("gphoto2:host=") != -1)) {
             image_list.clear();
             //判断是否图片格式
             if (ImageEngine::instance()->isImage(path)) {
@@ -979,11 +1001,13 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
                 }
             }
         }
+
         if (image_list.count() > 0) {
             bRet = true;
         } else {
             bRet = false;
         }
+
         //解决拖入非图片文件会出现崩溃
         QString loadingPath = "";
         if (image_list.contains(path)) {
@@ -1263,6 +1287,12 @@ void LibViewPanel::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::Butt
 
 bool LibViewPanel::startChooseFileDialog()
 {
+    // 授权控制状态下，判断是否允许切换图片
+    bool enableSwitch = PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableSwitch);
+    if (!enableSwitch) {
+        return false;
+    }
+
     bool bRet = false;
     if (m_stack->currentWidget() != m_sliderPanel) {
         QString filter = tr("All images");
@@ -1495,7 +1525,7 @@ bool LibViewPanel::slotOcrPicture()
     //图片过大，会导致崩溃，超过4K，智能裁剪
     if (m_ocrInterface != nullptr && m_view != nullptr) {
         // 提示授权控制拷贝图片
-        PermissionConfig::instance()->triggerCopy(path);
+        PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, path);
 
         QImage image = m_view->image();
         if (image.width() > 2500) {
@@ -1790,7 +1820,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                         openImg(0, filepath);
                     }
 
-                    PermissionConfig::instance()->triggerRename(oldPath);
+                    PermissionConfig::instance()->triggerAction(PermissionConfig::TidRename, oldPath);
                 }
             }
             if (m_dirWatcher) {
@@ -1814,7 +1844,7 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                 Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
             }
 
-            PermissionConfig::instance()->triggerCopy(m_bottomToolbar->getCurrentItemInfo().path);
+            PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, m_bottomToolbar->getCurrentItemInfo().path);
             break;
         }
         case IdMoveToTrash: {
@@ -2184,6 +2214,11 @@ void LibViewPanel::mousePressEvent(QMouseEvent *event)
 void LibViewPanel::dragEnterEvent(QDragEnterEvent *event)
 {
     if (m_AIEnhancing) {
+        return;
+    }
+
+    // 授权控制时判断是否允许拖拽图片进入
+    if (!PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableSwitch)) {
         return;
     }
 
