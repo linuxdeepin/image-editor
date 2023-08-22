@@ -6,14 +6,52 @@
 #include "imageengine.h"
 
 #include <QApplication>
+#include <QWindow>
 #include <QJsonDocument>
 #include <QFileInfo>
+#include <QCommandLineParser>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusReply>
 #include <QDebug>
 
 const QString g_KeyTid = "tid";
 const QString g_KeyOperate = "operate";
 const QString g_KeyFilePath = "filePath";
 const QString g_KeyRemaining = "remainingPrintCount";
+
+/**
+   @brief 通过dbus接口从任务栏激活窗口
+*/
+bool activateWindowFromDock(quintptr winId)
+{
+    bool bRet = false;
+    // 优先采用V23接口，低版本DDE还未提供区分V23/V20接口
+    QDBusInterface dockDbusInterfaceV23(
+        "org.deepin.dde.daemon.Dock1", "/org/deepin/dde/daemon/Dock1", "org.deepin.dde.daemon.Dock1");
+    if (dockDbusInterfaceV23.isValid()) {
+        QDBusReply<void> reply = dockDbusInterfaceV23.call("ActivateWindow", winId);
+        if (!reply.isValid()) {
+            qWarning() << qPrintable("Call v23 org.deepin.dde.daemon.Dock1 failed") << reply.error();
+        } else {
+            return true;
+        }
+    }
+
+    QDBusInterface dockDbusInterfaceV20(
+        "com.deepin.dde.daemon.Dock", "/com/deepin/dde/daemon/Dock", "com.deepin.dde.daemon.Dock");
+    if (dockDbusInterfaceV20.isValid() && !bRet) {
+        QDBusReply<void> reply = dockDbusInterfaceV20.call("ActivateWindow", winId);
+        if (!reply.isValid()) {
+            qWarning() << qPrintable("Call v20 com.deepin.dde.daemon.Dock failed") << reply.error();
+            bRet = false;
+        } else {
+            return true;
+        }
+    }
+
+    return bRet;
+}
 
 /**
    @class AuthoriseConfig
@@ -65,66 +103,6 @@ bool PermissionConfig::isCurrentIsTargetImage() const
 }
 
 /**
-   @return 是否允许编辑图片，无授权控制时默认返回 true
- */
-bool PermissionConfig::isEditable(const QString &fileName) const
-{
-    if (checkAuthInvalid(fileName)) {
-        return true;
-    }
-
-    return authFlags.testFlag(EnableEdit);
-}
-
-/**
-   @return 是否允许复制图片，无授权控制时默认返回 true
- */
-bool PermissionConfig::isCopyable(const QString &fileName) const
-{
-    if (checkAuthInvalid(fileName)) {
-        return true;
-    }
-
-    return authFlags.testFlag(EnableCopy);
-}
-
-/**
-   @return 是否允许删除图片，无授权控制时默认返回 true
- */
-bool PermissionConfig::isDeletable() const
-{
-    if (checkAuthInvalid()) {
-        return true;
-    }
-
-    return authFlags.testFlag(EnableDelete);
-}
-
-/**
-   @return 是否允许重命名图片，无授权控制时默认返回 true
- */
-bool PermissionConfig::isRenamable() const
-{
-    if (checkAuthInvalid()) {
-        return true;
-    }
-
-    return authFlags.testFlag(EnableRename);
-}
-
-/**
-   @return 是否允许切换图片，无授权控制时默认返回 true
- */
-bool PermissionConfig::isSwitchable() const
-{
-    if (checkAuthInvalid()) {
-        return true;
-    }
-
-    return authFlags.testFlag(EnableSwitch);
-}
-
-/**
    @return 是否允许打印图片，无授权控制时默认返回 true
    @note -1 表示无限制;0 表示无打印次数;1~表示剩余可打印次数
  */
@@ -154,111 +132,17 @@ bool PermissionConfig::hasPrintWaterMark() const
 }
 
 /**
-   @brief 触发打开文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerOpen(const QString &fileName)
-{
-    if (checkAuthInvalid(fileName)) {
-        return;
-    }
-
-    if (NotOpen != status) {
-        return;
-    }
-    status = Open;
-
-    QJsonObject data{{g_KeyTid, TidOpen}, {g_KeyOperate, "open"}, {g_KeyFilePath, fileName}};
-
-    triggerNotify(data);
-}
-
-/**
-   @brief 触发编辑文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerEdit(const QString &fileName)
-{
-    if (checkAuthInvalid(fileName)) {
-        return;
-    }
-
-    QJsonObject data{{g_KeyTid, TidEdit}, {g_KeyOperate, "edit"}, {g_KeyFilePath, fileName}};
-
-    triggerNotify(data);
-}
-
-/**
-   @brief 触发拷贝文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerCopy(const QString &fileName)
-{
-    if (checkAuthInvalid(fileName)) {
-        return;
-    }
-
-    QJsonObject data{{g_KeyTid, TidCopy}, {g_KeyOperate, "copy"}, {g_KeyFilePath, fileName}};
-
-    triggerNotify(data);
-}
-
-/**
-   @brief 触发删除文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerDelete(const QString &fileName)
-{
-    if (checkAuthInvalid(fileName)) {
-        return;
-    }
-
-    QJsonObject data{{g_KeyTid, TidDelete}, {g_KeyOperate, "delete"}, {g_KeyFilePath, fileName}};
-
-    triggerNotify(data);
-}
-
-/**
-   @brief 触发重命名文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerRename(const QString &fileName)
-{
-    if (checkAuthInvalid()) {
-        return;
-    }
-
-    QJsonObject data{{g_KeyTid, TidRename}, {g_KeyOperate, "rename"}, {g_KeyFilePath, fileName}};
-
-    triggerNotify(data);
-}
-
-/**
    @brief 触发打印文件 \a fileName ，若为限权文件，向外发送权限通知信号
  */
 void PermissionConfig::triggerPrint(const QString &fileName)
 {
-    if (checkAuthInvalid()) {
+    if (checkAuthInvalid(fileName)) {
         return;
     }
 
     // 减少打印计数
     reduceOnePrintCount();
     QJsonObject data{{g_KeyTid, TidPrint}, {g_KeyOperate, "print"}, {g_KeyFilePath, fileName}, {g_KeyRemaining, printCount()}};
-
-    triggerNotify(data);
-}
-
-/**
-   @brief 触发关闭文件 \a fileName ，若为限权文件，向外发送权限通知信号
- */
-void PermissionConfig::triggerClose(const QString &fileName)
-{
-    if (checkAuthInvalid(fileName)) {
-        return;
-    }
-
-    if (Open != status) {
-        return;
-    }
-    status = Close;
-
-    QJsonObject data{{"tid", TidClose}, {g_KeyOperate, "close"}, {g_KeyFilePath, fileName}};
 
     triggerNotify(data);
 }
@@ -292,8 +176,67 @@ void PermissionConfig::reduceOnePrintCount()
         printLimitCount--;
         Q_EMIT printCountChanged();
     } else {
-        qWarning() << "Escape print authorise check!";
+        qWarning() << qPrintable("Escape print authorise check!");
     }
+}
+
+/**
+   @brief 用于操作文件 \a fileName 触发不同类型 \a tid 动作，根据不同动作构造不同的 Json 通知数据，
+        并通过信号向外发送。
+*/
+void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
+{
+    if (checkAuthInvalid(fileName)) {
+        return;
+    }
+
+    QString optName;
+    switch (tid) {
+        case TidOpen:
+            if (NotOpen != status) {
+                return;
+            }
+            status = Open;
+            optName = "open";
+            break;
+        case TidClose:
+            if (Open != status) {
+                return;
+            }
+            status = Close;
+            // Note: 授权文件关闭后(关闭窗口或打开其他图片)，权限控制无效化
+            valid = false;
+
+            optName = "close";
+            break;
+        case TidEdit:
+            optName = "edit";
+            break;
+        case TidCopy:
+            optName = "copy";
+            break;
+        case TidDelete:
+            optName = "delete";
+            break;
+        case TidPrint:
+            // 打印操作略有不同，单独处理
+            triggerPrint(fileName);
+            return;
+        default:
+            /*
+            当前未捕获的操作将不会处理，直接返回
+            case TidSwitch:
+                optName = "pictureSwitch";
+                break;
+            case TidSetWallpaper:
+                optName = "setWallpaper";
+                break;
+             */
+            return;
+    }
+
+    QJsonObject data{{g_KeyTid, tid}, {g_KeyOperate, optName}, {g_KeyFilePath, fileName}};
+    triggerNotify(data);
 }
 
 /**
@@ -314,7 +257,14 @@ void PermissionConfig::triggerNotify(const QJsonObject &data)
  */
 void PermissionConfig::setCurrentImagePath(const QString &fileName)
 {
+    if (!valid) {
+        return;
+    }
+
     currentImagePath = fileName;
+
+    // 通知当前展示的图片变更
+    Q_EMIT currentImagePathChanged(fileName, bool(currentImagePath == targetImagePath));
 }
 
 /**
@@ -343,24 +293,46 @@ WaterMarkData PermissionConfig::printWaterMarkData() const
     return printWaterMark;
 }
 
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
-   @brief 从命令行参数中取得授权配置
+   @brief 接收来自外部的调起窗口指令，当 \a pid 和当前进程pid一致时，激活主窗口
+*/
+void PermissionConfig::activateProcess(qint64 pid)
+{
+    qInfo() << QString("Receive DBus activate process, current pid: %1, request pid %2").arg(qApp->applicationPid()).arg(pid);
+
+    if (pid == qApp->applicationPid()) {
+        QWindowList winList = qApp->topLevelWindows();
+        if (winList.isEmpty()) {
+            return;
+        }
+
+        // 看图默认一个窗口,通过 DBus 接口激活窗口(防止缩小在任务栏)
+        auto mainWin = winList.first();
+        if (!Q_LIKELY(activateWindowFromDock(mainWin->winId()))) {
+            mainWin->requestActivate();
+        }
+    }
+}
+
+/**
+   @brief 从命令行参数 \a arguments 中取得授权配置
    @note 命令行参数示例：
     deepin-image-viewer --config=[Base64 code data] /path/to/file
  */
-void PermissionConfig::initFromArguments()
+void PermissionConfig::initFromArguments(const QStringList &arguments)
 {
     if (valid) {
         return;
     }
 
-    QString configParam = parseConfigOption();
-    if (!configParam.isEmpty()) {
+    QString configParam;
+    QStringList imageList;
+    bool ret = parseConfigOption(arguments, configParam, imageList);
+    if (ret) {
         // 获取带权限控制的文件路径
-        QStringList arguments = qApp->arguments();
-        for (const QString &arg : arguments) {
+        for (const QString &arg : imageList) {
             QFileInfo info(arg);
             QString filePath = info.absoluteFilePath();
             if (ImageEngine::instance()->isImage(filePath) || info.suffix() == "dsps") {
@@ -370,10 +342,9 @@ void PermissionConfig::initFromArguments()
         }
 
         if (targetImagePath.isEmpty()) {
-            qWarning() << qPrintable("Authorise config with no target image path.") << arguments;
+            qWarning() << qPrintable("Authorise config with no target image path.");
             return;
         }
-
         QByteArray jsonData = QByteArray::fromBase64(configParam.toUtf8());
         qInfo() << QString("Parse authorise config, data: %1").arg(QString(jsonData));
 
@@ -386,72 +357,71 @@ void PermissionConfig::initFromArguments()
             initReadWaterMark(root.value("readWatermark").toObject());
             initPrintWaterMark(root.value("printWatermark").toObject());
 
-            valid = !targetImagePath.isEmpty();
-            if (valid) {
-                // 首次触发打开图片
-                triggerOpen(targetImagePath);
-            }
-
             qInfo() << qPrintable("Current Enable permission") << authFlags;
         } else {
             qWarning()
                 << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
         }
+
+        // 只要传入参数、图片即认为有效，无论参数是否正常解析
+        valid = true;
+        // 首次触发打开图片
+        triggerAction(TidOpen, targetImagePath);
     } else {
         qWarning() << qPrintable("Parse authorise config is empty.");
+    }
+
+    if (valid) {
+        // 传入权限控制参数时，绑定DBus唤醒信号
+        QDBusConnection connection = QDBusConnection::sessionBus();
+        bool ret = connection.connect(
+            "com.wps.cryptfs", "/com/wps/cryptfs", "cryptfs.method.Type", "activateProcess", this, SLOT(activateProcess(qint64)));
+        if (!ret) {
+            qWarning() << qPrintable("DBus connect activateProcess failed!");
+        } else {
+            qInfo() << qPrintable("DBus connect activateProcess success!");
+        }
     }
 }
 
 /**
    @return 解析命令行参数并返回设置的权限和水印配置，为设置则返回空
  */
-QString PermissionConfig::parseConfigOption()
+bool PermissionConfig::parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const
 {
-    if (!qApp) {
-        qWarning() << qPrintable("Must init authorise config after QApplication initialized");
-        return {};
-    }
-
-    const QString option("--config");
-    const QLatin1Char assignChar('=');
-    enum Status { FindOption, FindAssign, FindParam };
-    Status status = FindOption;
-
-    QStringList arguments = qApp->arguments();
-    for (const QString &arg : arguments) {
-        switch (status) {
-            case FindOption:
-                if (arg.simplified().startsWith(option)) {
-                    int index = arg.indexOf(assignChar);
-                    if (index < 0) {
-                        status = FindAssign;
-                        continue;
-                    } else if (index == arg.length() - 1) {
-                        status = FindParam;
-                        continue;
-                    } else {
-                        return arg.mid(index + 1);
-                    }
-                }
-                break;
-            case FindAssign:
-                if (arg.simplified().startsWith(assignChar)) {
-                    if (arg.length() > 1) {
-                        return arg.mid(1);
-                    } else {
-                        status = FindParam;
-                        continue;
-                    }
-                } else {
-                    return {};
-                }
-                break;
-            case FindParam:
-                return arg;
+    // 避开以 --config=* 开头的特殊图片
+    QStringList specialList;
+    QStringList argumentsList = arguments;
+    QString prefix("--config=");
+    for (auto itr = argumentsList.begin(); itr != argumentsList.end();) {
+        if ((*itr).startsWith(prefix) && (*itr).size() > prefix.size()) {
+            if (ImageEngine::instance()->isImage((*itr))) {
+                specialList.append(*itr);
+                itr = argumentsList.erase(itr);
+                continue;
+            }
         }
+
+        ++itr;
     }
 
-    return {};
+    // 取得 --config 后的数据
+    QCommandLineParser parser;
+    QCommandLineOption configOpt("config", "Permission config json(base64 encode).", "configvalue");
+    parser.addOption(configOpt);
+
+    if (!parser.parse(argumentsList)) {
+        qWarning() << QString("Can't parse arguments %1").arg(parser.errorText());
+        return false;
+    }
+
+    imageList = parser.positionalArguments() + specialList;
+    if (parser.isSet(configOpt)) {
+        configParam = parser.value(configOpt);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -467,8 +437,8 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     // 屏蔽 delete / rename ，默认无此功能
     authFlags.setFlag(EnableEdit, param.value("edit").toBool(false));
     authFlags.setFlag(EnableCopy, param.value("copy").toBool(false));
-    // 默认允许切换图片，包括快捷键及 Ctrl + O
-    authFlags.setFlag(EnableSwitch, true);
+    authFlags.setFlag(EnableSwitch, param.value("pictureSwitch").toBool(false));
+    authFlags.setFlag(EnableWallpaper, param.value("setWallpaper").toBool(false));
 
     printLimitCount = param.value("printCount").toInt(0);
 }
@@ -501,7 +471,7 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
     readWaterMark.text = param.value("text").toString();
 
     authFlags.setFlag(EnableReadWaterMark, true);
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 }
 
 /**
@@ -532,7 +502,19 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
     printWaterMark.text = param.value("text").toString();
 
     authFlags.setFlag(EnablePrintWaterMark, true);
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+}
+
+/**
+   @return 返回文件 \a fileName 是否符合权限标识 \a authFlag
+*/
+bool PermissionConfig::checkAuthFlag(PermissionConfig::Authorise authFlag, const QString &fileName) const
+{
+    if (checkAuthInvalid(fileName)) {
+        return true;
+    }
+
+    return authFlags.testFlag(authFlag);
 }
 
 /**

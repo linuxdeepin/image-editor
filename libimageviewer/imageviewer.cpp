@@ -43,7 +43,11 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     : q_ptr(parent)
 {
     // 在界面前初始化授权配置
-    PermissionConfig::instance()->initFromArguments();
+    if (!qApp) {
+        qWarning() << qPrintable("Must init authorise config after QApplication initialized!");
+    } else {
+        PermissionConfig::instance()->initFromArguments(qApp->arguments());
+    }
 
     QDir dir(PLUGINTRANSPATH);
     if (dir.exists()) {
@@ -92,6 +96,18 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
         auto data = PermissionConfig::instance()->readWaterMarkData();
         DWaterMarkHelper::instance()->setData(data);
         DWaterMarkHelper::instance()->registerWidget(m_panel);
+
+        // 仅权限控制图片单独展示
+        QObject::connect(PermissionConfig::instance(), &PermissionConfig::currentImagePathChanged, q_ptr, [ this ](const QString &, bool isTargetImage){
+            if (!PermissionConfig::instance()->isValid()) {
+                return;
+            }
+
+            DWaterMarkWidget *mark = m_panel->findChild<DWaterMarkWidget *>();
+            if (mark) {
+                mark->setVisible(isTargetImage);
+            }
+        });
     }
 #endif
 }
