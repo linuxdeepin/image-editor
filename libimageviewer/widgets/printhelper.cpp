@@ -191,7 +191,8 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 #ifndef USE_TEST
     int ret = printDialog2.exec();
 #else
-    int ret = printDialog2.show();
+    printDialog2.show();
+    int ret = QDialog::Accepted;
 #endif
 
    if (QDialog::Accepted == ret) {

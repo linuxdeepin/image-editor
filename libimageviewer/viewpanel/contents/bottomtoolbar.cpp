@@ -174,7 +174,7 @@ void LibBottomToolbar::setRotateBtnClicked(const bool &bRet)
 
 void LibBottomToolbar::setPictureDoBtnClicked(const bool &bRet)
 {
-    bool enableCopy = PermissionConfig::instance()->isCopyable();
+    bool enableCopy = PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableCopy);
 
     if (m_ocrIsExists && m_ocrBtn) {
         m_ocrBtn->setEnabled(bRet && enableCopy);
@@ -322,7 +322,7 @@ void LibBottomToolbar::deleteImage()
 
             m_imgListWidget->moveCenterWidget();
 
-            PermissionConfig::instance()->triggerDelete(path);
+            PermissionConfig::instance()->triggerAction(PermissionConfig::TidDelete, path);
         }
     }
 
@@ -484,7 +484,7 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
     PermissionConfig::instance()->setCurrentImagePath(info.absoluteFilePath());
     m_trashBtn->setVisible(!PermissionConfig::instance()->isCurrentIsTargetImage());
 
-    bool isCopyable = PermissionConfig::instance()->isCopyable();
+    bool isCopyable = PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableCopy);
     if (m_ocrIsExists) {
         if (isCopyable) {
             m_ocrBtn->setToolTip(QObject::tr("Extract text"));
@@ -507,7 +507,7 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
         m_adaptImageBtn->setEnabled(true);
         m_adaptScreenBtn->setEnabled(true);
 
-        if (!PermissionConfig::instance()->isEditable()) {
+        if (!PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableEdit)) {
             return;
         }
 
@@ -816,9 +816,9 @@ void LibBottomToolbar::initUI()
         auto authIns = PermissionConfig::instance();
 
         if (m_ocrBtn) {
-            m_ocrBtn->setEnabled(authIns->isEditable());
+            m_ocrBtn->setEnabled(authIns->checkAuthFlag(PermissionConfig::EnableEdit));
         }
-        bool isDeletable = authIns->isDeletable();
+        bool isDeletable = authIns->checkAuthFlag(PermissionConfig::EnableDelete);
         m_trashBtn->setVisible(isDeletable);
         m_trashBtn->setEnabled(isDeletable);
     }

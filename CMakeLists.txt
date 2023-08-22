@@ -23,7 +23,7 @@ message(STATUS ${CMAKE_CXX_FLAGS})
 
 option(DOTEST "option for test" OFF)
 
-if(DOTEST)
+if(DOTEST OR CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(tests)
 endif()
 
