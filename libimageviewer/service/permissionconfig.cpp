@@ -456,7 +456,7 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     readWaterMark.type = WaterMarkType::Text;
     readWaterMark.font.setFamily(param.value("font").toString());
-    readWaterMark.font.setPixelSize(param.value("fontSize").toInt());
+    readWaterMark.font.setPointSize(param.value("fontSize").toInt());
 
     QString colorName = param.value("color").toString();
     if (!colorName.startsWith('#')) {
