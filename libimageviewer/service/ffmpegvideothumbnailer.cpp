@@ -30,28 +30,9 @@ static video_thumbnailer *m_video_thumbnailer = nullptr;
 //解析成功标记
 static bool resolveSuccessed = false;
 
-static QString libPath(const QString &strlib)
-{
-    QDir dir;
-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
-    dir.setPath(path);
-    QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
-    if (list.contains(strlib)) {
-        return strlib;
-    } else {
-        list.sort();
-    }
-
-    if (list.size() > 0) {
-        return list.last();
-    } else {
-        return QString();
-    }
-}
-
 bool initFFmpegVideoThumbnailer()
 {
-    QLibrary library(libPath("libffmpegthumbnailer.so"));
+    QLibrary library("libffmpegthumbnailer.so");
     m_creat_video_thumbnailer = reinterpret_cast<mvideo_thumbnailer_create>(library.resolve("video_thumbnailer_create"));
     m_mvideo_thumbnailer_destroy = reinterpret_cast<mvideo_thumbnailer_destroy>(library.resolve("video_thumbnailer_destroy"));
     m_mvideo_thumbnailer_create_image_data = reinterpret_cast<mvideo_thumbnailer_create_image_data>(library.resolve("video_thumbnailer_create_image_data"));
