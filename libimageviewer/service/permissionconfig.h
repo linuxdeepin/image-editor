@@ -15,7 +15,7 @@
 #include <dprintpreviewsettinginfo.h>
 
 DWIDGET_USE_NAMESPACE
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 class PermissionConfig : public QObject
 {
@@ -32,33 +32,39 @@ public:
 
     enum Authorise {
         NoAuth = 0,
-        EnableEdit = 0x1,
+        EnableEdit = 0x1,  // 编辑权限，旋转图片是否允许写回文件
         EnableCopy = 0x2,
         EnableDelete = 0x4,
         EnableRename = 0x8,
-        EnableSwitch = 0x10,
+        EnableSwitch = 0x10,  // 是否允许切换文件
+        EnableWallpaper = 0x20,
 
         EnableReadWaterMark = 0x1000,
         EnablePrintWaterMark = 0x2000,
     };
     Q_DECLARE_FLAGS(Authorises, Authorise)
 
-    bool isEditable(const QString &fileName = QString()) const;
-    bool isCopyable(const QString &fileName = QString()) const;
-    bool isDeletable() const;
-    bool isRenamable() const;
-    bool isSwitchable() const;
+    // 权限/配置查询接口
+    bool checkAuthFlag(Authorise authFlag, const QString &fileName = QString()) const;
     bool isPrintable(const QString &fileName = QString()) const;
     bool hasReadWaterMark() const;
     bool hasPrintWaterMark() const;
 
-    void triggerOpen(const QString &fileName);
-    void triggerEdit(const QString &fileName);
-    void triggerCopy(const QString &fileName);
-    void triggerDelete(const QString &fileName);
-    void triggerRename(const QString &fileName);
+    enum TidType {
+        TidOpen = 1000200050,
+        TidEdit = 1000200051,
+        TidCopy = 1000200052,
+        TidPrint = 1000200053,
+        TidClose = 1000200054,
+        TidSwitch = 1000200055,
+        TidSetWallpaper = 1000200056,
+        TidDelete = 1000200057,
+        TidRename = 1000200058,
+    };
+
+    // 动作触发通知接口
+    void triggerAction(TidType tid, const QString &fileName);
     void triggerPrint(const QString &fileName);
-    void triggerClose(const QString &fileName);
     Q_SIGNAL void authoriseNotify(const QJsonObject &data);
 
     int printCount() const;
@@ -66,46 +72,44 @@ public:
     Q_SIGNAL void printCountChanged();
 
     void setCurrentImagePath(const QString &fileName);
+    Q_SIGNAL void currentImagePathChanged(const QString &fileName, bool isTargetImage);
     QString targetImage() const;
 
+    // 阅读/打印水印
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMarkData() const;
     WaterMarkData printWaterMarkData() const;
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
-    void initFromArguments();
+    Q_SLOT void activateProcess(qint64 pid);
+    void initFromArguments(const QStringList &arguments);
 
 private:
-    QString parseConfigOption();
+    // 解析配置
+    bool parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const;
     void initAuthorise(const QJsonObject &param);
     void initReadWaterMark(const QJsonObject &param);
     void initPrintWaterMark(const QJsonObject &param);
+
     bool checkAuthInvalid(const QString &fileName = QString()) const;
     void reduceOnePrintCount();
+
     void triggerNotify(const QJsonObject &data);
 
 private:
-    enum TidType {
-        TidOpen = 1000200050,
-        TidEdit = 1000200051,
-        TidCopy = 1000200052,
-        TidPrint = 1000200053,
-        TidClose = 1000200054,
-        TidDelete = 1000200055,
-        TidRename = 1000200056,
-    };
     enum Status { NotOpen, Open, Close };
 
     QString currentImagePath;  // 当前展示的图片文件路径
     QString targetImagePath;   // 权限控制指向的文件路径
     bool valid = false;
-    int printLimitCount = 0;
+    int printLimitCount = 0;  // 打印记数，-1表示无限制
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
+
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMark;
     WaterMarkData printWaterMark;
-#endif
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 };
 
 #endif  // PERMISSIONCONFIG_H
