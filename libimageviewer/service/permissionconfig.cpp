@@ -8,17 +8,27 @@
 #include <QApplication>
 #include <QWindow>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QFileInfo>
+#include <QPluginLoader>
+#include <QDir>
 #include <QCommandLineParser>
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusReply>
 #include <QDebug>
 
-const QString g_KeyTid = "tid";
-const QString g_KeyOperate = "operate";
-const QString g_KeyFilePath = "filePath";
-const QString g_KeyRemaining = "remainingPrintCount";
+#include <DPrintPreviewDialog>
+
+static const QString g_KeyTid = "tid";
+static const QString g_KeyOperate = "operate";
+static const QString g_KeyFilePath = "filePath";
+static const QString g_KeyRemaining = "remainingPrintCount";
+
+// 打印水印插件
+static const char *g_WaterMarkEnv = "DEEPIN_WATERMARK";
+static const QString g_WaterMarkPluginName = "WaterMarkFilter";
+static const QString g_WaterMarkPluginClass = "PrintPreviewSettingsPlugin";
 
 /**
    @brief 通过dbus接口从任务栏激活窗口
@@ -125,10 +135,12 @@ bool PermissionConfig::hasReadWaterMark() const
 
 /**
    @return 是否存在打印水印
+        当环境中存在打印水印插件时，将不再手动设置打印水印，而是通过环境变量设置调整打印水印插件的数据
+   @sa detectWaterMarkPluginExists()
  */
 bool PermissionConfig::hasPrintWaterMark() const
 {
-    return authFlags.testFlag(EnablePrintWaterMark);
+    return !useWaterMarkPlugin && authFlags.testFlag(EnablePrintWaterMark);
 }
 
 /**
@@ -363,6 +375,11 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
                 << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
         }
 
+        // 存在打印水印设置时，检测是否存在打印水印插件，若存在则通过设置环境变量调用打印插件而不是手动设置
+        if (authFlags.testFlag(EnablePrintWaterMark)) {
+            detectWaterMarkPluginExists();
+        }
+
         // 只要传入参数、图片即认为有效，无论参数是否正常解析
         valid = true;
         // 首次触发打开图片
@@ -503,6 +520,122 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
 
     authFlags.setFlag(EnablePrintWaterMark, true);
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+}
+
+/**
+   @brief 检测当前系统环境中是否存在打印水印插件
+        通过路径下是否存在指定的插件文件决定，使用DPKG判断不一定准确，
+        文件可能被移除。
+   @sa initWaterMarkPluginEnvironment()
+ */
+void PermissionConfig::detectWaterMarkPluginExists()
+{
+    if (useWaterMarkPlugin) {
+        return;
+    }
+
+    // 参考 dprintpreviewdialog.cpp loadPlugin() 加载过程判断插件是否允许加载
+    // Note: 打印插件初始化在创建时加载完成，因此此处不尝试加载
+#if defined(Q_OS_LINUX)
+    QString pluginPath = QLatin1String("/usr/share/deepin/dtk/plugins/printsupport");
+#else
+    QString pluginPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QLatin1String("/printsupport") +
+                         QLatin1String("/plugins");
+#endif
+
+    if (!QFileInfo(pluginPath).exists()) {
+        return;
+    }
+
+    QDir pluginDir(pluginPath);
+    QStringList fileList = pluginDir.entryList({"*PrintPreviewSettings*.so"}, QDir::Files);
+
+    bool detected = false;
+    for (const QString &pluginName : fileList) {
+        // 能否正常加载
+        QPluginLoader loader(pluginDir.absoluteFilePath(pluginName));
+        QString className = loader.metaData().value("className").toString();
+        qInfo() << qPrintable("Detect print preview plugin metadata:") << pluginName << loader.metaData();
+
+        if (g_WaterMarkPluginClass == className) {
+            detected = true;
+            break;
+        }
+    }
+
+    if (detected) {
+        if (initWaterMarkPluginEnvironment()) {
+            // 成功初始化打印插件环境变量
+            useWaterMarkPlugin = true;
+            qInfo() << qPrintable("Using watermark plugin to print preview instead of manual set.");
+        } else {
+            qWarning() << qPrintable("Detect watermark print preview plugin but init failed!");
+        }
+    } else {
+        qInfo() << qPrintable("Not detect watermark print preview plugin, current plugins:") << fileList;
+    }
+}
+
+/**
+   @brief 初始化打印水印插件环境变量
+   @note 打印插件在 loadPlugin() 初始化时读取环境变量，需要注意设置环境变量时间
+   @sa detectWaterMarkPluginExists()
+ */
+bool PermissionConfig::initWaterMarkPluginEnvironment()
+{
+    QJsonObject envData;
+    envData.insert("angle", static_cast<int>(printWaterMark.rotation));
+    envData.insert("transparency", static_cast<int>(printWaterMark.opacity * 100));
+    QFontMetrics fm(printWaterMark.font);
+    QSize textSize = fm.size(Qt::TextSingleLine, printWaterMark.text);
+    if (textSize.height() > 0) {
+        envData.insert("rowSpacing", qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height());
+    }
+    if (textSize.width() > 0) {
+        envData.insert("columnSpacing", qreal(printWaterMark.spacing + textSize.width()) / textSize.width());
+    }
+
+    envData.insert("layout",
+                   static_cast<int>(printWaterMark.layout == WaterMarkLayout::Center ? DPrintPreviewWatermarkInfo::Center :
+                                                                                       DPrintPreviewWatermarkInfo::Tiled));
+    // 仅文本水印
+    envData.insert("watermarkType", static_cast<int>(DPrintPreviewWatermarkInfo::TextWatermark));
+    envData.insert("textType", static_cast<int>(DPrintPreviewWatermarkInfo::Custom));
+    envData.insert("customText", printWaterMark.text);
+    envData.insert("textColor", printWaterMark.color.name());
+    // 兼容插件传参格式
+    QJsonArray fontList;
+    fontList.append(printWaterMark.font.family());
+    envData.insert("fontList", fontList);
+    static const float sc_defaultFontSize = 65.0f;
+    // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
+    envData.insert("size", int(printWaterMark.font.pixelSize() / sc_defaultFontSize * 100));
+
+    QJsonDocument doc;
+    doc.setObject(envData);
+    QByteArray envParam = doc.toJson(QJsonDocument::Compact);
+    qInfo() << qPrintable(QString("Set print preview plugin environment %1 PARAM: ").arg(g_WaterMarkEnv)) << envParam;
+
+    if (qputenv(g_WaterMarkEnv, envParam)) {
+        DWIDGET_USE_NAMESPACE
+        // 打印水印插件可能非默认插件，设置后手动初始化及配置打印
+        if (g_WaterMarkPluginName != DPrintPreviewDialog::currentPlugin()) {
+            QStringList plugins = DPrintPreviewDialog::availablePlugins();
+            if (plugins.contains(g_WaterMarkPluginName)) {
+                DPrintPreviewDialog::setCurrentPlugin(g_WaterMarkPluginName);
+            } else {
+                qWarning() << qPrintable(QString("Print preview plugin not contain %1, all plugins:").arg(g_WaterMarkPluginName))
+                           << plugins;
+                return false;
+            }
+        }
+
+    } else {
+        qWarning() << qPrintable("Set watermark plugin environment variable failed!");
+        return false;
+    }
+
+    return true;
 }
 
 /**
