@@ -5,6 +5,8 @@
 #include <QtTest/QtTest>
 #include <gtest/gtest.h>
 
+#include <DPrintPreviewDialog>
+
 #include "service/permissionconfig.h"
 #include "imageengine.h"
 
@@ -18,6 +20,7 @@ public:
 void UT_PermissionConfig::SetUp()
 {
     PermissionConfig::instance()->valid = true;
+    PermissionConfig::instance()->useWaterMarkPlugin = false;
     PermissionConfig::instance()->targetImagePath.clear();
     PermissionConfig::instance()->currentImagePath.clear();
 }
@@ -25,6 +28,7 @@ void UT_PermissionConfig::SetUp()
 void UT_PermissionConfig::TearDown()
 {
     PermissionConfig::instance()->valid = false;
+    PermissionConfig::instance()->useWaterMarkPlugin = false;
 }
 
 static QString permission_config()
@@ -207,4 +211,37 @@ TEST_F(UT_PermissionConfig, triggerAction_SignalNotify_Pass)
     EXPECT_EQ(PermissionConfig::instance()->status, PermissionConfig::Close);
 }
 
+TEST_F(UT_PermissionConfig, hasPrintWaterMark_usingWaterMark_Pass)
+{
+    PermissionConfig::instance()->authFlags = PermissionConfig::EnablePrintWaterMark;
+    EXPECT_TRUE(PermissionConfig::instance()->hasPrintWaterMark());
 
+    PermissionConfig::instance()->useWaterMarkPlugin = true;
+    EXPECT_FALSE(PermissionConfig::instance()->hasPrintWaterMark());
+}
+
+TEST_F(UT_PermissionConfig, detectWaterMarkPluginExists_Pass)
+{
+    PermissionConfig::instance()->detectWaterMarkPluginExists();
+
+    QStringList plugins = DPrintPreviewDialog::availablePlugins();
+    if (plugins.contains("WaterMarkFilter")) {
+        EXPECT_TRUE(PermissionConfig::instance()->useWaterMarkPlugin);
+    } else {
+        EXPECT_FALSE(PermissionConfig::instance()->useWaterMarkPlugin);
+    }
+}
+
+TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckPlugin_Pass)
+{
+    DWIDGET_USE_NAMESPACE
+    QStringList plugins = DPrintPreviewDialog::availablePlugins();
+    if (plugins.contains("WaterMarkFilter")) {
+        EXPECT_TRUE(PermissionConfig::instance()->initWaterMarkPluginEnvironment());
+    } else {
+        EXPECT_FALSE(PermissionConfig::instance()->initWaterMarkPluginEnvironment());
+    }
+
+    QByteArray envData = qgetenv("DEEPIN_WATERMARK");
+    EXPECT_FALSE(envData.isEmpty());
+}
