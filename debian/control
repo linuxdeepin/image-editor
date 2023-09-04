@@ -36,8 +36,11 @@ Build-Depends:
  libmediainfo-dev,
  libffmpegthumbnailer-dev,
  libtiff-dev,
-# Enable use dfm io to copy MTP mount file.
- libdfm-io-dev
+# Enable use dfm io to copy MTP mount file, Use `|`(or) relationship to 
+# compatible different environments, qttools5-private-dev will not be used.
+# WARNING: control file changes may cause qttools5-private-dev to be installed
+# instead of libdfm-io-dev.
+ libdfm-io-dev | qttools5-private-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
