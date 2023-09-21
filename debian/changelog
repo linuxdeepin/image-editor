@@ -1,3 +1,11 @@
+image-editor (1.0.35) unstable; urgency=medium
+
+  * feat: just use QLibrary to search .so
+  * fix: Read images from gvfs-mtp mounted folder was slow.(Bug: 204243)(Influence: FileLoad MTP)
+  * feat: dfm-io build depend compatibility with diff environments.(Influence: debian/control)
+
+ -- Deepin Packages Builder <packages@deepin.org>  Thu, 21 Sep 2023 15:34:15 +0800
+
 image-editor (1.0.34) unstable; urgency=medium
 
   * fix: Reading out of bounds while file access denied.(Bug: 206425)(Influence: FileAccess)
