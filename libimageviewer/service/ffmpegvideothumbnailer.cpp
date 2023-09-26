@@ -10,6 +10,7 @@
 #include <QLibrary>
 #include <QDir>
 #include <QLibraryInfo>
+#include <QDebug>
 
 #include <libffmpegthumbnailer/videothumbnailerc.h>
 
@@ -32,12 +33,19 @@ static bool resolveSuccessed = false;
 
 bool initFFmpegVideoThumbnailer()
 {
-    QLibrary library("libffmpegthumbnailer.so");
+    QLibrary library("libffmpegthumbnailer.so.4");
+
     m_creat_video_thumbnailer = reinterpret_cast<mvideo_thumbnailer_create>(library.resolve("video_thumbnailer_create"));
     m_mvideo_thumbnailer_destroy = reinterpret_cast<mvideo_thumbnailer_destroy>(library.resolve("video_thumbnailer_destroy"));
     m_mvideo_thumbnailer_create_image_data = reinterpret_cast<mvideo_thumbnailer_create_image_data>(library.resolve("video_thumbnailer_create_image_data"));
     m_mvideo_thumbnailer_destroy_image_data = reinterpret_cast<mvideo_thumbnailer_destroy_image_data>(library.resolve("video_thumbnailer_destroy_image_data"));
     m_mvideo_thumbnailer_generate_thumbnail_to_buffer = reinterpret_cast<mvideo_thumbnailer_generate_thumbnail_to_buffer>(library.resolve("video_thumbnailer_generate_thumbnail_to_buffer"));
+
+    if (nullptr == m_creat_video_thumbnailer) {
+        qWarning() << QString("Resolve libffmpegthumbnailer.so data failed, %1").arg(library.errorString());
+        resolveSuccessed = false;
+        return false;
+    }
     m_video_thumbnailer = m_creat_video_thumbnailer();
 
     if (m_mvideo_thumbnailer_destroy == nullptr

@@ -11,6 +11,7 @@
 #include <QProcess>
 #include <QtDebug>
 #include <QJsonDocument>
+#include <QTemporaryDir>
 #include "unionimage/baseutils.h"
 #include "service/ffmpegvideothumbnailer.h"
 
@@ -211,12 +212,16 @@ QImage MovieService::getMovieCover_ffmpegthumbnailer(const QUrl &url, const QStr
     }
 
     QString path = url.toLocalFile();
+    QString savePath;
     QFileInfo info(path);
+    QTemporaryDir tempDir;
+    // 此处临时文件创建后被删除，调整为使用tmp目录
+    if (tempDir.isValid()) {
+        savePath = tempDir.filePath(info.fileName() + ".png");
+    } else {
+        savePath = QString(bufferPath + info.fileName() + ".png");
+    }
 
-    //QString savePath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + info.fileName() + ".png");
-    QString savePath(bufferPath + info.fileName() + ".png");
-
-    QByteArray output;
     try {
         QProcess ffmpegthumbnailer;
         QStringList cmds{"-i", path, "-o", savePath};
