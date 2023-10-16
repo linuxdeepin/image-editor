@@ -1,3 +1,9 @@
+image-editor (1.0.38) unstable; urgency=medium
+
+  * chore: Update REUSE date
+
+ -- Deepin Packages Builder <packages@deepin.org>  Mon, 16 Oct 2023 17:33:35 +0800
+
 image-editor (1.0.37) unstable; urgency=medium
 
   * Bump version for community, previous is 1.0.34
