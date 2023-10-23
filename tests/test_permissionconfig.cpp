@@ -5,10 +5,14 @@
 #include <QtTest/QtTest>
 #include <gtest/gtest.h>
 
+#include <QJsonDocument>
+
 #include <DPrintPreviewDialog>
 
 #include "service/permissionconfig.h"
 #include "imageengine.h"
+
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 
 class UT_PermissionConfig : public ::testing::Test
 {
@@ -245,3 +249,55 @@ TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckPlugin_Pass)
     QByteArray envData = qgetenv("DEEPIN_WATERMARK");
     EXPECT_FALSE(envData.isEmpty());
 }
+
+TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue_Pass)
+{
+    static const qreal sc_defaultFontSize = 65.0;
+    // 验证打印水印设置值
+    WaterMarkData &watermark  = PermissionConfig::instance()->printWaterMark;
+    watermark.rotation = 45;
+    watermark.opacity = 0.3;
+    watermark.font.setPointSize(30);
+    watermark.text = "123";
+    watermark.lineSpacing = 0;
+    watermark.spacing = 0;
+    watermark.color = "#FF00FF";
+    watermark.layout = WaterMarkLayout::Center;
+
+    // 强制设置环境变量
+    PermissionConfig::instance()->initWaterMarkPluginEnvironment();
+
+    QByteArray envData = qgetenv("DEEPIN_WATERMARK");
+    QJsonDocument doc = QJsonDocument::fromJson(envData);
+    QJsonObject root = doc.object();
+
+    EXPECT_EQ(watermark.rotation, root.value("angle").toDouble());
+    EXPECT_EQ(watermark.opacity, root.value("transparency").toDouble() / 100);
+    EXPECT_EQ(watermark.text, root.value("customText").toString());
+    EXPECT_EQ(watermark.color, root.value("textColor").toString());
+    EXPECT_EQ(DPrintPreviewWatermarkInfo::TextWatermark, root.value("watermarkType").toInt());
+    EXPECT_EQ(DPrintPreviewWatermarkInfo::Custom, root.value("textType").toInt());
+    EXPECT_EQ(DPrintPreviewWatermarkInfo::Center, root.value("layout").toInt());
+
+    qreal realFontSize = (root.value("size").toDouble() * sc_defaultFontSize) / 100.0;
+    EXPECT_EQ(watermark.font.pointSize(), qFloor(realFontSize + 0.5));
+    EXPECT_TRUE(qFuzzyCompare(0, root.value("rowSpacing").toDouble()));
+    EXPECT_TRUE(qFuzzyCompare(0, root.value("columnSpacing").toDouble()));
+
+    // 计算间距
+    watermark.lineSpacing = 100;
+    watermark.spacing = 60;
+    PermissionConfig::instance()->initWaterMarkPluginEnvironment();
+    envData = qgetenv("DEEPIN_WATERMARK");
+    doc = QJsonDocument::fromJson(envData);
+    root = doc.object();
+
+    QFontMetrics fm(watermark.font);
+    QSize textSize = fm.size(Qt::TextSingleLine, watermark.text);
+    qreal realRowSpacing = (qreal(watermark.lineSpacing + textSize.height()) / textSize.height()) - 1.0;
+    qreal realColumnSpacing = (qreal(watermark.spacing + textSize.width()) / textSize.width()) - 1.0;
+    EXPECT_TRUE(qFuzzyCompare(realRowSpacing, root.value("rowSpacing").toDouble()));
+    EXPECT_TRUE(qFuzzyCompare(realColumnSpacing, root.value("columnSpacing").toDouble()));
+}
+
+#endif
