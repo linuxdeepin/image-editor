@@ -457,6 +457,9 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     authFlags.setFlag(EnableSwitch, param.value("pictureSwitch").toBool(false));
     authFlags.setFlag(EnableWallpaper, param.value("setWallpaper").toBool(false));
 
+    // Internal
+    ignoreDevicePixelRatio = param.value("ignoreDevicePixelRatio").toBool(false);
+
     printLimitCount = param.value("printCount").toInt(0);
 }
 
@@ -487,6 +490,13 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
     readWaterMark.spacing = param.value("columnSpacing").toInt();
     readWaterMark.text = param.value("text").toString();
 
+    qreal deviceRatio = qApp->devicePixelRatio();
+    if (ignoreDevicePixelRatio && !qFuzzyCompare(1.0, deviceRatio) && deviceRatio > 0) {
+        readWaterMark.font.setPointSizeF(readWaterMark.font.pointSizeF() / deviceRatio);
+        readWaterMark.lineSpacing /= deviceRatio;
+        readWaterMark.spacing /= deviceRatio;
+    }
+
     authFlags.setFlag(EnableReadWaterMark, true);
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 }
@@ -504,7 +514,7 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     printWaterMark.type = WaterMarkType::Text;
     printWaterMark.font.setFamily(param.value("font").toString());
-    printWaterMark.font.setPixelSize(param.value("fontSize").toInt());
+    printWaterMark.font.setPointSize(param.value("fontSize").toInt());
 
     QString colorName = param.value("color").toString();
     if (!colorName.startsWith('#')) {
@@ -584,15 +594,16 @@ void PermissionConfig::detectWaterMarkPluginExists()
 bool PermissionConfig::initWaterMarkPluginEnvironment()
 {
     QJsonObject envData;
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     envData.insert("angle", static_cast<int>(printWaterMark.rotation));
     envData.insert("transparency", static_cast<int>(printWaterMark.opacity * 100));
     QFontMetrics fm(printWaterMark.font);
     QSize textSize = fm.size(Qt::TextSingleLine, printWaterMark.text);
     if (textSize.height() > 0) {
-        envData.insert("rowSpacing", qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height());
+        envData.insert("rowSpacing", qMax(0.0, (qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0));
     }
     if (textSize.width() > 0) {
-        envData.insert("columnSpacing", qreal(printWaterMark.spacing + textSize.width()) / textSize.width());
+        envData.insert("columnSpacing", qMax(0.0, (qreal(printWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0));
     }
 
     envData.insert("layout",
@@ -607,9 +618,10 @@ bool PermissionConfig::initWaterMarkPluginEnvironment()
     QJsonArray fontList;
     fontList.append(printWaterMark.font.family());
     envData.insert("fontList", fontList);
-    static const float sc_defaultFontSize = 65.0f;
+    static const qreal sc_defaultFontSize = 65.0;
     // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
-    envData.insert("size", int(printWaterMark.font.pixelSize() / sc_defaultFontSize * 100));
+    envData.insert("size", int(printWaterMark.font.pointSizeF() / sc_defaultFontSize * 100));
+#endif
 
     QJsonDocument doc;
     doc.setObject(envData);
