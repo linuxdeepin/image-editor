@@ -143,8 +143,7 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 #endif
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    // 定制分支，水印功能不依赖DTK版本
-    // 更新打印水印设置
+    // 定制分支，水印功能不依赖DTK版本，更新打印水印设置
     if (PermissionConfig::instance()->hasPrintWaterMark()) {
         auto data = PermissionConfig::instance()->printWaterMarkData();
 
@@ -159,10 +158,10 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
                 QFontMetrics fm(data.font);
                 QSize textSize = fm.size(Qt::TextSingleLine, data.text);
                 if (textSize.height() > 0) {
-                    info->rowSpacing = qreal(data.lineSpacing + textSize.height()) / textSize.height();
+                    info->rowSpacing = qMax(0.0, (qreal(data.lineSpacing + textSize.height()) / textSize.height()) - 1.0);
                 }
                 if (textSize.width() > 0) {
-                    info->columnSpacing = qreal(data.spacing + textSize.width()) / textSize.width();
+                    info->columnSpacing = qMax(0.0, (qreal(data.spacing + textSize.width()) / textSize.width()) - 1.0);
                 }
                 info->layout = data.layout == WaterMarkLayout::Center ? DPrintPreviewWatermarkInfo::Center : DPrintPreviewWatermarkInfo::Tiled;
                 info->currentWatermarkType = (data.type == WaterMarkType::Text) ? DPrintPreviewWatermarkInfo::TextWatermark : DPrintPreviewWatermarkInfo::ImageWatermark;
@@ -170,9 +169,9 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
                 info->customText = data.text;
                 info->textColor = data.color;
                 info->fontList.append(data.font.family());
-                static const float sc_defaultFontSize = 65.0f;
+                static const qreal sc_defaultFontSize = 65.0;
                 // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
-                info->size = int(data.font.pixelSize() / sc_defaultFontSize * 100);
+                info->size = int(data.font.pointSizeF() / sc_defaultFontSize * 100);
                 printDialog2.updateDialogSettingInfo(info);
             } else {
                 qWarning() << qPrintable("Can't convert DPrintPreviewDialog watermark info.") << baseInfo->type();
@@ -182,6 +181,16 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
         } else {
             qWarning() << qPrintable("Can't get DPrintPreviewDialog watermark info.");
         }
+
+        // 在不使用打印插件时，需要手动设置打印插件选项显示且不可编辑，在设置后调用
+        // WaterMarkFrame 和 WaterMarkContentFrame 是DTK窗口中水印设置控件的 objectName
+        auto widgetList = printDialog2.findChildren<QWidget *>("WaterMarkFrame");
+        widgetList.append(printDialog2.findChildren<QWidget *>("WaterMarkContentFrame"));
+        for (auto wid: widgetList) {
+            wid->setVisible(true);
+            wid->setEnabled(false);
+        }
+
     }
 #endif
 
@@ -248,4 +257,3 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
     }
     painter.end();
 }
-

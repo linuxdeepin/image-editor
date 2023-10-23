@@ -108,7 +108,8 @@ private:
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
 
-    bool useWaterMarkPlugin = false;  // 是否使用水印插件
+    bool ignoreDevicePixelRatio = false;    // 过滤设备显示比率，按照原生像素计算
+    bool useWaterMarkPlugin = false;        // 是否使用水印插件
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMark;
     WaterMarkData printWaterMark;
