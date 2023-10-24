@@ -30,6 +30,12 @@ static const char *g_WaterMarkEnv = "DEEPIN_WATERMARK";
 static const QString g_WaterMarkPluginName = "WaterMarkFilter";
 static const QString g_WaterMarkPluginClass = "PrintPreviewSettingsPlugin";
 
+// 打破打印水印间距限制
+static const char *g_PrintRowSpacingProp = "_d_print_waterMarkRowSpacing";
+static const char *g_PrintColumnSpacingProp = "_d_print_waterMarkColumnSpacing";
+static const qreal g_PrintRowSpacingLimit = 10.0;
+static const qreal g_PrintColumnSpacingLimit = 2.0;
+
 /**
    @brief 通过dbus接口从任务栏激活窗口
 */
@@ -265,6 +271,40 @@ void PermissionConfig::triggerNotify(const QJsonObject &data)
 }
 
 /**
+   @brief 过滤 \a watched (DPrintPreviewWidget)的 DynamicPropertyChange 事件，
+        用于打破 DTK 对打印间距的限制，和设置值一致，仅在设置 breakPrintSpacingLimit 后有效
+   @sa installFilterPrintDialog
+ */
+bool PermissionConfig::eventFilter(QObject *watched, QEvent *event)
+{
+    if (QEvent::DynamicPropertyChange == event->type() && watched) {
+        QDynamicPropertyChangeEvent *propEvent = dynamic_cast<QDynamicPropertyChangeEvent *>(event);
+        if (!propEvent) {
+            return false;
+        }
+
+        auto checkFunc = [&](const char *prop, qreal value, qreal limit){
+            if (QByteArray(prop) != propEvent->propertyName()
+                    || (value <= limit)) {
+                return;
+            }
+
+            qreal curValue = watched->property(prop).toDouble();
+            if (!qFuzzyCompare(curValue, value)) {
+                // 强制设置间距和预期值一致
+                watched->setProperty(prop, value);
+            }
+        };
+
+        // 检查 rowSpacing 和 columnSpacing， DynamicPropertyChange 只是事后通知，无需实际过滤
+        checkFunc(g_PrintRowSpacingProp, printRowSpacing, g_PrintRowSpacingLimit);
+        checkFunc(g_PrintColumnSpacingProp, printColumnSpacing, g_PrintColumnSpacingLimit);
+    }
+
+    return false;
+}
+
+/**
    @brief 设置当前处理的文件路径为 \a fileName
  */
 void PermissionConfig::setCurrentImagePath(const QString &fileName)
@@ -402,6 +442,33 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
 }
 
 /**
+   @brief 添加 \a dialog 的过滤器，这是用于解除 DTK 中对打印水印间距的限制
+        仅在设置 `breakPrintSpacingLimit` 权限后，且打印水印间距系数超过 DTK 限制时有效。
+        此函数时预留的，用于预防后期新增需求。
+ */
+bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
+{
+    if (!breakPrintSpacingLimit) {
+        return false;
+    }
+
+    // 判断是否需要调整间距，若间距没有超过限制，则无需调整
+    if (!(printRowSpacing > g_PrintRowSpacingLimit || printColumnSpacing > g_PrintColumnSpacingLimit)) {
+        return false;
+    }
+
+    if (dialog) {
+        DPrintPreviewWidget *widget = dialog->findChild<DPrintPreviewWidget *>();
+        if (widget) {
+            widget->installEventFilter(this);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
    @return 解析命令行参数并返回设置的权限和水印配置，为设置则返回空
  */
 bool PermissionConfig::parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const
@@ -457,8 +524,15 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     authFlags.setFlag(EnableSwitch, param.value("pictureSwitch").toBool(false));
     authFlags.setFlag(EnableWallpaper, param.value("setWallpaper").toBool(false));
 
-    // Internal
+    // Internal 内部使用，默认均为false
     ignoreDevicePixelRatio = param.value("ignoreDevicePixelRatio").toBool(false);
+    breakPrintSpacingLimit = param.value("breakPrintSpacingLimit").toBool(false);
+    if (ignoreDevicePixelRatio) {
+        qInfo() << qPrintable("Enable internal property: ignore device pixel ratio.");
+    }
+    if (breakPrintSpacingLimit) {
+        qInfo() << qPrintable("Enable internal property: break print spacing limit.");
+    }
 
     printLimitCount = param.value("printCount").toInt(0);
 }
@@ -529,6 +603,23 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
     printWaterMark.text = param.value("text").toString();
 
     authFlags.setFlag(EnablePrintWaterMark, true);
+
+    // 计算 DTK 打印水印的间距转换系数，限制提升到 10000.0
+    if (!printWaterMark.text.isEmpty()) {
+        QFontMetrics fm(printWaterMark.font);
+        QSize textSize = fm.size(Qt::TextSingleLine, printWaterMark.text);
+        if (textSize.height() > 0) {
+            printRowSpacing = (qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0;
+            printRowSpacing = qBound(0.0, printRowSpacing, 10000.0);
+        }
+        if (textSize.width() > 0) {
+            printColumnSpacing = (qreal(printWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0;
+            printColumnSpacing = qBound(0.0, printColumnSpacing, 10000.0);
+        }
+
+        qInfo() << QString("Print config spacing ratio row: %1 column: %2").arg(printRowSpacing).arg(printColumnSpacing);
+    }
+
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 }
 
