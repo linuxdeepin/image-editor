@@ -143,6 +143,11 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 #endif
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+    // 检查是否过滤 DTK 部分设置
+    if (PermissionConfig::instance()->installFilterPrintDialog(&printDialog2)) {
+        qInfo() << qPrintable("Enable breakPrintSpacingLimit, filter print spacing config.");
+    }
+
     // 定制分支，水印功能不依赖DTK版本，更新打印水印设置
     if (PermissionConfig::instance()->hasPrintWaterMark()) {
         auto data = PermissionConfig::instance()->printWaterMarkData();

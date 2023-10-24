@@ -37,7 +37,9 @@ void UT_PermissionConfig::TearDown()
 
 static QString permission_config()
 {
-    QByteArray permission("{ \"permission\": { \"edit\": true, \"copy\": true, \"setWallpaper\": true, \"pictureSwitch\": true, \"printCount\": 2 } }");
+    QByteArray permission("{ \"permission\": { \"edit\": true, \"copy\": true, \"setWallpaper\": true, "
+                          "\"pictureSwitch\": true, \"printCount\": 2, "
+                          "\"ignoreDevicePixelRatio\": true, \"breakPrintSpacingLimit\": true } }");
     return permission.toBase64();
 }
 
@@ -93,6 +95,9 @@ TEST_F(UT_PermissionConfig, initFromArguments_NormalParam_Pass)
         PermissionConfig::EnableCopy | PermissionConfig::EnableEdit | PermissionConfig::EnableSwitch | PermissionConfig::EnableWallpaper);
     EXPECT_EQ(PermissionConfig::instance()->authFlags, auth);
     EXPECT_EQ(PermissionConfig::instance()->targetImagePath, tempPath);
+
+    EXPECT_EQ(PermissionConfig::instance()->ignoreDevicePixelRatio, true);
+    EXPECT_EQ(PermissionConfig::instance()->breakPrintSpacingLimit, true);
 }
 
 TEST_F(UT_PermissionConfig, initFromArguments_NormalParam_Fail)
@@ -298,6 +303,84 @@ TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue_Pass)
     qreal realColumnSpacing = (qreal(watermark.spacing + textSize.width()) / textSize.width()) - 1.0;
     EXPECT_TRUE(qFuzzyCompare(realRowSpacing, root.value("rowSpacing").toDouble()));
     EXPECT_TRUE(qFuzzyCompare(realColumnSpacing, root.value("columnSpacing").toDouble()));
+}
+
+TEST_F(UT_PermissionConfig, installFilterPrintDialog_Filter_Disable)
+{
+    auto ins = PermissionConfig::instance();
+    DPrintPreviewDialog dialog;
+
+    ins->breakPrintSpacingLimit = false;
+    ins->printRowSpacing = 10.0;
+    ins->printColumnSpacing = 2.0;
+    EXPECT_FALSE(ins->installFilterPrintDialog(&dialog));
+
+    ins->breakPrintSpacingLimit = true;
+    EXPECT_FALSE(ins->installFilterPrintDialog(&dialog));
+}
+
+TEST_F(UT_PermissionConfig, installFilterPrintDialog_Filter_Enable)
+{
+    auto ins = PermissionConfig::instance();
+    DPrintPreviewDialog dialog;
+
+    ins->breakPrintSpacingLimit = true;
+    ins->printRowSpacing = 11.0;
+    ins->printColumnSpacing = 2.0;
+    EXPECT_TRUE(ins->installFilterPrintDialog(&dialog));
+
+    ins->printRowSpacing = 0;
+    ins->printColumnSpacing = 2.1;
+    EXPECT_TRUE(ins->installFilterPrintDialog(&dialog));
+}
+
+TEST_F(UT_PermissionConfig, installFilterPrintDialog_FilterData_Pass)
+{
+    auto ins = PermissionConfig::instance();
+    DPrintPreviewDialog dialog;
+
+    ins->breakPrintSpacingLimit = true;
+    ins->printRowSpacing = 11.0;
+    ins->printColumnSpacing = 2.1;
+    EXPECT_TRUE(ins->installFilterPrintDialog(&dialog));
+
+    DPrintPreviewWidget *widget = dialog.findChild<DPrintPreviewWidget *>();
+    ASSERT_NE(nullptr, widget);
+
+    widget->setProperty("_d_print_waterMarkRowSpacing", 2.0);
+    EXPECT_NE(widget->property("_d_print_waterMarkRowSpacing").toReal(), 2.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkRowSpacing").toReal(), 11.0));
+    widget->setProperty("_d_print_waterMarkColumnSpacing", 1.0);
+    EXPECT_NE(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 2.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 2.1));
+
+    ins->printRowSpacing = 15.0;
+    ins->printColumnSpacing = 12.0;
+    widget->setProperty("_d_print_waterMarkRowSpacing", 2.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkRowSpacing").toReal(), 15.0));
+    widget->setProperty("_d_print_waterMarkColumnSpacing", 1.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 12.0));
+}
+
+TEST_F(UT_PermissionConfig, installFilterPrintDialog_FilterData_Ignore)
+{
+    auto ins = PermissionConfig::instance();
+    DPrintPreviewDialog dialog;
+
+    ins->breakPrintSpacingLimit = true;
+    ins->printRowSpacing = 11.0;
+    ins->printColumnSpacing = 2.1;
+    EXPECT_TRUE(ins->installFilterPrintDialog(&dialog));
+
+    DPrintPreviewWidget *widget = dialog.findChild<DPrintPreviewWidget *>();
+    ASSERT_NE(nullptr, widget);
+
+    ins->printRowSpacing = 5.0;
+    ins->printColumnSpacing = 1.0;
+    widget->setProperty("_d_print_waterMarkRowSpacing", 2.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkRowSpacing").toReal(), 2.0));
+    widget->setProperty("_d_print_waterMarkColumnSpacing", 1.0);
+    EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 1.0));
 }
 
 #endif

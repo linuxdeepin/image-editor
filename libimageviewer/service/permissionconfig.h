@@ -12,6 +12,7 @@
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
+#include <DPrintPreviewDialog>
 #include <dprintpreviewsettinginfo.h>
 
 DWIDGET_USE_NAMESPACE
@@ -84,6 +85,8 @@ public:
     Q_SLOT void activateProcess(qint64 pid);
     void initFromArguments(const QStringList &arguments);
 
+    bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
+
 private:
     // 解析配置
     bool parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const;
@@ -97,6 +100,8 @@ private:
     void reduceOnePrintCount();
 
     void triggerNotify(const QJsonObject &data);
+
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     enum Status { NotOpen, Open, Close };
@@ -114,6 +119,10 @@ private:
     WaterMarkData readWaterMark;
     WaterMarkData printWaterMark;
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+
+    bool breakPrintSpacingLimit = false;    // 打破打印间距限制
+    qreal printRowSpacing = 0.0;
+    qreal printColumnSpacing = 0.0;
 };
 
 #endif  // PERMISSIONCONFIG_H
