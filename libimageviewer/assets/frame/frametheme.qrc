@@ -15,5 +15,6 @@
         <file>dark/images/importtip/close_hover.png</file>
         <file>dark/images/importtip/close_normal.png</file>
         <file>dark/images/importtip/close_press.png</file>
+        <file>common/error.svg</file>
     </qresource>
 </RCC>

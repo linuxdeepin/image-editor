@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,6 +6,10 @@
 
 #include <QDebug>
 #include <QPainter>
+
+#include <DGuiApplicationHelper>
+
+DGUI_USE_NAMESPACE
 
 LibGraphicsMovieItem::LibGraphicsMovieItem(const QString &fileName, const QString &suffix, QGraphicsItem *parent)
     : QGraphicsPixmapItem(fileName, parent)
@@ -15,8 +19,9 @@ LibGraphicsMovieItem::LibGraphicsMovieItem(const QString &fileName, const QStrin
     setTransformationMode(Qt::SmoothTransformation);
 
     m_movie = new QMovie(fileName);
-    QObject::connect(m_movie, &QMovie::frameChanged, this, [ = ] {
-        if (m_movie.isNull()) return;
+    QObject::connect(m_movie, &QMovie::frameChanged, this, [=] {
+        if (m_movie.isNull())
+            return;
         setPixmap(m_movie->currentPixmap());
     });
     //自动执行播放
@@ -57,11 +62,9 @@ void LibGraphicsMovieItem::stop()
     m_movie->stop();
 }
 
-
 LibGraphicsPixmapItem::LibGraphicsPixmapItem(const QPixmap &pixmap)
     : QGraphicsPixmapItem(pixmap, nullptr)
 {
-
 }
 
 LibGraphicsPixmapItem::~LibGraphicsPixmapItem()
@@ -82,8 +85,7 @@ void LibGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     if (ts.type() == QTransform::TxScale && ts.m11() < 1) {
         QPixmap currentPixmap = pixmap();
         if (currentPixmap.width() < 10000 && currentPixmap.height() < 10000) {
-            painter->setRenderHint(QPainter::SmoothPixmapTransform,
-                                   (transformationMode() == Qt::SmoothTransformation));
+            painter->setRenderHint(QPainter::SmoothPixmapTransform, (transformationMode() == Qt::SmoothTransformation));
 
             Q_UNUSED(option);
             Q_UNUSED(widget);
@@ -109,4 +111,34 @@ void LibGraphicsPixmapItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     }
 }
 
+LibGraphicsMaskItem::LibGraphicsMaskItem(QGraphicsItem *parent)
+    : QGraphicsRectItem(parent)
+{
+    onThemeChange(DGuiApplicationHelper::instance()->themeType());
+    conn = QObject::connect(DGuiApplicationHelper::instance(),
+                            &DGuiApplicationHelper::themeTypeChanged,
+                            [this](DGuiApplicationHelper::ColorType themeType) { this->onThemeChange(themeType); });
+}
 
+LibGraphicsMaskItem::~LibGraphicsMaskItem()
+{
+    QObject::disconnect(conn);
+}
+
+void LibGraphicsMaskItem::onThemeChange(int theme)
+{
+    QColor maskColor;
+    if (DGuiApplicationHelper::ColorType::DarkType == theme) {
+        maskColor = QColor(Qt::black);
+        maskColor.setAlphaF(0.6);
+    } else {
+        maskColor = QColor(Qt::white);
+        maskColor.setAlphaF(0.6);
+    }
+
+    QPen curPen = pen();
+    curPen.setColor(maskColor);
+    setPen(curPen);
+    setBrush(maskColor);
+    update();
+}

@@ -34,6 +34,7 @@ class QPinchGesture;
 class QSwipeGesture;
 class LibImageSvgItem;
 class MorePicFloatWidget;
+class QLabel;
 
 QT_END_NAMESPACE
 
@@ -190,6 +191,12 @@ private slots:
      * 旋转图片松开手指回到特殊位置结束动画槽函数
      */
     void OnFinishPinchAnimal();
+
+private:
+    QPixmap getBlurPixmap(const QString &path, const imageViewerSpace::ItemInfo &info, const QPixmap &previousPix);
+    void addLoadSpinner(bool enhanceImage = false);
+    void hideSpinner();
+
 private:
     bool m_isFitImage = false;
     bool m_isFitWindow = false;
@@ -251,6 +258,7 @@ private:
 
     //加载旋转
     DSpinner *m_spinner{nullptr};
+    QLabel *m_spinnerLabel = nullptr;
     int TITLEBAR_HEIGHT = 50;
 
     //单击时间

@@ -30,6 +30,7 @@ class LibSlideShowPanel;
 class QPropertyAnimation;
 class LockWidget;
 class ThumbnailWidget;
+class AIEnhanceFloatWidget;
 
 class LibViewPanel : public QFrame
 {
@@ -176,6 +177,8 @@ public slots:
     void slotChangeShowTopBottom();
 
 protected:
+    bool event(QEvent *e) override;
+
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
     void paintEvent(QPaintEvent *event) override;
@@ -200,6 +203,19 @@ signals:
 
     //刷新缩略图
     void updateThumbnail(QPixmap pix, const QSize &originalSize);
+
+private:
+    // AI图像增强相关接口
+    void addAIMenu();
+    void createAIBtn();
+    void setAIBtnVisible(bool visible);
+    void triggerImageEnhance(const QString &filePath, int modelID);
+    void blockInputControl(bool block);
+    Q_SLOT void resetAIEnhanceImage();
+    Q_SLOT void onEnhanceStart();
+    Q_SLOT void onEnhanceReload(const QString &output);
+    Q_SLOT void onEnhanceEnd(const QString &source, const QString &output, int state);
+
 private:
     DStackedWidget *m_stack = nullptr;
     LibImageGraphicsView *m_view = nullptr;
@@ -253,5 +269,10 @@ private:
     QSize m_windowSize;
     int m_windowX = 0;
     int m_windowY = 0;
+
+    // AI 功能
+    bool m_AIEnhancing = false;
+    bool notNeedNotifyEnhanceSave = false;          // 用于控制是否需要提示保存增强图片
+    AIEnhanceFloatWidget *m_AIFloatBar = nullptr;   // 按钮浮动窗口
 };
 #endif  // VIEWPANEL_H

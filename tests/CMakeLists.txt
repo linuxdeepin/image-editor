@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0.0)
 
 project(image-editor-test VERSION 0.1)
 
+ADD_COMPILE_OPTIONS(-fno-access-control)
+
 #"option"用来定义宏，"ON"表示打开，"OFF"表示关闭
 option (LITE_DIV "Use tutorial provided math implementation" ON)
 add_definitions( -DLITE_DIV )

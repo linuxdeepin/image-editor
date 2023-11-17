@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en">
 <context>
+    <name>AIEnhanceFloatButton</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AIModelService</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
@@ -56,6 +74,18 @@
     <message>
         <source>Favorite</source>
         <translation>Favorite</translation>
+    </message>
+    <message>
+        <source>Image enhance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -236,11 +266,35 @@
     </message>
     <message>
         <source>day</source>
-        <translation>day</translation>
+        <translation type="vanished">day</translation>
     </message>
     <message>
         <source>Photo info</source>
         <translation>Photo info</translation>
+    </message>
+    <message>
+        <source>cartoon2d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cartoon3d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sketch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>coloring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>super-resolution</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -283,6 +337,29 @@
     <message>
         <source>Exit</source>
         <translation>Exit</translation>
+    </message>
+</context>
+<context>
+    <name>TextToImageDialog</name>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text to image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Negative prompt</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

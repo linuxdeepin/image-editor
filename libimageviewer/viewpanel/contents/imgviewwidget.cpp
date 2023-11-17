@@ -72,6 +72,9 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
         qDebug() << "QEvent::Leave" << obj;
     }
     if (e->type() == QEvent::MouseButtonPress) {
+        if (!isEnabled()) {
+            return true;
+        }
 
         QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
         m_pressPoint = mouseEvent->globalPos();
@@ -88,6 +91,10 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
         qDebug() << "------------getCount = " << LibImageDataService::instance()->getCount();
     }
     if (e->type() == QEvent::MouseButtonRelease) {
+        if (!isEnabled()) {
+            return true;
+        }
+
         if (m_movePoints.size() > 0) {
             int endPos = m_movePoints.last().x() - m_movePoints.first().x();
             //过滤掉触屏点击时的move误操作
@@ -101,6 +108,10 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
 //        animationStart(true, 0, 400);
     }
     if (e->type() == QEvent::MouseMove || e->type() == QEvent::TouchUpdate) {
+        if (!isEnabled()) {
+            return true;
+        }
+
         QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
         if (!mouseEvent) {
             return false;

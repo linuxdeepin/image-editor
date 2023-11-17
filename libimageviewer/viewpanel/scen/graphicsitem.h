@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -29,11 +29,25 @@ public:
     ~LibGraphicsPixmapItem() override;
 
     void setPixmap(const QPixmap &pixmap);
+
 protected:
     //自绘函数
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 private:
     QPair<qreal, QPixmap> cachePixmap;
 };
 
-#endif // GRAPHICSMOVIEITEM_H
+class LibGraphicsMaskItem : public QGraphicsRectItem
+{
+public:
+    explicit LibGraphicsMaskItem(QGraphicsItem *parent = nullptr);
+    ~LibGraphicsMaskItem();
+
+    void onThemeChange(int theme);
+
+private:
+    QMetaObject::Connection conn;
+};
+
+#endif  // GRAPHICSMOVIEITEM_H
