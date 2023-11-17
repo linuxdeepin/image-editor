@@ -79,9 +79,8 @@ QString ss(const QString &text, const QString &defaultValue)
 int titleBarHeight()
 {
     // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
-#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
-    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
-    if (checkVersion <= dtkVersion() && DGuiApplicationHelper::isCompactMode()) {
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    if (DGuiApplicationHelper::isCompactMode()) {
         return COMPACT_TITLEBAR_HEIGHT;
     } else {
         return TITLEBAR_HEIGHT;
@@ -269,18 +268,15 @@ void LibViewPanel::initConnect()
     connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, this, &LibViewPanel::slotsDirectoryChanged);
 
     // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
-#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
-    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
-    if (checkVersion <= dtkVersion()) {
-        connect(DGuiApplicationHelper::instance(),
-                &DGuiApplicationHelper::sizeModeChanged,
-                this,
-                [this](DGuiApplicationHelper::SizeMode) {
-                    m_topToolbar->resize(width(), titleBarHeight());
-                    m_topToolbar->move(0, 0);
-                    m_topToolbar->update();
-                });
-    }
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    connect(DGuiApplicationHelper::instance(),
+            &DGuiApplicationHelper::sizeModeChanged,
+            this,
+            [this](DGuiApplicationHelper::SizeMode) {
+                m_topToolbar->resize(width(), titleBarHeight());
+                m_topToolbar->move(0, 0);
+                m_topToolbar->update();
+            });
 #endif
 }
 

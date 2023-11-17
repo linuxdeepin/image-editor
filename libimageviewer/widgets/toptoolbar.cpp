@@ -45,9 +45,8 @@ const int COMPACT_BURSH_TEXTURE_HEIGHT = 60;
 int paintBrushHeight()
 {
     // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
-#if DTK_VERSION_CHECK(5, 6, 4, 0) <= DTK_VERSION_CHECK(DTK_VERSION_MAJOR, DTK_VERSION_MINOR, DTK_VERSION_PATCH, DTK_VERSION_BUILD)
-    int checkVersion = DTK_VERSION_CHECK(5, 6, 4, 0);
-    if (checkVersion <= dtkVersion() && DGuiApplicationHelper::isCompactMode()) {
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    if (DGuiApplicationHelper::isCompactMode()) {
         return COMPACT_BURSH_TEXTURE_HEIGHT;
     } else {
         return BRUSH_TEXTURE_HEIGHT;
