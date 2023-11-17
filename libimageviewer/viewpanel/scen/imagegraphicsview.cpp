@@ -14,6 +14,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSvgItem>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsProxyWidget>
 #include <QPaintEvent>
 #include <QtConcurrent>
 #include <QHBoxLayout>
@@ -36,6 +37,7 @@
 #include "../contents/morepicfloatwidget.h"
 #include "imageengine.h"
 #include "service/mtpfileproxy.h"
+#include "service/aimodelservice.h"
 
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
@@ -248,7 +250,7 @@ void LibImageGraphicsView::clear()
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
     // m_spinner 生命周期由 scene() 管理
-    m_spinner = nullptr;
+    hideSpinner();
 
     //默认多页图的按钮显示为false
     if (m_morePicFloatWidget) {
@@ -264,11 +266,23 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     MtpFileProxy::FileState state = MtpFileProxy::instance()->state(path);
     bool needProxyLoad = MtpFileProxy::instance()->contains(path) && (MtpFileProxy::Loading == state);
 
+    bool delayLoad = needProxyLoad;
+    // 判断是否为AI模型处理图片，需要延迟加载
+    auto enhanceState = AIModelService::instance()->enhanceState(path);
+    bool imageEnhance = (AIModelService::None != enhanceState);
+    delayLoad |= (AIModelService::Loading == enhanceState);
+    QString sourceFile = AIModelService::instance()->sourceFilePath(path);
+
     //检测数据缓存,如果存在,则使用缓存
     imageViewerSpace::ItemInfo info;
-    if (!needProxyLoad) {
+    if (needProxyLoad) {
+        // 不获取数据
+    } else if (imageEnhance) {
+        info = LibCommonService::instance()->getImgInfoByPath(sourceFile);
+    } else {
         info = LibCommonService::instance()->getImgInfoByPath(path);
     }
+
     m_bRoate = ImageEngine::instance()->isRotatable(path); //是否可旋转
 
     m_loadPath = path;
@@ -280,10 +294,19 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     // 同时移除 MTP 代理文件的观察
     m_imgFileWatcher->removePath(MtpFileProxy::instance()->mapToOriginFile(m_path));
     m_imgFileWatcher->removePath(m_path);
+    if (imageEnhance) {
+        // 获取之前的原文件
+        m_imgFileWatcher->removePath(AIModelService::instance()->sourceFilePath(m_path));
+    }
+
     m_path = path;
     if (!needProxyLoad) {
         // MTP 代理文件等待创建完成后再添加观察
         m_imgFileWatcher->addPath(m_path);
+    }
+    // 保留原始文件
+    if (imageEnhance) {
+        m_imgFileWatcher->addPath(sourceFile);
     }
 
     QString strfixL = QFileInfo(path).suffix().toUpper();
@@ -294,8 +317,8 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     //the judge way to solve the problem
 
     imageViewerSpace::ImageType Type = info.imageType;
-    if (needProxyLoad) {
-        // MTP代理文件默认为空，后续加载处理
+    if (delayLoad) {
+        // 延迟加载，MTP代理文件默认为空，后续加载处理
         Type = imageViewerSpace::ImageTypeBlank;
     } else if (Type == imageViewerSpace::ImageTypeBlank) {
         Type = LibUnionImage_NameSpace::getImageType(path);
@@ -344,6 +367,11 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         }, Qt::QueuedConnection);
         m_newImageLoadPhase = FullFinish;
     } else {
+        QPixmap previousPix;
+        if (imageEnhance && m_pixmapItem) {
+            previousPix = m_pixmapItem->pixmap();
+        }
+
         //当传入的image无效时，需要重新读取数据
         m_pixmapItem = nullptr;
         m_movieItem = nullptr;
@@ -354,96 +382,37 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         if (image.isNull()) {
             QPixmap pix ;
             if (!info.image.isNull()) {
-                QImageReader imagreader(path);      //取原图的分辨率
-                int w = imagreader.size().width();
-                int h = imagreader.size().height();
-
-                int wScale = 0;
-                int hScale = 0;
-                int wWindow = 0;
-                int hWindow = 0;
-                if (QApplication::activeWindow()) {
-                    wWindow = QApplication::activeWindow()->width() * devicePixelRatioF() ;
-                    hWindow = (QApplication::activeWindow()->height() - TITLEBAR_HEIGHT * 2) * devicePixelRatioF() ;
-                } else {
-                    wWindow = 1300;
-                    hWindow = 848;
-                }
-
-                if (w >= wWindow) {
-                    wScale = wWindow;
-                    hScale = wScale * h / w;
-                    if (hScale > hWindow) {
-                        hScale = hWindow;
-                        wScale = hScale * w / h;
-                    }
-                } else if (h >= hWindow) {
-                    hScale = hWindow;
-                    wScale = hScale * w / h;
-                    if (wScale >= wWindow) {
-                        wScale = wWindow;
-                        hScale = wScale * h / w;
-                    }
-                } else {
-                    wScale = w;
-                    hScale = h;
-                }
-                if (wScale == 0 || wScale == -1) { //进入这个地方说明QImageReader未识别出图片
-                    if (info.imgOriginalWidth > wWindow || info.imgOriginalHeight > hWindow) {
-                        wScale = wWindow;
-                        hScale = hWindow;
-                    } else {
-                        wScale = info.imgOriginalWidth;
-                        hScale = info.imgOriginalHeight;
-                    }
-                }
-
-                pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
-
-                //存在缩放比问题需要setDevicePixelRatio
-//                if (wScale < wWindow && hScale < hWindow) {
-                pix.setDevicePixelRatio(devicePixelRatioF());
-//                }
+                // 获取用于模糊的图片
+                pix = getBlurPixmap(path, info, previousPix);
             }
-            if (pix.isNull()) {
-                //spinner
-                if (!m_spinner) {
-                    m_spinner = new DSpinner;
-                    m_spinner->setFixedSize(SPINNER_SIZE);
-                }
-                m_spinner->start();
 
-                QWidget *w = new QWidget();
-                w->setFixedSize(SPINNER_SIZE);
-                QHBoxLayout *hLayout = new QHBoxLayout;
-                hLayout->setMargin(0);
-                hLayout->setSpacing(0);
-                hLayout->addWidget(m_spinner, 0, Qt::AlignCenter);
-                w->setLayout(hLayout);
-
-                // Make sure item show in center of view after reload
-                setSceneRect(w->rect());
-                s->addWidget(w);
-            }
             m_pixmapItem = new LibGraphicsPixmapItem(pix);
             m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
 
-            // Make sure item show in center of view after reload
-            if (!m_blurEffect) {
-                m_blurEffect = new QGraphicsBlurEffect(this);
+            if (delayLoad && imageEnhance) {
+                // 图像增强使用 60% 透明度蒙版效果,不同主题，白色/黑色
+                LibGraphicsMaskItem *maskItem = new LibGraphicsMaskItem(m_pixmapItem);
+                maskItem->setRect(m_pixmapItem->boundingRect());
+            } else {
+                // 设置加载图片模糊效果
+                // Make sure item show in center of view after reload
+                if (!m_blurEffect) {
+                    m_blurEffect = new QGraphicsBlurEffect(this);
+                    m_blurEffect->setBlurRadius(5);
+                    m_blurEffect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
+                }
+                m_pixmapItem->setGraphicsEffect(m_blurEffect);
             }
-            m_blurEffect->setBlurRadius(5);
-            m_blurEffect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
-            m_pixmapItem->setGraphicsEffect(m_blurEffect);
 
             //如果缩略图不为空,则区域变为m_pixmapItem
             if (!pix.isNull()) {
                 setSceneRect(m_pixmapItem->boundingRect());
             }
 
-            // 使用 MTP 代理文件时，需等待代理文件创建完成 createProxyFileFinished() ，完成后调用 onLoadTimerTimeout()
+            // 使用 MTP 代理文件，需等待代理文件创建完成 createProxyFileFinished() ，
+            // 或其他AI模型处理等延迟处理，完成后调用 onLoadTimerTimeout()
             //第一次打开直接启动,不使用延时300ms
-            if (!needProxyLoad) {
+            if (!delayLoad) {
                 if (m_isFistOpen) {
                     onLoadTimerTimeout();
                     m_isFistOpen = false;
@@ -453,7 +422,16 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             }
 
             scene()->addItem(m_pixmapItem);
-            emit imageChanged(path);
+
+            // 没有可用的图片，设置选转加载图标
+            // AI图像增强时，允许同时存在
+            if (pix.isNull() || delayLoad) {
+                addLoadSpinner(imageEnhance);
+            }
+
+            if (!imageEnhance) {
+                emit imageChanged(path);
+            }
             QMetaObject::invokeMethod(this, [ = ]() {
                 resetTransform();
             }, Qt::QueuedConnection);
@@ -473,6 +451,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
             emit hideNavigation();
             m_newImageLoadPhase = FullFinish;
         }
+
         if (Type == imageViewerSpace::ImageTypeMulti) {
             if (!m_morePicFloatWidget) {
                 initMorePicWidget();
@@ -773,6 +752,15 @@ void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
     MtpFileProxy::instance()->triggerOriginFileChanged(ddfFile);
 
     m_isChangedTimer->start(200);
+
+    // 判断是否为当前处理图片
+    if (AIModelService::instance()->isValid()) {
+        QString lastProcImage = AIModelService::instance()->lastProcOutput();
+        QString lastSource = AIModelService::instance()->sourceFilePath(lastProcImage);
+        if (lastSource == ddfFile) {
+            AIModelService::instance()->cancelProcess(lastProcImage);
+        }
+    }
 }
 
 void LibImageGraphicsView::onLoadTimerTimeout()
@@ -810,7 +798,6 @@ void LibImageGraphicsView::onIsChangedTimerTimeout()
     //刷新文件信息
     emit sigFIleDelete();
     m_isChangedTimer->stop();
-
 }
 
 void LibImageGraphicsView::slotsUp()
@@ -1194,10 +1181,8 @@ bool LibImageGraphicsView::event(QEvent *event)
 
 void LibImageGraphicsView::onCacheFinish()
 {
-    if (m_spinner) {
-        m_spinner->stop();
-        m_spinner->hide();
-    }
+    hideSpinner();
+
     QVariantList vl = m_watcher.result();
     if (vl.length() == 2) {
         const QString path = vl.first().toString();
@@ -1224,8 +1209,12 @@ void LibImageGraphicsView::onCacheFinish()
             emit imageChanged(path);
             this->update();
             m_newImageLoadPhase = FullFinish;
+
+            // AI修图 图像增强屏蔽更新缩略图和图像信息，以准确取得原始图片信息
+            bool currentImageEnhance = AIModelService::instance()->isTemporaryFile(path);
+
             //刷新缩略图
-            if (!pixmap.isNull()) {
+            if (!pixmap.isNull() && !currentImageEnhance) {
                 QPixmap thumbnailPixmap;
                 if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
                     bool cache_exist = false;
@@ -1464,8 +1453,132 @@ void LibImageGraphicsView::OnFinishPinchAnimal()
     titleBarControl();
 }
 
+/**
+   @brief 取得用于加载 \a path 文件过程中的模糊图片，此图片通过缓存 \a info 中的缩略图放大取得。
+        图片还未进行模糊，而是通过设置 QGraphicsBlurEffect 实现
+ */
+QPixmap LibImageGraphicsView::getBlurPixmap(const QString &path, const imageViewerSpace::ItemInfo &info, const QPixmap &previousPix)
+{
+    QPixmap pix;
+    QImageReader imagreader(path);      //取原图的分辨率
+    int w = imagreader.size().width();
+    int h = imagreader.size().height();
+
+    int wScale = 0;
+    int hScale = 0;
+    int wWindow = 0;
+    int hWindow = 0;
+    if (QApplication::activeWindow()) {
+        wWindow = static_cast<int>(QApplication::activeWindow()->width() * devicePixelRatioF());
+        hWindow = static_cast<int>((QApplication::activeWindow()->height() - TITLEBAR_HEIGHT * 2) * devicePixelRatioF());
+    } else {
+        wWindow = static_cast<int>(this->width() * devicePixelRatioF());
+        hWindow = static_cast<int>((this->height() - TITLEBAR_HEIGHT * 2) * devicePixelRatioF());
+    }
+
+    if (w >= wWindow) {
+        wScale = wWindow;
+        hScale = wScale * h / w;
+        if (hScale > hWindow) {
+            hScale = hWindow;
+            wScale = hScale * w / h;
+        }
+    } else if (h >= hWindow) {
+        hScale = hWindow;
+        wScale = hScale * w / h;
+        if (wScale >= wWindow) {
+            wScale = wWindow;
+            hScale = wScale * h / w;
+        }
+    } else {
+        wScale = w;
+        hScale = h;
+    }
+    if (wScale == 0 || wScale == -1) { //进入这个地方说明QImageReader未识别出图片
+        if (info.imgOriginalWidth > wWindow || info.imgOriginalHeight > hWindow) {
+            wScale = wWindow;
+            hScale = hWindow;
+        } else {
+            wScale = info.imgOriginalWidth;
+            hScale = info.imgOriginalHeight;
+        }
+    }
+
+    if (previousPix.isNull()) {
+        pix = QPixmap::fromImage(info.image).scaled(wScale, hScale, Qt::KeepAspectRatio);
+    } else {
+        pix = previousPix.scaled(wScale, hScale, Qt::KeepAspectRatio);
+    }
+
+    // 存在缩放比问题需要setDevicePixelRatio
+    pix.setDevicePixelRatio(devicePixelRatioF());
+    return pix;
+}
+
+/**
+   @brief 设置图片旋转加载图标，当图片无缩略图，无法使用模糊加载效果时，使用此加载器显示加载效果。
+        \a enhanceImage 用于 AI 图像增强时使用，显示不同文案
+   @note 加载控件由QVBoxLayout布局管理，而不是scene管理，当重新进入 setImage() 时，会自动隐藏
+ */
+void LibImageGraphicsView::addLoadSpinner(bool enhanceImage)
+{
+    if (!m_spinner) {
+        m_spinner = new DSpinner(this);
+        m_spinner->setFixedSize(SPINNER_SIZE);
+
+        QWidget *w = new QWidget(this);
+        w->setFixedSize(SPINNER_SIZE);
+        QVBoxLayout *hLayout = new QVBoxLayout;
+        hLayout->setMargin(0);
+        hLayout->setSpacing(0);
+        hLayout->addWidget(m_spinner, 0, Qt::AlignCenter);
+
+        // 图像增强增加文案，默认隐藏
+        w->setFixedWidth(300);
+        w->setFixedHeight(70);
+        m_spinnerLabel = new QLabel(w);
+        m_spinnerLabel->setText(tr("AI retouching in progress, please wait..."));
+        m_spinnerLabel->setVisible(false);
+        hLayout->addWidget(m_spinnerLabel, 1, Qt::AlignBottom | Qt::AlignHCenter);
+
+        w->setLayout(hLayout);
+
+        if (!this->layout()) {
+            QVBoxLayout *lay = new QVBoxLayout;
+            lay->setAlignment(Qt::AlignCenter);
+            this->setLayout(lay);
+        }
+        this->layout()->addWidget(w);
+    }
+
+    m_spinnerLabel->setVisible(enhanceImage);
+
+    m_spinner->setVisible(true);
+    m_spinner->start();
+}
+
+/**
+   @brief 隐藏加载图标和提示
+ */
+void LibImageGraphicsView::hideSpinner()
+{
+    if (m_spinner) {
+        m_spinner->stop();
+        m_spinner->hide();
+    }
+
+    if (m_spinnerLabel) {
+        m_spinnerLabel->hide();
+    }
+}
+
 void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
 {
+    // 加载过程不可缩放
+    if (m_spinner && m_spinner->isVisible()) {
+        return;
+    }
+
     if ((event->modifiers() == Qt::ControlModifier)) {
         if (event->delta() > 0) {
             emit previousRequested();

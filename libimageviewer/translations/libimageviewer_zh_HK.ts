@@ -2,6 +2,63 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_HK">
 <context>
+    <name>AIEnhanceFloatButton</name>
+    <message>
+        <source>Save</source>
+        <translation type="obsolete">保存</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation type="obsolete">還原</translation>
+    </message>
+</context>
+<context>
+    <name>AIEnhanceFloatWidget</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished">另存爲</translation>
+    </message>
+    <message>
+        <source>Reprovision</source>
+        <translation type="unfinished">還原</translation>
+    </message>
+</context>
+<context>
+    <name>AIModelService</name>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished">另存爲</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取 消</translation>
+    </message>
+    <message>
+        <source>Image not saved, Do you want to save it?</source>
+        <translation type="unfinished">圖片未保存，是否保存？</translation>
+    </message>
+    <message>
+        <source>Image format is not supported, please switch the image.</source>
+        <translation type="unfinished">圖像格式不支持，請切換圖片。</translation>
+    </message>
+    <message>
+        <source>The image resolution exceeds the limit, please switch the image.</source>
+        <translation type="unfinished">圖像分辨率超過限制，請切換圖片。</translation>
+    </message>
+    <message>
+        <source>Portrait not detected, switch pictures.</source>
+        <translation type="unfinished">未檢測到人像，請切換圖片。</translation>
+    </message>
+</context>
+<context>
     <name>ExtensionPanel</name>
     <message>
         <source>Image info</source>
@@ -10,6 +67,13 @@
     <message>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageGraphicsView</name>
+    <message>
+        <source>AI retouching in progress, please wait...</source>
+        <translation type="unfinished">AI修圖中，請稍等...</translation>
     </message>
 </context>
 <context>
@@ -56,6 +120,18 @@
     <message>
         <source>Favorite</source>
         <translation>收藏</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="vanished">還原</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="vanished">保存</translation>
+    </message>
+    <message>
+        <source>AI retouching</source>
+        <translation type="unfinished">AI修圖</translation>
     </message>
 </context>
 <context>
@@ -236,11 +312,51 @@
     </message>
     <message>
         <source>day</source>
-        <translation>天</translation>
+        <translation type="vanished">天</translation>
     </message>
     <message>
         <source>Photo info</source>
         <translation>照片信息</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished">重 試</translation>
+    </message>
+    <message>
+        <source>Colorize pictures</source>
+        <translation type="unfinished">圖片上色</translation>
+    </message>
+    <message>
+        <source>Upgrade resolution</source>
+        <translation type="unfinished">提升分辨率</translation>
+    </message>
+    <message>
+        <source>Blurred background</source>
+        <translation type="unfinished">模糊背景</translation>
+    </message>
+    <message>
+        <source>Delete background</source>
+        <translation type="unfinished">刪除背景</translation>
+    </message>
+    <message>
+        <source>Hand-drawn cartoons</source>
+        <translation type="unfinished">手繪漫畫</translation>
+    </message>
+    <message>
+        <source>2D Manga</source>
+        <translation type="unfinished">2D漫畫</translation>
+    </message>
+    <message>
+        <source>Sketch</source>
+        <translation type="unfinished">素描</translation>
+    </message>
+    <message>
+        <source>Processing failure.</source>
+        <translation type="unfinished">處理失敗。</translation>
+    </message>
+    <message>
+        <source>3D Manga</source>
+        <translation type="unfinished">3D漫畫</translation>
     </message>
 </context>
 <context>

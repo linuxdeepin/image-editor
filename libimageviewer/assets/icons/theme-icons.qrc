@@ -26,5 +26,8 @@
         <file>texts/dcc_up_36px.svg</file>
         <file>texts/dcc_down_dark_36px.svg</file>
         <file>texts/dcc_down_36px.svg</file>
+        <file>texts/dcc_save_36px.svg</file>
+        <file>texts/dcc_file_save_as_36px.svg</file>
+        <file>texts/dcc_reset_36px.svg</file>
     </qresource>
 </RCC>

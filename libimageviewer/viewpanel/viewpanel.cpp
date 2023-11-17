@@ -39,11 +39,12 @@
 #include "service/imagedataservice.h"
 #include "service/mtpfileproxy.h"
 #include "unionimage/imageutils.h"
+#include "service/aimodelservice.h"
+#include "contents/aienhancefloatwidget.h"
 
-const QString IMAGE_TMPPATH =   QDir::homePath() +
-                                "/.config/deepin/deepin-image-viewer/";
+const QString IMAGE_TMPPATH = QDir::homePath() + "/.config/deepin/deepin-image-viewer/";
 
-const int BOTTOM_TOOLBAR_HEIGHT = 80;   //底部工具看高
+const int BOTTOM_TOOLBAR_HEIGHT = 80;  //底部工具看高
 const int BOTTOM_SPACING = 5;          //底部工具栏与底部边缘距离
 const int RT_SPACING = 10;
 const int TOP_TOOLBAR_HEIGHT = 50;
@@ -115,6 +116,11 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
     initLockPanel();
     initThumbnailWidget();
     initConnect();
+
+    if (AIModelService::instance()->isValid()) {
+        // 创建按钮
+        createAIBtn();
+    }
 
     setAcceptDrops(true);
 //    initExtensionPanel();
@@ -266,6 +272,13 @@ void LibViewPanel::initConnect()
 
     m_dirWatcher = new  QFileSystemWatcher(this);
     connect(m_dirWatcher, &QFileSystemWatcher::directoryChanged, this, &LibViewPanel::slotsDirectoryChanged);
+
+    // AI图像增强
+    if (AIModelService::instance()->isValid()) {
+        connect(AIModelService::instance(), &AIModelService::enhanceStart, this, &LibViewPanel::onEnhanceStart);
+        connect(AIModelService::instance(), &AIModelService::enhanceReload, this, &LibViewPanel::onEnhanceReload);
+        connect(AIModelService::instance(), &AIModelService::enhanceEnd, this, &LibViewPanel::onEnhanceEnd);
+    }
 
     // DTK 在 5.6.4 后提供紧凑模式接口，调整控件大小
 #ifdef DTKWIDGET_CLASS_DSizeMode
@@ -446,6 +459,11 @@ void LibViewPanel::updateMenuContent(const QString &path)
         if (currentPath.isEmpty()) {
             currentPath = m_currentPath;
         }
+
+        if (AIModelService::instance()->isTemporaryFile(m_currentPath)) {
+            currentPath = m_currentPath;
+        }
+
         QFileInfo info(currentPath);
 
         bool isReadable = info.isReadable() ; //是否可读
@@ -555,6 +573,10 @@ void LibViewPanel::updateMenuContent(const QString &path)
             m_menu->addMenu(am);
         }
         m_menu->addSeparator();
+
+        // 添加AI模型选项，仅处理静态图
+        addAIMenu();
+
         if (isAlbum && isReadable) {
             appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
         }
@@ -1414,6 +1436,13 @@ void LibViewPanel::slotChangeShowTopBottom()
     slotBottomMove();
 }
 
+bool LibViewPanel::event(QEvent *e)
+{
+
+
+    return QFrame::event(e);
+}
+
 bool LibViewPanel::slotOcrPicture()
 {
     if (!m_ocrInterface) {
@@ -1858,6 +1887,12 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             emit ImageEngine::instance()->sigUpdateCollectBtn();
             break;
         }
+        case IdImageEnhance: {
+            // 调用进行图片增强
+            int enhanceModel = action->property("EnhanceModel").toInt();
+            triggerImageEnhance(currentpath, enhanceModel);
+            break;
+        }
         default:
             break;
         }
@@ -1928,16 +1963,40 @@ void LibViewPanel::resetBottomToolbarGeometry(bool visible)
 
 void LibViewPanel::openImg(int index, QString path)
 {
+    if (AIModelService::instance()->isValid()) {
+        // 判断当前图片是否为图像增强图片
+        bool previousEnhanced = AIModelService::instance()->isTemporaryFile(m_currentPath);
+        if (previousEnhanced) {
+            if (AIModelService::instance()->isWaitSave()) {
+                return;
+            }
+
+            // 提示是否保存
+            if (!notNeedNotifyEnhanceSave) {
+                AIModelService::instance()->saveFileDialog(m_currentPath, this);
+            }
+        }
+        // 打开其他图片时，清理之前的状态
+        Q_EMIT AIModelService::instance()->clearPreviousEnhance();
+    }
+
     //展示图片
     m_view->slotRotatePixCurrent();
     m_view->setImage(path);
     m_view->resetTransform();
-    QFileInfo info(path);
+
+    bool currentEnhance = AIModelService::instance()->isTemporaryFile(path);
+    setAIBtnVisible(currentEnhance);
+
+    QFileInfo info(AIModelService::instance()->sourceFilePath(path));
     m_topToolbar->setMiddleContent(info.fileName());
+
     m_currentPath = path;
+    if (!currentEnhance) {
+        loadThumbnails(path);
+    }
+
     //刷新收藏按钮
-//    qDebug() << index;
-    loadThumbnails(path);
     emit ImageEngine::instance()->sigUpdateCollectBtn();
     updateMenuContent(path);
 
@@ -2021,8 +2080,6 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
     //不需要动画滑动
     noAnimationBottomMove();
-
-
 }
 
 void LibViewPanel::showEvent(QShowEvent *e)
@@ -2139,4 +2196,214 @@ bool LibViewPanel::eventFilter(QObject *o, QEvent *e)
     }
 
     return QFrame::eventFilter(o, e);
+}
+
+/**
+   @brief 添加AI模型增强选项
+ */
+void LibViewPanel::addAIMenu()
+{
+    if (m_menu && AIModelService::instance()->isValid()) {
+        // 缓存的支持模型列表<名称，模型>
+        QList<QPair<int, QString>> modelList = AIModelService::instance()->supportModel();
+        if (!modelList.isEmpty()) {
+            // Image enhance
+            QMenu *enhanceMenu = m_menu->addMenu(tr("AI retouching"));
+
+            // 模型可能动态变更
+            for (const QPair<int, QString> &model : modelList) {
+                // 命名空间作用，需要指定 QObject::tr() 调用翻译
+                QAction *ac = enhanceMenu->addAction(QObject::tr(model.second.toUtf8().data()));
+                ac->setProperty("MenuID", IdImageEnhance);
+                ac->setProperty("EnhanceModel", model.first);
+            }
+
+            m_menu->addSeparator();
+        }
+    }
+}
+
+/**
+   @brief 创建右侧的AI按钮浮动栏
+ */
+void LibViewPanel::createAIBtn()
+{
+    if (!m_AIFloatBar) {
+        m_AIFloatBar = new AIEnhanceFloatWidget(this);
+
+        connect(m_AIFloatBar, &AIEnhanceFloatWidget::reset, this, &LibViewPanel::resetAIEnhanceImage);
+        connect(m_AIFloatBar, &AIEnhanceFloatWidget::save, this, [this](){
+            AIModelService::instance()->saveEnhanceFile(m_currentPath);
+            resetAIEnhanceImage();
+        });
+        connect(m_AIFloatBar, &AIEnhanceFloatWidget::saveAs, this, [this](){
+            AIModelService::instance()->saveEnhanceFileAs(m_currentPath, this);
+            resetAIEnhanceImage();
+        });
+    }
+}
+
+/**
+   @brief 设置AI按钮浮动栏是否显示
+ */
+void LibViewPanel::setAIBtnVisible(bool visible)
+{
+    if (m_AIFloatBar) {
+        m_AIFloatBar->setVisible(visible);
+    }
+}
+
+/**
+   @brief 触发 \a filePath 图像增强，根据不同选项调用不同模型 \a modelID
+ */
+void LibViewPanel::triggerImageEnhance(const QString &filePath, int modelID)
+{
+    // 判断原文件(可能删除)是否可用
+    QString source = AIModelService::instance()->sourceFilePath(filePath);
+    auto error = AIModelService::instance()->modelEnabled(modelID, source);
+    if (AIModelService::instance()->detectErrorAndNotify(this->parentWidget(), error, filePath)) {
+        return;
+    }
+
+    QString output = AIModelService::instance()->imageProcessing(filePath, modelID, m_view->image());
+    if (output.isEmpty()) {
+        return;
+    }
+    m_view->setImage(output, QImage());
+}
+
+/**
+   @brief 执行图像增强时，根据 \a block 屏蔽界面按钮和快捷键控制
+ */
+void LibViewPanel::blockInputControl(bool block)
+{
+    // 屏蔽工具栏和右键菜单
+    m_bottomToolbar->setEnabled(!block);
+    m_thumbnailWidget->setEnabled(!block);
+
+    if (block) {
+        setContextMenuPolicy(Qt::NoContextMenu);
+        if (m_menu) {
+            m_menu->clear();
+            qDeleteAll(this->actions());
+        }
+    } else {
+        // 右键菜单设置图片将自动刷新
+        setContextMenuPolicy(Qt::CustomContextMenu);
+    }
+
+    // 部分快捷键绑定到 viewpanel , Ctrl+O 绑定在主窗口
+    auto shortcutList = this->findChildren<QShortcut *>("");
+    for (auto shortcut : shortcutList) {
+        shortcut->setEnabled(!block);
+    }
+
+    auto win = window();
+    if (win) {
+        shortcutList = win->findChildren<QShortcut *>("");
+        for (auto shortcut : shortcutList) {
+            shortcut->setEnabled(!block);
+        }
+    }
+}
+
+/**
+   @brief 复位当前AI修图增强的图像
+ */
+void LibViewPanel::resetAIEnhanceImage()
+{
+    if (m_AIFloatBar) {
+        m_AIFloatBar->setVisible(false);
+    }
+
+    // 还原原始图片
+    QString source = AIModelService::instance()->sourceFilePath(m_currentPath);
+
+    notNeedNotifyEnhanceSave = true;
+    openImg(0, source);
+    notNeedNotifyEnhanceSave = false;
+}
+
+/**
+   @brief AI修图图像增强开始，屏蔽界面设置
+ */
+void LibViewPanel::onEnhanceStart()
+{
+    m_AIEnhancing = true;
+
+    blockInputControl(true);
+    setAIBtnVisible(false);
+}
+
+/**
+   @brief 接收到 \a output 文件的AI修图重试信号，再次屏蔽界面设置
+ */
+void LibViewPanel::onEnhanceReload(const QString &output)
+{
+    // 仅会处理当前图片，增强失败时会还原为原始文件路径
+    if (m_currentPath != AIModelService::instance()->sourceFilePath(output)) {
+        return;
+    };
+
+    // 设置临时图片
+    m_view->setImage(output, QImage());
+
+    m_AIEnhancing = true;
+
+    blockInputControl(true);
+    setAIBtnVisible(false);
+}
+
+/**
+   @brief AI修图调用结束，根据输出文件 \a output 的增强状态 \a state 判断是否界面替换 \a source 文件展示。
+        若图像增强失败，则会还原为原始的图像文件 \a source 。
+ */
+void LibViewPanel::onEnhanceEnd(const QString &source, const QString &output, int state)
+{
+    // 仅会处理当前图片
+    if (source != AIModelService::instance()->sourceFilePath(m_currentPath)) {
+        if (m_AIEnhancing) {
+            qWarning() << qPrintable("Detect error! receive previous procssing file but still in enhancing state.");
+            blockInputControl(false);
+        }
+        return;
+    };
+
+    QString procPath;
+    AIModelService::Error error = AIModelService::NoError;
+    switch (state) {
+        case AIModelService::LoadSucc: {
+            procPath = output;
+            break;
+        }
+        case AIModelService::LoadFailed: {
+            procPath = source;
+            error = AIModelService::LoadFiledError;
+            break;
+        }
+        case AIModelService::NotDetectPortrait: {
+            procPath = source;
+            error = AIModelService::NotDetectPortraitError;
+            break;
+        }
+        default:
+            // 其它错误，默认还原图片
+            procPath = source;
+            break;
+    }
+
+    // Note: 仅变更了运行时的文件名，而 m_bottomToolbar->getCurrentItemInfo() 的路径信息并未更新
+    notNeedNotifyEnhanceSave = true;
+    openImg(0, procPath);
+    notNeedNotifyEnhanceSave = false;
+
+    blockInputControl(false);
+    m_AIEnhancing = false;
+
+    // 提示信息延后到设置图片后，设置图片时会清理之前的浮动窗口
+    if (AIModelService::NoError != error) {
+        QTimer::singleShot(0, this, [=](){
+            AIModelService::instance()->detectErrorAndNotify(this->parentWidget(), error, output);
+        });
+    }
 }
