@@ -32,7 +32,8 @@ Build-Depends:
  libdtkcore5-bin,
  libgio-qt-dev,
  libudisks2-qt5-dev,
- libopencv-dev, 
+# Disable opencv, not used now.
+# libopencv-dev, 
  libmediainfo-dev,
  libffmpegthumbnailer-dev,
  libtiff-dev,
