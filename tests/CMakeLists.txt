@@ -102,10 +102,11 @@ add_executable( ${TARGET_NAME} ${SOURCES} ${SOURCESC}
     ${SOURCESCURRENT} ${QM} ${tiffToolsSources}
     )
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-link_directories(${OpenCV_LIBRARY_DIRS})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+# 暂未使用OpenCV, 暂时屏蔽
+# find_package(OpenCV REQUIRED)
+# include_directories(${OpenCV_INCLUDE_DIRS})
+# link_directories(${OpenCV_LIBRARY_DIRS})
+# target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS} ${PROJECT_INCLUDE} ${GLOB_RECURSE} ${TIFF_INCLUDE_DIRS})
 target_link_libraries(${TARGET_NAME} ${3rd_lib_LIBRARIES} -ldl ${TIFF_LIBRARIES})

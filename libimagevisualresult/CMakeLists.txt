@@ -15,7 +15,8 @@ set(CMAKE_C_FLAGS "-fPIC")
 set(CMAKE_CXX_FLAGS "-fPIC")
 
 find_package(PkgConfig REQUIRED)
-find_package(OpenCV REQUIRED)
+# OpenCV 并未使用，暂时屏蔽
+# find_package(OpenCV REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -46,8 +47,8 @@ add_executable(${PROJECT_NAME} ${SRCS})
 # 设置不删除生成的文件夹内容文件
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
-link_directories(${OpenCV_LIBRARY_DIRS})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+# link_directories(${OpenCV_LIBRARY_DIRS})
+# target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 # 设置不删除生成的文件夹内容文件
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
