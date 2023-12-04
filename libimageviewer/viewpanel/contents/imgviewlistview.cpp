@@ -308,6 +308,13 @@ void LibImgViewListView::slotCurrentImgFlush(QPixmap pix, const QSize &originalS
     data.imgOriginalWidth = originalSize.width();
     data.imgOriginalHeight = originalSize.height();
     data.image = pix.toImage();
+
+    // FIX:暂时修复，用于解决某些场景下初始化，图片全数据还未处理完成（多线程处理）
+    // data.imageType 还未设置的情况
+    if (data.imageType == imageViewerSpace::ImageTypeBlank) {
+        data.imageType = LibUnionImage_NameSpace::getImageType(data.path);
+    }
+
     QVariant meta;
     meta.setValue(data);
     m_model->setData(currentIndex, meta, Qt::DisplayRole);

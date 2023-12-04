@@ -349,7 +349,7 @@ QString AIModelService::imageProcessing(const QString &filePath, int modelID, co
     ptr->state = Loading;
     dptr->enhanceCache.insert(ptr->output, ptr);
 
-    qInfo() << QString("Call enhance processing %1, %2").arg(dptr->lastOutput).arg(modelID);
+    qInfo() << QString("Call enhance processing %1, %2").arg(dptr->lastOutput).arg(model);
 
     QFuture<EnhancePtr> f = QtConcurrent::run([=]() -> EnhancePtr {
         if (AIModelService::Cancel == ptr->state.loadAcquire()) {
@@ -582,7 +582,11 @@ void AIModelService::timerEvent(QTimerEvent *e)
         // 触发超时
         dptr->stopDBusTimer();
         // 获取最近的输出图片
-        onDBusEnhanceEnd(dptr->lastOutput, AIModelServiceData::DBusFailed);
+        auto ptr = dptr->enhanceCache.value(dptr->lastOutput);
+        if (ptr) {
+            ptr->state.storeRelease(AIModelService::LoadTimeout);
+            Q_EMIT enhanceEnd(ptr->source, ptr->output, LoadFailed);
+        }
     }
 
     QObject::timerEvent(e);
@@ -706,7 +710,7 @@ bool AIModelServiceData::sendImageEnhance(const QString &source, const QString &
         bool ret = reply.value().toBool();
 
         if (!ret) {
-            qWarning() << QString("[Enhance DBus] Call %1 error: value(%2)").arg(s_EnhanceProcMethod).arg(ret);
+            qWarning() << QString("[Enhance DBus] Call %1 error: value(%2)").arg(procMethod).arg(ret);
         }
         return ret;
     }
@@ -732,7 +736,8 @@ void AIModelService::onDBusEnhanceEnd(const QString &output, int error)
     }
 
     State state = static_cast<State>(ptr->state.loadAcquire());
-    if (Cancel == state) {
+    if (Cancel == state
+            || LoadTimeout == state) {
         // 处理终止，不继续处理
         return;
     } else if (Loading != state) {

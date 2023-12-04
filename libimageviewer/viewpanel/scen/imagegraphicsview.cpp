@@ -1526,35 +1526,36 @@ void LibImageGraphicsView::addLoadSpinner(bool enhanceImage)
         m_spinner = new DSpinner(this);
         m_spinner->setFixedSize(SPINNER_SIZE);
 
-        QWidget *w = new QWidget(this);
-        w->setFixedSize(SPINNER_SIZE);
+        m_spinnerCtx = new QWidget(this);
+        m_spinnerCtx->setFixedSize(SPINNER_SIZE);
         QVBoxLayout *hLayout = new QVBoxLayout;
         hLayout->setMargin(0);
         hLayout->setSpacing(0);
         hLayout->addWidget(m_spinner, 0, Qt::AlignCenter);
 
         // 图像增强增加文案，默认隐藏
-        w->setFixedWidth(300);
-        w->setFixedHeight(70);
-        m_spinnerLabel = new QLabel(w);
+        m_spinnerCtx->setFixedWidth(300);
+        m_spinnerCtx->setFixedHeight(70);
+        m_spinnerLabel = new QLabel(m_spinnerCtx);
         m_spinnerLabel->setText(tr("AI retouching in progress, please wait..."));
         m_spinnerLabel->setVisible(false);
         hLayout->addWidget(m_spinnerLabel, 1, Qt::AlignBottom | Qt::AlignHCenter);
 
-        w->setLayout(hLayout);
+        m_spinnerCtx->setLayout(hLayout);
 
         if (!this->layout()) {
             QVBoxLayout *lay = new QVBoxLayout;
             lay->setAlignment(Qt::AlignCenter);
             this->setLayout(lay);
         }
-        this->layout()->addWidget(w);
+        this->layout()->addWidget(m_spinnerCtx);
     }
 
-    m_spinnerLabel->setVisible(enhanceImage);
-
-    m_spinner->setVisible(true);
     m_spinner->start();
+
+    m_spinnerCtx->setVisible(true);
+    m_spinner->setVisible(true);
+    m_spinnerLabel->setVisible(enhanceImage);
 }
 
 /**
@@ -1562,6 +1563,10 @@ void LibImageGraphicsView::addLoadSpinner(bool enhanceImage)
  */
 void LibImageGraphicsView::hideSpinner()
 {
+    if (m_spinnerCtx) {
+        m_spinnerCtx->hide();
+    }
+
     if (m_spinner) {
         m_spinner->stop();
         m_spinner->hide();
