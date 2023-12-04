@@ -177,8 +177,6 @@ public slots:
     void slotChangeShowTopBottom();
 
 protected:
-    bool event(QEvent *e) override;
-
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
     void paintEvent(QPaintEvent *event) override;

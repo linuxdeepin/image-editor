@@ -257,7 +257,8 @@ private:
     bool m_isFistOpen = true;
 
     //加载旋转
-    DSpinner *m_spinner{nullptr};
+    QWidget *m_spinnerCtx = nullptr;    // 旋转控制窗口
+    DSpinner *m_spinner = nullptr;
     QLabel *m_spinnerLabel = nullptr;
     int TITLEBAR_HEIGHT = 50;
 

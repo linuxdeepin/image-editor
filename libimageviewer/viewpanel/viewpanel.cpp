@@ -1436,13 +1436,6 @@ void LibViewPanel::slotChangeShowTopBottom()
     slotBottomMove();
 }
 
-bool LibViewPanel::event(QEvent *e)
-{
-
-
-    return QFrame::event(e);
-}
-
 bool LibViewPanel::slotOcrPicture()
 {
     if (!m_ocrInterface) {
@@ -2114,6 +2107,10 @@ void LibViewPanel::mousePressEvent(QMouseEvent *event)
 
 void LibViewPanel::dragEnterEvent(QDragEnterEvent *event)
 {
+    if (m_AIEnhancing) {
+        return;
+    }
+
     const QMimeData *mimeData = event->mimeData();
     if (!pluginUtils::base::checkMimeData(mimeData)) {
         return;
@@ -2131,6 +2128,10 @@ void LibViewPanel::dragMoveEvent(QDragMoveEvent *event)
 
 void LibViewPanel::dropEvent(QDropEvent *event)
 {
+    if (m_AIEnhancing) {
+        return;
+    }
+
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) {
         return;
@@ -2330,6 +2331,12 @@ void LibViewPanel::resetAIEnhanceImage()
 void LibViewPanel::onEnhanceStart()
 {
     m_AIEnhancing = true;
+
+    // 复位界面，隐藏导航窗口，显示标题/工具栏
+    if (m_nav->isVisible()) {
+        m_nav->setVisible(false);
+    }
+    Q_EMIT m_view->sigImageOutTitleBar(false);
 
     blockInputControl(true);
     setAIBtnVisible(false);
