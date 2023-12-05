@@ -7,6 +7,8 @@
 #include <QVBoxLayout>
 
 #include <DAnchors>
+#include <DGuiApplicationHelper>
+#include <DPaletteHelper>
 
 const int FLOAT_WDITH = 72;
 const int FLOAT_HEIGHT = 122;  // 172, 移除保存按钮
@@ -32,20 +34,38 @@ AIEnhanceFloatWidget::AIEnhanceFloatWidget(QWidget *parent)
             anchor->setRightMargin(FLOAT_RIGHT_MARGIN);
         }
     }
+
+    onThemeChanged();
+    connect(
+        DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &AIEnhanceFloatWidget::onThemeChanged);
 }
 
 void AIEnhanceFloatWidget::initButtton()
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->setSpacing(10);
+    QVBoxLayout *backLayout = new QVBoxLayout(this);
+    backLayout->setSpacing(0);
+    backLayout->setContentsMargins(0, 0, 0, 0);
+
+    bkgBlur = new DBlurEffectWidget(this);
+    bkgBlur->setBlurRectXRadius(18);
+    bkgBlur->setBlurRectYRadius(18);
+    bkgBlur->setRadius(30);
+    bkgBlur->setBlurEnabled(true);
+    bkgBlur->setMode(DBlurEffectWidget::GaussianBlur);
+    QColor maskColor(255, 255, 255, 76);
+    bkgBlur->setMaskColor(maskColor);
+    backLayout->addWidget(bkgBlur);
+
+    QVBoxLayout *ctxLayout = new QVBoxLayout(bkgBlur);
+    ctxLayout->setAlignment(Qt::AlignCenter);
+    ctxLayout->setSpacing(10);
 
     resetBtn = new DIconButton(this);
     resetBtn->setFixedSize(FLOAT_BTN_SIZE);
     resetBtn->setIcon(QIcon::fromTheme("dcc_reset"));
     resetBtn->setIconSize(FLOAT_ICON_SIZE);
     resetBtn->setToolTip(tr("Reprovision"));
-    mainLayout->addWidget(resetBtn);
+    ctxLayout->addWidget(resetBtn);
     connect(resetBtn, &DIconButton::clicked, this, &AIEnhanceFloatWidget::reset);
 
     // 屏蔽Save按钮
@@ -64,8 +84,53 @@ void AIEnhanceFloatWidget::initButtton()
     saveAsBtn->setIcon(QIcon::fromTheme("dcc_file_save_as"));
     saveAsBtn->setIconSize(FLOAT_ICON_SIZE);
     saveAsBtn->setToolTip(tr("Save as"));
-    mainLayout->addWidget(saveAsBtn);
+    ctxLayout->addWidget(saveAsBtn);
     connect(saveAsBtn, &DIconButton::clicked, this, &AIEnhanceFloatWidget::saveAs);
 
-    setLayout(mainLayout);
+    setLayout(ctxLayout);
+}
+
+/**
+   @brief 按主题更新界面，使得图像增强侧边栏和底栏效果一致
+ */
+void AIEnhanceFloatWidget::onThemeChanged()
+{
+    auto themeType = DGuiApplicationHelper::instance()->themeType();
+    if (DGuiApplicationHelper::LightType == themeType) {
+        QColor maskColor(247, 247, 247);
+        maskColor.setAlphaF(0.15);
+        bkgBlur->setMaskColor(maskColor);
+
+        DPalette pa;
+        pa = resetBtn->palette();
+        pa.setColor(DPalette::Light, QColor("#FFFFFF"));
+        pa.setColor(DPalette::Dark, QColor("#FFFFFF"));
+        // 单个按钮边框
+        QColor btnframecolor("#000000");
+        btnframecolor.setAlphaF(0.00);
+        pa.setColor(DPalette::FrameBorder, btnframecolor);
+        // 取消阴影
+        pa.setColor(DPalette::Shadow, btnframecolor);
+
+        DPaletteHelper::instance()->setPalette(resetBtn, pa);
+        DPaletteHelper::instance()->setPalette(saveAsBtn, pa);
+    } else {
+        QColor maskColor("#202020");
+        maskColor.setAlphaF(0.50);
+        bkgBlur->setMaskColor(maskColor);
+
+        DPalette pa;
+        pa = resetBtn->palette();
+        pa.setColor(DPalette::Light, QColor("#303030"));
+        pa.setColor(DPalette::Dark, QColor("#303030"));
+        // 单个按钮边框
+        QColor btnframecolor("#000000");
+        btnframecolor.setAlphaF(0.30);
+        pa.setColor(DPalette::FrameBorder, btnframecolor);
+        // 取消阴影
+        pa.setColor(DPalette::Shadow, btnframecolor);
+
+        DPaletteHelper::instance()->setPalette(resetBtn, pa);
+        DPaletteHelper::instance()->setPalette(saveAsBtn, pa);
+    }
 }

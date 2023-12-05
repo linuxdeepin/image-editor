@@ -7,6 +7,7 @@
 
 #include <DFloatingWidget>
 #include <DIconButton>
+#include <DBlurEffectWidget>
 
 DWIDGET_USE_NAMESPACE
 
@@ -22,8 +23,10 @@ public:
 
 private:
     void initButtton();
+    Q_SLOT void onThemeChanged();
 
 private:
+    DBlurEffectWidget *bkgBlur = nullptr;
     DIconButton *resetBtn = nullptr;
     DIconButton *saveBtn = nullptr;
     DIconButton *saveAsBtn = nullptr;
