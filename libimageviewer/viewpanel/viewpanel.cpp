@@ -1658,6 +1658,14 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_bottomToolbar) {
                 m_bottomToolbar->setVisible(false);
             }
+
+            // 判断当前是否为AI增强图片，若为则设置为提示是否保存
+            if (AIModelService::instance()->isTemporaryFile(m_currentPath)
+                    && !AIModelService::instance()->isWaitSave()) {
+                AIModelService::instance()->saveFileDialog(m_currentPath, this);
+                resetAIEnhanceImage();
+            }
+
             ViewInfo vinfo;
             vinfo.fullScreen = window()->isFullScreen();
             vinfo.lastPanel = this;
@@ -1671,12 +1679,18 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
+
             //打开重命名窗口时关闭定时器
             killTimer(m_hideCursorTid);
             m_hideCursorTid = 0;
             m_view->viewport()->setCursor(Qt::ArrowCursor);
 
-            PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
+            // 判断当前是否为AI增强图片，若为设置增强后的图片
+            if (AIModelService::instance()->isTemporaryFile(m_currentPath)) {
+                PrintHelper::getIntance()->showPrintDialog({m_currentPath}, this);
+            } else {
+                PrintHelper::getIntance()->showPrintDialog(QStringList(m_bottomToolbar->getCurrentItemInfo().path), this);
+            }
 
             // 全屏时，开启定时器，3秒后隐藏鼠标
             if (window()->isFullScreen())
@@ -1737,8 +1751,14 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
-            //todo,复制
-            Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
+
+            // 判断当前是否为AI增强图片，若为设置增强后的图片
+            if (AIModelService::instance()->isTemporaryFile(m_currentPath)) {
+                Libutils::base::copyImageToClipboard({m_currentPath});
+            } else {
+                Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
+            }
+
             break;
         }
         case IdMoveToTrash: {
