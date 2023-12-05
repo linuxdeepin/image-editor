@@ -460,7 +460,9 @@ void LibViewPanel::updateMenuContent(const QString &path)
             currentPath = m_currentPath;
         }
 
-        if (AIModelService::instance()->isTemporaryFile(m_currentPath)) {
+        // AI增强图片特殊处理，部分选项屏蔽
+        bool enhanceImage = AIModelService::instance()->isTemporaryFile(m_currentPath);
+        if (enhanceImage) {
             currentPath = m_currentPath;
         }
 
@@ -527,7 +529,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
         //如果图片数量大于0才能有幻灯片
         appendAction(IdStartSlideShow, QObject::tr("Slide show"), ss("Slide show", "F5"));
         //添加到相册
-        if (isAlbum && isReadable) {
+        if (isAlbum && isReadable && !enhanceImage) {
             //这行代码是在向调用程序寻求album name，根据前面的connect，这里会采用回调的形式执行
             emit ImageEngine::instance()->sigGetAlbumName(ItemInfo.path);
             m_menu->addSeparator();
@@ -574,10 +576,18 @@ void LibViewPanel::updateMenuContent(const QString &path)
         }
         m_menu->addSeparator();
 
+        // 处理收藏按钮，AI修图的增强图片不允许点击
+        if (isAlbum) {
+            DIconButton *Collection = m_bottomToolbar->getBottomtoolbarButton(imageViewerSpace::ButtonTypeCollection);
+            if (Collection) {
+                Collection->setEnabled(!enhanceImage);
+            }
+        }
+
         // 添加AI模型选项，仅处理静态图
         addAIMenu();
 
-        if (isAlbum && isReadable) {
+        if (isAlbum && isReadable && !enhanceImage) {
             appendAction(IdExport, tr("Export"), ss("Export", "Ctrl+E"));   //导出
         }
         if (isReadable) {
@@ -612,12 +622,12 @@ void LibViewPanel::updateMenuContent(const QString &path)
             TrashButton->setEnabled(false);
         }
         //IdRemoveFromAlbum
-        if (isAlbum && m_isCustomAlbum && isReadable) {
+        if (isAlbum && m_isCustomAlbum && isReadable && !enhanceImage) {
             appendAction(IdRemoveFromAlbum, tr("Remove from album"), ss("Remove from album", ""));
         }
         m_menu->addSeparator();
         //fav
-        if (isAlbum && isReadable) {
+        if (isAlbum && isReadable && !enhanceImage) {
             if (m_isFav) {
                 appendAction(IdRemoveFromFavorites, tr("Unfavorite"), ".");    //取消收藏
             } else {
