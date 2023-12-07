@@ -275,13 +275,6 @@ AIModelService::Error AIModelService::modelEnabled(int modelID, const QString &f
     }
 
     switch (modelID) {
-        // 待定需求，模糊背景和删除背景不设置限制
-#if 0
-        case AIModelServiceData::BackgroundBlur:
-            Q_FALLTHROUGH();
-        case AIModelServiceData::BackgroundCut:
-            return NoError;
-#endif
         case AIModelServiceData::SuperResol: {
             const int resolLimitWidth = 512;
             const int resolLimitHeight = 512;
@@ -292,6 +285,8 @@ AIModelService::Error AIModelService::modelEnabled(int modelID, const QString &f
             break;
         }
         default: {
+        // 暂时不再需要看图前端进行图片大小限制，屏蔽此处判断
+#if 0
             const int normalLimitWidth = 2160;
             const int normalLimitHeight = 1440;
 
@@ -305,6 +300,7 @@ AIModelService::Error AIModelService::modelEnabled(int modelID, const QString &f
                     return PixelSizeError;
                 }
             }
+#endif
             break;
         }
     }
