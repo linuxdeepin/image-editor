@@ -57,6 +57,8 @@ private:
     AIModelService(QObject *parent = nullptr);
     ~AIModelService() override;
 
+    bool checkFileSavable(const QString &newPath, QWidget *target = nullptr);
+    void showWarningDialog(const QString &notify, QWidget *target = nullptr);
     bool saveFile(const QString &filePath, const QString &newPath);
     void saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target = nullptr);
     QString checkConvertFile(const QString &filePath, const QImage &image) const;
