@@ -2,13 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en">
 <context>
-    <name>AIEnhanceFloatButton</name>
+    <name>AIEnhanceFloatWidget</name>
+    <message>
+        <source>Reprovision</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restore</source>
+        <source>Save as</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -16,6 +20,42 @@
     <name>AIModelService</name>
     <message>
         <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image not saved, Do you want to save it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancel</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image format is not supported, please switch the image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The image resolution exceeds the limit, please switch the image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portrait not detected, switch pictures.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This file is read-only, please save with another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permission to save files here, please change and retry.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -28,6 +68,13 @@
     <message>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageGraphicsView</name>
+    <message>
+        <source>AI retouching in progress, please wait...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -76,15 +123,7 @@
         <translation>Favorite</translation>
     </message>
     <message>
-        <source>Image enhance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save</source>
+        <source>AI retouching</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -273,27 +312,43 @@
         <translation>Photo info</translation>
     </message>
     <message>
-        <source>cartoon2d</source>
+        <source>Colorize pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>cartoon3d</source>
+        <source>Upgrade resolution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hand</source>
+        <source>Blurred background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>sketch</source>
+        <source>Delete background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>coloring</source>
+        <source>Hand-drawn cartoons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>super-resolution</source>
+        <source>2D Manga</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3D Manga</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sketch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Processing failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -337,29 +392,6 @@
     <message>
         <source>Exit</source>
         <translation>Exit</translation>
-    </message>
-</context>
-<context>
-    <name>TextToImageDialog</name>
-    <message>
-        <source>Save as</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Generate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Text to image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Prompt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Negative prompt</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

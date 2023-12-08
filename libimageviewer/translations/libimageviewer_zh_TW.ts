@@ -57,6 +57,18 @@
         <source>Portrait not detected, switch pictures.</source>
         <translation type="unfinished">未檢測到人像，請切換圖片。</translation>
     </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">確定</translation>
+    </message>
+    <message>
+        <source>This file is read-only, please save with another name.</source>
+        <translation type="unfinished">該文件已設定為唯讀，請使用其他檔案名重試。</translation>
+    </message>
+    <message>
+        <source>You do not have permission to save files here, please change and retry.</source>
+        <translation type="unfinished">您沒有權限在此路徑儲存文件，請重試。</translation>
+    </message>
 </context>
 <context>
     <name>ExtensionPanel</name>

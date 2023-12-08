@@ -285,7 +285,7 @@ AIModelService::Error AIModelService::modelEnabled(int modelID, const QString &f
             break;
         }
         default: {
-        // 暂时不再需要看图前端进行图片大小限制，屏蔽此处判断
+            // 暂时不再需要看图前端进行图片大小限制，屏蔽此处判断
 #if 0
             const int normalLimitWidth = 2160;
             const int normalLimitHeight = 1440;
@@ -589,6 +589,55 @@ void AIModelService::timerEvent(QTimerEvent *e)
 }
 
 /**
+   @brief 检测文件路径 \a newPath 是否可用，只读文件和路径不可保存
+ */
+bool AIModelService::checkFileSavable(const QString &newPath, QWidget *target)
+{
+    // 如果文件存在，检查文件是否可写
+    QFileInfo info(newPath);
+    if (info.exists()) {
+        if (!info.isWritable()) {
+            showWarningDialog(tr("This file is read-only, please save with another name."), target);
+            return false;
+        }
+
+    } else {
+        // 如果文件不存在，检查目录是否可写
+        QString dirPath = info.absolutePath();
+        QFileInfo dir(dirPath);
+        if (dir.isDir() && !dir.isWritable()) {
+            showWarningDialog(tr("You do not have permission to save files here, please change and retry."), target);
+            return false;
+        }
+        return true;
+    }
+    return true;
+}
+
+/**
+   @brief 展示提示信息 \a notify .
+ */
+void AIModelService::showWarningDialog(const QString &notify, QWidget *target)
+{
+    DDialog dialog(target);
+    dialog.setIcon(QIcon::fromTheme("deepin-image-viewer"));
+    dialog.setMessage(" ");
+    dialog.addButton(tr("OK"));
+
+    // DDialog 在 showEvent 中调整弹窗大小，但并未重新设置位置，捕获展示信号，重新设置坐标居中于父窗口
+    QObject::connect(&dialog, &DDialog::visibleChanged, this, [&](bool b) {
+        if (b) {
+            // NOTE: 异常处理，DDialog在部分情况下计算提示信息的布局错误，调整为弹出后重设文本
+            //  以使得正常计算 messageLabel 的大小。
+            dialog.setMessage(notify);
+            dialog.moveToCenter();
+        }
+    });
+
+    dialog.exec();
+}
+
+/**
    @brief 保存文件 \a filePath 到 \a newPath , 默认覆盖 \a newPath 存在文件时无效,
         需要先移除旧文件。
  */
@@ -616,28 +665,42 @@ bool AIModelService::saveFile(const QString &filePath, const QString &newPath)
  */
 void AIModelService::saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target)
 {
-    QFileInfo info(sourcePath);
-    QString dir = info.absolutePath();
-    if (dir.isEmpty()) {
-        dir = QDir::homePath();
-    }
+    // 保存文件路径异常会尝试重试
+    bool retry = false;
+    do {
+        // 默认退出
+        retry = false;
 
-    Dtk::Widget::DFileDialog dialog(target, tr("Save"));
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDirectory(dir);
-    dialog.selectFile(info.completeBaseName() + ".png");
-    dialog.setNameFilter("*.png");
-
-    int mode = dialog.exec();
-    if (QDialog::Accepted == mode) {
-        auto files = dialog.selectedFiles();
-        if (files.isEmpty()) {
-            return;
+        QFileInfo info(sourcePath);
+        QString dir = info.absolutePath();
+        if (dir.isEmpty()) {
+            dir = QDir::homePath();
         }
 
-        QString newPath = files.value(0);
-        saveFile(filePath, newPath);
-    }
+        Dtk::Widget::DFileDialog dialog(target, tr("Save"));
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setDirectory(dir);
+        dialog.selectFile(info.completeBaseName() + ".png");
+        dialog.setNameFilter("*.png");
+
+        int mode = dialog.exec();
+        if (QDialog::Accepted == mode) {
+            auto files = dialog.selectedFiles();
+            if (files.isEmpty()) {
+                return;
+            }
+
+            QString newPath = files.value(0);
+
+            // 判断文件是否可保存
+            if (!checkFileSavable(newPath, target)) {
+                retry = true;
+                continue;
+            }
+
+            saveFile(filePath, newPath);
+        }
+    } while (retry);
 }
 
 /**
@@ -732,8 +795,7 @@ void AIModelService::onDBusEnhanceEnd(const QString &output, int error)
     }
 
     State state = static_cast<State>(ptr->state.loadAcquire());
-    if (Cancel == state
-            || LoadTimeout == state) {
+    if (Cancel == state || LoadTimeout == state) {
         // 处理终止，不继续处理
         return;
     } else if (Loading != state) {
