@@ -1,3 +1,21 @@
+image-editor (1.0.39) unstable; urgency=medium
+
+  * fix: compact mode build faild on low dtkgui version.
+         (Influence: CompactMode)
+  * fix: remove unnecessary dependency packages
+  * feat: Add AI image enhance support.(Influence: AIModel)
+  * fix: Init type error / disable drag in processing.
+         (Bug: 232295, 232301)(Influence: InitImageType DragImage)
+  * fix: Action using enhance image instead of source.
+         (Bug: 232505)(Influence: Menu)
+  * fix: Disable album action with enhance image.
+         (Bug: 232505)(Influence: Menu)
+  * fix: diff color with bottom bar and enhance bar.(Influence: EnhaceBar)
+  * feat: Disable enhance image size limit.
+  * fix: Add file unsavable notify dialog.
+
+ -- renbin <renbin@uniontech.com>  Tue, 12 Dec 2023 17:01:47 +0800
+
 image-editor (1.0.38) unstable; urgency=medium
 
   * chore: Update REUSE date
