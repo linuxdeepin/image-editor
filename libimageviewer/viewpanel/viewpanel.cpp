@@ -1669,8 +1669,8 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
                 m_bottomToolbar->setVisible(false);
             }
 
-            // 判断当前是否为AI增强图片，若为则设置为提示是否保存
-            if (AIModelService::instance()->isTemporaryFile(m_currentPath)
+            // 判断当前AI增强图片是否需要保存，若为则提示是否保存
+            if (AIModelService::instance()->imageNeedSave(m_currentPath)
                     && !AIModelService::instance()->isWaitSave()) {
                 AIModelService::instance()->saveFileDialog(m_currentPath, this);
                 resetAIEnhanceImage();
@@ -1987,8 +1987,8 @@ void LibViewPanel::resetBottomToolbarGeometry(bool visible)
 void LibViewPanel::openImg(int index, QString path)
 {
     if (AIModelService::instance()->isValid()) {
-        // 判断当前图片是否为图像增强图片
-        bool previousEnhanced = AIModelService::instance()->isTemporaryFile(m_currentPath);
+        // 判断当前AI增强图片是否需要保存
+        bool previousEnhanced = AIModelService::instance()->imageNeedSave(m_currentPath);
         if (previousEnhanced) {
             if (AIModelService::instance()->isWaitSave()) {
                 return;
@@ -2265,11 +2265,10 @@ void LibViewPanel::createAIBtn()
         connect(m_AIFloatBar, &AIEnhanceFloatWidget::reset, this, &LibViewPanel::resetAIEnhanceImage);
         connect(m_AIFloatBar, &AIEnhanceFloatWidget::save, this, [this](){
             AIModelService::instance()->saveEnhanceFile(m_currentPath);
-            resetAIEnhanceImage();
         });
         connect(m_AIFloatBar, &AIEnhanceFloatWidget::saveAs, this, [this](){
             AIModelService::instance()->saveEnhanceFileAs(m_currentPath, this);
-            resetAIEnhanceImage();
+            // 保存文件后不再主动退出当前图片
         });
     }
 }

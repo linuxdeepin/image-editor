@@ -481,12 +481,25 @@ bool AIModelService::isWaitSave() const
 }
 
 /**
+   @return 返回当前增强图片(若为)是否需要保存，已保存和非增强图片返回 false .
+ */
+bool AIModelService::imageNeedSave(const QString &filePath) const
+{
+    auto ptr = dptr->enhanceCache.value(filePath);
+    if (!ptr.isNull()) {
+        return !ptr->saved;
+    }
+
+    return false;
+}
+
+/**
    @brief 弹出对话框提示是否保存当前文件 \a filePath
  */
-void AIModelService::saveFileDialog(const QString &filePath, QWidget *target)
+bool AIModelService::saveFileDialog(const QString &filePath, QWidget *target)
 {
     if (isWaitSave()) {
-        return;
+        return false;
     }
     dptr->waitSave = true;
 
@@ -504,37 +517,39 @@ void AIModelService::saveFileDialog(const QString &filePath, QWidget *target)
         }
     });
 
+    bool saveSucc = false;
     int ret = expiredDialog.exec();
     if (ret == suggestRet) {
-        saveEnhanceFileAs(filePath, target);
+        saveSucc = saveEnhanceFileAs(filePath, target);
     }
 
     dptr->waitSave = false;
+    return saveSucc;
 }
 
 /**
    @brief 保存增强后的图像 \a filePath ， 如果非图像增强文件则不进行保存
  */
-void AIModelService::saveEnhanceFile(const QString &filePath)
+bool AIModelService::saveEnhanceFile(const QString &filePath)
 {
     if (!isTemporaryFile(filePath)) {
-        return;
+        return false;
     }
 
     // 覆盖原文件
-    saveFile(filePath, sourceFilePath(filePath));
+    return saveFile(filePath, sourceFilePath(filePath));
 }
 
 /**
    @brief 另存增强后的图像 \a filePath ， 如果非图像增强文件则不进行保存
  */
-void AIModelService::saveEnhanceFileAs(const QString &filePath, QWidget *target)
+bool AIModelService::saveEnhanceFileAs(const QString &filePath, QWidget *target)
 {
     if (!isTemporaryFile(filePath)) {
-        return;
+        return false;
     }
 
-    saveTemporaryAs(filePath, sourceFilePath(filePath), target);
+    return saveTemporaryAs(filePath, sourceFilePath(filePath), target);
 }
 
 /**
@@ -640,6 +655,7 @@ void AIModelService::showWarningDialog(const QString &notify, QWidget *target)
 /**
    @brief 保存文件 \a filePath 到 \a newPath , 默认覆盖 \a newPath 存在文件时无效,
         需要先移除旧文件。
+        通过此处保存的图像增强文件会被设置为已保存状态。
  */
 bool AIModelService::saveFile(const QString &filePath, const QString &newPath)
 {
@@ -655,6 +671,11 @@ bool AIModelService::saveFile(const QString &filePath, const QString &newPath)
     bool ret = QFile::copy(filePath, newPath);
     if (!ret) {
         qWarning() << QString("Copy temporary file %1 failed").arg(filePath);
+    } else {
+        auto ptr = dptr->enhanceCache.value(filePath);
+        if (!ptr.isNull()) {
+            ptr->saved = true;
+        }
     }
 
     return ret;
@@ -663,8 +684,9 @@ bool AIModelService::saveFile(const QString &filePath, const QString &newPath)
 /**
    @brief 弹出保存框将 \a filePath 保存，建议目录为源文件目录 \a sourcePath
  */
-void AIModelService::saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target)
+bool AIModelService::saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target)
 {
+    bool saveSucc = false;
     // 保存文件路径异常会尝试重试
     bool retry = false;
     do {
@@ -687,7 +709,7 @@ void AIModelService::saveTemporaryAs(const QString &filePath, const QString &sou
         if (QDialog::Accepted == mode) {
             auto files = dialog.selectedFiles();
             if (files.isEmpty()) {
-                return;
+                return false;
             }
 
             QString newPath = files.value(0);
@@ -698,9 +720,11 @@ void AIModelService::saveTemporaryAs(const QString &filePath, const QString &sou
                 continue;
             }
 
-            saveFile(filePath, newPath);
+            saveSucc = saveFile(filePath, newPath);
         }
     } while (retry);
+
+    return saveSucc;
 }
 
 /**
@@ -710,9 +734,15 @@ void AIModelService::saveTemporaryAs(const QString &filePath, const QString &sou
 QString AIModelService::checkConvertFile(const QString &filePath, const QImage &image) const
 {
     // 判断图片变更
+    QFileInfo info(filePath);
     QMutexLocker _locker(&dptr->cacheMutex);
     if (dptr->convertCache.contains(filePath)) {
-        return dptr->convertCache.value(filePath);
+        auto &sourceCache = dptr->convertCache[filePath];
+
+        // 判断文件是否变更(根据修改时间）
+        if (info.lastModified() == sourceCache.lastModified) {
+            return dptr->convertCache.value(filePath).cachedImage;
+        }
     }
 
     if (image.isNull()) {
@@ -728,7 +758,7 @@ QString AIModelService::checkConvertFile(const QString &filePath, const QImage &
     }
 
     _locker.relock();
-    dptr->convertCache.insert(filePath, cvtFile);
+    dptr->convertCache.insert(filePath, {info.lastModified(), cvtFile});
     return cvtFile;
 }
 

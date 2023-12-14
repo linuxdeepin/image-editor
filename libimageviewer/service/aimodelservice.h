@@ -41,9 +41,10 @@ public:
     QString lastProcOutput() const;
 
     bool isWaitSave() const;
-    void saveFileDialog(const QString &filePath, QWidget *target = nullptr);
-    void saveEnhanceFile(const QString &filePath);
-    void saveEnhanceFileAs(const QString &filePath, QWidget *target = nullptr);
+    bool imageNeedSave(const QString &filePath) const;
+    bool saveFileDialog(const QString &filePath, QWidget *target = nullptr);
+    bool saveEnhanceFile(const QString &filePath);
+    bool saveEnhanceFileAs(const QString &filePath, QWidget *target = nullptr);
 
     bool detectErrorAndNotify(QWidget *targetWidget, Error error, const QString &output = QString::null);
 
@@ -60,7 +61,7 @@ private:
     bool checkFileSavable(const QString &newPath, QWidget *target = nullptr);
     void showWarningDialog(const QString &notify, QWidget *target = nullptr);
     bool saveFile(const QString &filePath, const QString &newPath);
-    void saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target = nullptr);
+    bool saveTemporaryAs(const QString &filePath, const QString &sourcePath, QWidget *target = nullptr);
     QString checkConvertFile(const QString &filePath, const QImage &image) const;
 
     // DBus

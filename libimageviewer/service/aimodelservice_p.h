@@ -15,6 +15,7 @@
 #include <QTemporaryDir>
 #include <QDBusInterface>
 #include <QBasicTimer>
+#include <QDateTime>
 
 #include <DFloatingMessage>
 
@@ -37,7 +38,9 @@ struct EnhanceInfo
     const QString output;
     const QString model;
     int index = 0;
+    bool saved = false;  // 当前增强图片是否已保存
 
+    // 线程争用
     QAtomicInt state = AIModelService::None;  // 处理状态，可能有争用
 
     EnhanceInfo(const QString &s, const QString &o, const QString &m)
@@ -93,8 +96,13 @@ public:
     QHash<QString, EnhancePtr> enhanceCache;  // 图像增强缓存信息（仅主线程访问）
 
     QMutex cacheMutex;
-    QTemporaryDir convertTemp;             // 图像类型转换文件临时目录
-    QHash<QString, QString> convertCache;  // 缓存的信息，可能多个线程访问
+    QTemporaryDir convertTemp;  // 图像类型转换文件临时目录
+    struct SourceCache
+    {
+        QDateTime lastModified;  // 文件最后修改时间
+        QString cachedImage;     // 文件缓存路径
+    };
+    QHash<QString, SourceCache> convertCache;  // 缓存的信息，可能多个线程访问
 
     QFutureWatcher<EnhancePtr> enhanceWatcher;
 
