@@ -7,8 +7,8 @@
 #include <QVBoxLayout>
 
 #include <DAnchors>
+#include <DApplicationHelper>
 #include <DGuiApplicationHelper>
-#include <DPaletteHelper>
 
 const int FLOAT_WDITH = 72;
 const int FLOAT_HEIGHT = 122;  // 172, 移除保存按钮
@@ -112,8 +112,8 @@ void AIEnhanceFloatWidget::onThemeChanged()
         // 取消阴影
         pa.setColor(DPalette::Shadow, btnframecolor);
 
-        DPaletteHelper::instance()->setPalette(resetBtn, pa);
-        DPaletteHelper::instance()->setPalette(saveAsBtn, pa);
+        DApplicationHelper::instance()->setPalette(resetBtn, pa);
+        DApplicationHelper::instance()->setPalette(saveAsBtn, pa);
     } else {
         QColor maskColor("#202020");
         maskColor.setAlphaF(0.50);
@@ -130,7 +130,7 @@ void AIEnhanceFloatWidget::onThemeChanged()
         // 取消阴影
         pa.setColor(DPalette::Shadow, btnframecolor);
 
-        DPaletteHelper::instance()->setPalette(resetBtn, pa);
-        DPaletteHelper::instance()->setPalette(saveAsBtn, pa);
+        DApplicationHelper::instance()->setPalette(resetBtn, pa);
+        DApplicationHelper::instance()->setPalette(saveAsBtn, pa);
     }
 }
