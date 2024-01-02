@@ -289,10 +289,17 @@ void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInf
         if (data.path == path) {
             pix.imgWidth = data.imgWidth;
             pix.imgHeight = data.imgHeight;
-//            cutPixmap(pix);
+
+            // 更新文件信息
             QVariant meta;
             meta.setValue(pix);
             m_model->setData(index, meta, Qt::DisplayRole);
+
+            // 判断当前的文件路径是否变更(重命名时)，若变更则更新
+            if (path == m_currentPath && pix.path != m_currentPath) {
+                m_currentPath = pix.path;
+            }
+
             this->update(index);
             this->viewport()->update();
             break;
