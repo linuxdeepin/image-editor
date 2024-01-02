@@ -256,11 +256,12 @@ void LibBottomToolbar::checkAdaptScreenBtn()
 
 void LibBottomToolbar::deleteImage()
 {
-    if (m_imgListWidget->getImgCount() == 0)
-        return;
     //移除正在展示照片
     if (m_imgListWidget) {
-        QString path = m_imgListWidget->getCurrentPath();
+        if (m_imgListWidget->getImgCount() == 0)
+            return;
+
+        QString path = getCurrentItemInfo().path;
 
         QFile file(path);
         if (!file.exists()) {
@@ -373,7 +374,7 @@ void LibBottomToolbar::onTrashBtnClicked()
     //更换删除顺序,相册需要现在显示删除,再删除本体
     QString path;
     if (m_imgListWidget) {
-        path = m_imgListWidget->getCurrentPath();
+        path = getCurrentItemInfo().path;
     }
     if (path.isEmpty() && m_currentpath.isEmpty()) {
         path = m_currentpath;
