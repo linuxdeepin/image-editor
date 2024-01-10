@@ -1,3 +1,9 @@
+image-editor (1.0.41) unstable; urgency=medium
+
+  * fix: Delete image not work after rename.(Bug: 236589)
+
+ -- renbin <renbin@uniontech.com>  Wed, 10 Jan 2024 13:38:35 +0800
+
 image-editor (1.0.40) unstable; urgency=medium
 
   * fix: Build error on low dtk version.
