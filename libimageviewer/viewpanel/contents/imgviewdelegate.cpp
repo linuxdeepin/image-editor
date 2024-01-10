@@ -161,10 +161,14 @@ void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         painter->setClipPath(bg);
     }
 
+    //对略缩图的拉伸做了截取，使显示为未拉伸的图片
     QPainterPath bp1;
     bp1.addRoundedRect(pixmapRect, 4, 4);
     painter->setClipPath(bp1);
-    painter->drawImage(pixmapRect, _pixmap);
+    _pixmap = _pixmap.scaled(pixmapRect.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    qreal adjustx = _pixmap.width() - pixmapRect.width();
+    qreal adjusty = _pixmap.height() - pixmapRect.height();
+    painter->drawImage(pixmapRect,_pixmap,_pixmap.rect().adjusted(adjustx/2, -adjusty/2, -adjustx/2, adjusty/2));
 
     painter->restore();
 }
