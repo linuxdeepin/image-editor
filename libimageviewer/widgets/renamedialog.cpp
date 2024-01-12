@@ -7,7 +7,7 @@
 #include "unionimage/imageutils.h"
 
 #include "accessibility/ac-desktop-define.h"
-
+#include <DGuiApplicationHelper>
 #include <DMessageBox>
 #include <DLabel>
 #include <DFontSizeManager>
@@ -26,8 +26,8 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 {
     this->setIcon(QIcon::fromTheme("deepin-image-viewer"));
     DWidget *widet = new DWidget(this);
-    this->setContentsMargins(0,0,0,0);
-    layout()->setSpacing(0); // 标题栏和内容部件间隙设为0，在视觉上缩短标题栏间隙
+    this->setContentsMargins(0, 0, 0, 0);
+    layout()->setSpacing(0);  // 标题栏和内容部件间隙设为0，在视觉上缩短标题栏间隙
     addContent(widet);
     m_vlayout = new QVBoxLayout(widet);
     m_labvlayout = new QVBoxLayout();
@@ -38,7 +38,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_lineedt = new DLineEdit(widet);
     QFrame *line = new QFrame(widet);
     line->setLineWidth(2);
-    line->setFixedHeight(25);// 垂直分割线短于按钮高度
+    line->setFixedHeight(25);  // 垂直分割线短于按钮高度
     QLbtoDLabel *labtitle = new QLbtoDLabel();
     okbtn = new DSuggestButton(tr("Confirm"), widet);
     cancelbtn = new DPushButton(tr("Cancel"), widet);
@@ -46,25 +46,20 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     cancelbtn->setFixedHeight(35);
     m_labformat = new DLabel(widet);
     m_vlayout->setContentsMargins(2, 0, 2, 1);
-//    okbtn->setText();
-//    cancelbtn->setText();
+
     m_hlayout->addWidget(cancelbtn);
     line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Plain); // 垂直分割线颜色应为浅灰
+    line->setFrameShadow(QFrame::Plain);  // 垂直分割线颜色应为浅灰
     m_hlayout->addWidget(line);
     m_hlayout->addWidget(okbtn);
-    m_hlayout->setSpacing(7);// 保证按钮间距20px
+    m_hlayout->setSpacing(7);  // 保证按钮间距20px
     labtitle->setText(tr("Input a new name"));
-    labtitle->setFixedHeight(40); //增加标签区域显示高度，在视觉上缩短标题栏间隙
+    labtitle->setFixedHeight(40);  //增加标签区域显示高度，在视觉上缩短标题栏间隙
     labtitle->setAlignment(Qt::AlignCenter);
     m_labvlayout->addWidget(labtitle);
-//    m_vlayout->addWidget(labtitle);
-//    m_vlayout->addStretch();
 
     m_edtlayout->addWidget(m_lineedt);
     m_lineedt->setFixedHeight(35);
-
-//    connect(m_lineedt, &DLineEdit::focusChanged, this, &RenameDialog::slotsFocusChanged);
 
     m_labformat->setEnabled(false);
     m_edtlayout->addWidget(m_labformat);
@@ -73,39 +68,32 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_vlayout->addLayout(m_labvlayout);
     m_vlayout->addStretch();
 
-
     m_vlayout->addLayout(m_hlayout);
-//    m_vlayout->setStretch(0, 5);
-//    m_vlayout->setStretch(1, 1);
-//    m_vlayout->setStretch(2, 1);
-//    m_vlayout->setStretch(3, 1);
     widet->setLayout(m_vlayout);
-//    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
+    onThemeChanged(DGuiApplicationHelper::instance()->themeType());
     InitDlg();
     m_lineedt->lineEdit()->setFocus();
     int Dirlen = /*m_DirPath.size() +*/ 1 + m_labformat->text().size();
-    //正则表达式排除文管不支持的字符
-    QRegExp rx("^[^\\.\\\\/\':\\*\\?\"<>|%&][^\\\\/\':\\*\\?\"<>|%&]*"); //屏蔽特殊字符
-//    QRegExp rx("[^\\\\//:*?\"<>|]*");
+    // 正则表达式排除文管不支持的字符
+    // 屏蔽特殊字符 QRegExp rx("[^\\\\//:*?\"<>|]*");
+    QRegExp rx("^[^\\.\\\\/\':\\*\\?\"<>|%&][^\\\\/\':\\*\\?\"<>|%&]*");
+
     QRegExpValidator *pReg = new QRegExpValidator(rx, this);
     m_lineedt->lineEdit()->setValidator(pReg);
-    connect(okbtn, &DSuggestButton::clicked, this, [ = ] {
+    connect(okbtn, &DSuggestButton::clicked, this, [=] {
         m_filename = m_lineedt->text() + m_labformat->text();
         m_filenamepath = m_DirPath + "/" + m_filename;
         accept();
     });
-    connect(cancelbtn, &DPushButton::clicked, this, [ = ] {
-        reject();
-    });
-
-    connect(m_lineedt, &DLineEdit::textChanged, this, [ = ](const QString & arg) {
+    connect(cancelbtn, &DPushButton::clicked, this, [=] { reject(); });
+    connect(m_lineedt, &DLineEdit::textChanged, this, [=](const QString &arg) {
         setCurrentTip();
         int len = arg.toLocal8Bit().length();
         //修复字符串长度超长会将
-        if (len > 256 - Dirlen) return;
-
+        if (len > 256 - Dirlen)
+            return;
     });
-    connect(m_lineedt, &DLineEdit::textEdited, this, [ = ](const QString & arg) {
+    connect(m_lineedt, &DLineEdit::textEdited, this, [=](const QString &arg) {
         if (arg.isEmpty()) {
             return;
         }
@@ -124,7 +112,8 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
             for (; i < arg.size(); i++) {
                 if (arg.at(i) >= 0x4e00 && arg.at(i) <= 0x9fa5) {
                     num += 3;
-                    if (num >= 256 - Dirlen - 1) break;
+                    if (num >= 256 - Dirlen - 1)
+                        break;
                 } else if (num < 256 - Dirlen) {
                     num += 1;
                 } else {
@@ -150,19 +139,6 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     setFixedSize(380, 190);
 }
 
-
-//void RenameDialog::onThemeChanged(ViewerThemeManager::AppTheme theme)
-//{
-//    QPalette pe;
-//    if (theme == ViewerThemeManager::Dark) {
-//        pe.setColor(QPalette::WindowText, Qt::darkGray);
-//    } else {
-//        pe.setColor(QPalette::WindowText, Qt::lightGray);
-//    }
-//    m_labformat->setPalette(pe);
-//}
-
-
 QString RenameDialog::GetFilePath()
 {
     return m_filenamepath;
@@ -180,7 +156,7 @@ void RenameDialog::InitDlg()
     m_filename = fileinfo.fileName();
     QString format = fileinfo.suffix();
     QString basename;
-    //basename会过滤掉.,那么1.....png就会出现basename为1,completeBaseName不会,修改bug66356
+    // basename会过滤掉.,那么1.....png就会出现basename为1,completeBaseName不会,修改bug66356
     m_basename = fileinfo.completeBaseName();
     m_lineedt->setText(m_basename);
     m_labformat->setText("." + format);
@@ -204,14 +180,12 @@ void RenameDialog::setCurrentTip()
         okbtn->setEnabled(true);
         m_lineedt->hideAlertMessage();
     }
-
 }
 
 void RenameDialog::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
 }
-
 
 QString RenameDialog::geteElidedText(QFont font, QString str, int MaxWidth)
 {
@@ -228,6 +202,20 @@ void RenameDialog::slotsFocusChanged(bool onFocus)
     if (!onFocus) {
         m_lineedt->hideAlertMessage();
     }
+}
+
+void RenameDialog::onThemeChanged(DGuiApplicationHelper::ColorType theme)
+{
+    // 文件后缀颜色跟随主题变化
+    QPalette palette = m_labformat->palette();
+    if (theme == DGuiApplicationHelper::ColorType::DarkType) {
+        const QColor prefixColor = QColor(179, 179, 179);
+        palette.setColor(QPalette::WindowText, prefixColor);
+    } else {
+        const QColor prefixColor = QColor(77, 77, 77);
+        palette.setColor(QPalette::WindowText, prefixColor);
+    }
+    m_labformat->setPalette(palette);
 }
 
 void RenameDialog::slotsUpdate()

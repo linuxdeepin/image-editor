@@ -168,7 +168,7 @@ void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     _pixmap = _pixmap.scaled(pixmapRect.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     qreal adjustx = _pixmap.width() - pixmapRect.width();
     qreal adjusty = _pixmap.height() - pixmapRect.height();
-    painter->drawImage(pixmapRect,_pixmap,_pixmap.rect().adjusted(adjustx/2, -adjusty/2, -adjustx/2, adjusty/2));
+    painter->drawImage(pixmapRect,_pixmap,_pixmap.rect().adjusted(adjustx / 2, -adjusty / 2, -adjustx / 2, adjusty / 2));
 
     painter->restore();
 }
