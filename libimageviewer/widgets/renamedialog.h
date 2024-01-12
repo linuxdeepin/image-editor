@@ -13,6 +13,7 @@
 #include <DPushButton>
 #include <DSuggestButton>
 #include <DLabel>
+#include <DGuiApplicationHelper>
 
 DWIDGET_USE_NAMESPACE
 class RenameDialog : public DDialog
@@ -32,6 +33,7 @@ public:
     QString geteElidedText(QFont font, QString str, int MaxWidth);
 private slots:
     void slotsFocusChanged(bool onFocus);
+    void onThemeChanged(DGuiApplicationHelper::ColorType theme);
 public:
     void slotsUpdate();
 protected:
