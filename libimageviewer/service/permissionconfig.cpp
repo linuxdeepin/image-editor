@@ -326,6 +326,8 @@ QString PermissionConfig::targetImage() const
     return targetImagePath;
 }
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+
 /**
    @return 返回适配的数据，以便于外部进行打印水印的计算
  */
@@ -333,8 +335,6 @@ PermissionConfig::AdapterWaterMarkData PermissionConfig::adapterPrintWaterMarkDa
 {
     return printAdapterWaterMark;
 }
-
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
    @return 返回从配置中读取的阅读水印配置，用于图片展示时显示
@@ -350,6 +350,35 @@ WaterMarkData PermissionConfig::readWaterMarkData() const
 WaterMarkData PermissionConfig::printWaterMarkData() const
 {
     return printWaterMark;
+}
+
+/**
+   @brief 添加 \a dialog 的过滤器，这是用于解除 DTK 中对打印水印间距的限制
+        仅在设置 `breakPrintSpacingLimit` 权限后，且打印水印间距系数超过 DTK 限制时有效。
+        此函数时预留的，用于预防后期新增需求。
+
+        打印的插件接口在5.5.50后提供，DTKWIDGET_CLASS_DWaterMarkHelper(5.6.9)包含这部分功能
+ */
+bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
+{
+    if (!breakPrintSpacingLimit) {
+        return false;
+    }
+
+    // 判断是否需要调整间距，若间距没有超过限制，则无需调整
+    if (!(printRowSpacing > g_PrintRowSpacingLimit || printColumnSpacing > g_PrintColumnSpacingLimit)) {
+        return false;
+    }
+
+    if (dialog) {
+        DPrintPreviewWidget *widget = dialog->findChild<DPrintPreviewWidget *>();
+        if (widget) {
+            widget->installEventFilter(this);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
@@ -413,8 +442,10 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
         if (!doc.isNull()) {
             QJsonObject root = doc.object();
             initAuthorise(root.value("permission").toObject());
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
             initReadWaterMark(root.value("readWatermark").toObject());
             initPrintWaterMark(root.value("printWatermark").toObject());
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
             qInfo() << qPrintable("Current Enable permission") << authFlags;
         } else {
@@ -422,10 +453,12 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
                 << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
         }
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
         // 存在打印水印设置时，检测是否存在打印水印插件，若存在则通过设置环境变量调用打印插件而不是手动设置
         if (authFlags.testFlag(EnablePrintWaterMark)) {
             detectWaterMarkPluginExists();
         }
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
         // 只要传入参数、图片即认为有效，无论参数是否正常解析
         valid = true;
@@ -446,33 +479,6 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
             qInfo() << qPrintable("DBus connect activateProcess success!");
         }
     }
-}
-
-/**
-   @brief 添加 \a dialog 的过滤器，这是用于解除 DTK 中对打印水印间距的限制
-        仅在设置 `breakPrintSpacingLimit` 权限后，且打印水印间距系数超过 DTK 限制时有效。
-        此函数时预留的，用于预防后期新增需求。
- */
-bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
-{
-    if (!breakPrintSpacingLimit) {
-        return false;
-    }
-
-    // 判断是否需要调整间距，若间距没有超过限制，则无需调整
-    if (!(printRowSpacing > g_PrintRowSpacingLimit || printColumnSpacing > g_PrintColumnSpacingLimit)) {
-        return false;
-    }
-
-    if (dialog) {
-        DPrintPreviewWidget *widget = dialog->findChild<DPrintPreviewWidget *>();
-        if (widget) {
-            widget->installEventFilter(this);
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /**
@@ -544,6 +550,8 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     printLimitCount = param.value("printCount").toInt(0);
 }
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+
 /**
    @brief 从 Json 配置 \a param 中取得阅读水印信息
  */
@@ -554,7 +562,6 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     readAdapterWaterMark.type = AdapterWaterMarkData::Text;
     readAdapterWaterMark.font.setFamily(param.value("font").toString());
     readAdapterWaterMark.font.setPointSize(param.value("fontSize").toInt());
@@ -582,7 +589,6 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
 
     // 转换为公共接口类型
     readWaterMark = convertAdapterWaterMarkData(readAdapterWaterMark);
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 }
 
 /**
@@ -595,7 +601,6 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     printAdapterWaterMark.type = AdapterWaterMarkData::Text;
     printAdapterWaterMark.font.setFamily(param.value("font").toString());
     printAdapterWaterMark.font.setPointSize(param.value("fontSize").toInt());
@@ -632,10 +637,8 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
 
     // 转换为公共接口类型
     printWaterMark = convertAdapterWaterMarkData(printAdapterWaterMark);
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 }
 
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 /**
    @brief 将内部使用的数据 `adptData` 转换为可被外部使用的公共接口类型 `WaterMarkData` ,
         `WaterMarkData` 在主线和定制分支的接口结构不同，需要转换以兼容不同版本
@@ -679,7 +682,6 @@ WaterMarkData PermissionConfig::convertAdapterWaterMarkData(const PermissionConf
 
     return data;
 }
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
    @brief 检测当前系统环境中是否存在打印水印插件
@@ -743,7 +745,6 @@ void PermissionConfig::detectWaterMarkPluginExists()
 bool PermissionConfig::initWaterMarkPluginEnvironment()
 {
     QJsonObject envData;
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     envData.insert("angle", static_cast<int>(printAdapterWaterMark.rotation));
     envData.insert("transparency", static_cast<int>(printAdapterWaterMark.opacity * 100));
     QFontMetrics fm(printAdapterWaterMark.font);
@@ -773,7 +774,6 @@ bool PermissionConfig::initWaterMarkPluginEnvironment()
     static const qreal sc_defaultFontSize = 65.0;
     // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
     envData.insert("size", int(printAdapterWaterMark.font.pointSizeF() / sc_defaultFontSize * 100));
-#endif
 
     QJsonDocument doc;
     doc.setObject(envData);
@@ -801,6 +801,8 @@ bool PermissionConfig::initWaterMarkPluginEnvironment()
 
     return true;
 }
+
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
    @return 返回文件 \a fileName 是否符合权限标识 \a authFlag
