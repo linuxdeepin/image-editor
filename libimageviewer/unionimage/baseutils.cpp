@@ -187,7 +187,6 @@ void copyImageToClipboard(const QStringList &paths)
     }
 
     //  Get clipboard
-//    QClipboard *cb = QApplication::clipboard();
     QClipboard *cb = qApp->clipboard();
 
     // Ownership of the new data is transferred to the clipboard.
