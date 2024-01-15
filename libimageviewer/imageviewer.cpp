@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 - 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2022 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -31,15 +31,24 @@
 class ImageViewerPrivate
 {
 public:
-    ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, ImageViewer *parent);
+    ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType,
+                       const QString &savePath,
+                       AbstractTopToolbar *customTopToolbar,
+                       ImageViewer *parent);
+
 private:
-    ImageViewer     *q_ptr;
-    LibViewPanel       *m_panel = nullptr;
-    imageViewerSpace::ImgViewerType   m_imgViewerType;
+    ImageViewer *q_ptr;
+    LibViewPanel *m_panel = nullptr;
+    imageViewerSpace::ImgViewerType m_imgViewerType;
+
     Q_DECLARE_PUBLIC(ImageViewer)
+    Q_DISABLE_COPY(ImageViewerPrivate)
 };
 
-ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, ImageViewer *parent)
+ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewerType,
+                                       const QString &savePath,
+                                       AbstractTopToolbar *customTopToolbar,
+                                       ImageViewer *parent)
     : q_ptr(parent)
 {
     // 在界面前初始化授权配置
@@ -64,8 +73,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
 
         QStringList parseLocalNameList = QLocale::system().name().split("_", QString::SkipEmptyParts);
         if (parseLocalNameList.length() > 0) {
-            QString  translateFilename = QString("/libimageviewer_%2.qm")
-                                         .arg(parseLocalNameList.at(0));
+            QString translateFilename = QString("/libimageviewer_%2.qm").arg(parseLocalNameList.at(0));
 
             QString translatePath = PLUGINTRANSPATH + translateFilename;
             if (QFile::exists(translatePath)) {
@@ -98,21 +106,27 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
         DWaterMarkHelper::instance()->registerWidget(m_panel);
 
         // 仅权限控制图片单独展示
-        QObject::connect(PermissionConfig::instance(), &PermissionConfig::currentImagePathChanged, q_ptr, [ this ](const QString &, bool isTargetImage){
-            if (!PermissionConfig::instance()->isValid()) {
-                return;
-            }
+        QObject::connect(PermissionConfig::instance(),
+                         &PermissionConfig::currentImagePathChanged,
+                         q_ptr,
+                         [this](const QString &, bool isTargetImage) {
+                             if (!PermissionConfig::instance()->isValid()) {
+                                 return;
+                             }
 
-            DWaterMarkWidget *mark = m_panel->findChild<DWaterMarkWidget *>();
-            if (mark) {
-                mark->setVisible(isTargetImage);
-            }
-        });
+                             DWaterMarkWidget *mark = m_panel->findChild<DWaterMarkWidget *>();
+                             if (mark) {
+                                 mark->setVisible(isTargetImage);
+                             }
+                         });
     }
 #endif
 }
 
-ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar, QWidget *parent)
+ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType,
+                         const QString &savePath,
+                         AbstractTopToolbar *customTopToolbar,
+                         QWidget *parent)
     : DWidget(parent)
     , d_ptr(new ImageViewerPrivate(imgViewerType, savePath, customTopToolbar, this))
 {
@@ -141,7 +155,8 @@ bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstP
     return d->m_panel->startdragImage(paths, firstPath);
 }
 
-bool ImageViewer::startdragImageWithUID(const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album, int UID)
+bool ImageViewer::startdragImageWithUID(
+    const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album, int UID)
 {
     Q_D(ImageViewer);
     d->m_panel->setIsCustomAlbumWithUID(isCustom, album, UID);
@@ -161,7 +176,7 @@ void ImageViewer::startImgView(const QString &currentPath, const QStringList &pa
 
     //启动线程制作缩略图
     if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
-            LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
+        LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
         //首先生成当前图片的缓存
         ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(realPath), 1);
         //看图制作全部缩略图
