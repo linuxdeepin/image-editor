@@ -9,10 +9,12 @@
 #include <QJsonObject>
 
 #include <dtkwidget_config.h>
-#include <DPrintPreviewDialog>
 
+// 在 5.6.9 版本后提供
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
+// 较低版本(<5.5.50)不提供插件相关接口
+#include <DPrintPreviewDialog>
 
 DWIDGET_USE_NAMESPACE
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
@@ -75,6 +77,7 @@ public:
     Q_SIGNAL void currentImagePathChanged(const QString &fileName, bool isTargetImage);
     QString targetImage() const;
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     // 用于兼容主线/定制线的通用水印定义，适配不同接口
     struct AdapterWaterMarkData
     {
@@ -95,36 +98,32 @@ public:
         bool grayScale = true;             // 是否灰度化图片
     };
     AdapterWaterMarkData adapterPrintWaterMarkData() const;
-
     // 阅读/打印水印
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     WaterMarkData readWaterMarkData() const;
     WaterMarkData printWaterMarkData() const;
+
+    bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
     Q_SLOT void activateProcess(qint64 pid);
     void initFromArguments(const QStringList &arguments);
 
-    bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
-
 private:
     // 解析配置
     bool parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const;
     void initAuthorise(const QJsonObject &param);
-    void initReadWaterMark(const QJsonObject &param);
-    void initPrintWaterMark(const QJsonObject &param);
-    void detectWaterMarkPluginExists();
-    bool initWaterMarkPluginEnvironment();
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+    void initReadWaterMark(const QJsonObject &param);
+    void initPrintWaterMark(const QJsonObject &param);
     WaterMarkData convertAdapterWaterMarkData(const AdapterWaterMarkData &adptData) const;
+    void detectWaterMarkPluginExists();
+    bool initWaterMarkPluginEnvironment();
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
     bool checkAuthInvalid(const QString &fileName = QString()) const;
     void reduceOnePrintCount();
-
     void triggerNotify(const QJsonObject &data);
-
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
@@ -140,10 +139,11 @@ private:
     bool ignoreDevicePixelRatio = false;  // 过滤设备显示比率，按照原生像素计算
     bool useWaterMarkPlugin = false;      // 是否使用水印插件
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     AdapterWaterMarkData readAdapterWaterMark;  // 水印数据，不区分DTK版本
     AdapterWaterMarkData printAdapterWaterMark;
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    WaterMarkData readWaterMark;  // 水印数据，根据不同DTK版本支持程度不同
+
+    WaterMarkData readWaterMark;  // 水印数据，根据不同DTK版本支持接口不同
     WaterMarkData printWaterMark;
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
