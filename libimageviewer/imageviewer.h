@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 - 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2022 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,24 +14,28 @@ class AbstractTopToolbar;
 
 DWIDGET_USE_NAMESPACE
 
-
 class ImageViewerPrivate;
 class IMAGEVIEWERSHARED_EXPORT ImageViewer : public DWidget
 {
     Q_OBJECT
 public:
-    //ImgViewerType:图片展示类型, savePath:缩略图保存位置，customTopToolbar:自定义标题栏，nullptr的时候使用内置方案
-    explicit ImageViewer(imageViewerSpace::ImgViewerType imgViewerType, QString savePath, AbstractTopToolbar *customTopToolbar = nullptr, QWidget *parent = nullptr);
+    // ImgViewerType:图片展示类型, savePath:缩略图保存位置，customTopToolbar:自定义标题栏，nullptr的时候使用内置方案
+    explicit ImageViewer(imageViewerSpace::ImgViewerType imgViewerType,
+                         const QString &savePath,
+                         AbstractTopToolbar *customTopToolbar = nullptr,
+                         QWidget *parent = nullptr);
     ~ImageViewer() override;
 
     //调用文件选择窗口
     bool startChooseFileDialog();
 
     //传入路径加载图片 paths：所有照片 firstPath：第一张 isCustom：是否是自定义相册 album：自定义相册名称
-    bool startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "");
+    bool
+    startdragImage(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "");
 
     //传入路径加载图片 paths：所有照片 firstPath：第一张 isCustom：是否是自定义相册 album：自定义相册名称 UID：相册的UID
-    bool startdragImageWithUID(const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "", int UID = -1);
+    bool startdragImageWithUID(
+        const QStringList &paths, const QString &firstPath = "", bool isCustom = false, const QString &album = "", int UID = -1);
 
     //启动图片展示入口
     void startImgView(const QString &currentPath, const QStringList &paths = QStringList());
@@ -74,9 +78,10 @@ public:
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void showEvent(QShowEvent *e) override;
+
 private:
     QScopedPointer<ImageViewerPrivate> d_ptr;
     Q_DECLARE_PRIVATE_D(qGetPtrHelper(d_ptr), ImageViewer)
 };
 
-#endif // IMAGEVIEWER_H
+#endif  // IMAGEVIEWER_H

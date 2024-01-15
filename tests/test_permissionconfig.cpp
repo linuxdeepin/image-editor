@@ -166,7 +166,11 @@ TEST_F(UT_PermissionConfig, print_Count_Pass)
     EXPECT_TRUE(PermissionConfig::instance()->isUnlimitPrint());
 }
 
-#ifdef WATERMARK_5_4_42
+// DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
+// 主线水印接口在 5.6.9 之后引入.
+// 因此，判断定制线：存在水印接口，版本不低于 5.4.42.7 且低于 5.5
+#if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
+
 TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass_5_4_42)
 {
     // Default value
@@ -214,7 +218,7 @@ TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass)
     markData = PermissionConfig::instance()->printWaterMarkData();
     EXPECT_EQ(markData.type(), WaterMarkData::WaterMarkType::Text);
 }
-#endif  // WATERMARK_5_4_42
+#endif  // VERSION CHECK
 
 TEST_F(UT_PermissionConfig, triggerAction_SignalNotify_Pass)
 {
@@ -285,13 +289,13 @@ TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue)
 {
     static const qreal sc_defaultFontSize = 65.0;
     // 验证打印水印设置值
-#ifdef WATERMARK_5_4_42
+#if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
     WaterMarkData &watermark = PermissionConfig::instance()->printWaterMark;
     watermark.layout = WaterMarkLayout::Center;
 #else
     PermissionConfig::AdapterWaterMarkData &watermark = PermissionConfig::instance()->printAdapterWaterMark;
     watermark.layout = PermissionConfig::AdapterWaterMarkData::Center;
-#endif // WATERMARK_5_4_42
+#endif // VERSION CHECK
     watermark.rotation = 45;
     watermark.opacity = 0.3;
     watermark.font.setPointSize(30);
@@ -414,7 +418,7 @@ TEST_F(UT_PermissionConfig, installFilterPrintDialog_FilterData_Ignore)
     EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 1.0));
 }
 
-#ifdef WATERMARK_5_4_42
+#if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
 
 TEST_F(UT_PermissionConfig, convertAdapterWaterMarkData_Equal_Pass)
 {
@@ -484,6 +488,6 @@ TEST_F(UT_PermissionConfig, convertAdapterWaterMarkData_Equal_Pass)
     EXPECT_EQ(data.rotation(), cvtData.rotation());
 }
 
-#endif  // WATERMARK_5_4_42
+#endif  // VERSION CHECK
 
 #endif

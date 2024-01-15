@@ -9,18 +9,10 @@
 #include <QJsonObject>
 
 #include <dtkwidget_config.h>
+#include <DPrintPreviewDialog>
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
-#include <DPrintPreviewDialog>
-#include <dprintpreviewsettinginfo.h>
-
-// DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
-// 主线水印接口在 5.6.9 之后引入.
-// 因此，判断定制线：存在水印接口，版本不低于 5.4.42.7 且低于 5.5
-#if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
-#define WATERMARK_5_4_42
-#endif  // VERSION CHECK
 
 DWIDGET_USE_NAMESPACE
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
