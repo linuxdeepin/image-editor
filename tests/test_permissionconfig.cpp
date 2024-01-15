@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -48,14 +48,14 @@ TEST_F(UT_PermissionConfig, parseConfigOption_NormalParam_Pass)
     QString configParam;
     QStringList imageList;
     QString tempPath = QApplication::applicationDirPath() + "/svg.svg";
-    QStringList tmpList {tempPath};
-    QStringList arguments {qApp->arguments().first(), "--config=test", tempPath};
+    QStringList tmpList{tempPath};
+    QStringList arguments{qApp->arguments().first(), "--config=test", tempPath};
 
     EXPECT_TRUE(PermissionConfig::instance()->parseConfigOption(arguments, configParam, imageList));
     EXPECT_EQ(configParam, QString("test"));
     EXPECT_EQ(imageList, tmpList);
 
-    QStringList arguments2 {qApp->arguments().first(), "--config", "test", tempPath};
+    QStringList arguments2{qApp->arguments().first(), "--config", "test", tempPath};
     EXPECT_TRUE(PermissionConfig::instance()->parseConfigOption(arguments2, configParam, imageList));
     EXPECT_EQ(configParam, QString("test"));
 }
@@ -65,13 +65,13 @@ TEST_F(UT_PermissionConfig, parseConfigOption_NormalParam_Fail)
     QString configParam;
     QStringList imageList;
     QString tempPath = QApplication::applicationDirPath() + "/svg.svg";
-    QStringList arguments {qApp->arguments().first(), "config", "test", tempPath};
+    QStringList arguments{qApp->arguments().first(), "config", "test", tempPath};
 
     EXPECT_FALSE(PermissionConfig::instance()->parseConfigOption({}, configParam, imageList));
     EXPECT_TRUE(configParam.isEmpty());
     EXPECT_TRUE(imageList.isEmpty());
 
-    QStringList tmpList {"config", "test", tempPath};
+    QStringList tmpList{"config", "test", tempPath};
     EXPECT_FALSE(PermissionConfig::instance()->parseConfigOption(arguments, configParam, imageList));
     EXPECT_TRUE(configParam.isEmpty());
     EXPECT_EQ(imageList, tmpList);
@@ -84,15 +84,14 @@ TEST_F(UT_PermissionConfig, initFromArguments_NormalParam_Pass)
 
     QString tempPath = QApplication::applicationDirPath() + "/svg.svg";
     QStringList args;
-    args << qApp->arguments().first()
-         << QString("--config=%1").arg(permission_config())
-         << tempPath;
+    args << qApp->arguments().first() << QString("--config=%1").arg(permission_config()) << tempPath;
 
     PermissionConfig::instance()->initFromArguments(args);
     EXPECT_TRUE(PermissionConfig::instance()->isValid());
 
-    PermissionConfig::Authorises auth = PermissionConfig::Authorises(
-        PermissionConfig::EnableCopy | PermissionConfig::EnableEdit | PermissionConfig::EnableSwitch | PermissionConfig::EnableWallpaper);
+    PermissionConfig::Authorises auth =
+        PermissionConfig::Authorises(PermissionConfig::EnableCopy | PermissionConfig::EnableEdit |
+                                     PermissionConfig::EnableSwitch | PermissionConfig::EnableWallpaper);
     EXPECT_EQ(PermissionConfig::instance()->authFlags, auth);
     EXPECT_EQ(PermissionConfig::instance()->targetImagePath, tempPath);
 
@@ -167,7 +166,8 @@ TEST_F(UT_PermissionConfig, print_Count_Pass)
     EXPECT_TRUE(PermissionConfig::instance()->isUnlimitPrint());
 }
 
-TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass)
+#ifdef WATERMARK_5_4_42
+TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass_5_4_42)
 {
     // Default value
     auto markData = PermissionConfig::instance()->readWaterMarkData();
@@ -176,7 +176,7 @@ TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass)
     EXPECT_EQ(markData.layout, WaterMarkLayout::Center);
     EXPECT_TRUE(markData.text.isEmpty());
 
-    QJsonObject param {{"text", "test"}, {"opacity", 0}, {"layout", 1}};
+    QJsonObject param{{"text", "test"}, {"opacity", 0}, {"layout", 1}};
 
     PermissionConfig::instance()->initReadWaterMark(param);
     markData = PermissionConfig::instance()->readWaterMarkData();
@@ -190,14 +190,40 @@ TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass)
     EXPECT_EQ(markData.type, WaterMarkType::Text);
 }
 
+#else
+
+TEST_F(UT_PermissionConfig, watarMark_JsonData_Pass)
+{
+    // Default value
+    auto markData = PermissionConfig::instance()->readWaterMarkData();
+    EXPECT_EQ(markData.type(), WaterMarkData::WaterMarkType::None);
+    EXPECT_EQ(markData.opacity(), 1);
+    EXPECT_EQ(markData.layout(), WaterMarkData::WaterMarkLayout::Center);
+    EXPECT_TRUE(markData.text().isEmpty());
+
+    QJsonObject param{{"text", "test"}, {"opacity", 0}, {"layout", 1}};
+
+    PermissionConfig::instance()->initReadWaterMark(param);
+    markData = PermissionConfig::instance()->readWaterMarkData();
+    EXPECT_EQ(markData.type(), WaterMarkData::WaterMarkType::Text);
+    EXPECT_EQ(markData.opacity(), 0);
+    EXPECT_EQ(markData.layout(), WaterMarkData::WaterMarkLayout::Tiled);
+    EXPECT_EQ(markData.text(), QString("test"));
+
+    PermissionConfig::instance()->initPrintWaterMark(param);
+    markData = PermissionConfig::instance()->printWaterMarkData();
+    EXPECT_EQ(markData.type(), WaterMarkData::WaterMarkType::Text);
+}
+#endif  // WATERMARK_5_4_42
+
 TEST_F(UT_PermissionConfig, triggerAction_SignalNotify_Pass)
 {
     QJsonObject notifyData;
-    QObject::connect(PermissionConfig::instance(), &PermissionConfig::authoriseNotify, [&](const QJsonObject &notify){
+    QObject::connect(PermissionConfig::instance(), &PermissionConfig::authoriseNotify, [&](const QJsonObject &notify) {
         notifyData = notify;
     });
 
-    auto TriggerFunction = [&](PermissionConfig::TidType tid, const QString &operate){
+    auto TriggerFunction = [&](PermissionConfig::TidType tid, const QString &operate) {
         // PermissionConfig::targetImagePath is empty.
         PermissionConfig::instance()->triggerAction(tid, "");
         // ReportMode::ReportAndBroadcast = 0b11
@@ -255,11 +281,17 @@ TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckPlugin_Pass)
     EXPECT_FALSE(envData.isEmpty());
 }
 
-TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue_Pass)
+TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue)
 {
     static const qreal sc_defaultFontSize = 65.0;
     // 验证打印水印设置值
-    WaterMarkData &watermark  = PermissionConfig::instance()->printWaterMark;
+#ifdef WATERMARK_5_4_42
+    WaterMarkData &watermark = PermissionConfig::instance()->printWaterMark;
+    watermark.layout = WaterMarkLayout::Center;
+#else
+    PermissionConfig::AdapterWaterMarkData &watermark = PermissionConfig::instance()->printAdapterWaterMark;
+    watermark.layout = PermissionConfig::AdapterWaterMarkData::Center;
+#endif // WATERMARK_5_4_42
     watermark.rotation = 45;
     watermark.opacity = 0.3;
     watermark.font.setPointSize(30);
@@ -267,7 +299,6 @@ TEST_F(UT_PermissionConfig, initWaterMarkPluginEnvironment_CheckValue_Pass)
     watermark.lineSpacing = 0;
     watermark.spacing = 0;
     watermark.color = "#FF00FF";
-    watermark.layout = WaterMarkLayout::Center;
 
     // 强制设置环境变量
     PermissionConfig::instance()->initWaterMarkPluginEnvironment();
@@ -382,5 +413,77 @@ TEST_F(UT_PermissionConfig, installFilterPrintDialog_FilterData_Ignore)
     widget->setProperty("_d_print_waterMarkColumnSpacing", 1.0);
     EXPECT_TRUE(qFuzzyCompare(widget->property("_d_print_waterMarkColumnSpacing").toReal(), 1.0));
 }
+
+#ifdef WATERMARK_5_4_42
+
+TEST_F(UT_PermissionConfig, convertAdapterWaterMarkData_Equal_Pass)
+{
+    WaterMarkData data;
+    data.type = WaterMarkData::Text;
+    data.layout = WaterMarkData::Tiled;
+    data.text = "123Test";
+    QFont f;
+    f.setPointSize(15);
+    data.font = f;
+    QColor color(Qt::red);
+    data.color = color;
+    data.lineSpacing = 10;
+    data.rotation = 10;
+
+    PermissionConfig::AdapterWaterMarkData adptData;
+    adptData.type = PermissionConfig::AdapterWaterMarkData::Text;
+    adptData.layout = PermissionConfig::AdapterWaterMarkData::Tiled;
+    adptData.text = "123Test";
+    adptData.font = f;
+    adptData.color = color;
+    adptData.lineSpacing = 10;
+    adptData.rotation = 10;
+
+    auto cvtData = PermissionConfig::instance()->convertAdapterWaterMarkData(adptData);
+    EXPECT_EQ(data.type, cvtData.type);
+    EXPECT_EQ(data.layout, cvtData.layout);
+    EXPECT_EQ(data.text, cvtData.text);
+    EXPECT_EQ(data.font, cvtData.font);
+    EXPECT_EQ(data.color, cvtData.color);
+    EXPECT_EQ(data.lineSpacing, cvtData.lineSpacing);
+    EXPECT_EQ(data.rotation, cvtData.rotation);
+}
+
+#else
+
+TEST_F(UT_PermissionConfig, convertAdapterWaterMarkData_Equal_Pass)
+{
+    WaterMarkData data;
+    data.setType(WaterMarkData::Text);
+    data.setLayout(WaterMarkData::Tiled);
+    data.setText("123Test");
+    QFont f;
+    f.setPointSize(15);
+    data.setFont(f);
+    QColor color(Qt::red);
+    data.setColor(color);
+    data.setLineSpacing(10);
+    data.setRotation(10);
+
+    PermissionConfig::AdapterWaterMarkData adptData;
+    adptData.type = PermissionConfig::AdapterWaterMarkData::Text;
+    adptData.layout = PermissionConfig::AdapterWaterMarkData::Tiled;
+    adptData.text = "123Test";
+    adptData.font = f;
+    adptData.color = color;
+    adptData.lineSpacing = 10;
+    adptData.rotation = 10;
+
+    auto cvtData = PermissionConfig::instance()->convertAdapterWaterMarkData(adptData);
+    EXPECT_EQ(data.type(), cvtData.type());
+    EXPECT_EQ(data.layout(), cvtData.layout());
+    EXPECT_EQ(data.text(), cvtData.text());
+    EXPECT_EQ(data.font(), cvtData.font());
+    EXPECT_EQ(data.color(), cvtData.color());
+    EXPECT_EQ(data.lineSpacing(), cvtData.lineSpacing());
+    EXPECT_EQ(data.rotation(), cvtData.rotation());
+}
+
+#endif  // WATERMARK_5_4_42
 
 #endif
