@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -505,7 +505,6 @@ void LibViewPanel::updateMenuContent(const QString &path)
         imageViewerSpace::ImageType imageType = LibUnionImage_NameSpace::getImageType(currentPath);//图片类型
 
         auto authIns = PermissionConfig::instance();
-        bool isEditable = authIns->checkAuthFlag(PermissionConfig::EnableEdit, currentPath);
         bool isCopyable = authIns->checkAuthFlag(PermissionConfig::EnableCopy, currentPath);
 
         //判断是否是损坏图片

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -18,7 +18,10 @@
 #include <QDBusReply>
 #include <QDebug>
 
-#include <DPrintPreviewDialog>
+// dprintpreviewsettinginfo 没有单独宏，使用 DWaterMarkHelper (版本更前)进行限制
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+#include <dprintpreviewsettinginfo.h>
+#endif
 
 static const QString g_KeyTid = "tid";
 static const QString g_KeyOperate = "operate";
@@ -35,6 +38,9 @@ static const char *g_PrintRowSpacingProp = "_d_print_waterMarkRowSpacing";
 static const char *g_PrintColumnSpacingProp = "_d_print_waterMarkColumnSpacing";
 static const qreal g_PrintRowSpacingLimit = 10.0;
 static const qreal g_PrintColumnSpacingLimit = 2.0;
+
+// 打印水印默认字体大小，用于计算转换系数
+static const qreal g_DefaultPrintFontSize = 65.0;
 
 /**
    @brief 通过dbus接口从任务栏激活窗口
@@ -70,7 +76,7 @@ bool activateWindowFromDock(quintptr winId)
 }
 
 /**
-   @class AuthoriseConfig
+   @class PermissionConfig
    @brief 授权控制类，提供操作授权和水印配置
    @details 授权控制主要包括编辑、拷贝、删除、保存等操作，水印包括阅读水印及打印水印。
     配置信息通过命令行参数获取，当授权控制开启时，进行主要操作将自动发送通知信息。
@@ -283,9 +289,8 @@ bool PermissionConfig::eventFilter(QObject *watched, QEvent *event)
             return false;
         }
 
-        auto checkFunc = [&](const char *prop, qreal value, qreal limit){
-            if (QByteArray(prop) != propEvent->propertyName()
-                    || (value <= limit)) {
+        auto checkFunc = [&](const char *prop, qreal value, qreal limit) {
+            if (QByteArray(prop) != propEvent->propertyName() || (value <= limit)) {
                 return;
             }
 
@@ -345,6 +350,101 @@ WaterMarkData PermissionConfig::printWaterMarkData() const
     return printWaterMark;
 }
 
+/**
+   @brief 添加 \a dialog 的过滤器，这是用于解除 DTK 中对打印水印间距的限制
+        仅在设置 `breakPrintSpacingLimit` 权限后，且打印水印间距系数超过 DTK 限制时有效。
+        此函数时预留的，用于预防后期新增需求。
+
+        打印的插件接口在5.5.50后提供，DTKWIDGET_CLASS_DWaterMarkHelper(5.6.9)包含这部分功能
+ */
+bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
+{
+    if (!breakPrintSpacingLimit) {
+        return false;
+    }
+
+    // 判断是否需要调整间距，若间距没有超过限制，则无需调整
+    if (!(printRowSpacing > g_PrintRowSpacingLimit || printColumnSpacing > g_PrintColumnSpacingLimit)) {
+        return false;
+    }
+
+    if (dialog) {
+        DPrintPreviewWidget *widget = dialog->findChild<DPrintPreviewWidget *>();
+        if (widget) {
+            widget->installEventFilter(this);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+   @brief 设置打印对话框 `dialog` 的打印水印格式，当系统环境中存在打印插件时，将不会进入此函数。
+ */
+bool PermissionConfig::setDialogPrintWatermark(DPrintPreviewDialog *dialog) const
+{
+    if (!dialog) {
+        return false;
+    }
+
+    // 使用适配的水印配置
+    bool ret = false;
+    const AdapterWaterMarkData &data = printAdapterWaterMark;
+    DPrintPreviewSettingInfo *baseInfo = dialog->createDialogSettingInfo(DPrintPreviewWatermarkInfo::PS_Watermark);
+
+    if (baseInfo) {
+        DPrintPreviewWatermarkInfo *info = dynamic_cast<DPrintPreviewWatermarkInfo *>(baseInfo);
+        if (info) {
+            // 打印水印实现方式同阅读水印略有不同，调整参数以使得效果一致。
+            info->opened = true;
+
+            info->angle = static_cast<int>(data.rotation);
+            info->transparency = static_cast<int>(data.opacity * 100);
+            QFontMetrics fm(data.font);
+            QSize textSize = fm.size(Qt::TextSingleLine, data.text);
+            if (textSize.height() > 0) {
+                info->rowSpacing = qMax(0.0, (qreal(data.lineSpacing + textSize.height()) / textSize.height()) - 1.0);
+            }
+            if (textSize.width() > 0) {
+                info->columnSpacing = qMax(0.0, (qreal(data.spacing + textSize.width()) / textSize.width()) - 1.0);
+            }
+            info->layout = (data.layout == PermissionConfig::AdapterWaterMarkData::Center) ? DPrintPreviewWatermarkInfo::Center :
+                                                                                             DPrintPreviewWatermarkInfo::Tiled;
+            info->currentWatermarkType = (data.type == PermissionConfig::AdapterWaterMarkData::Text) ?
+                                             DPrintPreviewWatermarkInfo::TextWatermark :
+                                             DPrintPreviewWatermarkInfo::ImageWatermark;
+            info->textType = DPrintPreviewWatermarkInfo::Custom;
+            info->customText = data.text;
+            info->textColor = data.color;
+            info->fontList.append(data.font.family());
+            // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
+            info->size = int(data.font.pointSizeF() / g_DefaultPrintFontSize * 100);
+
+            dialog->updateDialogSettingInfo(info);
+
+            ret = true;
+        } else {
+            qWarning() << qPrintable("Can't convert DPrintPreviewDialog watermark info.") << baseInfo->type();
+        }
+
+        delete baseInfo;
+    } else {
+        qWarning() << qPrintable("Can't get DPrintPreviewDialog watermark info.");
+    }
+
+    // 在不使用打印插件时，需要手动设置打印插件选项显示且不可编辑，在设置后调用
+    // WaterMarkFrame 和 WaterMarkContentFrame 是DTK窗口中水印设置控件的 objectName
+    auto widgetList = dialog->findChildren<QWidget *>("WaterMarkFrame");
+    widgetList.append(dialog->findChildren<QWidget *>("WaterMarkContentFrame"));
+    for (auto wid : widgetList) {
+        wid->setVisible(true);
+        wid->setEnabled(false);
+    }
+
+    return ret;
+}
+
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
@@ -381,8 +481,8 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
 
     QString configParam;
     QStringList imageList;
-    bool ret = parseConfigOption(arguments, configParam, imageList);
-    if (ret) {
+    bool parseRet = parseConfigOption(arguments, configParam, imageList);
+    if (parseRet) {
         // 获取带权限控制的文件路径
         for (const QString &arg : imageList) {
             QFileInfo info(arg);
@@ -406,8 +506,10 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
         if (!doc.isNull()) {
             QJsonObject root = doc.object();
             initAuthorise(root.value("permission").toObject());
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
             initReadWaterMark(root.value("readWatermark").toObject());
             initPrintWaterMark(root.value("printWatermark").toObject());
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
             qInfo() << qPrintable("Current Enable permission") << authFlags;
         } else {
@@ -415,10 +517,12 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
                 << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
         }
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
         // 存在打印水印设置时，检测是否存在打印水印插件，若存在则通过设置环境变量调用打印插件而不是手动设置
         if (authFlags.testFlag(EnablePrintWaterMark)) {
             detectWaterMarkPluginExists();
         }
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
         // 只要传入参数、图片即认为有效，无论参数是否正常解析
         valid = true;
@@ -431,41 +535,14 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
     if (valid) {
         // 传入权限控制参数时，绑定DBus唤醒信号
         QDBusConnection connection = QDBusConnection::sessionBus();
-        bool ret = connection.connect(
+        bool connRet = connection.connect(
             "com.wps.cryptfs", "/com/wps/cryptfs", "cryptfs.method.Type", "activateProcess", this, SLOT(activateProcess(qint64)));
-        if (!ret) {
+        if (!connRet) {
             qWarning() << qPrintable("DBus connect activateProcess failed!");
         } else {
             qInfo() << qPrintable("DBus connect activateProcess success!");
         }
     }
-}
-
-/**
-   @brief 添加 \a dialog 的过滤器，这是用于解除 DTK 中对打印水印间距的限制
-        仅在设置 `breakPrintSpacingLimit` 权限后，且打印水印间距系数超过 DTK 限制时有效。
-        此函数时预留的，用于预防后期新增需求。
- */
-bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
-{
-    if (!breakPrintSpacingLimit) {
-        return false;
-    }
-
-    // 判断是否需要调整间距，若间距没有超过限制，则无需调整
-    if (!(printRowSpacing > g_PrintRowSpacingLimit || printColumnSpacing > g_PrintColumnSpacingLimit)) {
-        return false;
-    }
-
-    if (dialog) {
-        DPrintPreviewWidget *widget = dialog->findChild<DPrintPreviewWidget *>();
-        if (widget) {
-            widget->installEventFilter(this);
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /**
@@ -537,6 +614,8 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     printLimitCount = param.value("printCount").toInt(0);
 }
 
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+
 /**
    @brief 从 Json 配置 \a param 中取得阅读水印信息
  */
@@ -547,32 +626,33 @@ void PermissionConfig::initReadWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    readWaterMark.type = WaterMarkType::Text;
-    readWaterMark.font.setFamily(param.value("font").toString());
-    readWaterMark.font.setPointSize(param.value("fontSize").toInt());
+    readAdapterWaterMark.type = AdapterWaterMarkData::Text;
+    readAdapterWaterMark.font.setFamily(param.value("font").toString());
+    readAdapterWaterMark.font.setPointSize(param.value("fontSize").toInt());
 
     QString colorName = param.value("color").toString();
     if (!colorName.startsWith('#')) {
         colorName.prepend('#');
     }
-    readWaterMark.color.setNamedColor(colorName);
-    readWaterMark.opacity = param.value("opacity").toDouble() / 255;
-    readWaterMark.layout = param.value("layout").toInt() ? WaterMarkLayout::Tiled : WaterMarkLayout::Center;
-    readWaterMark.rotation = param.value("angle").toDouble();
-    readWaterMark.lineSpacing = param.value("rowSpacing").toInt();
-    readWaterMark.spacing = param.value("columnSpacing").toInt();
-    readWaterMark.text = param.value("text").toString();
+    readAdapterWaterMark.color.setNamedColor(colorName);
+    readAdapterWaterMark.opacity = param.value("opacity").toDouble() / 255;
+    readAdapterWaterMark.layout = param.value("layout").toInt() ? AdapterWaterMarkData::Tiled : AdapterWaterMarkData::Center;
+    readAdapterWaterMark.rotation = param.value("angle").toDouble();
+    readAdapterWaterMark.lineSpacing = param.value("rowSpacing").toInt();
+    readAdapterWaterMark.spacing = param.value("columnSpacing").toInt();
+    readAdapterWaterMark.text = param.value("text").toString();
 
     qreal deviceRatio = qApp->devicePixelRatio();
     if (ignoreDevicePixelRatio && !qFuzzyCompare(1.0, deviceRatio) && deviceRatio > 0) {
-        readWaterMark.font.setPointSizeF(readWaterMark.font.pointSizeF() / deviceRatio);
-        readWaterMark.lineSpacing /= deviceRatio;
-        readWaterMark.spacing /= deviceRatio;
+        readAdapterWaterMark.font.setPointSizeF(readAdapterWaterMark.font.pointSizeF() / deviceRatio);
+        readAdapterWaterMark.lineSpacing /= deviceRatio;
+        readAdapterWaterMark.spacing /= deviceRatio;
     }
 
     authFlags.setFlag(EnableReadWaterMark, true);
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+
+    // 转换为公共接口类型
+    readWaterMark = convertAdapterWaterMarkData(readAdapterWaterMark);
 }
 
 /**
@@ -585,42 +665,86 @@ void PermissionConfig::initPrintWaterMark(const QJsonObject &param)
         return;
     }
 
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    printWaterMark.type = WaterMarkType::Text;
-    printWaterMark.font.setFamily(param.value("font").toString());
-    printWaterMark.font.setPointSize(param.value("fontSize").toInt());
+    printAdapterWaterMark.type = AdapterWaterMarkData::Text;
+    printAdapterWaterMark.font.setFamily(param.value("font").toString());
+    printAdapterWaterMark.font.setPointSize(param.value("fontSize").toInt());
 
     QString colorName = param.value("color").toString();
     if (!colorName.startsWith('#')) {
         colorName.prepend('#');
     }
-    printWaterMark.color.setNamedColor(colorName);
-    printWaterMark.opacity = param.value("opacity").toDouble() / 255;
-    printWaterMark.layout = param.value("layout").toInt() ? WaterMarkLayout::Tiled : WaterMarkLayout::Center;
-    printWaterMark.rotation = param.value("angle").toDouble();
-    printWaterMark.lineSpacing = param.value("rowSpacing").toInt();
-    printWaterMark.spacing = param.value("columnSpacing").toInt();
-    printWaterMark.text = param.value("text").toString();
+    printAdapterWaterMark.color.setNamedColor(colorName);
+    printAdapterWaterMark.opacity = param.value("opacity").toDouble() / 255;
+    printAdapterWaterMark.layout = param.value("layout").toInt() ? AdapterWaterMarkData::Tiled : AdapterWaterMarkData::Center;
+    printAdapterWaterMark.rotation = param.value("angle").toDouble();
+    printAdapterWaterMark.lineSpacing = param.value("rowSpacing").toInt();
+    printAdapterWaterMark.spacing = param.value("columnSpacing").toInt();
+    printAdapterWaterMark.text = param.value("text").toString();
 
     authFlags.setFlag(EnablePrintWaterMark, true);
 
     // 计算 DTK 打印水印的间距转换系数，限制提升到 10000.0
-    if (!printWaterMark.text.isEmpty()) {
-        QFontMetrics fm(printWaterMark.font);
-        QSize textSize = fm.size(Qt::TextSingleLine, printWaterMark.text);
+    if (!printAdapterWaterMark.text.isEmpty()) {
+        QFontMetrics fm(printAdapterWaterMark.font);
+        QSize textSize = fm.size(Qt::TextSingleLine, printAdapterWaterMark.text);
         if (textSize.height() > 0) {
-            printRowSpacing = (qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0;
+            printRowSpacing = (qreal(printAdapterWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0;
             printRowSpacing = qBound(0.0, printRowSpacing, 10000.0);
         }
         if (textSize.width() > 0) {
-            printColumnSpacing = (qreal(printWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0;
+            printColumnSpacing = (qreal(printAdapterWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0;
             printColumnSpacing = qBound(0.0, printColumnSpacing, 10000.0);
         }
 
         qInfo() << QString("Print config spacing ratio row: %1 column: %2").arg(printRowSpacing).arg(printColumnSpacing);
     }
 
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+    // 转换为公共接口类型
+    printWaterMark = convertAdapterWaterMarkData(printAdapterWaterMark);
+}
+
+/**
+   @brief 将内部使用的数据 `adptData` 转换为可被外部使用的公共接口类型 `WaterMarkData` ,
+        `WaterMarkData` 在主线和定制分支的接口结构不同，需要转换以兼容不同版本
+ */
+WaterMarkData PermissionConfig::convertAdapterWaterMarkData(const PermissionConfig::AdapterWaterMarkData &adptData) const
+{
+    WaterMarkData data;
+
+    // DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
+    // 主线水印接口在 5.6.9 之后引入.
+    // 因此，判断定制线：存在水印接口，版本不低于 5.4.42.7 且低于 5.5
+#if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
+    data.type = AdapterWaterMarkData::Text == adptData.type ? WaterMarkType::Text : WaterMarkType::Image;
+    data.layout = AdapterWaterMarkData::Center == adptData.layout ? WaterMarkLayout::Center : WaterMarkLayout::Tiled;
+    data.scaleFactor = adptData.scaleFactor;
+    data.spacing = adptData.spacing;
+    data.lineSpacing = adptData.lineSpacing;
+    data.text = adptData.text;
+    data.font = adptData.font;
+    data.color = adptData.color;
+    data.rotation = adptData.rotation;
+    data.opacity = adptData.opacity;
+    data.image = adptData.image;
+    data.grayScale = adptData.grayScale;
+
+#else
+    data.setType(AdapterWaterMarkData::Text == adptData.type ? WaterMarkData::Text : WaterMarkData::Image);
+    data.setLayout(AdapterWaterMarkData::Center == adptData.layout ? WaterMarkData::Center : WaterMarkData::Tiled);
+    data.setScaleFactor(adptData.scaleFactor);
+    data.setSpacing(adptData.spacing);
+    data.setLineSpacing(adptData.lineSpacing);
+    data.setText(adptData.text);
+    data.setFont(adptData.font);
+    data.setColor(adptData.color);
+    data.setRotation(adptData.rotation);
+    data.setOpacity(adptData.opacity);
+    data.setImage(adptData.image);
+    data.setGrayScale(adptData.grayScale);
+
+#endif  // VERSION CHECK
+
+    return data;
 }
 
 /**
@@ -685,34 +809,34 @@ void PermissionConfig::detectWaterMarkPluginExists()
 bool PermissionConfig::initWaterMarkPluginEnvironment()
 {
     QJsonObject envData;
-#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    envData.insert("angle", static_cast<int>(printWaterMark.rotation));
-    envData.insert("transparency", static_cast<int>(printWaterMark.opacity * 100));
-    QFontMetrics fm(printWaterMark.font);
-    QSize textSize = fm.size(Qt::TextSingleLine, printWaterMark.text);
+    envData.insert("angle", static_cast<int>(printAdapterWaterMark.rotation));
+    envData.insert("transparency", static_cast<int>(printAdapterWaterMark.opacity * 100));
+    QFontMetrics fm(printAdapterWaterMark.font);
+    QSize textSize = fm.size(Qt::TextSingleLine, printAdapterWaterMark.text);
     if (textSize.height() > 0) {
-        envData.insert("rowSpacing", qMax(0.0, (qreal(printWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0));
+        envData.insert("rowSpacing",
+                       qMax(0.0, (qreal(printAdapterWaterMark.lineSpacing + textSize.height()) / textSize.height()) - 1.0));
     }
     if (textSize.width() > 0) {
-        envData.insert("columnSpacing", qMax(0.0, (qreal(printWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0));
+        envData.insert("columnSpacing",
+                       qMax(0.0, (qreal(printAdapterWaterMark.spacing + textSize.width()) / textSize.width()) - 1.0));
     }
 
     envData.insert("layout",
-                   static_cast<int>(printWaterMark.layout == WaterMarkLayout::Center ? DPrintPreviewWatermarkInfo::Center :
-                                                                                       DPrintPreviewWatermarkInfo::Tiled));
+                   static_cast<int>(printAdapterWaterMark.layout == AdapterWaterMarkData::Center ?
+                                        DPrintPreviewWatermarkInfo::Center :
+                                        DPrintPreviewWatermarkInfo::Tiled));
     // 仅文本水印
     envData.insert("watermarkType", static_cast<int>(DPrintPreviewWatermarkInfo::TextWatermark));
     envData.insert("textType", static_cast<int>(DPrintPreviewWatermarkInfo::Custom));
-    envData.insert("customText", printWaterMark.text);
-    envData.insert("textColor", printWaterMark.color.name());
+    envData.insert("customText", printAdapterWaterMark.text);
+    envData.insert("textColor", printAdapterWaterMark.color.name());
     // 兼容插件传参格式
     QJsonArray fontList;
-    fontList.append(printWaterMark.font.family());
+    fontList.append(printAdapterWaterMark.font.family());
     envData.insert("fontList", fontList);
-    static const qreal sc_defaultFontSize = 65.0;
     // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
-    envData.insert("size", int(printWaterMark.font.pointSizeF() / sc_defaultFontSize * 100));
-#endif
+    envData.insert("size", int(printAdapterWaterMark.font.pointSizeF() / g_DefaultPrintFontSize * 100));
 
     QJsonDocument doc;
     doc.setObject(envData);
@@ -740,6 +864,8 @@ bool PermissionConfig::initWaterMarkPluginEnvironment()
 
     return true;
 }
+
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
    @return 返回文件 \a fileName 是否符合权限标识 \a authFlag

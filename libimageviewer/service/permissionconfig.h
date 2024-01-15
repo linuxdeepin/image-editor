@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2024 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,10 +10,11 @@
 
 #include <dtkwidget_config.h>
 
+// 在 5.6.9 版本后提供
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
 #include <DWaterMarkHelper>
+// 较低版本(<5.5.50)不提供插件相关接口
 #include <DPrintPreviewDialog>
-#include <dprintpreviewsettinginfo.h>
 
 DWIDGET_USE_NAMESPACE
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
@@ -76,31 +77,54 @@ public:
     Q_SIGNAL void currentImagePathChanged(const QString &fileName, bool isTargetImage);
     QString targetImage() const;
 
-    // 阅读/打印水印
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+    // 阅读/打印水印
     WaterMarkData readWaterMarkData() const;
     WaterMarkData printWaterMarkData() const;
+
+    bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
+    bool setDialogPrintWatermark(DPrintPreviewDialog *dialog) const;
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
     Q_SLOT void activateProcess(qint64 pid);
     void initFromArguments(const QStringList &arguments);
 
-    bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
-
 private:
     // 解析配置
     bool parseConfigOption(const QStringList &arguments, QString &configParam, QStringList &imageList) const;
     void initAuthorise(const QJsonObject &param);
+
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+    // 用于兼容主线/定制线的通用水印定义，适配不同接口
+    struct AdapterWaterMarkData
+    {
+        enum AWaterMarkType { None, Text, Image };  // 水印类型
+        enum AWaterMarkLayout { Center, Tiled };    // 水印布局
+
+        AWaterMarkType type = None;        // 水印类型
+        AWaterMarkLayout layout = Center;  // 水印布局
+        qreal scaleFactor = 1.0;           // 整体大小缩放系数
+        int spacing = 0;                   // 间距
+        int lineSpacing = 0;               // 行间距
+        QString text;                      // 文本水印内容
+        QFont font;                        // 文本水印字体
+        QColor color;                      // 文本水印颜色
+        qreal rotation = 0;                // 水印旋转角度(0~360)
+        qreal opacity = 1;                 // 水印透明度(0~1)
+        QImage image;                      // 图片水印中的图片
+        bool grayScale = true;             // 是否灰度化图片
+    };
+    WaterMarkData convertAdapterWaterMarkData(const AdapterWaterMarkData &adptData) const;
+
     void initReadWaterMark(const QJsonObject &param);
     void initPrintWaterMark(const QJsonObject &param);
     void detectWaterMarkPluginExists();
     bool initWaterMarkPluginEnvironment();
+#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
     bool checkAuthInvalid(const QString &fileName = QString()) const;
     void reduceOnePrintCount();
-
     void triggerNotify(const QJsonObject &data);
-
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
@@ -113,16 +137,22 @@ private:
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
 
-    bool ignoreDevicePixelRatio = false;    // 过滤设备显示比率，按照原生像素计算
-    bool useWaterMarkPlugin = false;        // 是否使用水印插件
+    // 内部拓展参数
+    bool ignoreDevicePixelRatio = false;  // 过滤设备显示比率，按照原生像素计算
+    bool useWaterMarkPlugin = false;      // 是否使用水印插件
+    bool breakPrintSpacingLimit = false;  // 打破打印间距限制
+    qreal printRowSpacing = 0.0;
+    qreal printColumnSpacing = 0.0;
+
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
-    WaterMarkData readWaterMark;
+    AdapterWaterMarkData readAdapterWaterMark;  // 水印数据，不区分DTK版本
+    AdapterWaterMarkData printAdapterWaterMark;
+
+    WaterMarkData readWaterMark;  // 水印数据，根据不同DTK版本支持接口不同
     WaterMarkData printWaterMark;
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
-    bool breakPrintSpacingLimit = false;    // 打破打印间距限制
-    qreal printRowSpacing = 0.0;
-    qreal printColumnSpacing = 0.0;
+    Q_DISABLE_COPY(PermissionConfig)
 };
 
 #endif  // PERMISSIONCONFIG_H
