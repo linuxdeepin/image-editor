@@ -27,10 +27,10 @@
 
 #include "service/commonservice.h"
 
-
 DWIDGET_USE_NAMESPACE
 
-//const int Distance_factor = 4;//距离因子
+#define LEFT_LISTVIEW_MOVE_MAXLEN 60
+#define RIGHT_LISTVIEW_MOVE_UPDATE 35
 
 MyImageListWidget::MyImageListWidget(QWidget *parent)
     : QWidget(parent)
@@ -42,37 +42,39 @@ MyImageListWidget::MyImageListWidget(QWidget *parent)
 
     m_listview = new LibImgViewListView(this);
     m_listview->setObjectName("ImgViewListView");
-//    hb->addWidget(m_listview);
+    //    hb->addWidget(m_listview);
     m_listview->viewport()->installEventFilter(this);
-    //设置一个可以放置的高度
+    // 设置一个可以放置的高度
     m_listview->viewport()->setFixedHeight(90);
     connect(m_listview, &LibImgViewListView::clicked, this, &MyImageListWidget::onClicked);
-//    connect(m_listview->selectionModel(), &QItemSelectionModel::selectionChanged,
-//            this, &MyImageListWidget::ONselectionChanged);
+    //    connect(m_listview->selectionModel(), &QItemSelectionModel::selectionChanged,
+    //            this, &MyImageListWidget::ONselectionChanged);
 
     connect(m_listview, &LibImgViewListView::openImg, this, &MyImageListWidget::openImg);
     connect(m_listview->horizontalScrollBar(), &QScrollBar::valueChanged, this, &MyImageListWidget::onScrollBarValueChanged);
     initAnimation();
 
-    //解决释放到程序外,不会动画的问题
-    connect(LibCommonService::instance(), &LibCommonService::sigRightMousePress, this, [ = ] {
+    // 解决释放到程序外,不会动画的问题
+    connect(LibCommonService::instance(), &LibCommonService::sigRightMousePress, this, [=]
+            {
         qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
         if (currentTime - 100 > m_lastReleaseTime)
         {
             m_lastReleaseTime = currentTime;
             animationStart(true, 0, 400);
-        }
-    });
-
+        } });
 }
 #include "service/imagedataservice.h"
 bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
 {
-    if (e->type() == QEvent::Leave) {
+    if (e->type() == QEvent::Leave)
+    {
         qDebug() << "QEvent::Leave" << obj;
     }
-    if (e->type() == QEvent::MouseButtonPress) {
-        if (!isEnabled()) {
+    if (e->type() == QEvent::MouseButtonPress)
+    {
+        if (!isEnabled())
+        {
             return true;
         }
 
@@ -90,86 +92,118 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
         m_listview->update();
         qDebug() << "------------getCount = " << LibImageDataService::instance()->getCount();
     }
-    if (e->type() == QEvent::MouseButtonRelease) {
-        if (!isEnabled()) {
+    if (e->type() == QEvent::MouseButtonRelease)
+    {
+        if (!isEnabled())
+        {
             return true;
         }
 
-        if (m_movePoints.size() > 0) {
+        if (m_movePoints.size() > 0)
+        {
             int endPos = m_movePoints.last().x() - m_movePoints.first().x();
-            //过滤掉触屏点击时的move误操作
-            if (abs(m_movePoints.last().x() - m_movePoints.first().x()) > 15) {
+            // 过滤掉触屏点击时的move误操作
+            if (abs(m_movePoints.last().x() - m_movePoints.first().x()) > 15)
+            {
                 animationStart(false, endPos, 500);
-            } else {
+            }
+            else
+            {
                 animationStart(true, 0, 400);
             }
         }
-        //松手，动画重置按钮应该所在的位置
-//        animationStart(true, 0, 400);
+        // 松手，动画重置按钮应该所在的位置
+        //        animationStart(true, 0, 400);
     }
-    if (e->type() == QEvent::MouseMove || e->type() == QEvent::TouchUpdate) {
-        if (!isEnabled()) {
+    if (e->type() == QEvent::MouseMove || e->type() == QEvent::TouchUpdate)
+    {
+        if (!isEnabled())
+        {
             return true;
         }
 
         QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
-        if (!mouseEvent) {
+        if (!mouseEvent)
+        {
             return false;
         }
         QPoint p = mouseEvent->globalPos();
-        if (m_movePoints.size() < 20) {
+        if (m_movePoints.size() < 20)
+        {
             m_movePoints.push_back(p);
-        } else {
+        }
+        else
+        {
             m_movePoints.pop_front();
             m_movePoints.push_back(p);
         }
-        m_listview->move(m_listview->x() + p.x() - m_moveViewPoint.x(), m_listview->y());
+        // 限制缩略图List的移动范围
+        int moveRangeX = m_listview->x() + p.x() - m_moveViewPoint.x();
+        int rowWidth = m_listview->getRowWidth();
+        int offsetRowMove = rowWidth - ((rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE) > 14 ? 12 : (rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE - 3)) * RIGHT_LISTVIEW_MOVE_UPDATE;
+        moveRangeX = moveRangeX > LEFT_LISTVIEW_MOVE_MAXLEN ? LEFT_LISTVIEW_MOVE_MAXLEN : moveRangeX;
+        moveRangeX = moveRangeX < (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) ? (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) : moveRangeX;
+        m_listview->move(moveRangeX, m_listview->y());
         m_moveViewPoint = p;
 
-        //目的为了获取moveX的值,中心离当前位置的差值
+        // 目的为了获取moveX的值,中心离当前位置的差值
         int moveX = 0;
-        int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
+        int middle = (this->geometry().right() - this->geometry().left()) / 2;
         int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
-        int rowWidth = m_listview->getRowWidth();
-        if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
-            moveX = this->geometry().width() - rowWidth - m_listview->x() ;
-        } else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
+        if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+        {
+            moveX = this->geometry().width() - rowWidth - m_listview->x();
+        }
+        else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+        {
             moveX = 0 - m_listview->pos().x();
-        } else if (m_listview->geometry().width() <= this->width()) {
+        }
+        else if (m_listview->geometry().width() <= this->width())
+        {
             moveX = 0;
-        } else {
+        }
+        else
+        {
             moveX = middle - itemX;
         }
-        //moveX > 32或moveX <- 32则滑动两次(代表没有居中)
-        //如果这一次的移动并没有超过很大范围32-50,向右切换,并且m_movePoint位置记录为移动了32,这样的话可以保证每次切换流畅
-        if (m_listview->x() < 0 && m_movePoint.x() - p.x() >= 32 && m_movePoint.x() - p.x() <= 50) {
+        // moveX > 32或moveX <- 32则滑动两次(代表没有居中)
+        // 如果这一次的移动并没有超过很大范围32-50,向右切换,并且m_movePoint位置记录为移动了32,这样的话可以保证每次切换流畅
+        if (m_listview->x() < 0 && m_movePoint.x() - p.x() >= 32 && m_movePoint.x() - p.x() <= 50)
+        {
             m_listview->openNext();
             m_movePoint = QPoint(m_movePoint.x() - 32, m_movePoint.y());
-            if (moveX > 32) {
+            if (moveX > 32)
+            {
                 m_listview->openNext();
             }
         }
-        //如果这一次的移动并超过很大范围>50,向右切换,并且m_movePoint位置记录为移动了到了当前的位置,目的是在最前面滑动的时候做到始终显示在屏幕上,到开头才滑动
-        else if (m_listview->x() < 0 && m_movePoint.x() - p.x() > 32) {
+        // 如果这一次的移动并超过很大范围>50,向右切换,并且m_movePoint位置记录为移动了到了当前的位置,目的是在最前面滑动的时候做到始终显示在屏幕上,到开头才滑动
+        else if (m_listview->x() < 0 && m_movePoint.x() - p.x() > 32)
+        {
             m_listview->openNext();
             m_movePoint = QPoint(p.x(), m_movePoint.y());
-            if (moveX > 32) {
+            if (moveX > 32)
+            {
                 m_listview->openNext();
             }
         }
-        //同上,32-50之间则m_movePoint移动32
-        else if ((rowWidth - m_listview->getCurrentItemX() - moveX) > 0 && m_movePoint.x() - p.x() <= -32 && m_movePoint.x() - p.x() >= -50) {
+        // 同上,32-50之间则m_movePoint移动32
+        else if ((rowWidth - m_listview->getCurrentItemX() - moveX) > 0 && m_movePoint.x() - p.x() <= -32 && m_movePoint.x() - p.x() >= -50)
+        {
             m_listview->openPre();
             m_movePoint = QPoint(m_movePoint.x() + 32, m_movePoint.y());
-            if (moveX < -32) {
+            if (moveX < -32)
+            {
                 m_listview->openPre();
             }
         }
         //>50,超过边界则不移动,框框要在屏幕范围内
-        else if ((rowWidth - m_listview->getCurrentItemX() - moveX) > 0 && m_movePoint.x() - p.x() <= -32) {
+        else if ((rowWidth - m_listview->getCurrentItemX() - moveX) > 0 && m_movePoint.x() - p.x() <= -32)
+        {
             m_listview->openPre();
             m_movePoint = QPoint(p.x(), m_movePoint.y());
-            if (moveX < -32) {
+            if (moveX < -32)
+            {
                 m_listview->openPre();
             }
         }
@@ -186,13 +220,14 @@ void MyImageListWidget::mousePressEvent(QMouseEvent *event)
 
 void MyImageListWidget::resizeEvent(QResizeEvent *event)
 {
-    //resize之后需要重新找到中心点
+    // resize之后需要重新找到中心点
     moveCenterWidget();
     Q_UNUSED(event);
 }
 MyImageListWidget::~MyImageListWidget()
 {
-    if (m_resetAnimation != nullptr) {
+    if (m_resetAnimation != nullptr)
+    {
         m_resetAnimation->deleteLater();
     }
 }
@@ -208,10 +243,12 @@ void MyImageListWidget::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, 
 imageViewerSpace::ItemInfo MyImageListWidget::getImgInfo(QString path)
 {
     imageViewerSpace::ItemInfo info;
-    for (int i = 0; i < m_listview->m_model->rowCount(); i++) {
+    for (int i = 0; i < m_listview->m_model->rowCount(); i++)
+    {
         QModelIndex indexImg = m_listview->m_model->index(i, 0);
         imageViewerSpace::ItemInfo infoImg = indexImg.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
-        if (infoImg.path == path) {
+        if (infoImg.path == path)
+        {
             info = infoImg;
             break;
         }
@@ -222,13 +259,14 @@ imageViewerSpace::ItemInfo MyImageListWidget::getImgInfo(QString path)
 imageViewerSpace::ItemInfo MyImageListWidget::getCurrentImgInfo()
 {
     imageViewerSpace::ItemInfo infoImg;
-    if (m_listview->m_currentRow < m_listview->m_model->rowCount()) {
+    if (m_listview->m_currentRow < m_listview->m_model->rowCount())
+    {
         QModelIndex indexImg = m_listview->m_model->index(m_listview->m_currentRow, 0);
         infoImg = indexImg.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
     }
     return infoImg;
 }
-//将选中项移到最前面，后期可能有修改，此时获取的列表宽度不正确
+// 将选中项移到最前面，后期可能有修改，此时获取的列表宽度不正确
 void MyImageListWidget::setSelectCenter()
 {
     m_listview->setSelectCenter();
@@ -236,7 +274,7 @@ void MyImageListWidget::setSelectCenter()
 
 int MyImageListWidget::getImgCount()
 {
-//    qDebug() << "---" << __FUNCTION__ << "---m_listview->m_model->rowCount() = " << m_listview->m_model->rowCount();
+    //    qDebug() << "---" << __FUNCTION__ << "---m_listview->m_model->rowCount() = " << m_listview->m_model->rowCount();
     return m_listview->m_model->rowCount();
 }
 
@@ -250,8 +288,9 @@ void MyImageListWidget::initAnimation()
     m_timer = new QTimer(this);
     m_timer->setInterval(200);
     m_timer->setSingleShot(true);
-    if (m_listview) {
-        m_resetAnimation = new QPropertyAnimation(m_listview, "pos", nullptr); //和上层m_obj的销毁绑在一起
+    if (m_listview)
+    {
+        m_resetAnimation = new QPropertyAnimation(m_listview, "pos", nullptr); // 和上层m_obj的销毁绑在一起
     }
     connect(m_resetAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
     connect(m_resetAnimation, SIGNAL(valueChanged(const QVariant)), this, SLOT(animationValueChanged(const QVariant)));
@@ -290,127 +329,166 @@ QStringList MyImageListWidget::getAllPath()
 
 void MyImageListWidget::animationFinished()
 {
-    //设置type标志用来判断是惯性动画还是复位动画
-    if (m_resetAnimation->property("type") == "500") {
+    // 设置type标志用来判断是惯性动画还是复位动画
+    if (m_resetAnimation->property("type") == "500")
+    {
         m_resetFinish = false;
         animationStart(true, 0, 400);
     }
-    if (m_resetAnimation->property("type") == "400") {
+    if (m_resetAnimation->property("type") == "400")
+    {
         m_resetFinish = true;
     }
 }
 
 void MyImageListWidget::animationValueChanged(const QVariant value)
 {
-    if (m_resetAnimation->property("type") != "500") {
+    if (m_resetAnimation->property("type") != "500")
+    {
         return;
     }
-    //惯性滑动
+    // 惯性滑动
     thumbnailIsMoving();
     Q_UNUSED(value)
 }
 
 void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
 {
-    if (m_resetAnimation->state() == QPropertyAnimation::State::Running) {
+    if (m_resetAnimation->state() == QPropertyAnimation::State::Running)
+    {
         m_resetAnimation->stop();
     }
 
-    //目的为了获取moveX的值,中心离当前位置的差值
+    // 目的为了获取moveX的值,中心离当前位置的差值
     int moveX = 0;
-    int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
+    int middle = (this->geometry().right() - this->geometry().left()) / 2;
     int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
-    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
-        moveX = this->geometry().width() - rowWidth - m_listview->x() ;
-    } else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
+    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
+        moveX = this->geometry().width() - rowWidth - m_listview->x();
+    }
+    else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
         moveX = 0 - m_listview->pos().x();
-    } else if (m_listview->geometry().width() <= this->width()) {
+    }
+    else if (m_listview->geometry().width() <= this->width())
+    {
         moveX = 0;
-    } else {
+    }
+    else
+    {
         moveX = middle - itemX;
     }
 
-    if (!isReset) {
+    if (!isReset)
+    {
         moveX = endPos;
     }
     m_resetAnimation->setDuration(duration);
-    if (duration == 500) {
+    if (duration == 500)
+    {
         m_resetAnimation->setProperty("type", "500");
-    } else {
+    }
+    else
+    {
         m_resetAnimation->setProperty("type", "400");
     }
     m_resetAnimation->setEasingCurve(QEasingCurve::OutQuad);
     m_resetAnimation->setStartValue(m_listview->pos());
-    m_resetAnimation->setEndValue(QPoint(m_listview->pos().x() + moveX, m_listview->pos().y()));
+    // 限制缩略图List的移动范围
+    int moveRangeX = m_listview->pos().x() + moveX;
+    int offsetRowMove = rowWidth - ((rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE) >= 12 ? 9 : (rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE - 3)) * RIGHT_LISTVIEW_MOVE_UPDATE;
+    moveRangeX = moveRangeX > LEFT_LISTVIEW_MOVE_MAXLEN ? LEFT_LISTVIEW_MOVE_MAXLEN : moveRangeX;
+    moveRangeX = moveRangeX < (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) ? (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) : moveRangeX;
+    m_resetAnimation->setEndValue(QPoint(moveRangeX, m_listview->pos().y()));
     m_resetAnimation->start();
-
 }
 
 void MyImageListWidget::stopAnimation()
 {
-    if (m_resetAnimation) {
+    if (m_resetAnimation)
+    {
         m_resetAnimation->stop();
     }
-
 }
 
 void MyImageListWidget::thumbnailIsMoving()
 {
-    if (m_resetAnimation->state() == QPropertyAnimation::State::Running && m_resetAnimation->duration() == 400) {
+    if (m_resetAnimation->state() == QPropertyAnimation::State::Running && m_resetAnimation->duration() == 400)
+    {
         return;
     }
-//    int endPos = m_movePoints.last().x() - m_movePoints.first().x();
+    //    int endPos = m_movePoints.last().x() - m_movePoints.first().x();
     int offsetLimit = m_listview->geometry().left() - m_preListGeometryLeft;
-    if (abs(offsetLimit) <= 32) {
+    if (abs(offsetLimit) <= 32)
+    {
         return;
     }
     qDebug() << offsetLimit;
-    //目的为了获取moveX的值,中心离当前位置的差值
+    // 目的为了获取moveX的值,中心离当前位置的差值
     int moveX = 0;
-    int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
+    int middle = (this->geometry().right() - this->geometry().left()) / 2;
     int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
-    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
-        moveX = this->geometry().width() - rowWidth - m_listview->x() ;
-    } else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
+    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
+        moveX = this->geometry().width() - rowWidth - m_listview->x();
+    }
+    else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
         moveX = 0 - m_listview->pos().x();
-    } else if (m_listview->geometry().width() <= this->width()) {
+    }
+    else if (m_listview->geometry().width() <= this->width())
+    {
         moveX = 0;
-    } else {
+    }
+    else
+    {
         moveX = middle - itemX;
     }
-    //如果图片没居中,会切换两次
-    if (offsetLimit > 0) {
+    // 如果图片没居中,会切换两次
+    if (offsetLimit > 0)
+    {
         m_listview->openPre();
-        if (moveX < -32) {
+        if (moveX < -32)
+        {
             m_listview->openPre();
         }
-    } else {
+    }
+    else
+    {
         m_listview->openNext();
-        if (moveX > 32) {
+        if (moveX > 32)
+        {
             m_listview->openNext();
         }
     }
     m_preListGeometryLeft = m_listview->geometry().left();
-
 }
 
 void MyImageListWidget::moveCenterWidget()
 {
-    //移动时停止动画
+    // 移动时停止动画
     stopAnimation();
     int moveX = 0;
-    int middle = (this->geometry().right() - this->geometry().left()) / 2 ;
+    int middle = (this->geometry().right() - this->geometry().left()) / 2;
     int itemX = m_listview->x() + m_listview->getCurrentItemX() + 31;
     int rowWidth = m_listview->getRowWidth();
-    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
-        moveX = this->geometry().width() - rowWidth - m_listview->x() ;
-    } else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2)) {
+    if (rowWidth - m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
+        moveX = this->geometry().width() - rowWidth - m_listview->x();
+    }
+    else if (m_listview->getCurrentItemX() < (this->geometry().width() / 2))
+    {
         moveX = 0 - m_listview->pos().x();
-    } else if (m_listview->geometry().width() <= this->width()) {
+    }
+    else if (m_listview->geometry().width() <= this->width())
+    {
         moveX = 0;
-    } else {
+    }
+    else
+    {
         moveX = middle - itemX;
     }
     m_listview->move(m_listview->x() + moveX, m_listview->y());
@@ -419,10 +497,11 @@ void MyImageListWidget::moveCenterWidget()
 void MyImageListWidget::onScrollBarValueChanged(int value)
 {
     QModelIndex index = m_listview->indexAt(QPoint((m_listview->width() - 15), 10));
-    if (!index.isValid()) {
+    if (!index.isValid())
+    {
         index = m_listview->indexAt(QPoint((m_listview->width() - 20), 10));
     }
-     Q_UNUSED(value);
+    Q_UNUSED(value);
 }
 
 void MyImageListWidget::openNext()
@@ -440,7 +519,8 @@ void MyImageListWidget::openPre()
 void MyImageListWidget::onClicked(const QModelIndex &index)
 {
     qDebug() << "---------";
-    if (m_timer->isActive()) {
+    if (m_timer->isActive())
+    {
         m_listview->onClicked(index);
     }
     animationStart(true, 0, 400);
@@ -449,10 +529,10 @@ void MyImageListWidget::onClicked(const QModelIndex &index)
 void MyImageListWidget::ONselectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     qDebug() << "---ONselectionChanged------";
-    if (!selected.indexes().isEmpty()) {
+    if (!selected.indexes().isEmpty())
+    {
         m_listview->onClicked(selected.indexes().first());
         animationStart(true, 0, 400);
     }
     Q_UNUSED(deselected);
-
 }
