@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QColor>
+#include <QImage>
 
 #if QT_VERSION >= 0x050500
 #define TIMER_SINGLESHOT(Time, Code, captured...){ \
@@ -123,7 +124,7 @@ namespace widgets {
 }
 namespace base {
 void        copyOneImageToClipboard(const QString &path);
-void        copyImageToClipboard(const QStringList &paths);
+void        copyImageToClipboard(const QStringList &paths, const QImage &sourceImage = QImage());
 void        showInFileManager(const QString &path);
 int         stringWidth(const QFont &f, const QString &str);
 int         stringHeight(const QFont &f, const QString &str);
@@ -146,6 +147,8 @@ bool        onMountDevice(const QString &path);
 bool        mountDeviceExist(const QString &path);
 bool checkCommandExist(const QString &command);
 //bool        isCommandExist(const QString &command);
+
+bool        checkWayland();
 }  // namespace base
 
 }  // namespace utils
