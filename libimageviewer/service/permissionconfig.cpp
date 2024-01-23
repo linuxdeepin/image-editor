@@ -18,7 +18,10 @@
 #include <QDBusReply>
 #include <QDebug>
 
-#include <DPrintPreviewDialog>
+// dprintpreviewsettinginfo 没有单独宏，使用 DWaterMarkHelper 进行限制
+#ifdef DTKWIDGET_CLASS_DWaterMarkHelper
+#include <dprintpreviewsettinginfo.h>
+#endif
 
 static const QString g_KeyTid = "tid";
 static const QString g_KeyOperate = "operate";
@@ -35,6 +38,9 @@ static const char *g_PrintRowSpacingProp = "_d_print_waterMarkRowSpacing";
 static const char *g_PrintColumnSpacingProp = "_d_print_waterMarkColumnSpacing";
 static const qreal g_PrintRowSpacingLimit = 10.0;
 static const qreal g_PrintColumnSpacingLimit = 2.0;
+
+// 打印水印默认字体大小，用于计算转换系数
+static const qreal g_DefaultPrintFontSize = 65.0;
 
 /**
    @brief 通过dbus接口从任务栏激活窗口
@@ -70,7 +76,7 @@ bool activateWindowFromDock(quintptr winId)
 }
 
 /**
-   @class AuthoriseConfig
+   @class PermissionConfig
    @brief 授权控制类，提供操作授权和水印配置
    @details 授权控制主要包括编辑、拷贝、删除、保存等操作，水印包括阅读水印及打印水印。
     配置信息通过命令行参数获取，当授权控制开启时，进行主要操作将自动发送通知信息。
@@ -381,6 +387,72 @@ bool PermissionConfig::installFilterPrintDialog(DPrintPreviewDialog *dialog)
     return false;
 }
 
+/**
+   @brief 设置打印对话框 `dialog` 的打印水印格式，当系统环境中存在打印插件时，将不会进入此函数。
+ */
+bool PermissionConfig::setDialogPrintWatermark(DPrintPreviewDialog *dialog) const
+{
+    if (!dialog) {
+        return false;
+    }
+
+    // 使用适配的水印配置
+    bool ret = false;
+    const AdapterWaterMarkData &data = printAdapterWaterMark;
+    DPrintPreviewSettingInfo *baseInfo = dialog->createDialogSettingInfo(DPrintPreviewWatermarkInfo::PS_Watermark);
+
+    if (baseInfo) {
+        DPrintPreviewWatermarkInfo *info = dynamic_cast<DPrintPreviewWatermarkInfo *>(baseInfo);
+        if (info) {
+            // 打印水印实现方式同阅读水印略有不同，调整参数以使得效果一致。
+            info->opened = true;
+
+            info->angle = static_cast<int>(data.rotation);
+            info->transparency = static_cast<int>(data.opacity * 100);
+            QFontMetrics fm(data.font);
+            QSize textSize = fm.size(Qt::TextSingleLine, data.text);
+            if (textSize.height() > 0) {
+                info->rowSpacing = qMax(0.0, (qreal(data.lineSpacing + textSize.height()) / textSize.height()) - 1.0);
+            }
+            if (textSize.width() > 0) {
+                info->columnSpacing = qMax(0.0, (qreal(data.spacing + textSize.width()) / textSize.width()) - 1.0);
+            }
+            info->layout = (data.layout == PermissionConfig::AdapterWaterMarkData::Center) ? DPrintPreviewWatermarkInfo::Center :
+                                                                                             DPrintPreviewWatermarkInfo::Tiled;
+            info->currentWatermarkType = (data.type == PermissionConfig::AdapterWaterMarkData::Text) ?
+                                             DPrintPreviewWatermarkInfo::TextWatermark :
+                                             DPrintPreviewWatermarkInfo::ImageWatermark;
+            info->textType = DPrintPreviewWatermarkInfo::Custom;
+            info->customText = data.text;
+            info->textColor = data.color;
+            info->fontList.append(data.font.family());
+            // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
+            info->size = int(data.font.pointSizeF() / g_DefaultPrintFontSize * 100);
+
+            dialog->updateDialogSettingInfo(info);
+
+            ret = true;
+        } else {
+            qWarning() << qPrintable("Can't convert DPrintPreviewDialog watermark info.") << baseInfo->type();
+        }
+
+        delete baseInfo;
+    } else {
+        qWarning() << qPrintable("Can't get DPrintPreviewDialog watermark info.");
+    }
+
+    // 在不使用打印插件时，需要手动设置打印插件选项显示且不可编辑，在设置后调用
+    // WaterMarkFrame 和 WaterMarkContentFrame 是DTK窗口中水印设置控件的 objectName
+    auto widgetList = dialog->findChildren<QWidget *>("WaterMarkFrame");
+    widgetList.append(dialog->findChildren<QWidget *>("WaterMarkContentFrame"));
+    for (auto wid : widgetList) {
+        wid->setVisible(true);
+        wid->setEnabled(false);
+    }
+
+    return ret;
+}
+
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
 /**
@@ -647,9 +719,9 @@ WaterMarkData PermissionConfig::convertAdapterWaterMarkData(const PermissionConf
 {
     WaterMarkData data;
 
-// DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
-// 主线水印接口在 5.6.9 之后引入.
-// 因此，判断定制线：存在水印接口，版本不低于 5.4.42.7 且低于 5.5
+    // DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
+    // 主线水印接口在 5.6.9 之后引入.
+    // 因此，判断定制线：存在水印接口，版本不低于 5.4.42.7 且低于 5.5
 #if DTK_VERSION_CHECK(5, 4, 42, 7) <= DTK_VERSION && DTK_VERSION < DTK_VERSION_CHECK(5, 5, 0, 0)
     data.type = AdapterWaterMarkData::Text == adptData.type ? WaterMarkType::Text : WaterMarkType::Image;
     data.layout = AdapterWaterMarkData::Center == adptData.layout ? WaterMarkLayout::Center : WaterMarkLayout::Tiled;
@@ -771,9 +843,8 @@ bool PermissionConfig::initWaterMarkPluginEnvironment()
     QJsonArray fontList;
     fontList.append(printAdapterWaterMark.font.family());
     envData.insert("fontList", fontList);
-    static const qreal sc_defaultFontSize = 65.0;
     // 字体使用缩放滑块处理 10%~200%, 默认字体大小为65
-    envData.insert("size", int(printAdapterWaterMark.font.pointSizeF() / sc_defaultFontSize * 100));
+    envData.insert("size", int(printAdapterWaterMark.font.pointSizeF() / g_DefaultPrintFontSize * 100));
 
     QJsonDocument doc;
     doc.setObject(envData);

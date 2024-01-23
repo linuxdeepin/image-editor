@@ -103,6 +103,8 @@ public:
     WaterMarkData printWaterMarkData() const;
 
     bool installFilterPrintDialog(DPrintPreviewDialog *dialog);
+    bool setDialogPrintWatermark(DPrintPreviewDialog *dialog) const;
+
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
     Q_SLOT void activateProcess(qint64 pid);
@@ -136,9 +138,6 @@ private:
     Status status = NotOpen;  // 被控制权限图片的状态
     Authorises authFlags = NoAuth;
 
-    bool ignoreDevicePixelRatio = false;  // 过滤设备显示比率，按照原生像素计算
-    bool useWaterMarkPlugin = false;      // 是否使用水印插件
-
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     AdapterWaterMarkData readAdapterWaterMark;  // 水印数据，不区分DTK版本
     AdapterWaterMarkData printAdapterWaterMark;
@@ -147,6 +146,9 @@ private:
     WaterMarkData printWaterMark;
 #endif  // DTKWIDGET_CLASS_DWaterMarkHelper
 
+    // 内部拓展参数
+    bool ignoreDevicePixelRatio = false;  // 过滤设备显示比率，按照原生像素计算
+    bool useWaterMarkPlugin = false;      // 是否使用水印插件
     bool breakPrintSpacingLimit = false;  // 打破打印间距限制
     qreal printRowSpacing = 0.0;
     qreal printColumnSpacing = 0.0;
