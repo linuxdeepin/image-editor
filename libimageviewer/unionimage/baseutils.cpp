@@ -180,7 +180,10 @@ void showInFileManager(const QString &path)
 //    }
 }
 
-void copyImageToClipboard(const QStringList &paths)
+/**
+   @brief 拷贝图片信息到剪贴板，若 `sourceImage` 不为空，则在 wayland 下设置缩略图数据
+ */
+void copyImageToClipboard(const QStringList &paths, const QImage &sourceImage)
 {
     if (paths.isEmpty()) {
         return;
@@ -214,10 +217,8 @@ void copyImageToClipboard(const QStringList &paths)
     newMimeData->setData("x-special/gnome-copied-files", gnomeFormat);
 
     // Copy Image Data
-    QImage img;
-    QString errMsg;
-    if (LibUnionImage_NameSpace::loadStaticImageFromFile(paths.first(), img, errMsg)) {
-        newMimeData->setImageData(img);
+    if (!sourceImage.isNull() && checkWayland()) {
+        newMimeData->setImageData(sourceImage.scaled(200, 200, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
     }
 
     // Set the mimedata
@@ -482,6 +483,22 @@ bool checkCommandExist(const QString &command)
         }
     } catch (std::logic_error &e) {
         qWarning() << e.what();
+        return false;
+    }
+}
+
+/**
+   @brief 判断当前是否为 wayland 环境
+ */
+bool checkWayland()
+{
+    auto e = QProcessEnvironment::systemEnvironment();
+    QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
+    QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
+
+    if (XDG_SESSION_TYPE == QLatin1String("wayland") || WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive))
+        return true;
+    else {
         return false;
     }
 }

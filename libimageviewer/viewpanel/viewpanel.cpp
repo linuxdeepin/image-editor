@@ -1838,9 +1838,9 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
 
             // 判断当前是否为AI增强图片，若为设置增强后的图片
             if (AIModelService::instance()->isTemporaryFile(m_currentPath)) {
-                Libutils::base::copyImageToClipboard({m_currentPath});
+                Libutils::base::copyImageToClipboard(QStringList(m_currentPath), m_view->image());
             } else {
-                Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path));
+                Libutils::base::copyImageToClipboard(QStringList(m_bottomToolbar->getCurrentItemInfo().path), m_view->image());
             }
 
             PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, m_bottomToolbar->getCurrentItemInfo().path);
