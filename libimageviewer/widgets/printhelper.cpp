@@ -16,7 +16,6 @@
 #include <QDebug>
 
 #include <DApplication>
-#include <dprintpreviewsettinginfo.h>
 #include <dtkwidget_config.h>
 
 #ifdef USE_UNIONIMAGE
