@@ -216,10 +216,14 @@ void copyImageToClipboard(const QStringList &paths, const QImage &sourceImage)
     gnomeFormat.remove(gnomeFormat.length() - 1, 1);
     newMimeData->setData("x-special/gnome-copied-files", gnomeFormat);
 
+    // Warning: 会导致 1070 wayland 下拷贝无图片显示，此修改和 bug 191601 有关，仅在定制镜像保留。
+    Q_UNUSED(sourceImage);
+#if 0
     // Copy Image Data
     if (!sourceImage.isNull() && checkWayland()) {
         newMimeData->setImageData(sourceImage.scaled(200, 200, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
     }
+#endif
 
     // Set the mimedata
     cb->setMimeData(newMimeData, QClipboard::Clipboard);
