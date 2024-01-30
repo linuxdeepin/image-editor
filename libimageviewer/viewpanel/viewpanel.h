@@ -11,6 +11,7 @@
 #include <DStackedWidget>
 #include <DAnchors>
 #include <DIconButton>
+#include <dshadowline.h>
 
 #include <bitset>
 
@@ -213,6 +214,7 @@ private:
     Q_SLOT void onEnhanceStart();
     Q_SLOT void onEnhanceReload(const QString &output);
     Q_SLOT void onEnhanceEnd(const QString &source, const QString &output, int state);
+    void updateTitleShadow(bool toShow);
 
 private:
     DStackedWidget *m_stack = nullptr;
@@ -221,7 +223,9 @@ private:
     ThumbnailWidget *m_thumbnailWidget = nullptr;
     LibBottomToolbar *m_bottomToolbar = nullptr;
     LibImageInfoWidget *m_info = nullptr;
+    DShadowLine *titleShadow = nullptr;
     ExtensionPanel  *m_extensionPanel {nullptr};
+
     DAnchors<NavigationWidget> m_nav ;
 
     //ocr接口
