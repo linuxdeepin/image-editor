@@ -13,11 +13,10 @@
 #include <QApplication>
 #include <QStringList>
 #include <QDesktopWidget>
-
+#include <dshadowline.h>
 #include <DDesktopServices>
 #include <DMenu>
 #include <DFileDialog>
-
 #include "contents/bottomtoolbar.h"
 #include "navigationwidget.h"
 #include "lockwidget.h"
@@ -143,7 +142,12 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
             }
         }
     });
-
+    titleShadow= new DShadowLine(this);
+    titleShadow->setAttribute(Qt::WA_AlwaysStackOnTop);
+    QRect rect(0,m_topToolbar->geometry().bottom()+1,m_topToolbar->geometry().width(),titleShadow->sizeHint().height());
+    titleShadow->setGeometry(rect);
+    titleShadow->setVisible(true);
+    titleShadow->raise();
     // 添加过滤处理，当窗口出现状态变更时(最大化、全屏)，处理标题栏隐藏、显示
     if (window()) {
         window()->installEventFilter(this);
@@ -324,7 +328,6 @@ void LibViewPanel::initTopBar()
     } else {
         m_topToolbar->setParent(dynamic_cast<QWidget *>(this->parent()));
     }
-
     m_topToolbar->resize(width(), titleBarHeight());
     m_topToolbar->move(0, 0);
     m_topToolbar->setTitleBarTransparent(false);
@@ -1262,7 +1265,7 @@ void LibViewPanel::slotsImageOutTitleBar(bool bRet)
         m_ImageOutTitleBar = bRet;
         slotBottomMove();
     }
-
+    updateTitleShadow(!bRet);
 }
 
 void LibViewPanel::slotsDirectoryChanged(const QString &path)
@@ -2129,7 +2132,18 @@ void LibViewPanel::slotResetTransform(bool bRet)
         m_view->fitImage();
     }
 }
-
+void LibViewPanel::updateTitleShadow(bool toShow)
+{
+    if (!titleShadow)
+    {
+        return;
+    }
+    QRect rect(0, 50, this->geometry().width(), titleShadow->sizeHint().height());
+    titleShadow->setGeometry(rect);
+    //对于全屏和图片高度过大进行隐身
+    titleShadow->setVisible(!window()->isFullScreen() && toShow);
+    titleShadow->raise();
+}
 
 void LibViewPanel::resizeEvent(QResizeEvent *e)
 {
@@ -2157,7 +2171,6 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
         m_topBarAnimation = nullptr;
     }
     if (this->m_topToolbar) {
-
         if (window()->isFullScreen()) {
             this->m_topToolbar->setVisible(false);
 
@@ -2178,6 +2191,7 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
     //不需要动画滑动
     noAnimationBottomMove();
+    updateTitleShadow(true);
 }
 
 void LibViewPanel::showEvent(QShowEvent *e)
