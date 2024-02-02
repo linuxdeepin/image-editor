@@ -42,6 +42,9 @@ static const qreal g_PrintColumnSpacingLimit = 2.0;
 // 打印水印默认字体大小，用于计算转换系数
 static const qreal g_DefaultPrintFontSize = 65.0;
 
+// 打印计数为-1时，无打印限制
+static const int g_UnlimitPrintCount = -1;
+
 /**
    @brief 通过dbus接口从任务栏激活窗口
 */
@@ -188,7 +191,7 @@ bool PermissionConfig::isUnlimitPrint() const
     if (checkAuthInvalid()) {
         return true;
     }
-    return -1 == printLimitCount;
+    return g_UnlimitPrintCount == printLimitCount;
 }
 
 /**
@@ -196,6 +199,10 @@ bool PermissionConfig::isUnlimitPrint() const
  */
 void PermissionConfig::reduceOnePrintCount()
 {
+    if (g_UnlimitPrintCount == printLimitCount) {
+        return;
+    }
+
     if (printLimitCount > 0) {
         printLimitCount--;
         Q_EMIT printCountChanged();
@@ -612,6 +619,9 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     }
 
     printLimitCount = param.value("printCount").toInt(0);
+    if (printLimitCount < g_UnlimitPrintCount) {
+        printLimitCount = 0;
+    }
 }
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
