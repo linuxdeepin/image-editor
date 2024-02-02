@@ -50,10 +50,9 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
         return;
     }
 
-    m_re->m_paths.clear();
-    m_re->m_imgs.clear();
+    m_re->clearPrintState();
+    m_re->setPaths(paths);
 
-    m_re->m_paths = paths;
     QStringList tempExsitPaths;  // 保存存在的图片路径
     for (const QString &path : paths) {
         QString errMsg;
@@ -61,14 +60,14 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
         if (imgReadreder.imageCount() > 1) {
             for (int imgindex = 0; imgindex < imgReadreder.imageCount(); imgindex++) {
                 imgReadreder.jumpToImage(imgindex);
-                m_re->m_imgs << imgReadreder.read();
+                m_re->appendImage(imgReadreder.read());
             }
         } else {
             // QImage不应该多次赋值，所以换到这里来，修复style问题
             QImage img;
             LibUnionImage_NameSpace::loadStaticImageFromFile(path, img, errMsg);
             if (!img.isNull()) {
-                m_re->m_imgs << img;
+                m_re->appendImage(img);
             }
         }
         tempExsitPaths << paths;
@@ -108,14 +107,19 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
     int ret = QDialog::Accepted;
 #endif
 
+    // DTKWidget 在 5.6.9 版本前，无论是否打印，只会返回相同值 0 ，区分版本判断 (DTKWIDGET_CLASS_DWaterMarkHelper在 5.6.9 提供)
+    // 没有直接以 DTKCore(DTK_VERSION_CHECK) 版本判断，DTKCore 和 DTKWidget 版本可能不同
+#ifndef DTKWIDGET_CLASS_DWaterMarkHelper
+    if (m_re->isPrinted()) {
+#else
     if (QDialog::Accepted == ret) {
+#endif
         if (!tempExsitPaths.isEmpty()) {
             PermissionConfig::instance()->triggerPrint(tempExsitPaths.first());
         }
     }
 
-    m_re->m_paths.clear();
-    m_re->m_imgs.clear();
+    m_re->clearPrintState();
 }
 
 RequestedSlot::RequestedSlot(QObject *parent)
@@ -125,6 +129,32 @@ RequestedSlot::RequestedSlot(QObject *parent)
 
 RequestedSlot::~RequestedSlot() {}
 
+void RequestedSlot::clearPrintState()
+{
+    m_paths.clear();
+    m_imgs.clear();
+    m_printed = false;
+}
+
+/**
+   @brief 设置打印文件路径 `paths`
+ */
+void RequestedSlot::setPaths(const QStringList &paths)
+{
+    m_paths = paths;
+}
+
+/**
+   @brief 追加打印图片数据 `img`
+ */
+void RequestedSlot::appendImage(const QImage &img)
+{
+    m_imgs << img;
+}
+
+/**
+   @brief dtk打印组件请求绘制页面，将打印信息绘制到 `_printer` 中
+ */
 void RequestedSlot::paintRequestSync(DPrinter *_printer)
 {
     // 由于之前再度修改了打印的逻辑，导致了相同图片不在被显示，多余多页tiff来说不合理
@@ -154,4 +184,8 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
         }
     }
     painter.end();
+
+    if (!m_printed && 0 != indexNum) {
+        m_printed = true;
+    }
 }

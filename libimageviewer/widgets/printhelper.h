@@ -21,12 +21,20 @@ public:
     explicit RequestedSlot(QObject *parent = nullptr);
     ~RequestedSlot();
 
-private slots:
-    void paintRequestSync(DPrinter *_printer);
+    // 清理打印状态，当前是否触发打印
+    void clearPrintState();
+    inline bool isPrinted() { return m_printed; }
 
-public:
+    void setPaths(const QStringList &paths);
+    void appendImage(const QImage &img);
+
+private:
+    Q_SLOT void paintRequestSync(DPrinter *_printer);
+
+private:
     QStringList m_paths;
     QList<QImage> m_imgs;
+    bool m_printed = false;
 };
 
 class PrintHelper : public QObject
