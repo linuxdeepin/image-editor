@@ -1,3 +1,20 @@
+image-editor (1.0.42) unstable; urgency=medium
+
+  * fix: Fixed the issue where the thumbnail display would be
+         stretched when viewing images.(Bug: 158423)
+  * fix: Modify the file name suffix color of the rename window
+         (Bug: 231485)
+  * fix: Fix the issue that the pop-up window does not match the
+         system controls(Bug: 194649)
+  * fix: The wrong toolbar thumbnail movable range(Bug: 158443)
+  * feat: Merge permission/watermark into master(Task: 27785, 30217)
+  * fix: Copy may cause program lag
+  * fix: The top toolbar background shading is inconsistent(Bug: 156727)
+  * fix: Limit input printCount range(Bug: 241777)
+  * fix: printCount not decrease on low dtk version(Bug: 241949)
+
+ -- renbin <renbin@uniontech.com>  Mon, 05 Feb 2024 13:39:07 +0800
+
 image-editor (1.0.41) unstable; urgency=medium
 
   * fix: Delete image not work after rename.(Bug: 236589)
