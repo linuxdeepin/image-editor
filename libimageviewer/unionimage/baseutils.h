@@ -148,6 +148,7 @@ bool        mountDeviceExist(const QString &path);
 bool checkCommandExist(const QString &command);
 //bool        isCommandExist(const QString &command);
 
+bool        initCheckWaylandEnv();
 bool        checkWayland();
 }  // namespace base
 

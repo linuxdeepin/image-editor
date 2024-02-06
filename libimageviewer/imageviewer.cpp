@@ -51,6 +51,9 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
                                        ImageViewer *parent)
     : q_ptr(parent)
 {
+    // 初始化检测wayland环境
+    Libutils::base::initCheckWaylandEnv();
+
     // 在界面前初始化授权配置
     if (!qApp) {
         qWarning() << qPrintable("Must init authorise config after QApplication initialized!");

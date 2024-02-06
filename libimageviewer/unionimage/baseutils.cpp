@@ -491,20 +491,30 @@ bool checkCommandExist(const QString &command)
     }
 }
 
+static bool g_IsWaylandEnv = false;
 /**
-   @brief 判断当前是否为 wayland 环境
+   @brief 初始化判断当前是否为 wayland 环境，并缓存状态
  */
-bool checkWayland()
+bool initCheckWaylandEnv()
 {
     auto e = QProcessEnvironment::systemEnvironment();
     QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
     QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
 
-    if (XDG_SESSION_TYPE == QLatin1String("wayland") || WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive))
+    if (XDG_SESSION_TYPE == QLatin1String("wayland") || WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
+        g_IsWaylandEnv = true;
         return true;
-    else {
+    } else {
         return false;
     }
+}
+
+/**
+   @return 返回当前是否为 wayland 环境
+ */
+bool checkWayland()
+{
+    return g_IsWaylandEnv;
 }
 
 }  // namespace base

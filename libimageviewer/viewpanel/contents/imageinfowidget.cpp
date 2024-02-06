@@ -27,13 +27,11 @@
 #include <QtDebug>
 #include <QPainterPath>
 
-
 namespace {
 
-const int TITLE_MAXWIDTH = 72 - 3;
-//const
-int TITLE_MAXCNWIDETH = 80; //中文Title宽度
-int TITLE_MAXOTHERWIDETH = 105; //其他语言Title宽度
+// const
+int TITLE_MAXCNWIDETH = 80;      //中文Title宽度
+int TITLE_MAXOTHERWIDETH = 105;  //其他语言Title宽度
 //因为qrc改变,icon资源路径改变
 const QString ICON_CLOSE_DARK = ":/dark/images/close_normal.svg";
 const QString ICON_CLOSE_LIGHT = ":/light/images/close_normal .svg";
@@ -42,52 +40,47 @@ const QString ICON_CLOSE_LIGHT = ":/light/images/close_normal .svg";
 #define ArrowLineExpand_SPACING 10
 #define DIALOG_TITLEBAR_HEIGHT 60
 
-struct MetaData {
+struct MetaData
+{
     QString key;
     const char *name;
 };
 
-static MetaData MetaDataBasics[] = {
-    {"FileName", QT_TRANSLATE_NOOP("MetadataName", "Name")},
-    {"DateTimeOriginal", QT_TRANSLATE_NOOP("MetadataName", "Date captured")},
-    {"DateTimeDigitized", QT_TRANSLATE_NOOP("MetadataName", "Date modified")},
-    {"FileFormat", QT_TRANSLATE_NOOP("MetadataName", "Type")},
-    {"Dimension", QT_TRANSLATE_NOOP("MetadataName", "Dimensions")},
-    {"FileSize", QT_TRANSLATE_NOOP("MetadataName", "File size")},
-    {"Tag", QT_TRANSLATE_NOOP("MetadataName", "Tag")},
-    {"", ""}
-};
+static MetaData MetaDataBasics[] = {{"FileName", QT_TRANSLATE_NOOP("MetadataName", "Name")},
+                                    {"DateTimeOriginal", QT_TRANSLATE_NOOP("MetadataName", "Date captured")},
+                                    {"DateTimeDigitized", QT_TRANSLATE_NOOP("MetadataName", "Date modified")},
+                                    {"FileFormat", QT_TRANSLATE_NOOP("MetadataName", "Type")},
+                                    {"Dimension", QT_TRANSLATE_NOOP("MetadataName", "Dimensions")},
+                                    {"FileSize", QT_TRANSLATE_NOOP("MetadataName", "File size")},
+                                    {"Tag", QT_TRANSLATE_NOOP("MetadataName", "Tag")},
+                                    {"", ""}};
 
-static MetaData MetaDataDetails[] = {
-    {"ColorSpace", QT_TRANSLATE_NOOP("MetadataName", "Colorspace")},
-    {"ExposureMode", QT_TRANSLATE_NOOP("MetadataName", "Exposure mode")},
-    {"ExposureProgram", QT_TRANSLATE_NOOP("MetadataName", "Exposure program")},
-    {"ExposureTime", QT_TRANSLATE_NOOP("MetadataName", "Exposure time")},
-    {"Flash", QT_TRANSLATE_NOOP("MetadataName", "Flash")},
-    {"ApertureValue", QT_TRANSLATE_NOOP("MetadataName", "Aperture")},
-    {"FocalLength", QT_TRANSLATE_NOOP("MetadataName", "Focal length")},
-    {"ISOSpeedRatings", QT_TRANSLATE_NOOP("MetadataName", "ISO")},
-    {"MaxApertureValue", QT_TRANSLATE_NOOP("MetadataName", "Max aperture")},
-    {"MeteringMode", QT_TRANSLATE_NOOP("MetadataName", "Metering mode")},
-    {"WhiteBalance", QT_TRANSLATE_NOOP("MetadataName", "White balance")},
-    {"FlashExposureComp", QT_TRANSLATE_NOOP("MetadataName", "Flash compensation")},
-    {"Model", QT_TRANSLATE_NOOP("MetadataName", "Camera model")},
-    {"LensType", QT_TRANSLATE_NOOP("MetadataName", "Lens model")},
-    {"", ""}
-};
+static MetaData MetaDataDetails[] = {{"ColorSpace", QT_TRANSLATE_NOOP("MetadataName", "Colorspace")},
+                                     {"ExposureMode", QT_TRANSLATE_NOOP("MetadataName", "Exposure mode")},
+                                     {"ExposureProgram", QT_TRANSLATE_NOOP("MetadataName", "Exposure program")},
+                                     {"ExposureTime", QT_TRANSLATE_NOOP("MetadataName", "Exposure time")},
+                                     {"Flash", QT_TRANSLATE_NOOP("MetadataName", "Flash")},
+                                     {"ApertureValue", QT_TRANSLATE_NOOP("MetadataName", "Aperture")},
+                                     {"FocalLength", QT_TRANSLATE_NOOP("MetadataName", "Focal length")},
+                                     {"ISOSpeedRatings", QT_TRANSLATE_NOOP("MetadataName", "ISO")},
+                                     {"MaxApertureValue", QT_TRANSLATE_NOOP("MetadataName", "Max aperture")},
+                                     {"MeteringMode", QT_TRANSLATE_NOOP("MetadataName", "Metering mode")},
+                                     {"WhiteBalance", QT_TRANSLATE_NOOP("MetadataName", "White balance")},
+                                     {"FlashExposureComp", QT_TRANSLATE_NOOP("MetadataName", "Flash compensation")},
+                                     {"Model", QT_TRANSLATE_NOOP("MetadataName", "Camera model")},
+                                     {"LensType", QT_TRANSLATE_NOOP("MetadataName", "Lens model")},
+                                     {"", ""}};
 
 static int maxTitleWidth()
 {
     int maxWidth = 0;
     for (const MetaData *i = MetaDataBasics; !i->key.isEmpty(); ++i) {
-        maxWidth = qMax(maxWidth + 1,
-                        Libutils::base::stringWidth(
-                            DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
+        maxWidth =
+            qMax(maxWidth + 1, Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
     }
     for (const MetaData *i = MetaDataDetails; !i->key.isEmpty(); ++i) {
-        maxWidth = qMax(maxWidth + 1,
-                        Libutils::base::stringWidth(
-                            DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
+        maxWidth =
+            qMax(maxWidth + 1, Libutils::base::stringWidth(DFontSizeManager::instance()->get(DFontSizeManager::T8), i->name));
     }
 
     return maxWidth;
@@ -109,22 +102,11 @@ public:
 class DFMDArrowLineExpand : public DArrowLineDrawer
 {
 public:
-    DFMDArrowLineExpand()
-    {
-        //        if (headerLine()) {
-        //            DFontSizeManager::instance()->bind(headerLine(), DFontSizeManager::T6,
-        //            QFont::Medium);
-
-        //            DPalette pa = DApplicationHelper::instance()->palette(headerLine());
-        //            pa.setBrush(DPalette::Text, pa.color(DPalette::TextTitle));
-        //            headerLine()->setPalette(pa);
-
-        //            headerLine()->setLeftMargin(10);
-        //        }
-    }
+    DFMDArrowLineExpand() {}
+    ~DFMDArrowLineExpand() override;
 
 protected:
-    void paintEvent(QPaintEvent *event)
+    void paintEvent(QPaintEvent *event) override
     {
         Q_UNUSED(event);
         QPainter painter(this);
@@ -142,10 +124,11 @@ protected:
     }
 };
 
+DFMDArrowLineExpand::~DFMDArrowLineExpand() {}
+
 #include "imageinfowidget.moc"
 
-LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &lightStyle,
-                                       QWidget *parent)
+LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &lightStyle, QWidget *parent)
     : QFrame(parent)
     , m_maxTitleWidth(maxTitleWidth())
     , m_maxFieldWidth(0)
@@ -158,17 +141,7 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     Q_UNUSED(darkStyle);
     Q_UNUSED(lightStyle);
     setFixedWidth(300);
-    //    setMaximumHeight(540);
     setFrameStyle(QFrame::NoFrame);
-
-    // Title field
-    //    SimpleFormLabel *title = new SimpleFormLabel(tr("Image info"));
-    //    title->setFixedHeight(50);
-    //    DFontSizeManager::instance()->bind(title, DFontSizeManager::T6);
-
-    //    DPalette pa = DApplicationHelper::instance()->palette(title);
-    //    pa.setBrush(DPalette::Text, pa.color(DPalette::TextTitle));
-    //    title->setPalette(pa);
 
     // Info field
     m_exif_base = new QFrame(this);
@@ -198,53 +171,9 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     m_mainLayout->setMargin(0);
     m_mainLayout->setSpacing(10);
 
-    //    m_scrollArea = new QScrollArea();
-    //    QPalette palette = m_scrollArea->viewport()->palette();
-    //    palette.setBrush(QPalette::Background, Qt::NoBrush);
-    ////    palette.setBrush(QPalette::Background, Qt::red);
-    //    m_scrollArea->viewport()->setPalette(palette);
-    //    m_scrollArea->setFrameShape(QFrame::Shape::NoFrame);
-
-    //    QWidget *scrollContentWidget = new QWidget;
-    //    QVBoxLayout *scrollWidgetLayout = new QVBoxLayout;
-    //    scrollWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    //    scrollWidgetLayout->setSpacing(ArrowLineExpand_SPACING);
-    //    scrollContentWidget->setLayout(scrollWidgetLayout);
-    //    m_scrollArea->setWidget(scrollContentWidget);
-    //    m_scrollArea->setWidgetResizable(true);
-    //    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
-
-    //    m_mainLayout->addWidget(m_scrollArea, 1);
     m_mainLayout->addWidget(m_exif_base);
     m_mainLayout->addWidget(m_exif_details);
     this->setLayout(m_mainLayout);
-    //    QVBoxLayout *scrolllayout = new QVBoxLayout;
-    //    scrolllayout->addWidget(m_scrollArea);
-
-    //    QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->layout());
-    //    layout->addLayout(scrolllayout, 1);
-#if 0
-    m_closedString = "";
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-    if (themeType == DGuiApplicationHelper::DarkType) {
-        m_closedString = ICON_CLOSE_DARK;
-    } else {
-        m_closedString = ICON_CLOSE_LIGHT;
-    }
-
-    DDialogCloseButton *m_close = new DDialogCloseButton(this);
-    m_close->setIcon(QIcon(m_closedString));
-
-    m_close->setIconSize(QSize(36, 36));
-    m_close->setFlat(true);
-    m_close->move(257, 7);
-    DPalette palette1;
-    palette1.setColor(DPalette::Background, QColor(0, 0, 0, 1));
-    m_close->setPalette(palette1);
-
-    connect(m_close, &DDialogCloseButton::clicked, this,
-            [ = ] { emit dApp->signalM->hideExtensionPanel(); });
-#endif
 }
 
 LibImageInfoWidget::~LibImageInfoWidget()
@@ -260,9 +189,9 @@ void updateFileTime(QMap<QString, QString> &data, const QString &path)
         QDateTime time = QDateTime::fromString(data["DateTime"], "yyyy:MM:dd hh:mm:ss");
         data["DateTimeOriginal"] = time.toString("yyyy/MM/dd hh:mm");
     } else {
-        data.insert("DateTimeOriginal",  info.lastModified().toString("yyyy/MM/dd HH:mm"));
+        data.insert("DateTimeOriginal", info.lastModified().toString("yyyy/MM/dd HH:mm"));
     }
-    data.insert("DateTimeDigitized",  info.lastModified().toString("yyyy/MM/dd HH:mm"));
+    data.insert("DateTimeDigitized", info.lastModified().toString("yyyy/MM/dd HH:mm"));
 }
 
 void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
@@ -311,23 +240,45 @@ void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
 
     m_expandGroup.clear();
 
+    bool firstExpand = true;
+    // Wayland 下延迟首次动画展示
+    if (Libutils::base::checkWayland()) {
+        firstExpand = isVisible();
+    }
+
     if (m_isBaseInfo == true && m_isDetailsInfo == true) {
         titleList << tr("Basic info");
         titleList << tr("Details");
         m_expandGroup = addExpandWidget(titleList);
         m_expandGroup.at(0)->setContent(m_exif_base);
-        m_expandGroup.at(0)->setExpand(true);
+        m_expandGroup.at(0)->setExpand(firstExpand);
         m_expandGroup.at(1)->setContent(m_exif_details);
-        m_expandGroup.at(1)->setExpand(true);
+        m_expandGroup.at(1)->setExpand(firstExpand);
 
     } else if (m_isBaseInfo == true && m_isDetailsInfo == false) {
         titleList << tr("Basic info");
         m_expandGroup = addExpandWidget(titleList);
         m_expandGroup.at(0)->setContent(m_exif_base);
-        m_expandGroup.at(0)->setExpand(true);
+        m_expandGroup.at(0)->setExpand(firstExpand);
     }
 
     layout->addStretch(1);
+}
+
+void LibImageInfoWidget::showEvent(QShowEvent *e)
+{
+    QFrame::showEvent(e);
+
+    // Note: Wayland 下默认动画和应用动画重叠，同时可能导致 wayland 未正确取得
+    //  控件信息，显示花屏，调整应用动画在 wayland 动画后
+    if (Libutils::base::checkWayland()) {
+        const int waylandAnimationDuration = 250;
+        QTimer::singleShot(waylandAnimationDuration, this, [this]() {
+            for (auto expand : m_expandGroup) {
+                expand->setExpand(true);
+            }
+        });
+    }
 }
 
 void LibImageInfoWidget::resizeEvent(QResizeEvent *e)
@@ -339,12 +290,13 @@ void LibImageInfoWidget::timerEvent(QTimerEvent *e)
 {
     QWidget::timerEvent(e);
 }
-//LMH0609解决31498 【看图】【5.6.3.9】【sp2】更改字体大小后，图片信息窗口文字布局展示异常
+
+// LMH0609解决31498 【看图】【5.6.3.9】【sp2】更改字体大小后，图片信息窗口文字布局展示异常
 void LibImageInfoWidget::paintEvent(QPaintEvent *event)
 {
     QFont font;
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
-    //LMH0609判断与上次自体的大小是否一样，不一样则刷新
+    // LMH0609判断与上次自体的大小是否一样，不一样则刷新
     if (currentSize != m_currentFontSize) {
         m_currentFontSize = currentSize;
         TITLE_MAXCNWIDETH = currentSize * 4;
@@ -374,10 +326,7 @@ void LibImageInfoWidget::clearLayout(QLayout *layout)
         }
     }
 }
-// QSize ImageInfoWidget::sizeHint() const
-//{
-//    return QSize(m_maxContentWidth, height());
-//}
+
 const QString LibImageInfoWidget::trLabel(const char *str)
 {
     return qApp->translate("MetadataName", str);
@@ -387,15 +336,15 @@ void LibImageInfoWidget::updateInfo()
 {
     // Minus layout margins
     //    m_maxFieldWidth = width() - m_maxTitleWidth - 20*2;
-    //solve bug 1623 根据中英文系统语言设置Title宽度  shuwenzhi   20200313
+    // solve bug 1623 根据中英文系统语言设置Title宽度  shuwenzhi   20200313
     QLocale local;
     bool CNflag;
     QLocale::Language lan = local.language();
     if (lan == QLocale::Language::Chinese) {
-        m_maxFieldWidth = width() - TITLE_MAXCNWIDETH/* - 20 * 2 */ - 10 * 2 - 10;
+        m_maxFieldWidth = width() - TITLE_MAXCNWIDETH /* - 20 * 2 */ - 10 * 2 - 10;
         CNflag = true;
     } else {
-        m_maxFieldWidth = width() - TITLE_MAXOTHERWIDETH/* - 20 * 2 */ - 10 * 2 - 10;
+        m_maxFieldWidth = width() - TITLE_MAXOTHERWIDETH /* - 20 * 2 */ - 10 * 2 - 10;
         CNflag = false;
     }
 
@@ -419,8 +368,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
             continue;
         }
 
-        if ((i->key == "DateTimeOriginal" || i->key == "DateTimeDigitized") &&
-                value.left(1) == QString("0")) {
+        if ((i->key == "DateTimeOriginal" || i->key == "DateTimeDigitized") && value.left(1) == QString("0")) {
             continue;
         }
 
@@ -433,7 +381,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         if (i->key == "FileFormat" && !suffix.isEmpty() && infos.value(i->key).isNull()) {
             value = fi.suffix();
         }
-        //value必须为小写
+        // value必须为小写
         if (i->key == "FileFormat") {
             value = value.toLower();
         }
@@ -446,7 +394,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         pa1.setBrush(DPalette::WindowText, pa1.color(DPalette::TextTitle));
         field->setPalette(pa1);
 
-        //hujianbo 修改图片信息中文修改格式为年月日，英文不变，修复bug24447  备注：随系统升级有时拿到的是年月日格式 ，有时是/格式
+        // hujianbo 修改图片信息中文修改格式为年月日，英文不变，修复bug24447  备注：随系统升级有时拿到的是年月日格式 ，有时是/格式
         if (i->key == "DateTimeOriginal" || i->key == "DateTimeDigitized") {
             if (CNflag) {
                 QDateTime tmpTime = QDateTime::fromString(value, "yyyy/MM/dd hh:mm:ss");
@@ -553,7 +501,7 @@ void LibImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
     layout->addWidget(expand, 0, Qt::AlignTop);
     //修复style问题
     DEnhancedWidget *hanceedWidget = new DEnhancedWidget(expand, expand);
-    connect(hanceedWidget, &DEnhancedWidget::heightChanged, hanceedWidget, [ = ]() {
+    connect(hanceedWidget, &DEnhancedWidget::heightChanged, hanceedWidget, [=]() {
         QRect rc1 = geometry();
         rc1.setHeight(contentHeight() + ArrowLineExpand_SPACING * 2);
         setGeometry(rc1);
@@ -571,6 +519,5 @@ int LibImageInfoWidget::contentHeight() const
     if (m_expandGroup.size() == 2)
         expandsHeight += 10;
 
-    return (DIALOG_TITLEBAR_HEIGHT + expandsHeight + contentsMargins().top() +
-            contentsMargins().bottom());
+    return (DIALOG_TITLEBAR_HEIGHT + expandsHeight + contentsMargins().top() + contentsMargins().bottom());
 }
