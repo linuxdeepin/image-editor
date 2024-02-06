@@ -25,6 +25,7 @@ class ViewSeparator;
 class LibImageInfoWidget : public QFrame
 {
     Q_OBJECT
+    
 public:
     explicit LibImageInfoWidget(const QString &darkStyle, const QString &lightStyle, QWidget *parent = nullptr);
     ~LibImageInfoWidget() Q_DECL_OVERRIDE;
@@ -32,10 +33,10 @@ public:
     void updateInfo();
     int contentHeight() const;
 
-signals:
-    void extensionPanelHeight(int height);
+    Q_SIGNAL void extensionPanelHeight(int height);
 
 protected:
+    void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
     void timerEvent(QTimerEvent *e) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
