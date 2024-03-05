@@ -51,7 +51,7 @@ const int RT_SPACING = 20;
 const int TOOLBAR_HEIGHT = 60;
 
 const int TOOLBAR_DVALUE = 114 + 8;
-
+const QColor TOOLBAR_BUTTOM_DARK=QColor("#303030");
 const int THUMBNAIL_WIDTH = 32;
 const int THUMBNAIL_ADD_WIDTH = 32;
 const int THUMBNAIL_LIST_ADJUST = 9;
@@ -440,11 +440,10 @@ void LibBottomToolbar::slotThemeChanged(int type)
 
         DPalette pa;
         pa = m_preButton->palette();
-        pa.setColor(DPalette::Light, QColor("#303030"));
-        pa.setColor(DPalette::Dark, QColor("#303030"));
+        pa.setColor(DPalette::Light, TOOLBAR_BUTTOM_DARK);
+        pa.setColor(DPalette::Dark, TOOLBAR_BUTTOM_DARK);
         // 单个按钮边框
-        QColor btnframecolor("#000000");
-        btnframecolor.setAlphaF(0.30);
+        QColor btnframecolor(TOOLBAR_BUTTOM_DARK);
         pa.setColor(DPalette::FrameBorder, btnframecolor);
         // 取消阴影
         pa.setColor(DPalette::Shadow, btnframecolor);
