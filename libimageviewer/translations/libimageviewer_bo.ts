@@ -1,6 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="bo">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="bo">
+<context>
+    <name>AIEnhanceFloatWidget</name>
+    <message>
+        <source>Reprovision</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>AIModelService</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Image not saved, Do you want to save it?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>འདོར་བ། </translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Image format is not supported, please switch the image.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The image resolution exceeds the limit, please switch the image.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Portrait not detected, switch pictures.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>This file is read-only, please save with another name.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>You do not have permission to save files here, please change and retry.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
 <context>
     <name>ExtensionPanel</name>
     <message>
@@ -10,6 +66,13 @@
     <message>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
+    </message>
+</context>
+<context>
+    <name>LibImageGraphicsView</name>
+    <message>
+        <source>AI retouching in progress, please wait...</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -56,6 +119,10 @@
     <message>
         <source>Favorite</source>
         <translation>ཉར་ཚགས།</translation>
+    </message>
+    <message>
+        <source>AI retouching</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -240,7 +307,63 @@
     </message>
     <message>
         <source>Photo info</source>
-        <translation type="unfinished"></translation>
+        <translation>པར་གྱི་ཆ་འཕྲིན།</translation>
+    </message>
+    <message>
+        <source>(Disabled)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(Remaining %1 times)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Colorize pictures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Upgrade resolution</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Blurred background</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Delete background</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Hand-drawn cartoons</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>2D Manga</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>3D Manga</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Sketch</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Processing failure.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The selected file has permission denied or is corrupted and cannot be printed.</source>
+        <translation>འདེམ་པའི་ཡིག་ཆའི་ནང་དུ་དབང་ཆ་མེད་པ་དང་ཆག་སྐྱོན་བྱུང་བའི་ཡིག་ཆ་ཡོད།དཔར་མི་ཐུབ།</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation>གཏན་འཁེལ།</translation>
     </message>
 </context>
 <context>
@@ -259,7 +382,7 @@
     </message>
     <message>
         <source>The file already exists, please use another name</source>
-        <translation type="unfinished"></translation>
+        <translation>ཡིག་ཆ་འདི་འདུག་པས། མིང་གཞན་བེད་སྤྱོད་བྱོས།</translation>
     </message>
 </context>
 <context>

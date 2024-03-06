@@ -127,6 +127,18 @@ bool MtpFileProxy::submitChangesToMTP(const QString &proxyFile)
 }
 
 /**
+   @brief 返回当前MTP文件代理是否支持DFM IO(异步)，反之则使用 Qt 默认拷贝方式。
+ */
+bool MtpFileProxy::supportDFMIO() const
+{
+#ifdef USE_DFM_IO
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
    @return 返回缓存是否包含 `proxyFile` 代理文件路径
  */
 bool MtpFileProxy::contains(const QString &proxyFile) const

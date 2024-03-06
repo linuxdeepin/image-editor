@@ -106,7 +106,6 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
-
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS} ${dfm-io_lib_INCLUDE_DIRS})
 target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES} ${dfm-io_lib_LIBRARIES} dl)
 
@@ -115,15 +114,18 @@ configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONL
 
 install(TARGETS ${CMD_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+# 公共库头文件
 install(FILES
     imageengine.h
     imageviewer.h
     image-viewer_global.h
     movieservice.h
+    quickprint.h
     DESTINATION include/libimageviewer)
 
+# pkg-config 配置文件
 install(FILES ${PROJECT_BINARY_DIR}/libimageviewer.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-#translations
+# translations 翻译文件
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/translations
     DESTINATION ${PREFIX}/share/libimageviewer
     FILES_MATCHING PATTERN "*.qm")

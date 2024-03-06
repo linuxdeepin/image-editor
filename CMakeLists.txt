@@ -18,16 +18,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
 
-
 message(STATUS ${CMAKE_CXX_FLAGS})
 
 option(DOTEST "option for test" OFF)
-
 if(DOTEST OR CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(tests)
 endif()
-
-
 
 add_subdirectory(libimageviewer)
 add_subdirectory(libimagevisualresult)
