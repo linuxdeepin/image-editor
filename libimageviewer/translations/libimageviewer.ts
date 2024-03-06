@@ -305,7 +305,7 @@
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">day</translation>
+        <translation>day</translation>
     </message>
     <message>
         <source>Photo info</source>
@@ -358,6 +358,14 @@
     <message>
         <source>Retry</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected file has permission denied or is corrupted and cannot be printed.</source>
+        <translation>The selected file has permission denied or is corrupted and cannot be printed.</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation>Confirm</translation>
     </message>
 </context>
 <context>

@@ -1492,7 +1492,7 @@ imageViewerSpace::ImageType getImageType(const QString &imagepath)
         int nSize = -1;
         QImageReader imgreader(imagepath);
         nSize = imgreader.imageCount();
-        //
+
         if (strType == "svg" && QSvgRenderer().load(imagepath)) {
             type = imageViewerSpace::ImageTypeSvg;
         } else if ((strType == "mng")
@@ -1505,7 +1505,10 @@ imageViewerSpace::ImageType getImageType(const QString &imagepath)
             type = imageViewerSpace::ImageTypeDynamic;
         } else if (nSize > 1) {
             type = imageViewerSpace::ImageTypeMulti;
-        } else {
+        } else if (mt.name().startsWith("image/")
+                   || mt.name().startsWith("video/x-mng")
+                   || mt1.name().startsWith("image/")
+                   || mt1.name().startsWith("video/x-mng")) {
             type = imageViewerSpace::ImageTypeStatic;
         }
     }

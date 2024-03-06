@@ -370,6 +370,14 @@
         <source>3D Manga</source>
         <translation type="unfinished">3D漫畫</translation>
     </message>
+    <message>
+        <source>The selected file has permission denied or is corrupted and cannot be printed.</source>
+        <translation>選中的文件中包含無權限或已損壞的文件，無法打印。</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation>確定</translation>
+    </message>
 </context>
 <context>
     <name>RenameDialog</name>

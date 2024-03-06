@@ -27,6 +27,7 @@ public:
     bool checkAndCreateProxyFile(QStringList &paths, QString &firstPath);
     bool checkFileDeviceIsMtp(const QString &filePath);
     bool submitChangesToMTP(const QString &proxyFile);
+    bool supportDFMIO() const;
 
     // 文件状态
     enum FileState { None, Loading, LoadSucc, LoadFailed, FileDelete };

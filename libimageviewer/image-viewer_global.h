@@ -16,6 +16,9 @@
 #  define IMAGEVIEWERSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
+// class interface define
+#define IMAGEVIEWER_CLASS_QUICKPRINT
+
 //image viewer plugin space
 namespace imageViewerSpace {
 
