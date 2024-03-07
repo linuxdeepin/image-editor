@@ -39,8 +39,8 @@ public:
     // 后端数据加载完成
     Q_SLOT void printLoadFinished(bool error, const QString &errorString);
 
-    // 同步等待处理
-    Q_SIGNAL void notifyLoadFinished(bool error);
+    // 等待处理完成，对话框处理完成后调用
+    Q_SIGNAL void notifyLoadFinished(int ret, bool error);
     bool waitLoadFinished();
 
     // 图片打印绘制
