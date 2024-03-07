@@ -29,6 +29,8 @@
 #include <QTextStream>
 #include <QtMath>
 #include <QImageReader>
+#include <QTranslator>
+#include <QDirIterator>
 
 #include <DApplication>
 #include <DDesktopServices>
@@ -38,6 +40,9 @@
 #include "unionimage.h"
 #endif
 DWIDGET_USE_NAMESPACE
+
+// 当前动态库使用的翻译QM翻译文件路径
+#define PLUGIN_QM_TRANS_PATH "/usr/share/libimageviewer/translations"
 
 namespace Libutils {
 
@@ -515,6 +520,51 @@ bool initCheckWaylandEnv()
 bool checkWayland()
 {
     return g_IsWaylandEnv;
+}
+
+// 是否已初始化翻译文件
+static bool g_LoadTranslator = false;
+/**
+   @brief 加载动态库指向的翻译文件
+   @note 非线程安全，仅在GUI线程调用
+ */
+bool loadLibTransaltor()
+{
+    if (g_LoadTranslator) {
+        return true;
+    }
+
+    QDir dir(PLUGIN_QM_TRANS_PATH);
+    if (dir.exists()) {
+        QDirIterator qmIt(PLUGIN_QM_TRANS_PATH, QStringList() << QString("*%1.qm").arg(QLocale::system().name()), QDir::Files);
+
+        while (qmIt.hasNext()) {
+            qmIt.next();
+            QFileInfo finfo = qmIt.fileInfo();
+            QTranslator *translator = new QTranslator(qApp);
+            if (translator->load(finfo.baseName(), finfo.absolutePath())) {
+                qApp->installTranslator(translator);
+            }
+        }
+
+        QStringList parseLocalNameList = QLocale::system().name().split("_", QString::SkipEmptyParts);
+        if (parseLocalNameList.length() > 0) {
+            QString translateFilename = QString("/libimageviewer_%2.qm").arg(parseLocalNameList.at(0));
+
+            QString translatePath = PLUGIN_QM_TRANS_PATH + translateFilename;
+            if (QFile::exists(translatePath)) {
+                qDebug() << "translatePath after feedback:" << translatePath;
+                auto translator = new QTranslator(qApp);
+                translator->load(translatePath);
+                qApp->installTranslator(translator);
+            }
+        }
+
+        g_LoadTranslator = true;
+        return true;
+    }
+
+    return false;
 }
 
 }  // namespace base

@@ -5,6 +5,8 @@
 #include "quickprint.h"
 #include "quickprint_p.h"
 
+#include "unionimage/baseutils.h"
+
 #include <DPrintPreviewDialog>
 
 #include <QtGlobal>
@@ -24,8 +26,17 @@ QuickPrintPrivate::QuickPrintPrivate(QuickPrint *q)
     : q_ptr(q)
     , imageLoader(new PrintImageLoader)
 {
+    // 快速打印可能无需加载主窗体，单独加载动态库翻译信息
+    Libutils::base::loadLibTransaltor();
+
+    QObject::connect(imageLoader.data(), &PrintImageLoader::loadFinished, this, &QuickPrintPrivate::printLoadFinished);
+    // Note: 队列发送，在调用接口结束后发出，避免部分操作流程嵌套。
     QObject::connect(
-        imageLoader.data(), &PrintImageLoader::loadFinished, this, &QuickPrintPrivate::printLoadFinished);
+        this,
+        &QuickPrintPrivate::notifyLoadFinished,
+        this,
+        [this](int ret, bool) { Q_EMIT q_ptr->printFinished(ret); },
+        Qt::QueuedConnection);
 }
 
 /**
@@ -95,8 +106,6 @@ void QuickPrintPrivate::showWarningNotify(const QString &errorString)
     warnDialog.addButton(QObject::tr("Confirm"));
 
     warnDialog.exec();
-    // 通知打印结束
-    Q_EMIT q_ptr->printFinished(QDialog::Rejected);
 }
 
 /**
@@ -218,18 +227,18 @@ void QuickPrintPrivate::printLoadFinished(bool error, const QString &errorString
 {
     this->stopSpinner();
 
+    int ret = QDialog::Rejected;
     if (error) {
         this->showWarningNotify(errorString);
     } else {
         loadDataList = imageLoader->takeLoadData();
 
         // 在此处弹出打印窗口
-        int ret = this->showPrintDialog(this->parentWidget);
-        Q_EMIT q_ptr->printFinished(ret);
+        ret = this->showPrintDialog(this->parentWidget);
     }
 
-    // 在处理完成后，触发提示信号，唤醒等待 EventLoop
-    Q_EMIT this->notifyLoadFinished(error);
+    // 在处理完成后，触发提示信号，唤醒等待 EventLoop，并队列发送 printFinsihed() 信号
+    Q_EMIT this->notifyLoadFinished(ret, error);
 }
 
 /**
@@ -240,14 +249,10 @@ bool QuickPrintPrivate::waitLoadFinished()
     bool ret = true;
     if (imageLoader->isLoading()) {
         QEventLoop loop;
-        connect(
-            this,
-            &QuickPrintPrivate::notifyLoadFinished,
-            this,
-            [&ret, &loop](bool error) {
-                ret = !error;
-                loop.quit();
-            });
+        connect(this, &QuickPrintPrivate::notifyLoadFinished, this, [&ret, &loop](int, bool error) {
+            ret = !error;
+            loop.quit();
+        });
         loop.exec();
     }
 

@@ -150,6 +150,8 @@ bool checkCommandExist(const QString &command);
 
 bool        initCheckWaylandEnv();
 bool        checkWayland();
+
+bool        loadLibTransaltor();
 }  // namespace base
 
 }  // namespace utils
