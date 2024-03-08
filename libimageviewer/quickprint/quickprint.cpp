@@ -57,6 +57,7 @@ void QuickPrintPrivate::startSpinner()
     if (!spinner) {
         spinner.reset(new DSpinner);
 
+        spinner->setObjectName("QuickPrint_Spinner");
         spinner->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
         spinner->setAttribute(Qt::WA_TranslucentBackground, true);
         spinner->setFixedSize(s_SpinnerSize, s_SpinnerSize);
@@ -100,6 +101,7 @@ void QuickPrintPrivate::showWarningNotify(const QString &errorString)
     Q_UNUSED(errorString)
 
     DDialog warnDialog(this->parentWidget);
+    warnDialog.setObjectName("QuickPrint_WarnDialog");
     warnDialog.setIcon(QIcon::fromTheme("deepin-image-viewer"));
     // "选中的文件中包含无权限或已损坏的文件，无法打印。"
     warnDialog.setMessage(QObject::tr("The selected file has permission denied or is corrupted and cannot be printed."));
@@ -118,6 +120,7 @@ int QuickPrintPrivate::showPrintDialog(QWidget *parentWidget)
     }
 
     DPrintPreviewDialog printDialog(parentWidget);
+    printDialog.setObjectName("QuickPrint_PrintDialog");
     printDialog.setAsynPreview(loadDataList.size());
     // 设置打印文件名，用于 Cups 服务记录打印任务
     printDialog.setDocName(loadDataList.first()->filePath);

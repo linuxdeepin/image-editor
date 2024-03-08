@@ -28,7 +28,7 @@ struct PrintImageData
     ImageFileState state = Normal;  // 文件状态
     QImage data;                    // 文件数据
 
-    PrintImageData(const QString &path, int f = -1)
+    explicit PrintImageData(const QString &path, int f = -1)
         : filePath(path)
         , frame(f)
     {
