@@ -195,16 +195,6 @@ bool imageSupportSave(const QString &path)
 #endif
 }
 
-//bool imageSupportWrite(const QString &path)
-//{
-//        /*lmh0724使用USE_UNIONIMAGE*/
-//#ifdef USE_UNIONIMAGE
-//    return UnionImage_NameSpace::canSave(path);
-//#else
-//    return freeimage::isSupportsWriting(path);
-//#endif
-//}
-
 bool rotate(const QString &path, int degree)
 {
     /*lmh0724使用USE_UNIONIMAGE*/
@@ -787,25 +777,17 @@ bool imageSupportWallPaper(const QString &path)
            && !mt.name().endsWith("x-portable-anymap");
 }
 
-//bool suffixisImage(const QString &path)
-//{
-//#ifdef USE_UNIONIMAGE
-//    return UnionImage_NameSpace::suffixisImage(path);
-//#else
-//    bool iRet = false;
-//    QFileInfo info(path);
-//    QMimeDatabase db;
-//    QMimeType mt = db.mimeTypeForFile(path, QMimeDatabase::MatchContent);
-//    QMimeType mt1 = db.mimeTypeForFile(path, QMimeDatabase::MatchExtension);
-//    QString str = info.suffix();
-//    // if (!m_nosupportformat.contains(str, Qt::CaseSensitive)) {
-//    if (mt.name().startsWith("image/") || mt.name().startsWith("video/x-mng") ||
-//            mt1.name().startsWith("image/") || mt1.name().startsWith("video/x-mng")) {
-//        iRet = true;
-//    }
-//    return iRet;
-//#endif
-//}
+/**
+   @return 返回文件类型是否可以直接设置锁屏壁纸
+        壁纸支持 jpeg jpg png bmp tif gif
+        锁屏支持 jpeg jpg png
+ */
+bool imageSupportGreeterDirect(const QString &path)
+{
+    QMimeDatabase db;
+    QMimeType mt = db.mimeTypeForFile(path, QMimeDatabase::MatchDefault);
+    return "image/jpeg" == mt.name() || "image/png" == mt.name();
+}
 
 QString makeVaultLocalPath(const QString &path, const QString &base)
 {

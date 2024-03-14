@@ -827,61 +827,75 @@ void LibViewPanel::setContextMenuItemVisible(imageViewerSpace::NormalMenuItemId 
     updateMenuContent();
 }
 
+/**
+   @brief 通过DBus接口设置图片 \a path 为壁纸
+    task 32367: 同时设置为锁屏壁纸
+ */
+static void setWallpaperWithDBus(const QString &path)
+{
+    //202011/12 bug54279 设置壁纸代码改变，采用DBus
+    qDebug() << "SettingWallpaper: " << "flatpak" << path;
+    QDBusInterface interface("com.deepin.daemon.Appearance",
+                                 "/com/deepin/daemon/Appearance",
+                                 "com.deepin.daemon.Appearance");
+
+    if (interface.isValid()) {
+        QString screenname;
+
+        //判断环境是否是wayland
+        auto e = QProcessEnvironment::systemEnvironment();
+        QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
+        QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
+
+        bool isWayland = false;
+        if (XDG_SESSION_TYPE != QLatin1String("wayland") && !WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
+            isWayland = false;
+        } else {
+            isWayland = true;
+        }
+
+        // wayland下设置壁纸使用，2020/09/21
+        if (isWayland) {
+            QDBusInterface interfaceWayland("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
+            screenname = qvariant_cast< QString >(interfaceWayland.property("Primary"));
+        } else {
+            screenname = QGuiApplication::primaryScreen()->name();
+        }
+        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
+        QString error = reply.errorMessage();
+        if (!error.isEmpty()) {
+            qWarning() << "SettingWallpaper: replay" << reply.errorMessage();
+        }
+
+        // 新增需求32367：同时设置锁屏壁纸
+        reply = interface.call(QStringLiteral("Set"), QStringLiteral("greeterbackground"), path);
+        error = reply.errorMessage();
+        if (!error.isEmpty()) {
+            qWarning() << "Set greeterbackground: replay" << reply.errorMessage();
+        }
+
+        // 通知触发设置壁纸动作（属于拷贝动作）
+        PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, path);
+    } else {
+        qWarning() << "SettingWallpaper failed" << interface.lastError();
+    }
+}
+
 void LibViewPanel::setWallpaper(const QImage &img)
 {
     QThread *th1 = QThread::create([ = ]() {
         if (!img.isNull()) {
-            QString path = "/tmp/DIVIMG.png";
-            img.save("/tmp/DIVIMG.png", "png");
-            //202011/12 bug54279
-            {
-                //设置壁纸代码改变，采用DBus,原方法保留
-                if (/*!qEnvironmentVariableIsEmpty("FLATPAK_APPID")*/1) {
-                    // gdbus call -e -d com.deepin.daemon.Appearance -o /com/deepin/daemon/Appearance -m com.deepin.daemon.Appearance.Set background /home/test/test.png
-                    qDebug() << "SettingWallpaper: " << "flatpak" << path;
-                    QDBusInterface interface("com.deepin.daemon.Appearance",
-                                                 "/com/deepin/daemon/Appearance",
-                                                 "com.deepin.daemon.Appearance");
-//                    if (interface.isValid()) {
-//                        //获取鼠标在的位置的桌面
-//                        QString screenname = QGuiApplication::screenAt(QCursor::pos())->name();
-//                        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
-//                        qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
-//                    }
-                    if (interface.isValid()) {
-                        QString screenname;
-
-                        //判断环境是否是wayland
-                        auto e = QProcessEnvironment::systemEnvironment();
-                        QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
-                        QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
-
-                        bool isWayland = false;
-                        if (XDG_SESSION_TYPE != QLatin1String("wayland") && !WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
-                            isWayland = false;
-                        } else {
-                            isWayland = true;
-                        }
-                        //wayland下设置壁纸使用，2020/09/21
-                        if (isWayland) {
-                            QDBusInterface interfaceWayland("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
-                            screenname = qvariant_cast< QString >(interfaceWayland.property("Primary"));
-                        } else {
-                            screenname = QGuiApplication::primaryScreen()->name();
-                        }
-                        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
-                        qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
-                    } else {
-                        qWarning() << "SettingWallpaper failed" << interface.lastError();
-                    }
-                }
-//                // Remove the tmp file
-//                QTimer::singleShot(1000,this, [ = ] {
-//                    QFile(path).remove();
-//                });
-
-
+            // 设置锁屏壁纸不能使用相同名称，且临时文件不能立即删除(调用DBus接口拷贝需要时间)，保留至缓存目录，程序退出自动清理
+            QTemporaryFile tmpImage;
+            tmpImage.setAutoRemove(false);
+            tmpImage.setFileTemplate(Libutils::image::getCacheImagePath() + QDir::separator() + "XXXXXX_Wallpaper.png");
+            if (!tmpImage.open() || !img.save(tmpImage.fileName(), "PNG")) {
+                qWarning() << QString("Copy image set wallpaper failed! path: %1").arg(tmpImage.fileName());
+                return;
             }
+            qInfo() << QString("Copy image set wallpaper, path: %1").arg(tmpImage.fileName());
+
+            setWallpaperWithDBus(tmpImage.fileName());
         }
     });
     connect(th1, &QThread::finished, th1, &QObject::deleteLater);
@@ -892,53 +906,7 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
 {
     QThread *th1 = QThread::create([ = ]() {
         if (!imgPath.isNull()) {
-            QString path = imgPath;
-            //202011/12 bug54279
-            {
-                //设置壁纸代码改变，采用DBus,原方法保留
-                if (/*!qEnvironmentVariableIsEmpty("FLATPAK_APPID")*/1) {
-                    // gdbus call -e -d com.deepin.daemon.Appearance -o /com/deepin/daemon/Appearance -m com.deepin.daemon.Appearance.Set background /home/test/test.png
-                    qDebug() << "SettingWallpaper: " << "flatpak" << path;
-                    QDBusInterface interface("com.deepin.daemon.Appearance",
-                                                 "/com/deepin/daemon/Appearance",
-                                                 "com.deepin.daemon.Appearance");
-//                    if (interface.isValid()) {
-//                        //获取鼠标在的位置的桌面
-//                        QString screenname = QGuiApplication::screenAt(QCursor::pos())->name();
-//                        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
-//                        qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
-//                    }
-                    if (interface.isValid()) {
-                        QString screenname;
-
-                        //判断环境是否是wayland
-                        auto e = QProcessEnvironment::systemEnvironment();
-                        QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
-                        QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
-
-                        bool isWayland = false;
-                        if (XDG_SESSION_TYPE != QLatin1String("wayland") && !WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
-                            isWayland = false;
-                        } else {
-                            isWayland = true;
-                        }
-                        //wayland下设置壁纸使用，2020/09/21
-                        if (isWayland) {
-                            QDBusInterface interfaceWayland("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
-                            screenname = qvariant_cast< QString >(interfaceWayland.property("Primary"));
-                        } else {
-                            screenname = QGuiApplication::primaryScreen()->name();
-                        }
-                        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
-                        qDebug() << "SettingWallpaper: replay" << reply.errorMessage();
-
-                        // 通知触发设置壁纸动作（属于拷贝动作）
-                        PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, path);
-                    } else {
-                        qWarning() << "SettingWallpaper failed" << interface.lastError();
-                    }
-                }
-            }
+            setWallpaperWithDBus(imgPath);
         }
     });
     connect(th1, &QThread::finished, th1, &QObject::deleteLater);
@@ -1885,12 +1853,12 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             if (m_view) {
                 m_view->slotRotatePixCurrent();
             }
-            //todo设置壁纸
-            qDebug() << m_currentPath;
-//            setWallpaper(m_view->image());
-            if (!m_currentPath.isNull() && m_view->getcurrentImgCount() <= 1) {
+
+            // 仅 jpeg 和 png 图片类型使用文件路径直接设置
+            if (Libutils::image::imageSupportGreeterDirect(m_currentPath)) {
                 setWallpaper(m_currentPath);
             } else {
+                // 保存文件存在时延 bug 106135
                 setWallpaper(m_view->image());
             }
             break;
