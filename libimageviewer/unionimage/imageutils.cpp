@@ -25,6 +25,7 @@
 #include <QReadWriteLock>
 #include <QUrl>
 #include <QApplication>
+#include <QTemporaryDir>
 
 namespace Libutils {
 
@@ -824,32 +825,67 @@ bool isCanRemove(const QString &path)
     return bRet;
 }
 
+// 缓存文件路径及互斥锁
+static QMutex s_CachePathMutex;
+static QString s_CachePath;
+
 /**
- * @brief 取得图像缓存文件夹路径
+   @brief 取得图像缓存文件夹路径，未成功初始化将自动创建
+   @threadsafe
  */
 QString getCacheImagePath()
 {
-    return QDir::homePath() + "/.cache/deepin/deepin-image-viewer/cache_image";
+    QMutexLocker _locker(&s_CachePathMutex);
+    if (s_CachePath.isEmpty()) {
+        _locker.unlock();
+        initCacheImageFolder();
+        _locker.relock();
+    }
+
+    return s_CachePath;
 }
 
 /**
- * @brief 初始化图像缓存文件夹并返回是否初始化成功
+   @brief 初始化图像临时缓存文件夹（/tmp/image-viewer-cache_XXXXXX）并返回是否初始化成功，仅在加载图片时调用
+    看图为多实例进程，不同实例创建缓存位置不同
+   @threadsafe
  */
 bool initCacheImageFolder()
 {
-    QDir homeDir(QDir::homePath());
-    return homeDir.mkpath(".cache/deepin/deepin-image-viewer/cache_image");
+    QMutexLocker _locker(&s_CachePathMutex);
+    if (!s_CachePath.isEmpty()) {
+        return true;
+    }
+
+    QTemporaryDir dir(QDir::tempPath() + QDir::separator() + "image-viewer-cache_XXXXXX");
+    dir.setAutoRemove(false);
+    if (dir.isValid()) {
+        s_CachePath = dir.path();
+        return true;
+    }
+
+    qWarning() << QString("Create cache image folder failed, %1:%2").arg(dir.path()).arg(dir.errorString());
+    return false;
 }
 
 /**
- * @brief 清空图像缓存文件夹并返回是否清理成功，
- *  在程序启动或打开文件时调用
+   @brief 清空图像缓存文件夹并返回是否清理成功，在程序退出时调用。
+   @threadsafe
  */
 bool clearCacheImageFolder()
 {
-    QDir cacheDir(getCacheImagePath());
+    QMutexLocker _locker(&s_CachePathMutex);
+    if (s_CachePath.isEmpty()) {
+        return false;
+    }
+
+    QDir cacheDir(s_CachePath);
     if (cacheDir.exists()) {
-        return cacheDir.removeRecursively();
+        bool ret = cacheDir.removeRecursively();
+        if (ret) {
+            s_CachePath.clear();
+        }
+        return ret;
     }
     return false;
 }

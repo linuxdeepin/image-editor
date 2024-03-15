@@ -179,7 +179,6 @@ LibViewPanel::~LibViewPanel()
 void LibViewPanel::loadImage(const QString &path, QStringList paths)
 {
     // 初始化图像缓存目录
-    Libutils::image::clearCacheImageFolder();
     Libutils::image::initCacheImageFolder();
 
     QFileInfo info(path);
@@ -883,12 +882,13 @@ static void setWallpaperWithDBus(const QString &path)
 
 void LibViewPanel::setWallpaper(const QImage &img)
 {
-    QThread *th1 = QThread::create([ = ]() {
-        if (!img.isNull()) {
+    if (!img.isNull()) {
+        QString tempPathTemplate = Libutils::image::getCacheImagePath() + QDir::separator() + "XXXXXX_Wallpaper.png";
+        QThread *th1 = QThread::create([ = ]() {
             // 设置锁屏壁纸不能使用相同名称，且临时文件不能立即删除(调用DBus接口拷贝需要时间)，保留至缓存目录，程序退出自动清理
             QTemporaryFile tmpImage;
             tmpImage.setAutoRemove(false);
-            tmpImage.setFileTemplate(Libutils::image::getCacheImagePath() + QDir::separator() + "XXXXXX_Wallpaper.png");
+            tmpImage.setFileTemplate(tempPathTemplate);
             if (!tmpImage.open() || !img.save(tmpImage.fileName(), "PNG")) {
                 qWarning() << QString("Copy image set wallpaper failed! path: %1").arg(tmpImage.fileName());
                 return;
@@ -896,21 +896,19 @@ void LibViewPanel::setWallpaper(const QImage &img)
             qInfo() << QString("Copy image set wallpaper, path: %1").arg(tmpImage.fileName());
 
             setWallpaperWithDBus(tmpImage.fileName());
-        }
-    });
-    connect(th1, &QThread::finished, th1, &QObject::deleteLater);
-    th1->start();
+        });
+        connect(th1, &QThread::finished, th1, &QObject::deleteLater);
+        th1->start();
+    }
 }
 
 void LibViewPanel::setWallpaper(const QString &imgPath)
 {
-    QThread *th1 = QThread::create([ = ]() {
-        if (!imgPath.isNull()) {
-            setWallpaperWithDBus(imgPath);
-        }
-    });
-    connect(th1, &QThread::finished, th1, &QObject::deleteLater);
-    th1->start();
+    if (!imgPath.isEmpty()) {
+        QThread *th1 = QThread::create([ = ]() { setWallpaperWithDBus(imgPath); });
+        connect(th1, &QThread::finished, th1, &QObject::deleteLater);
+        th1->start();
+    }
 }
 
 bool LibViewPanel::startdragImage(const QStringList &paths, const QString &firstPath)
