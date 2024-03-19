@@ -782,9 +782,15 @@ bool imageSupportWallPaper(const QString &path)
    @return 返回文件类型是否可以直接设置锁屏壁纸
         壁纸支持 jpeg jpg png bmp tif gif
         锁屏支持 jpeg jpg png
+        且允许直接设置的图片大小不超过5MB (后端限制<32MB)
  */
 bool imageSupportGreeterDirect(const QString &path)
 {
+    static qint64 s_maxFileSize = 5 * 1024 * 1024;
+    if (QFileInfo(path).size() > s_maxFileSize) {
+        return false;
+    }
+
     QMimeDatabase db;
     QMimeType mt = db.mimeTypeForFile(path, QMimeDatabase::MatchDefault);
     return "image/jpeg" == mt.name() || "image/png" == mt.name();

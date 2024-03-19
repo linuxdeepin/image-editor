@@ -883,13 +883,14 @@ static void setWallpaperWithDBus(const QString &path)
 void LibViewPanel::setWallpaper(const QImage &img)
 {
     if (!img.isNull()) {
-        QString tempPathTemplate = Libutils::image::getCacheImagePath() + QDir::separator() + "XXXXXX_Wallpaper.png";
+        QString tempPathTemplate = Libutils::image::getCacheImagePath() + QDir::separator() + "XXXXXX_Wallpaper.jpg";
         QThread *th1 = QThread::create([ = ]() {
             // 设置锁屏壁纸不能使用相同名称，且临时文件不能立即删除(调用DBus接口拷贝需要时间)，保留至缓存目录，程序退出自动清理
             QTemporaryFile tmpImage;
             tmpImage.setAutoRemove(false);
             tmpImage.setFileTemplate(tempPathTemplate);
-            if (!tmpImage.open() || !img.save(tmpImage.fileName(), "PNG")) {
+            // 使用JPG压缩而不是PNG以压缩减少缓存图片大小
+            if (!tmpImage.open() || !img.save(tmpImage.fileName(), "JPG")) {
                 qWarning() << QString("Copy image set wallpaper failed! path: %1").arg(tmpImage.fileName());
                 return;
             }
