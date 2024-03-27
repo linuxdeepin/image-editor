@@ -1,3 +1,12 @@
+image-editor (1.0.44) unstable; urgency=medium
+
+  * fix: The bottom line of the bottombar bottoms is thick.(Bug: 197857)
+  * feat: Set greeter background when setting wallpaper(Task: 32367)(Influence: SetWallpaper)
+  * fix: Wrong clean cache folder(Bug: 247289)(Influence: SetWallpaper)
+  * fix: Cached greeter background image too large(Bug: 247311)(Influence: SetWallpaper)
+
+ -- renbin <renbin@uniontech.com>  Wed, 27 Mar 2024 15:30:02 +0800
+
 image-editor (1.0.43) unstable; urgency=medium
 
   * fix: Info widget flicking on wayland.(Bug: 242125)
