@@ -724,7 +724,8 @@ WaterMarkData PermissionConfig::convertAdapterWaterMarkData(const PermissionConf
     // DTKWidget 主线和定制线的水印接口不同，通过版本进行区分
     // 主线水印接口在 5.6.9 之后引入.
     // 因此，判断定制线：存在水印接口宏 DTKWIDGET_CLASS_DWaterMarkHelper ，版本低于 5.6.9
-#if DTK_VERSION < DTK_VERSION_CHECK(5, 6, 9, 0)
+    // 由于DTKCore 和 DTKWidget 版本可能不一致，调整使用安装dev包版本识别
+#ifdef USE_SPECIFIC_DTK_WATERMARK
     data.type = AdapterWaterMarkData::Text == adptData.type ? WaterMarkType::Text : WaterMarkType::Image;
     data.layout = AdapterWaterMarkData::Center == adptData.layout ? WaterMarkLayout::Center : WaterMarkLayout::Tiled;
     data.scaleFactor = adptData.scaleFactor;
