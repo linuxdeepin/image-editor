@@ -587,6 +587,9 @@ void LibBottomToolbar::resizeEvent(QResizeEvent *event)
 
     emit sigResizeBottom();
     m_imgListWidget->moveCenterWidget();
+
+    // 计算当前展示的Item数量是否变更
+    estimatedDisplayCount();
 }
 
 void LibBottomToolbar::showEvent(QShowEvent *event)
@@ -877,4 +880,25 @@ void LibBottomToolbar::setButtonVisible(imageViewerSpace::ButtonType id, bool vi
             btn->setVisible(false);
         }
     }
+}
+
+/**
+   @return 返回当前缩略图栏显示的item计数，计数 = (显示控件宽度 / 显示的 Item 宽度) + 1，
+        计数将至少为 1
+ */
+int LibBottomToolbar::estimatedDisplayCount()
+{
+    int itemWidth = LibImgViewListView::ITEM_NORMAL_WIDTH + LibImgViewListView::ITEM_SPACING;
+    int estimate = ((m_imgListWidget->width() - LibImgViewListView::ITEM_CURRENT_WH) / itemWidth) + 1;
+    int curCount = qMax(1, estimate);
+
+    bool growup = curCount > m_estimateDisplayCount;
+    if (curCount != m_estimateDisplayCount) {
+        m_estimateDisplayCount = curCount;
+    }
+    if (growup) {
+        Q_EMIT displayItemGrowUp(m_estimateDisplayCount);
+    }
+
+    return curCount;
 }

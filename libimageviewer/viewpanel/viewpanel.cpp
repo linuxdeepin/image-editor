@@ -316,6 +316,11 @@ void LibViewPanel::initConnect()
                 m_topToolbar->update();
             });
 #endif
+
+    // 展示的item增加时(拖拽、放大等)，需要同步更新缩略图
+    connect(m_bottomToolbar, &LibBottomToolbar::displayItemGrowUp, this, [this](int){
+        loadThumbnails(m_currentPath);
+    });
 }
 
 void LibViewPanel::initTopBar()
@@ -1130,33 +1135,45 @@ void LibViewPanel::hideAnimationTopBottom()
 
 void LibViewPanel::loadThumbnails(const QString &path)
 {
-//    LibCommonService::instance()->m_listAllPath = pathList;
-//    LibCommonService::instance()->m_noLoadingPath = pathList;
-
     int index = LibCommonService::instance()->m_listAllPath.indexOf(path);
-    int left = index;
-    int right = index;
-    if (index + 50 > LibCommonService::instance()->m_listAllPath.count()) {
-        right = LibCommonService::instance()->m_listAllPath.count();
-    } else {
-        right = index + 50;
+    if (-1 == index) {
+        return;
     }
-    if (index - 50 > 0) {
-        left = index - 50;
-    } else {
-        left = 0;
-    }
+
+    // 默认的缩略图加载数量
+    static const int s_DefaultLoadThumbnails = 4;
+    // 通过当前显示的缩略图栏宽度计算待预加载的缩略图计数，适当调整宽度以预载部分未显示图片
+    int imageCount = LibCommonService::instance()->m_listAllPath.count();
+    int needLoadImages = qMax(m_bottomToolbar->estimatedDisplayCount() + 2, s_DefaultLoadThumbnails);
+    needLoadImages = qMin(needLoadImages, imageCount);
+
     QStringList loadList;
-    for (int i = left; i < right; i++) {
-        QString loadPath = LibCommonService::instance()->m_listAllPath[i];
-        if (LibCommonService::instance()->m_listLoaded.indexOf(loadPath) < 0) {
-            loadList << loadPath;
-            LibCommonService::instance()->m_listLoaded << loadPath;
-            LibCommonService::instance()->m_noLoadingPath.removeOne(loadPath);
+    auto appendFunc = [&](const QString &addPath){
+        if (!LibCommonService::instance()->m_listLoaded.contains(addPath)) {
+            loadList.append(addPath);
+            LibCommonService::instance()->m_listLoaded.insert(addPath);
+            LibCommonService::instance()->m_noLoadingPath.removeOne(addPath);
         }
+    };
 
-
+    // 从中间向两侧扩散追加，若一侧已全加载，则另一侧继续添加
+    int loadImageCount = 0;
+    int l = index;
+    int r = index + 1;
+    while (loadImageCount < needLoadImages) {
+        if (0 <= l) {
+            appendFunc(LibCommonService::instance()->m_listAllPath[l]);
+            loadImageCount++;
+            --l;
+        }
+        if (r < imageCount) {
+            appendFunc(LibCommonService::instance()->m_listAllPath[r]);
+            loadImageCount++;
+            ++r;
+        }
     }
+
+    // 异步加载数据
     ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), loadList, loadList.size());
 }
 

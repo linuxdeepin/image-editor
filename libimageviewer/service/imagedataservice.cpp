@@ -42,12 +42,14 @@ LibImageDataService::~LibImageDataService()
 bool LibImageDataService::add(const QStringList &paths)
 {
     QMutexLocker locker(&m_imgDataMutex);
-//    m_requestQueue.clear();
-    for (int i = 0; i < paths.size(); i++) {
-        if (!m_AllImageMap.contains(paths.at(i))) {
-            m_requestQueue.append(paths.at(i));
+    // FIXME: 虽然这样修改将后续的数据优先添加，但也会导致边缘变更单独更新的数据被优先读取，变成非中心加载而是偏向一侧加载。
+    // 反向添加，尾部数据在之后添加，QList两侧都有预留分配，非共享差异不大
+    std::for_each(paths.rbegin(), paths.rend(), [this](const QString &path){
+        if (!m_AllImageMap.contains(path)) {
+            m_requestQueue.prepend(path);
         }
-    }
+    });
+
     return true;
 }
 
@@ -56,7 +58,8 @@ bool LibImageDataService::add(const QString &path)
     QMutexLocker locker(&m_imgDataMutex);
     if (!path.isEmpty()) {
         if (!m_AllImageMap.contains(path)) {
-            m_requestQueue.append(path);
+            // 后添加的单一数据优先加载
+            m_requestQueue.prepend(path);
         }
     }
     return true;
@@ -83,26 +86,38 @@ int LibImageDataService::getCount()
     return m_AllImageMap.count();
 }
 
-bool LibImageDataService::readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake)
+bool LibImageDataService::readThumbnailByPaths(const QString &thumbnailPath, const QStringList &files, bool remake)
 {
-    qDebug() << "------------files.size = " << files.size();
+    Q_UNUSED(thumbnailPath)
+    Q_UNUSED(remake)
 
     LibImageDataService::instance()->add(files);
 
-    int needCoreCounts = static_cast<int>(std::thread::hardware_concurrency());
-    needCoreCounts = needCoreCounts / 2;
-    if (files.size() < needCoreCounts) {
-        needCoreCounts = files.size();
+    int threadCounts = static_cast<int>(readThreadGroup.size());
+    // 调整占用线程数量
+    int recommendThreadCounts = QThread::idealThreadCount() / 2;
+    int needCoreCounts = qBound(1, files.size(), recommendThreadCounts);
+    int curActivateThreads = 0;
+
+    // 激活已有的线程
+    for (int i = 0; i < threadCounts && i < needCoreCounts; ++i) {
+        auto thread = readThreadGroup.at(static_cast<uint>(i));
+        if (!thread->isRunning()) {
+            thread->start();
+            curActivateThreads++;
+        }
     }
-    if (needCoreCounts < 1)
-        needCoreCounts = 1;
-    for (int i = 0; i < needCoreCounts; i++) {
+
+    // 当前激活的线程不满足文件加载，且当前线程仍有余量，创建更多线程处理
+    int avaliableThreads = recommendThreadCounts - threadCounts;
+    int requesetThreads = needCoreCounts - curActivateThreads;
+    int addThreads = qMin(avaliableThreads, requesetThreads);
+    for (int i = 0; i < addThreads; ++i) {
         LibReadThumbnailThread *thread = new LibReadThumbnailThread;
-        thread->m_thumbnailPath = thumbnailPath;
-        thread->m_remake = remake;
         thread->start();
         readThreadGroup.push_back(thread);
     }
+
     return true;
 }
 

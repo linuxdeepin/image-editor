@@ -31,8 +31,7 @@ public:
     int getCount();
 
     //读取缩略图到缓存map
-    bool readThumbnailByPaths(QString thumbnailPath, QStringList files, bool remake);
-//    bool readThumbnailByPath(QString file);
+    bool readThumbnailByPaths(const QString &thumbnailPath, const QStringList &files, bool remake);
 
     void addImage(const QString &path, const QImage &image);
     QImage getThumnailImageByPath(const QString &path);
@@ -76,22 +75,23 @@ private:
 class LibReadThumbnailThread : public QThread
 {
     Q_OBJECT
+
 public:
-    LibReadThumbnailThread(QObject *parent = nullptr);
+    explicit LibReadThumbnailThread(QObject *parent = nullptr);
     ~LibReadThumbnailThread() override = default;
     void readThumbnail(QString m_path);
     void setQuit(bool quit);
-    QString m_thumbnailPath = "";
-    bool m_remake = false;
 
     //判断图片类型
     imageViewerSpace::ImageType getImageType(const QString &imagepath);
     //判断路径类型
     imageViewerSpace::PathType getPathType(const QString &imagepath);
+
 protected:
     void run() override;
+
 private:
     std::atomic_bool m_quit;
-
 };
+
 #endif // IMAGEDATASERVICE_H
