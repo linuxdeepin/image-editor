@@ -63,6 +63,7 @@ public:
 
     //获得当前
     int getCurrentCount();
+
 signals:
     void openImg(int index, QString path);
 private:

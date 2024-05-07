@@ -5,12 +5,14 @@
 #ifndef COMMONSERVICE_H
 #define COMMONSERVICE_H
 
+#include "image-viewer_global.h"
+
 #include <QObject>
 #include <QStandardPaths>
 #include <QDir>
 #include <QMap>
 #include <QMutex>
-#include "image-viewer_global.h"
+#include <QSet>
 
 class LibCommonService : public QObject
 {
@@ -35,7 +37,7 @@ public:
 public:
     QStringList m_listAllPath;//全部需要加载的
     QStringList m_noLoadingPath;//没有加载的地址
-    QStringList m_listLoaded;//已经加载的
+    QSet<QString> m_listLoaded;//已经加载的
 
 signals:
     void sigRightMousePress();

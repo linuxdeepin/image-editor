@@ -88,6 +88,9 @@ public:
     //限于目前的代码结构，这个设置仅能在设置隐藏的时候立即生效
     void setButtonVisible(imageViewerSpace::ButtonType id, bool visible);
 
+    // 当前在缩略图展示的item统计(模糊计算结果)
+    int estimatedDisplayCount();
+
 signals:
     void resetTransform(bool fitWindow);
     void rotateClockwise();
@@ -114,6 +117,8 @@ signals:
 
     void sigResizeBottom();
 
+    // 当前展示的item增加
+    void displayItemGrowUp(int estimatedCount);
 
 public slots:
     void updateCollectButton();
@@ -178,6 +183,8 @@ private:
     bool badaptScreenBtnChecked = false;
     QString m_currentpath = "";
     bool m_ocrIsExists = false;
+
+    int m_estimateDisplayCount = 0;
 };
 
 #endif // BOTTOMTOOBAR_H
