@@ -666,7 +666,9 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
         } else {
             reader.setFormat(format_bar.toLatin1());
         }
-        reader.setAutoTransform(true);
+        // Tiff 图片不根据EXIF信息旋转
+        reader.setAutoTransform(FIF_TIFF != f);
+
         if (reader.imageCount() > 0 || file_suffix_upper != "ICNS") {
             res_qt = reader.read();
             if (res_qt.isNull()) {
@@ -674,7 +676,8 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                 QString format = PrivateDetectImageFormat(path);
                 QImageReader readerF(path, format.toLatin1());
                 QImage try_res;
-                readerF.setAutoTransform(true);
+                readerF.setAutoTransform(FIF_TIFF != f);
+
                 if (readerF.canRead()) {
                     try_res = readerF.read();
                 } else {

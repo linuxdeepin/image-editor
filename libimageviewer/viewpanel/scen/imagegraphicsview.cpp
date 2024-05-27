@@ -834,7 +834,20 @@ void LibImageGraphicsView::slotsUp()
             scene()->clear();
 
             resetTransform();
-            QPixmap pixmap = QPixmap::fromImage(m_imageReader->read());
+            QPixmap pixmap;
+
+            // FIXME: 临时修改，TIFF 图片不根据EXIF信息旋转
+            // 且由于 libqtiff 插件缓存的旋转信息可能错误，缓存数据会导致内存占用升高，调整为单次新建读取
+            QString format = m_imageReader->format().toLower();
+            if ("tiff" == format || "tif" == format) {
+                QImageReader tmpReader(m_imageReader->fileName());
+                tmpReader.setAutoTransform(false);
+                tmpReader.jumpToImage(m_imageReader->currentImageNumber());
+                pixmap = QPixmap::fromImage(tmpReader.read());
+            } else {
+                pixmap = QPixmap::fromImage(m_imageReader->read());
+            }
+
             pixmap.setDevicePixelRatio(devicePixelRatioF());
             m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
             scene()->addItem(m_pixmapItem);
@@ -884,7 +897,20 @@ void LibImageGraphicsView::slotsDown()
             m_imgSvgItem = nullptr;
             scene()->clear();
             resetTransform();
-            QPixmap pixmap = QPixmap::fromImage(m_imageReader->read());
+            QPixmap pixmap;
+
+            // FIXME: 临时修改，TIFF 图片不根据EXIF信息旋转
+            // 且由于 libqtiff 插件缓存的旋转信息可能错误，缓存数据会导致内存占用升高，调整为单次新建读取
+            QString format = m_imageReader->format().toLower();
+            if ("tiff" == format || "tif" == format) {
+                QImageReader tmpReader(m_imageReader->fileName());
+                tmpReader.setAutoTransform(false);
+                tmpReader.jumpToImage(m_imageReader->currentImageNumber());
+                pixmap = QPixmap::fromImage(tmpReader.read());
+            } else {
+                pixmap = QPixmap::fromImage(m_imageReader->read());
+            }
+
             pixmap.setDevicePixelRatio(devicePixelRatioF());
             m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
             scene()->addItem(m_pixmapItem);

@@ -57,6 +57,13 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
     for (const QString &path : paths) {
         QString errMsg;
         QImageReader imgReadreder(path);
+
+        // TIFF 图片不根据EXIF信息旋转
+        QString format = imgReadreder.format().toLower();
+        if ("tiff" == format || "tif" == format) {
+            imgReadreder.setAutoTransform(false);
+        }
+
         if (imgReadreder.imageCount() > 1) {
             for (int imgindex = 0; imgindex < imgReadreder.imageCount(); imgindex++) {
                 imgReadreder.jumpToImage(imgindex);

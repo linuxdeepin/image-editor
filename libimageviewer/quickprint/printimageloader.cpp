@@ -269,6 +269,13 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
             }
         } else {
             QImageReader reader(imagePtr->filePath);
+
+            // TIFF 图片不根据EXIF信息旋转
+            QString format = reader.format().toLower();
+            if ("tiff" == format || "tif" == format) {
+                reader.setAutoTransform(false);
+            }
+
             // jumpToImage 可能返回 false, 但数据正常读取
             reader.jumpToImage(imagePtr->frame);
             if (!reader.canRead()) {
