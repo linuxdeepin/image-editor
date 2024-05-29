@@ -171,7 +171,9 @@ public:
                       << "RAW"
                       << "MRW"
                       << "NEF"
-                      << "JP2";
+                      << "JP2"
+                      << "HEIF" << "HEIC" << "HEJ2"
+                      << "AVIF" << "AVIFS";
         //pic（多张图片） pcx不支持旋转
         m_canSave << "BMP" << "JPG" << "JPEG"  << "JPS" << "JPE" << "PNG"
                   << "PGM" << "PPM" << "PNM"
