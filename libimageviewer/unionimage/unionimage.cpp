@@ -547,6 +547,10 @@ UNIONIMAGESHARED_EXPORT FIBITMAP *QImge2FIBitMap(QImage img)
  */
 UNIONIMAGESHARED_EXPORT FIBITMAP *readFile2FIBITMAP(const QString &path, int flags FI_DEFAULT(0))
 {
+    QImage image(path);
+    if(image.isNull()) {//判断图片是否有效
+        return nullptr;
+    }
     QByteArray b;
     b.append(path);
     const char *pc = b.data();
