@@ -1,3 +1,17 @@
+image-editor (1.0.45) unstable; urgency=medium
+
+  * fix: 修复漏洞 【CITIVD】Deepin-image-viewer-缓冲区溢出
+  * feat: add avif and heif image format file support
+  * fix: Improve image load policy
+  * fix: Update version check with dpkg
+  * fix: Remove watermark low version check
+  * fix: Change watermark version check
+  * test: Update quick print unit test
+  * fix: Load translation file on quick print.
+  * feat: Add quick print pictures
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Wed, 26 Jun 2024 09:57:51 +0800
+
 image-editor (1.0.44) unstable; urgency=medium
 
   * fix: The bottom line of the bottombar bottoms is thick.(Bug: 197857)
