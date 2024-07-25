@@ -48,16 +48,21 @@ AIModelServiceData::AIModelServiceData(AIModelService *q)
     supportNameToModel = initDBusModelList();
     qInfo() << qPrintable("Support image enhance models:") << supportNameToModel;
 
-    if (!enhanceTemp.isValid()) {
-        qWarning() << qPrintable("Create enhance temp dir failed") << enhanceTemp.errorString();
-    } else {
-        qInfo() << qPrintable("Enhance temp dir:") << enhanceTemp.path();
-    }
+    // QTemporaryDir::isValid() 会创建临时文件路径，在没有模型数据时不进行路径判断
+    if (!supportNameToModel.isEmpty()) {
+        enhanceTemp.reset(new QTemporaryDir);
+        if (!enhanceTemp->isValid()) {
+            qWarning() << qPrintable("Create enhance temp dir failed") << enhanceTemp->errorString();
+        } else {
+            qInfo() << qPrintable("Enhance temp dir:") << enhanceTemp->path();
+        }
 
-    if (!convertTemp.isValid()) {
-        qWarning() << qPrintable("Create convert temp dir failed") << convertTemp.errorString();
-    } else {
-        qInfo() << qPrintable("Convert temp dir:") << convertTemp.path();
+        convertTemp.reset(new QTemporaryDir);
+        if (!convertTemp->isValid()) {
+            qWarning() << qPrintable("Create convert temp dir failed") << convertTemp->errorString();
+        } else {
+            qInfo() << qPrintable("Convert temp dir:") << convertTemp->path();
+        }
     }
 }
 
@@ -82,7 +87,7 @@ QList<QPair<int, QString>> AIModelServiceData::initDBusModelList()
 
     if (modelList.isEmpty()) {
         auto error = interface.lastError();
-        qWarning() << QString("[Enhance DBus] Get model list failed, %1: %2").arg(error.name()).arg(error.message());
+        qInfo() << QString("[Enhance DBus] No AI models on device? Get model list failed, %1: %2").arg(error.name()).arg(error.message());
         return {};
     }
 
@@ -237,7 +242,7 @@ AIModelService *AIModelService::instance()
  */
 bool AIModelService::isValid() const
 {
-    return !dptr->supportNameToModel.isEmpty();
+    return dptr && !dptr->supportNameToModel.isEmpty();
 }
 
 /**
@@ -337,7 +342,10 @@ QString AIModelService::imageProcessing(const QString &filePath, int modelID, co
 
     // 生命周期交由子线程维护
     QImage caputureImage = image.copy();
-    dptr->lastOutput = dptr->enhanceTemp.filePath(QString("%1.png").arg(dptr->enhanceCache.size()));
+    if (!dptr->enhanceTemp) {
+        return {};
+    }
+    dptr->lastOutput = dptr->enhanceTemp->filePath(QString("%1.png").arg(dptr->enhanceCache.size()));
     QString model = dptr->mapModelInfo.value(modelID)->model;
 
     EnhancePtr ptr(new EnhanceInfo(sourceFile, dptr->lastOutput, model));
@@ -449,7 +457,7 @@ void AIModelService::cancelProcess(const QString &output)
  */
 bool AIModelService::isTemporaryFile(const QString &filePath)
 {
-    return dptr->enhanceCache.contains(filePath);
+    return isValid() && dptr->enhanceCache.contains(filePath);
 }
 
 /**
@@ -457,7 +465,7 @@ bool AIModelService::isTemporaryFile(const QString &filePath)
  */
 QString AIModelService::sourceFilePath(const QString &filePath)
 {
-    if (dptr->enhanceCache.contains(filePath)) {
+    if (isValid() && dptr->enhanceCache.contains(filePath)) {
         auto ptr = dptr->enhanceCache.value(filePath);
         return ptr->source;
     }
@@ -719,8 +727,12 @@ QString AIModelService::checkConvertFile(const QString &filePath, const QImage &
         return {};
     }
 
+    if (!dptr->convertTemp) {
+        return {};
+    }
+
     QString cvtFile;
-    cvtFile = dptr->convertTemp.filePath(QString("%1_%2.png").arg(dptr->convertCache.size()).arg(QFileInfo(filePath).fileName()));
+    cvtFile = dptr->convertTemp->filePath(QString("%1_%2.png").arg(dptr->convertCache.size()).arg(QFileInfo(filePath).fileName()));
 
     _locker.unlock();
     if (!image.save(cvtFile, "PNG")) {

@@ -89,11 +89,11 @@ public:
     QList<QPair<int, QString>> supportNameToModel;  // 缓存的支持模型列表<模型ID，名称>
 
     QString lastOutput;                       // 最近的图像增强输出文件
-    QTemporaryDir enhanceTemp;                // 图像增强文件临时目录
+    QScopedPointer<QTemporaryDir> enhanceTemp;                // 图像增强文件临时目录
     QHash<QString, EnhancePtr> enhanceCache;  // 图像增强缓存信息（仅主线程访问）
 
     QMutex cacheMutex;
-    QTemporaryDir convertTemp;             // 图像类型转换文件临时目录
+    QScopedPointer<QTemporaryDir> convertTemp;             // 图像类型转换文件临时目录
     QHash<QString, QString> convertCache;  // 缓存的信息，可能多个线程访问
 
     QFutureWatcher<EnhancePtr> enhanceWatcher;
