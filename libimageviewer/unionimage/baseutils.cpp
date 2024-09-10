@@ -475,21 +475,8 @@ bool mountDeviceExist(const QString &path)
 bool checkCommandExist(const QString &command)
 {
     try {
-        QProcess bash;
-        bash.start("bash");
-        bash.waitForStarted();
-        bash.write(("command -v " + command).toUtf8());
-        bash.closeWriteChannel();
-        if (!bash.waitForFinished()) {
-            qWarning() << bash.errorString();
-            return false;
-        }
-        auto output = bash.readAllStandardOutput();
-        if (output.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+        QString path = QStandardPaths::findExecutable(command);
+        return !path.isEmpty();
     } catch (std::logic_error &e) {
         qWarning() << e.what();
         return false;
