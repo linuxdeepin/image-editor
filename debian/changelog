@@ -1,3 +1,12 @@
+image-editor (1.0.46) unstable; urgency=medium
+
+  * chore(CI): add debian check workflow
+    Thanks to kuchune
+  * fix: temporary dirs are created by default
+  * fix: [cmd] remove bash use(Task: 362321)
+
+ -- renbin <renbin@uniontech.com>  Fri, 20 Sep 2024 14:16:15 +0800
+
 image-editor (1.0.45) unstable; urgency=medium
 
   * fix: 修复漏洞 【CITIVD】Deepin-image-viewer-缓冲区溢出
