@@ -13,9 +13,7 @@ CONFIG += c++11 link_pkgconfig
 PKGCONFIG += dtkwidget dtkcore
 DEFINES += IMAGEVIEWER_LIBRARY
 
-LIBS += -lfreeimage
 DEFINES += LITE_DIV
-DEFINES += USE_UNIONIMAGE
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings

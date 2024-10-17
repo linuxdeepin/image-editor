@@ -36,9 +36,6 @@
 #include <DDesktopServices>
 
 
-#ifdef USE_UNIONIMAGE
-#include "unionimage.h"
-#endif
 DWIDGET_USE_NAMESPACE
 
 // 当前动态库使用的翻译QM翻译文件路径
@@ -53,22 +50,6 @@ const QString DATETIME_FORMAT_EXIF = "yyyy:MM:dd HH:mm:ss";
 
 QPixmap renderSVG(const QString &filePath, const QSize &size)
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    QImage tImg(size, QImage::Format_ARGB32);
-    QString errMsg;
-    QSize realSize;
-//    if (!UnionImage_NameSpace::loadStaticImageFromFile(filePath, tImg, realSize, errMsg)) {
-//        qDebug() << errMsg;
-//    }
-    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(filePath, tImg, errMsg)) {
-        qDebug() << errMsg;
-    }
-    QPixmap pixmap;
-    pixmap = QPixmap::fromImage(tImg);
-
-    return pixmap;
-#else
     QImageReader reader;
     QPixmap pixmap;
 
@@ -84,7 +65,6 @@ QPixmap renderSVG(const QString &filePath, const QSize &size)
     }
 
     return pixmap;
-#endif
 }
 
 //QString sizeToHuman(const qlonglong bytes)

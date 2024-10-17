@@ -38,9 +38,9 @@ const QFileInfoList                 getImagesInfo(const QString &dir,
 int getOrientation(const QString &path);
 const QImage                        getRotatedImage(const QString &path);
 
-#ifndef USE_UNIONIMAGE
+
 const QImage loadTga(QString filePath, bool &success);
-#endif
+
 
 bool                                imageSupportRead(const QString &path);
 bool                                imageSupportSave(const QString &path);
