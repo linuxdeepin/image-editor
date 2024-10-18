@@ -263,8 +263,6 @@ QString mkMutiDir(const QString &path)   //创建多级目录
 bool imageSupportRead(const QString &path)
 {
     const QString suffix = QFileInfo(path).suffix();
-
-    //FIXME: file types below will cause freeimage to crash on loading,
     // take them here for good.
     QStringList errorList;
     errorList << "X3F";

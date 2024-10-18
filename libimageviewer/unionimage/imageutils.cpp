@@ -5,7 +5,6 @@
 #include "baseutils.h"
 #include "imageutils.h"
 #include "imageutils_libexif.h"
-#include "imageutils_freeimage.h"
 #include "snifferimageformat.h"
 #include "unionimage.h"
 #include <fstream>
@@ -26,6 +25,7 @@
 #include <QUrl>
 #include <QApplication>
 #include <QTemporaryDir>
+#include <QtMath>
 
 namespace Libutils {
 
@@ -36,22 +36,6 @@ const QImage scaleImage(const QString &path, const QSize &size)
     if (!imageSupportRead(path)) {
         return QImage();
     }
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    QImage tImg(size, QImage::Format_ARGB32);
-    QString errMsg;
-    QSize realSize;
-//    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, realSize, errMsg)) {
-//        qDebug() << errMsg;
-//    }
-    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
-        qDebug() << errMsg;
-    }
-    if (tImg.size() != size) { //调用加速接口失败，主动进行缩放
-        tImg = tImg.scaled(size);
-    }
-    return tImg;
-#else
     QImageReader reader(path);
     reader.setAutoTransform(true);
     if (! reader.canRead()) {
@@ -86,7 +70,6 @@ const QImage scaleImage(const QString &path, const QSize &size)
         }
     } else
         return tImg;
-#endif
 }
 
 const QDateTime getCreateDateTime(const QString &path)
@@ -122,23 +105,8 @@ const QDateTime getCreateDateTime(const QString &path)
 
 bool imageSupportRead(const QString &path)
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    //修正论坛上提出的格式判断错误，应该采用真实格式
-    //20210220真实格式来做判断
-    QMap<QString, QString> dataMap = getAllMetaData(path);
-    const QString suffix = dataMap.value("FileFormat");
-    QStringList errorList;
-    errorList << "X3F";
-    if (errorList.indexOf(suffix.toUpper()) != -1) {
-        return false;
-    }
-    return LibUnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
-#else
     const QString suffix = QFileInfo(path).suffix();
-//解决freeimage不支持icns
     if (suffix == "icns") return true;
-    //FIXME: file types below will cause freeimage to crash on loading,
     // take them here for good.
     QStringList errorList;
     errorList << "X3F";
@@ -146,28 +114,17 @@ bool imageSupportRead(const QString &path)
     if (errorList.indexOf(suffix.toUpper()) != -1) {
         return false;
     }
-
-    if (freeimage::isSupportsReading(path))
-        return true;
-    else {
-        return (suffix == "svg");
-    }
-#endif
+    return (suffix == "svg");
 }
 
 bool imageSupportSave(const QString &path)
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    return LibUnionImage_NameSpace::canSave(path);
-#else
     const QString suffix = QFileInfo(path).suffix();
     //J2K格式暂时不支持
     if (suffix.toUpper() == "J2K") {
         return false;
     }
     // RAW image decode is too slow, and most of these does not support saving
-    // RAW formats render incorrectly by freeimage
     const QStringList raws = QStringList()
                              << "CR2" << "CRW"   // Canon cameras
                              << "DCR" << "KDC"   // Kodak cameras
@@ -190,68 +147,14 @@ bool imageSupportSave(const QString &path)
     if (raws.indexOf(suffix.toUpper()) != -1
             || QImageReader(path).imageCount() > 1) {
         return false;
-    } else {
-        return freeimage::canSave(path);
     }
-#endif
+    return true;
 }
 
 bool rotate(const QString &path, int degree)
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
     QString erroMsg;
     return LibUnionImage_NameSpace::rotateImageFIle(degree, path, erroMsg);
-#else
-    if (degree % 90 != 0)
-        return false;
-
-    int loadFlags = 0;
-    int saveFlags = 0;
-    FREE_IMAGE_FORMAT fif = freeimage::fFormat(path);
-    switch (int(fif)) {
-    case FIF_JPEG:
-        loadFlags = JPEG_ACCURATE;          // Load the file with the best quality, sacrificing some speed
-        saveFlags = JPEG_QUALITYSUPERB;     // Saves with superb quality (100:1)
-        break;
-    case FIF_JP2:
-        // Freeimage3.17 does not support special load flags for JP2
-        saveFlags = JP2_DEFAULT;            // Save with a 16:1 rate
-        break;
-    case FIF_BMP:
-        saveFlags = BMP_DEFAULT;            // Save without any compression
-        break;
-    case FIF_EXR:
-        saveFlags = EXR_NONE;               // Save with no compression
-        break;
-    case FIF_PNG:
-        saveFlags = PNG_DEFAULT;   // Save without ZLib compression
-        break;
-    }
-
-    FIBITMAP *dib = freeimage::readFileToFIBITMAP(path, loadFlags);
-    FIBITMAP *rotated = FreeImage_Rotate(dib, -degree);
-    if (rotated) {
-        // Regenerate thumbnail if it's exits
-        // Image formats that currently support thumbnail saving are
-        // JPEG (JFIF formats), EXR, TGA and TIFF.
-        if (FreeImage_GetThumbnail(dib)) {
-            FIBITMAP *thumb = FreeImage_GetThumbnail(dib);
-            FIBITMAP *rotateThumb = FreeImage_Rotate(thumb, -degree);
-            FreeImage_SetThumbnail(rotated, rotateThumb);
-            FreeImage_Unload(rotateThumb);
-        }
-    }
-
-    bool v = freeimage::writeFIBITMAPToFile(rotated, path, saveFlags);
-    FreeImage_Unload(dib);
-    FreeImage_Unload(rotated);
-
-    // The thumbnail should regenerate by caller
-    removeThumbnail(path);
-
-    return v;
-#endif
 }
 
 /*!
@@ -343,14 +246,9 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
 
 int getOrientation(const QString &path)
 {
-#ifdef USE_UNIONIMAGE
     return LibUnionImage_NameSpace::getOrientation(path);
-#else
-    return freeimage::getOrientation(path);
-#endif
 }
 
-#ifndef USE_UNIONIMAGE
 const QImage loadTga(QString filePath, bool &success)
 {
     QImage img;
@@ -478,7 +376,6 @@ const QImage loadTga(QString filePath, bool &success)
 
     return img;
 }
-#endif
 
 /*!
  * \brief getRotatedImage
@@ -491,26 +388,12 @@ const QImage getRotatedImage(const QString &path)
 
 
     QImage tImg;
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    QString errMsg;
-    QSize realSize;
-//    if (!UnionImage_NameSpace::loadStaticImageFromFile(path, tImg, realSize, errMsg)) {
-//        qDebug() << errMsg;
-//    }
-    if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
-        qDebug() << errMsg;
-    }
-#else
     QString format = DetectImageFormat(path);
     if (format.isEmpty()) {
         QImageReader reader(path);
         reader.setAutoTransform(true);
         if (reader.canRead()) {
             tImg = reader.read();
-        } else if (path.contains(".tga")) {
-            bool ret = false;
-            tImg = utils::image::loadTga(path, ret);
         }
     } else {
         QImageReader readerF(path, format.toLatin1());
@@ -524,18 +407,67 @@ const QImage getRotatedImage(const QString &path)
             tImg = QImage(path);
         }
     }
-#endif
     return tImg;
+}
+
+QString size2HumanT(const qlonglong bytes)
+{
+    qlonglong kb = 1024;
+    if (bytes < kb) {
+        return QString::number(bytes) + " B";
+    } else if (bytes < kb * kb) {
+        QString vs = QString::number(static_cast<double>(bytes) / kb, 'f', 1);
+        if (qCeil(vs.toDouble()) == qFloor(vs.toDouble())) {
+            return QString::number(static_cast<int>(vs.toDouble())) + " KB";
+        } else {
+            return vs + " KB";
+        }
+    } else if (bytes < kb * kb * kb) {
+        QString vs = QString::number(static_cast<double>(bytes) / kb / kb, 'f', 1);
+        if (qCeil(vs.toDouble()) == qFloor(vs.toDouble())) {
+            return QString::number(static_cast<int>(vs.toDouble())) + " MB";
+        } else {
+            return vs + " MB";
+        }
+    } else {
+        //修改了当超过一个G的图片,应该用G返回,不应该返回一堆数字,bug68094
+        QString vs = QString::number(static_cast<double>(bytes) / kb / kb / kb, 'f', 1);
+        if (qCeil(vs.toDouble()) == qFloor(vs.toDouble())) {
+            return QString::number(static_cast<int>(vs.toDouble())) + " GB";
+        } else {
+            return vs + " GB";
+        }
+    }
 }
 
 const QMap<QString, QString> getAllMetaData(const QString &path)
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
-    return LibUnionImage_NameSpace::getAllMetaData(path);
-#else
-    return freeimage::getAllMetaData(path);
-#endif
+    QMap<QString, QString> admMap;
+
+    //移除秒　　2020/6/5 DJH
+    //需要转义才能读出：或者/　　2020/8/21 DJH
+    QFileInfo info(path);
+    if (admMap.contains("DateTime")) {
+        QDateTime time = QDateTime::fromString(admMap["DateTime"], "yyyy:MM:dd hh:mm:ss");
+        admMap["DateTimeOriginal"] = time.toString("yyyy/MM/dd hh:mm");
+    } else {
+        admMap.insert("DateTimeOriginal", info.lastModified().toString("yyyy/MM/dd HH:mm"));
+    }
+    admMap.insert("DateTimeDigitized", info.lastModified().toString("yyyy/MM/dd HH:mm"));
+
+    //    // The value of width and height might incorrect
+    QImageReader reader(path);
+    int w = reader.size().width();
+
+    int h = reader.size().height();
+    admMap.insert("Dimension", QString::number(w) + "x" + QString::number(h));
+
+    admMap.insert("FileName", info.fileName());
+    //应该使用qfileinfo的格式
+    admMap.insert("FileFormat", info.suffix());
+    admMap.insert("FileSize", size2HumanT(info.size()));
+
+    return admMap;
 }
 
 const QPixmap cachePixmap(const QString &path)
@@ -623,7 +555,6 @@ const QPixmap getThumbnail(const QString &path, bool cacheOnly)
     if (QFileInfo(encodePath).exists()) {
         return QPixmap(encodePath);
     }
-    /*lmh0724使用USE_UNIONIMAGE*/
     else if (QFileInfo(failEncodePath).exists()) {
         qDebug() << "Fail-thumbnail exist, won't regenerate: " ;
         return QPixmap();
@@ -726,7 +657,7 @@ bool thumbnailExist(const QString &path, ThumbnailType type)
         return false;
     }
 }
-/*
+
 static QStringList fromByteArrayList(const QByteArrayList &list)
 {
     QStringList sList;
@@ -748,22 +679,20 @@ static QStringList fromByteArrayList(const QByteArrayList &list)
 
     return sList;
 }
-*/
+
 QStringList supportedImageFormats()
 {
-    /*lmh0724使用USE_UNIONIMAGE*/
-#ifdef USE_UNIONIMAGE
     QStringList list ;
     for (auto str : LibUnionImage_NameSpace::unionImageSupportFormat()) {
         str = "*." + str;
         list += str;
     }
     return list;
-#else
-    static QStringList list = fromByteArrayList(QImageReader::supportedImageFormats());
+// #else
+//     static QStringList list = fromByteArrayList(QImageReader::supportedImageFormats());
 
-    return list;
-#endif
+//     return list;
+// #endif
 }
 
 //直接搬运文管代码
