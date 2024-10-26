@@ -42,6 +42,8 @@
 
 #include <DGuiApplicationHelper>
 #include <DApplicationHelper>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #ifndef QT_NO_OPENGL
 //#include <QGLWidget>
@@ -78,6 +80,25 @@ QVariantList cachePixmap(const QString &path)
     if (QFileInfo(path).exists() && p.isNull()) {
         //判定为损坏图片
 //        p = utils::image::getDamagePixmap(DApplicationHelper::instance()->themeType() == DApplicationHelper::LightType);
+        if(path.contains("ftp:host=")) {//前面失败后再处理ftp图片
+            QFileInfo info(path);
+            if(info.size() <=  1024*1024*1024) {//小于1Mftp文件做下载本地处理
+                QNetworkAccessManager manager;
+                QEventLoop loop;
+
+                QObject::connect(&manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply){
+                    QByteArray imageData = reply->readAll();
+                    tImg.loadFromData(imageData);
+                    p = QPixmap::fromImage(tImg);
+                    loop.quit();
+                });
+                int nIdex = path.indexOf("ftp:host=");
+                QString urlAddr = path.mid(nIdex).replace("ftp:host=", "ftp://");
+                QNetworkRequest request(urlAddr);
+                manager.get(request);
+                loop.exec();
+            }
+        }
         qDebug() << errMsg;
     }
     QVariantList vl;
