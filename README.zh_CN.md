@@ -22,7 +22,6 @@ _**master**分支是当前开发分支，编译依赖可能在未更新README.md
 * libxcb-util0-dev,
 * libstartup-notification0-dev,
 * libraw-dev,
-* libfreeimage-dev,
 * libqt5opengl5-dev,
 * qtbase5-private-dev,
 * qtmultimedia5-dev,
@@ -59,7 +58,7 @@ $ sudo apt-get build-dep image-editor
 ```
 或者手动安装
 ``` shell
-$ sudo apt install cmake qtbase5-dev pkg-config libexif-dev libqt5svg5-dev libqt5x11extras5-dev libsqlite3-dev qttools5-dev-tools qttools5-dev libxcb-util0-dev libstartup-notification0-dev libraw-dev libfreeimage-dev libqt5opengl5-dev qtbase5-private-dev qtmultimedia5-dev x11proto-xext-dev libmtdev-dev libegl1-mesa-dev libudev-dev libfontconfig1-dev libfreetype6-dev libglib2.0-dev libxrender-dev libdtkwidget-dev libdtkwidget5-bin libdtkcore5-bin libgio-qt-dev libudisks2-qt5-dev libmediainfo-dev libopencv-dev libgstreamer1.0-dev
+$ sudo apt install cmake qtbase5-dev pkg-config libexif-dev libqt5svg5-dev libqt5x11extras5-dev libsqlite3-dev qttools5-dev-tools qttools5-dev libxcb-util0-dev libstartup-notification0-dev libraw-dev libqt5opengl5-dev qtbase5-private-dev qtmultimedia5-dev x11proto-xext-dev libmtdev-dev libegl1-mesa-dev libudev-dev libfontconfig1-dev libfreetype6-dev libglib2.0-dev libxrender-dev libdtkwidget-dev libdtkwidget5-bin libdtkcore5-bin libgio-qt-dev libudisks2-qt5-dev libmediainfo-dev libopencv-dev libgstreamer1.0-dev
 ```
 
 2. 构建:

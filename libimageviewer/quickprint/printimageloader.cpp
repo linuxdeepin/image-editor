@@ -261,13 +261,6 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
 
     try {
         if (s_SingleFrame == imagePtr->frame) {
-            QString errorMsg;
-            if (!LibUnionImage_NameSpace::loadStaticImageFromFile(imagePtr->filePath, imagePtr->data, errorMsg)) {
-                qWarning() << QString("Load image failed: %1").arg(errorMsg);
-                imagePtr->state = ContentError;
-                return false;
-            }
-        } else {
             QImageReader reader(imagePtr->filePath);
             // jumpToImage 可能返回 false, 但数据正常读取
             reader.jumpToImage(imagePtr->frame);
@@ -284,7 +277,6 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
                 return false;
             }
         }
-
     } catch (const std::exception &e) {
         // 图片读取，考虑未界定异常
         qCritical() << qPrintable("Exception: load image failed!") << qPrintable(e.what());

@@ -45,7 +45,6 @@ include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_definitions( -DLITE_DIV )
-add_definitions( -DUSE_UNIONIMAGE )
 add_definitions( -DCMAKE_BUILD )
 
 #库目录
@@ -92,8 +91,6 @@ set(LINK_DIR /usr/lib/)
 include_directories(${INC_DIR})
 link_directories(${LINK_DIR})
 
-link_libraries(freeimage)
-
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
 file(GLOB TS LIST_DIRECTORIES false translations/libimageviewer*.ts)
@@ -122,7 +119,7 @@ set(${TARGET_NAME} ${CMAKE_INSTALL_LIBDIR})
 set_target_properties(${TARGET_NAME} PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
 
 target_include_directories(${CMD_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}  ${TIFF_INCLUDE_DIRS} ${dfm-io_lib_INCLUDE_DIRS})
-target_link_libraries(imageviewer ${3rd_lib_LIBRARIES} freeimage ${TIFF_LIBRARIES} ${dfm-io_lib_LIBRARIES} dl)
+target_link_libraries(imageviewer ${3rd_lib_LIBRARIES}  ${TIFF_LIBRARIES} ${dfm-io_lib_LIBRARIES} dl)
 
 include(GNUInstallDirs)
 configure_file(libimageviewer.pc.in ${PROJECT_BINARY_DIR}/libimageviewer.pc @ONLY)

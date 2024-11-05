@@ -7,8 +7,6 @@ ADD_COMPILE_OPTIONS(-fno-access-control)
 #"option"用来定义宏，"ON"表示打开，"OFF"表示关闭
 option (LITE_DIV "Use tutorial provided math implementation" ON)
 add_definitions( -DLITE_DIV )
-option (USE_UNIONIMAGE "Use UNIONIMAGE" ON)
-add_definitions( -DUSE_UNIONIMAGE )
 
 option (USE_TEST "Use TESTS" ON)
 add_definitions( -DUSE_TEST )
@@ -84,7 +82,6 @@ pkg_check_modules(3rd_lib REQUIRED
     gsettings-qt
     gstreamer-1.0
     libmediainfo
-#    freeimage
         )
 
 ## translations
@@ -137,7 +134,6 @@ target_link_libraries(
 #    gio-unix-2.0
     gio-qt
     udisks2-qt5
-    freeimage
     pthread
     gtest
     )

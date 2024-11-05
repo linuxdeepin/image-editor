@@ -1,6 +1,5 @@
 HEADERS += \
     $$PWD/baseutils.h \
-    $$PWD/imageutils_freeimage.h \
     $$PWD/imageutils_libexif.h \
     $$PWD/imageutils.h \
     $$PWD/imgoperate.h \
