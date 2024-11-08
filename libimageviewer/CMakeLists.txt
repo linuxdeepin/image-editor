@@ -1,22 +1,17 @@
-#定义需要的cmake版本
+# Define the required cmake version
 cmake_minimum_required(VERSION 3.10)
 
-# 设置工程名字
+# Set project name
 project(libimageviewer VERSION 0.1.0)
 
-# 检查dtkwidget版本
-execute_process(COMMAND dpkg -s libdtkwidget-dev
-                COMMAND grep Version
-                TIMEOUT 5
-                OUTPUT_VARIABLE DWIDGET_VERSION_STR)
-string(REPLACE "Version: " "" DWIDGET_VERSION_STR ${DWIDGET_VERSION_STR})
-message(STATUS "BUILD DTKWidget VERSION ${DWIDGET_VERSION_STR}")
+# Check dtkwidget version
+find_package(DtkWidget REQUIRED)
 
-if (${DWIDGET_VERSION_STR} VERSION_LESS "5.6.9-1")
-    message(STATUS "Use specific dtk watermakr, Version < 5.6.9-1")
+if (${DWIDGET_VERSION_STR} VERSION_LESS "5.6.9")
+    message(STATUS "Use specific dtk watermakr, Version < 5.6.9")
     add_definitions(-DUSE_SPECIFIC_DTK_WATERMARK)
 else()
-    message(STATUS "Use master dtk watermakr, Version >= 5.6.9-1")
+    message(STATUS "Use master dtk watermakr, Version >= 5.6.9")
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
