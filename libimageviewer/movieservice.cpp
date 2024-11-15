@@ -324,9 +324,10 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
         mi.vCodecID = videoStreamInfo[0].split(" ")[0];
 
         //分辨率，长宽比
-        QRegExp resolutionExp(resolutionPattern);
-        if (resolutionExp.indexIn(videoInfoString) > 0) {
-            mi.resolution = resolutionExp.cap(0);
+        QRegularExpression resolutionExp(resolutionPattern);
+        QRegularExpressionMatch match = resolutionExp.match(videoInfoString);
+        if (match.hasMatch()) {
+            mi.resolution = match.captured(0);
 
             auto videoSize = mi.resolution.split("x");
             int size_w = videoSize[0].toInt();
@@ -338,18 +339,20 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
         }
 
         //码率
-        QRegExp codeRateExp(codeRatePattern);
-        if (codeRateExp.indexIn(videoInfoString) > 0) {
-            auto codeRate = codeRateExp.cap(0);
+        QRegularExpression codeRateExp(codeRatePattern);
+        match = codeRateExp.match(videoInfoString);
+        if (match.hasMatch()) {
+            auto codeRate = match.captured(0);
             mi.vCodeRate = codeRate.split(" ")[0].toInt();
         } else {
             mi.vCodeRate = 0;
         }
 
         //帧率
-        QRegExp fpsExp(fpsPattern);
-        if (fpsExp.indexIn(videoInfoString) > 0) {
-            auto fps = fpsExp.cap(0);
+        QRegularExpression fpsExp(fpsPattern);
+        match = fpsExp.match(videoInfoString);
+        if (match.hasMatch()) {
+            auto fps = match.captured(0);
             mi.fps = fps.split(" ")[0].toInt();
         } else {
             mi.fps = 0;

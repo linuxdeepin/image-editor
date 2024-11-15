@@ -163,7 +163,7 @@ void ExtensionPanel::init()
     m_scrollArea = new QScrollArea;
     m_scrollArea->setMinimumHeight(40);
     QPalette palette = m_scrollArea->viewport()->palette();
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    palette.setBrush(QPalette::Window, Qt::NoBrush);
     m_scrollArea->viewport()->setPalette(palette);
     m_scrollArea->setFrameShape(QFrame::Shape::NoFrame);
 

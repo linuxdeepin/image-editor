@@ -501,7 +501,7 @@ QMap<QString, QString> thumbnailAttribute(const QUrl  &url)
         set.insert("Thumb::Mimetype", QMimeDatabase().mimeTypeForFile(path).name());
         set.insert("Thumb::Size", QString::number(info.size()));
         set.insert("Thumb::URI", url.toString());
-        set.insert("Thumb::MTime", QString::number(info.lastModified().toTime_t()));
+        set.insert("Thumb::MTime", QString::number(info.lastModified().toSecsSinceEpoch()));
         set.insert("Software", "Deepin Image Viewer");
 
         QImageReader reader(path);
@@ -738,7 +738,7 @@ bool isVaultFile(const QString &path)
 {
     bool bVaultFile = false;
     QString rootPath = makeVaultLocalPath("", "");
-    if (rootPath.back() == "/") {
+    if (rootPath.back() == QChar('/')) {
         rootPath.chop(1);
     }
 

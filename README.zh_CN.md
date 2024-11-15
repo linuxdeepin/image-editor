@@ -8,40 +8,44 @@ Image editor 是深度开发的用于  deepin-image-viewer 和 deepin-album 的�
 
 _**master**分支是当前开发分支，编译依赖可能在未更新README.md文件的情况下变更，请参考./debian/control文件获取有效的编译依赖列表_
 
-* Qt (>=5.11)
-* debhelper (>= 11),
-* cmake,
-* qtbase5-dev,
+* debhelper (>= 11), 
+* cmake, 
 * pkg-config,
-* libexif-dev,
+* qtbase5-dev,
+* qtbase5-private-dev,
+* qttools5-dev,
+* qttools5-dev-tools,
+* qtmultimedia5-dev,
 * libqt5svg5-dev,
 * libqt5x11extras5-dev,
-* libsqlite3-dev,
-* qttools5-dev-tools,
-* qttools5-dev,
-* libxcb-util0-dev,
+* qt6-base-dev,
+* qt6-base-private-dev,
+* qt6-tools-dev,
+* qt6-tools-dev-tools,
+* qt6-multimedia-dev, 
+* libqt6svg6-dev,
+* libqt6opengl6-dev,
+* libexif-dev, 
+* libsqlite3-dev, 
+* libxcb-util0-dev, 
 * libstartup-notification0-dev,
-* libraw-dev,
-* libqt5opengl5-dev,
-* qtbase5-private-dev,
-* qtmultimedia5-dev,
-* x11proto-xext-dev,
-* libmtdev-dev,
+* libraw-dev, 
+* x11proto-xext-dev, 
+* libmtdev-dev, 
 * libegl1-mesa-dev,
-* libudev-dev,
-* libfontconfig1-dev,
-* libfreetype6-dev,
-* libglib2.0-dev,
-* libxrender-dev,
+* libudev-dev, 
+* libfontconfig1-dev, 
+* libfreetype6-dev, 
+* libxrender-dev, 
 * libdtkwidget-dev,
-* libdtkwidget5-bin,
 * libdtkcore5-bin,
-* libgio-qt-dev,
-* libudisks2-qt5-dev,
-* libopencv-dev,
+* libdtk6widget-dev,
+* libdtk6core-bin,
 * libmediainfo-dev,
-* libgstreamer1.0-dev,
-* libtiff-dev
+* libffmpegthumbnailer-dev,
+* libtiff-dev,
+* libdfm6-io-dev | hello,
+* libdfm-io-dev | hello
 
 ## 安装
 
@@ -58,7 +62,7 @@ $ sudo apt-get build-dep image-editor
 ```
 或者手动安装
 ``` shell
-$ sudo apt install cmake qtbase5-dev pkg-config libexif-dev libqt5svg5-dev libqt5x11extras5-dev libsqlite3-dev qttools5-dev-tools qttools5-dev libxcb-util0-dev libstartup-notification0-dev libraw-dev libqt5opengl5-dev qtbase5-private-dev qtmultimedia5-dev x11proto-xext-dev libmtdev-dev libegl1-mesa-dev libudev-dev libfontconfig1-dev libfreetype6-dev libglib2.0-dev libxrender-dev libdtkwidget-dev libdtkwidget5-bin libdtkcore5-bin libgio-qt-dev libudisks2-qt5-dev libmediainfo-dev libopencv-dev libgstreamer1.0-dev
+$ sudo apt install cmake pkg-config qtbase5-dev qtbase5-private-dev qttools5-dev qttools5-dev-tools qtmultimedia5-dev libqt5svg5-dev libqt5x11extras5-dev qt6-base-dev qt6-base-private-dev qt6-tools-dev qt6-tools-dev-tools qt6-multimedia-dev libqt6svg6-dev libqt6opengl6-dev libexif-dev libsqlite3-dev libxcb-util0-dev libstartup-notification0-dev libraw-dev x11proto-xext-dev libmtdev-dev libegl1-mesa-dev libudev-dev libfontconfig1-dev libfreetype6-dev libxrender-dev libdtkwidget-dev libdtkcore5-bin libdtk6widget-dev libdtk6core-bin libmediainfo-dev libffmpegthumbnailer-dev libtiff-dev libdfm6-io-dev libdfm-io-dev
 ```
 
 2. 构建:

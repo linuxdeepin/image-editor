@@ -5,13 +5,18 @@
 #include "mtpfileproxy.h"
 #include "imageengine.h"
 
+#include <QRegularExpression>
 #include <QStorageInfo>
 #include <QDebug>
 
 #include <algorithm>
 
 #ifdef USE_DFM_IO
-#include <dfm-io/doperator.h>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#   include <dfm-io/doperator.h>
+#else
+#   include <dfm6-io/dfm-io/doperator.h>
+#endif
 USING_IO_NAMESPACE
 #endif
 
@@ -30,7 +35,7 @@ static void fileOperateCallbackFunc(bool ret, void *data)
     }
 }
 
-MtpFileProxy::MtpFileProxy() 
+MtpFileProxy::MtpFileProxy()
 {
 #ifdef USE_DFM_IO
     qInfo() << qPrintable("Use dfm-io copy MTP file.");
@@ -85,7 +90,7 @@ bool MtpFileProxy::checkFileDeviceIsMtp(const QString &filePath)
     if (storage.device().startsWith("gvfs") || storage.device().startsWith("cifs")) {
         // /run/user/1000/gvfs/mtp: /run/user/1000/gvfs/gphoto2:
         QString absoluteFilePath = QFileInfo(filePath).absoluteFilePath();
-        if (absoluteFilePath.contains(QRegExp("fs/(mtp|gphoto2):"))) {
+        if (absoluteFilePath.contains(QRegularExpression("fs/(mtp|gphoto2):"))) {
             // 判断是否为图片文件
             if (ImageEngine::instance()->isImage(filePath)) {
                 return true;

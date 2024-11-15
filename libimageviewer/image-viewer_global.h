@@ -9,6 +9,7 @@
 #include <QString>
 #include <QPixmap>
 #include <QImage>
+#include <QObject>
 
 #if defined(IMAGEVIEWER_LIBRARY)
 #  define IMAGEVIEWERSHARED_EXPORT Q_DECL_EXPORT

@@ -20,9 +20,7 @@
 #include <QtMath>
 
 #include <DLabel>
-#include <DImageButton>
 #include <DThumbnailProvider>
-#include <DApplicationHelper>
 #include <DSpinner>
 
 #include "service/commonservice.h"

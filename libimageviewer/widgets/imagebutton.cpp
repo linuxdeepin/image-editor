@@ -3,48 +3,56 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "imagebutton.h"
-//#include "application.h"
+
 #include <QApplication>
-#include <QDesktopWidget>
-#include <DFrame>
+#include <QEvent>
+#include <QEnterEvent>
 #include <QFile>
 #include <QHelpEvent>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QTimer>
+#include <QScreen>
+
+#include <DLabel>
+#include <DFrame>
 
 DWIDGET_USE_NAMESPACE
 typedef DFrame QFrToDFrame;
+typedef DLabel QLbtoDLabel;
+
+// comaptible alias
+#if DTK_VERSION >= DTK_VERSION_CHECK(6, 0, 0, 0)
+using DImageButton = DToolButton;
+#endif
 
 ImageButton::ImageButton(QWidget *parent)
-    : DImageButton(parent), m_tooltipVisiable(false)
+#if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
+    : DImageButton(parent)
+#else
+    : DToolButton(parent)
+#endif
+    , m_tooltipVisiable(false)
 {
-//    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
-//    connect(dApp->viewerTheme, &ViewerThemeManager::viewerThemeChanged, this,
-//            &ImageButton::onThemeChanged);
 }
 
-ImageButton::ImageButton(const QString &normalPic, const QString &hoverPic,
-                         const QString &pressPic, const QString &disablePic,
-                         QWidget *parent)
+ImageButton::ImageButton(
+    const QString &normalPic, const QString &hoverPic, const QString &pressPic, const QString &disablePic, QWidget *parent)
+#if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
     : DImageButton(normalPic, hoverPic, pressPic, parent)
+#else
+    : DToolButton(parent)
+#endif
     , m_tooltipVisiable(false)
     , m_disablePic_(disablePic)
 {
-//    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
-//    connect(dApp->viewerTheme, &ViewerThemeManager::viewerThemeChanged, this,
-//            &ImageButton::onThemeChanged);
+#if DTK_VERSION >= DTK_VERSION_CHECK(6, 0, 0, 0)
+    setIcon(QIcon(normalPic));
+#endif
 }
-
 
 void ImageButton::setDisabled(bool d)
 {
-//    if (d) {
-//        setNormalPic(m_disablePic_);
-//    }
-//    else {
-//        setNormalPic(this->getNormalPic());
-//    }
     DImageButton::setDisabled(d);
 }
 
@@ -56,29 +64,26 @@ bool ImageButton::event(QEvent *e)
 
             return false;
         }
-    } else if (e->type() == QEvent::Leave)  {
+    } else if (e->type() == QEvent::Leave) {
         emit mouseLeave();
         DImageButton::leaveEvent(e);
     } else if (e->type() == QEvent::MouseButtonPress) {
         emit mouseLeave();
-
     }
 
     return DImageButton::event(e);
 }
-
-//void ImageButton::onThemeChanged(ViewerThemeManager::AppTheme theme)
-//{
-//    Q_UNUSED(theme);
-//}
 
 void ImageButton::setTooltipVisible(bool visible)
 {
     m_tooltipVisiable = visible;
 }
 
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ImageButton::enterEvent(QEvent *e)
+#else
+void ImageButton::enterEvent(QEnterEvent *e)
+#endif
 {
     if (isEnabled()) {
         DImageButton::enterEvent(e);
@@ -94,7 +99,7 @@ void ImageButton::showTooltip(const QPoint &gPos)
     }
 
     QFrToDFrame *tf = new QFrToDFrame();
-//    tf->setStyleSheet(this->styleSheet());
+
     tf->setWindowFlags(Qt::ToolTip);
     tf->setAttribute(Qt::WA_TranslucentBackground);
     QLbtoDLabel *tl = new QLbtoDLabel(tf);
@@ -105,7 +110,7 @@ void ImageButton::showTooltip(const QPoint &gPos)
     layout->addWidget(tl);
 
     tf->show();
-    QRect dr = qApp->desktop()->geometry();
+    QRect dr = qApp->primaryScreen()->geometry();
     int y = gPos.y() + tf->height();
     if (y > dr.y() + dr.height()) {
         y = gPos.y() - tf->height() - 10;
@@ -114,9 +119,7 @@ void ImageButton::showTooltip(const QPoint &gPos)
 
     QTimer::singleShot(5000, tf, SLOT(deleteLater()));
 
-    connect(tf, &QFrToDFrame::destroyed, this, [ = ] {
-        m_tooltipVisiable = false;
-    });
+    connect(tf, &QFrToDFrame::destroyed, this, [=] { m_tooltipVisiable = false; });
 
     connect(this, &ImageButton::mouseLeave, tf, &QFrToDFrame::deleteLater);
 }

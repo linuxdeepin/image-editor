@@ -1,0 +1,6 @@
+usr/lib/*/libimageviewer6.so.*
+usr/lib/*/libimageviewer6.so
+usr/share/libimageviewer6/translations/*.qm
+usr/lib/*/libimagevisualresult6.so.*
+usr/share/libimagevisualresult6/filter_cube/*.CUBE
+usr/share/libimagevisualresult6/filter_cube/*.dat

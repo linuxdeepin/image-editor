@@ -1,11 +1,11 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}/bin
-libimagevisualresult=${prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/include/libimagevisualresult
+@PROJECT_NAME@=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include/@PROJECT_NAME@
 
-Name: imagevisualresult
+Name: @TARGET_NAME@
 Description: deepin image viewer plugins
 Version: @PROJECT_VERSION@
-Libs: -L${libimageviewer} -limagevisualresult
+Libs: -L${libimageviewer@IMGE_VERSION_MAJOR@} -l@TARGET_NAME@
 Cflags: -I${includedir}
 

@@ -18,7 +18,6 @@
 #include <DListView>
 #include <DAnchors>
 #include <DFloatingWidget>
-#include <DImageButton>
 #include <DThumbnailProvider>
 #include <DIconButton>
 #include <DBlurEffectWidget>
@@ -32,7 +31,6 @@ DWIDGET_USE_NAMESPACE
 
 class ElidedLabel;
 class QAbstractItemModel;
-//class DImageButton;
 class ImageButton;
 class LibImgViewListView;
 class ImageItem;
