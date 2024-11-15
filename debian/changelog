@@ -1,3 +1,9 @@
+image-editor (1.0.47) unstable; urgency=medium
+
+  * remove freeimage
+
+ -- Liu zheng <liuzheng@uniontech.com>  Fri, 15 Nov 2024 14:00:19 +0800
+
 image-editor (1.0.46) unstable; urgency=medium
 
   * chore(CI): add debian check workflow
