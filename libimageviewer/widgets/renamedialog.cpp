@@ -12,7 +12,7 @@
 #include <DLabel>
 #include <DFontSizeManager>
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDebug>
 
 DWIDGET_USE_NAMESPACE
@@ -75,10 +75,10 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     m_lineedt->lineEdit()->setFocus();
     int Dirlen = /*m_DirPath.size() +*/ 1 + m_labformat->text().size();
     // 正则表达式排除文管不支持的字符
-    // 屏蔽特殊字符 QRegExp rx("[^\\\\//:*?\"<>|]*");
-    QRegExp rx("^[^\\.\\\\/\':\\*\\?\"<>|%&][^\\\\/\':\\*\\?\"<>|%&]*");
+    // 屏蔽特殊字符 QRegularExpression rx("[^\\\\//:*?\"<>|]*");
+    QRegularExpression rx("^[^\\.\\\\/\':\\*\\?\"<>|%&][^\\\\/\':\\*\\?\"<>|%&]*");
 
-    QRegExpValidator *pReg = new QRegExpValidator(rx, this);
+    QRegularExpressionValidator *pReg = new QRegularExpressionValidator(rx, this);
     m_lineedt->lineEdit()->setValidator(pReg);
     connect(okbtn, &DSuggestButton::clicked, this, [=] {
         m_filename = m_lineedt->text() + m_labformat->text();
@@ -97,7 +97,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
         if (arg.isEmpty()) {
             return;
         }
-        if (arg.at(0) == " ") {
+        if (arg.at(0) == QChar(' ')) {
             QString str = arg;
             str = str.right(str.size() - 1);
 
@@ -110,7 +110,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
             int num = 0;
             int i = 0;
             for (; i < arg.size(); i++) {
-                if (arg.at(i) >= 0x4e00 && arg.at(i) <= 0x9fa5) {
+                if (arg.at(i) >= QChar(0x4e00) && arg.at(i) <= QChar(0x9fa5)) {
                     num += 3;
                     if (num >= 256 - Dirlen - 1)
                         break;

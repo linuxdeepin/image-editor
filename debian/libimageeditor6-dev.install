@@ -1,0 +1,5 @@
+usr/include/libimageviewer6/*.h
+usr/lib/*/pkgconfig/libimageviewer6.pc
+usr/include/libimagevisualresult6/*.h
+usr/lib/*/libimagevisualresult6.so
+usr/lib/*/pkgconfig/libimagevisualresult6.pc

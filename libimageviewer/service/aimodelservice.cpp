@@ -445,7 +445,7 @@ void AIModelService::cancelProcess(const QString &output)
     if (dptr->enhanceCache.contains(output)) {
         EnhancePtr ptr = dptr->enhanceCache.value(output);
         if (!ptr.isNull() && Loading == ptr->state.loadAcquire()) {
-            ptr->state.store(Cancel);
+            ptr->state.storeRelease(Cancel);
 
             Q_EMIT enhanceEnd(ptr->source, ptr->output, Cancel);
         }

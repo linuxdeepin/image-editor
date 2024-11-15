@@ -45,7 +45,7 @@ public:
     void saveEnhanceFile(const QString &filePath);
     void saveEnhanceFileAs(const QString &filePath, QWidget *target = nullptr);
 
-    bool detectErrorAndNotify(QWidget *targetWidget, Error error, const QString &output = QString::null);
+    bool detectErrorAndNotify(QWidget *targetWidget, Error error, const QString &output = {});
 
     // 图片切换/中断增强处理等操作时，清理之前的图像增强状态
     Q_SIGNAL void clearPreviousEnhance();

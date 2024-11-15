@@ -502,7 +502,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         QPainter rotatePainter;
         rotatePainter.begin(&generator);
         rotatePainter.resetTransform();
-        rotatePainter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        rotatePainter.setRenderHint(QPainter::Antialiasing, true);
         int realangel = angel / 90;
         if (realangel > 0) {
             for (int i = 0; i < qAbs(realangel); i++) {
@@ -526,7 +526,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         QImage image_copy(path);
         image_copy = adjustImageToRealPosition(image_copy, orientation);
         if (!image_copy.isNull()) {
-            QMatrix rotatematrix;
+            QTransform rotatematrix;
             rotatematrix.rotate(angel);
             image_copy = image_copy.transformed(rotatematrix, Qt::SmoothTransformation);
 
@@ -561,7 +561,7 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIleWithImage(int angel, QImage &img, co
         QPainter rotatePainter;
         rotatePainter.begin(&generator);
         rotatePainter.resetTransform();
-        rotatePainter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        rotatePainter.setRenderHint(QPainter::Antialiasing, true);
         int realangel = angel / 90;
         if (realangel > 0) {
             for (int i = 0; i < qAbs(realangel); i++) {

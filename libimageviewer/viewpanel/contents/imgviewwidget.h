@@ -10,7 +10,6 @@
 #include <DListView>
 #include <DAnchors>
 #include <DThumbnailProvider>
-#include <dimagebutton.h>
 #include <DIconButton>
 #include <DBlurEffectWidget>
 #include <DGuiApplicationHelper>
@@ -30,7 +29,6 @@ DWIDGET_USE_NAMESPACE
 
 class ElidedLabel;
 class QAbstractItemModel;
-//class DImageButton;
 class ImageButton;
 class MyImageListWidget;
 class ImageItem;

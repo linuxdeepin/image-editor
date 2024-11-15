@@ -19,6 +19,7 @@
 #include <QImageReader>
 #include <QApplication>
 
+#include <DGuiApplicationHelper>
 #include <DFontSizeManager>
 
 #include "imgviewlistview.h"
@@ -80,18 +81,13 @@ void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         painter->restore();
         return;
     }
+
     _pixmap = data.image;
-//    _pixmap = ImageDataService::instance()->getThumnailImageByPath(data.path);
     if (_pixmap.isNull()) {
-//        _pixmap = data.damagedPixmap;
         _pixmap = m_damageImage;
     }
-//    bool selected = data.isSelected;
-//    if (/*(option.state & QStyle::State_MouseOver) &&*/
-//        (option.state & QStyle::State_Selected) != 0) {
-//        selected = true;
-//    }
-    painter->setRenderHints(QPainter::HighQualityAntialiasing |
+
+    painter->setRenderHints(QPainter::Antialiasing |
                             QPainter::SmoothPixmapTransform |
                             QPainter::Antialiasing);
     QRect backgroundRect = option.rect;

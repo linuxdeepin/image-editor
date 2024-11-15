@@ -74,7 +74,11 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
             }
         }
 
+#if QT_VERSION_CHECK(6, 0, 0) < QT_VERSION
+        QStringList parseLocalNameList = QLocale::system().name().split("_", Qt::SkipEmptyParts);
+#else
         QStringList parseLocalNameList = QLocale::system().name().split("_", QString::SkipEmptyParts);
+#endif
         if (parseLocalNameList.length() > 0) {
             QString translateFilename = QString("/libimageviewer_%2.qm").arg(parseLocalNameList.at(0));
 

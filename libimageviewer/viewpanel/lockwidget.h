@@ -46,7 +46,6 @@ private slots:
     void pinchTriggered(QPinchGesture *gesture);
 private:
     void onThemeChanged(DGuiApplicationHelper::ColorType theme);
-//    DLabel *m_thumbnailLabel{nullptr};
     QPixmap m_logo;
     QString m_picString;
     bool m_theme;

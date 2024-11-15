@@ -13,9 +13,8 @@
 #include <QtMath>
 
 #include <DLabel>
-#include <DImageButton>
 #include <DThumbnailProvider>
-#include <DApplicationHelper>
+#include <DPaletteHelper>
 #include <QMetaObject>
 #include <DSpinner>
 
@@ -419,20 +418,20 @@ void LibBottomToolbar::slotThemeChanged(int type)
         pa.setColor(DPalette::FrameBorder, btnframecolor);
         // 取消阴影
         pa.setColor(DPalette::Shadow, btnframecolor);
-        DApplicationHelper::instance()->setPalette(m_backButton, pa);
-        DApplicationHelper::instance()->setPalette(m_preButton, pa);
-        DApplicationHelper::instance()->setPalette(m_nextButton, pa);
-        DApplicationHelper::instance()->setPalette(m_adaptImageBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_adaptScreenBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_clBT, pa);
+        DPaletteHelper::instance()->setPalette(m_backButton, pa);
+        DPaletteHelper::instance()->setPalette(m_preButton, pa);
+        DPaletteHelper::instance()->setPalette(m_nextButton, pa);
+        DPaletteHelper::instance()->setPalette(m_adaptImageBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_adaptScreenBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_clBT, pa);
 
         if (m_ocrIsExists) {
-            DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+            DPaletteHelper::instance()->setPalette(m_ocrBtn, pa);
         }
 
-        DApplicationHelper::instance()->setPalette(m_rotateLBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_rotateRBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_trashBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_rotateLBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_rotateRBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_trashBtn, pa);
     } else {
         QColor maskColor("#202020");
         maskColor.setAlphaF(0.50);
@@ -447,20 +446,20 @@ void LibBottomToolbar::slotThemeChanged(int type)
         pa.setColor(DPalette::FrameBorder, btnframecolor);
         // 取消阴影
         pa.setColor(DPalette::Shadow, btnframecolor);
-        DApplicationHelper::instance()->setPalette(m_backButton, pa);
-        DApplicationHelper::instance()->setPalette(m_preButton, pa);
-        DApplicationHelper::instance()->setPalette(m_nextButton, pa);
-        DApplicationHelper::instance()->setPalette(m_adaptImageBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_adaptScreenBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_clBT, pa);
+        DPaletteHelper::instance()->setPalette(m_backButton, pa);
+        DPaletteHelper::instance()->setPalette(m_preButton, pa);
+        DPaletteHelper::instance()->setPalette(m_nextButton, pa);
+        DPaletteHelper::instance()->setPalette(m_adaptImageBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_adaptScreenBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_clBT, pa);
 
         if (m_ocrIsExists) {
-            DApplicationHelper::instance()->setPalette(m_ocrBtn, pa);
+            DPaletteHelper::instance()->setPalette(m_ocrBtn, pa);
         }
 
-        DApplicationHelper::instance()->setPalette(m_rotateLBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_rotateRBtn, pa);
-        DApplicationHelper::instance()->setPalette(m_trashBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_rotateLBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_rotateRBtn, pa);
+        DPaletteHelper::instance()->setPalette(m_trashBtn, pa);
     }
 }
 

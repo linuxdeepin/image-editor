@@ -139,8 +139,6 @@ signals:
     void sigClicked();
 
 public slots:
-//    void setHighQualityAntialiasing(bool highQualityAntialiasing);
-
     //保存旋转图片
     void slotSavePic();
 

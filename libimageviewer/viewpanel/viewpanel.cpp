@@ -12,11 +12,12 @@
 #include <QScreen>
 #include <QApplication>
 #include <QStringList>
-#include <QDesktopWidget>
+
 #include <dshadowline.h>
 #include <DDesktopServices>
 #include <DMenu>
 #include <DFileDialog>
+
 #include "contents/bottomtoolbar.h"
 #include "navigationwidget.h"
 #include "lockwidget.h"
