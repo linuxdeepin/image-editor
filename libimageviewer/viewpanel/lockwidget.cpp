@@ -190,9 +190,9 @@ LockWidget::~LockWidget()
 void LockWidget::wheelEvent(QWheelEvent *event)
 {
     if ((event->modifiers() == Qt::ControlModifier)) {
-        if (event->delta() > 0) {
+        if (event->angleDelta().y() > 0) {
             emit previousRequested();
-        } else if (event->delta() < 0) {
+        } else if (event->angleDelta().y() < 0) {
             emit nextRequested();
         }
         qDebug() << "control++";

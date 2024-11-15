@@ -1,12 +1,11 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}/bin
-libimageviewer=${prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/include/libimageviewer
+@PROJECT_NAME@=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include/@PROJECT_NAME@
 
-Name: image-viewer
+Name: image-viewer@IMGE_VERSION_MAJOR@
 Description: deepin image viewer plugins
 Version: @PROJECT_VERSION@
-Libs: -L${libimageviewer} -limageviewer
+Libs: -L${@PROJECT_NAME@} -l@TARGET_NAME@
 Cflags: -I${includedir}
-Requires: Qt5Core Qt5Gui Qt5Widgets Qt5Svg Qt5DBus Qt5Concurrent Qt5PrintSupport dtkcore dtkwidget
-
+Requires: Qt@QT_VERSION_MAJOR@Core Qt@QT_VERSION_MAJOR@Gui Qt@QT_VERSION_MAJOR@Widgets Qt@QT_VERSION_MAJOR@Svg Qt@QT_VERSION_MAJOR@DBus Qt@QT_VERSION_MAJOR@Concurrent Qt@QT_VERSION_MAJOR@PrintSupport dtk@DTK_VERSION_MAJOR@core dtk@DTK_VERSION_MAJOR@widget

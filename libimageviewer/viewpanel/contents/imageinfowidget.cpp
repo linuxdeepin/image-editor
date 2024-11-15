@@ -10,7 +10,7 @@
 #include "service/commonservice.h"
 #include "service/mtpfileproxy.h"
 
-#include <DApplicationHelper>
+#include <DPaletteHelper>
 #include <DArrowLineDrawer>
 #include <DDialogCloseButton>
 #include <DFontSizeManager>
@@ -113,7 +113,7 @@ protected:
         QRectF bgRect;
         bgRect.setSize(size());
         const QPalette pal = QGuiApplication::palette();  // this->palette();
-        QColor bgColor = pal.color(QPalette::Background);
+        QColor bgColor = pal.color(QPalette::Window);
 
         QPainterPath path;
         path.addRoundedRect(bgRect, 8, 8);
@@ -168,7 +168,6 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     m_mainLayout = new QVBoxLayout(this);
 
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
-    m_mainLayout->setMargin(0);
     m_mainLayout->setSpacing(10);
 
     m_mainLayout->addWidget(m_exif_base);
@@ -374,7 +373,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
 
         //部分图片采用meta data的形式无法正确读取大小，此处改成使用已缓存的图片大小数据
         if (i->key == "Dimension") {
-            value = QString().sprintf("%dx%d", info.imgOriginalWidth, info.imgOriginalHeight);
+            value = QString("%1x%2").arg(info.imgOriginalWidth).arg(info.imgOriginalHeight);
         }
 
         /*lmh0825真实格式，没有真格式采用后缀名*/
@@ -390,7 +389,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         SimpleFormField *field = new SimpleFormField;
         field->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         DFontSizeManager::instance()->bind(field, DFontSizeManager::T8);
-        DPalette pa1 = DApplicationHelper::instance()->palette(field);
+        DPalette pa1 = DPaletteHelper::instance()->palette(field);
         pa1.setBrush(DPalette::WindowText, pa1.color(DPalette::TextTitle));
         field->setPalette(pa1);
 
@@ -415,7 +414,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         }
         title->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         DFontSizeManager::instance()->bind(title, DFontSizeManager::T8);
-        DPalette pa2 = DApplicationHelper::instance()->palette(title);
+        DPalette pa2 = DPaletteHelper::instance()->palette(title);
         pa2.setBrush(DPalette::WindowText, pa2.color(DPalette::TextTitle));
         title->setPalette(pa2);
         if (CNflag) {
@@ -447,7 +446,7 @@ void LibImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, 
         SimpleFormField *field = new SimpleFormField;
         field->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         DFontSizeManager::instance()->bind(field, DFontSizeManager::T8);
-        DPalette pa1 = DApplicationHelper::instance()->palette(field);
+        DPalette pa1 = DPaletteHelper::instance()->palette(field);
         pa1.setBrush(DPalette::WindowText, pa1.color(DPalette::TextTitle));
         field->setPalette(pa1);
         field->setText(SpliteText(value, field->font(), m_maxFieldWidth));
@@ -461,7 +460,7 @@ void LibImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, 
         }
         title->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         DFontSizeManager::instance()->bind(title, DFontSizeManager::T8);
-        DPalette pa2 = DApplicationHelper::instance()->palette(title);
+        DPalette pa2 = DPaletteHelper::instance()->palette(title);
         pa2.setBrush(DPalette::WindowText, pa2.color(DPalette::TextTitle));
         title->setPalette(pa2);
         if (CNflag) {
