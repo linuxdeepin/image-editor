@@ -12,6 +12,7 @@
 #include <QtDebug>
 #include <QRgb>
 
+#include <DIconButton>
 #include <DDialogCloseButton>
 #include <DGuiApplicationHelper>
 #include <dwindowclosebutton.h>
@@ -40,7 +41,6 @@ NavigationWidget::NavigationWidget(QWidget *parent)
 {
     hide();
     resize(150, 112);
-//    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
 
     ImageButton *closeBtn_light = new ImageButton(ICON_CLOSE_NORMAL_LIGHT, ICON_CLOSE_HOVER_LIGHT, ICON_CLOSE_PRESS_LIGHT, " ", this);
     closeBtn_light->setTooltipVisible(true);
@@ -48,7 +48,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     closeBtn_light->move(QPoint(this->x() + this->width() - 27 - 10,
                                 rect().topRight().y() + 4 - 3));
     DPalette palette1 ;
-    palette1.setColor(DPalette::Background, QColor(0, 0, 0, 1));
+    palette1.setColor(DPalette::Window, QColor(0, 0, 0, 1));
     closeBtn_light->setPalette(palette1);
     closeBtn_light->hide();
     connect(closeBtn_light, &ImageButton::clicked, [this]() {
@@ -61,7 +61,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     closeBtn_dark->move(QPoint(this->x() + this->width() - 27 - 10,
                                rect().topRight().y() + 4 - 3));
     DPalette palette2 ;
-    palette2.setColor(DPalette::Background, QColor(0, 0, 0, 1));
+    palette2.setColor(DPalette::Window, QColor(0, 0, 0, 1));
     closeBtn_dark->setPalette(palette2);
     closeBtn_dark->hide();
     connect(closeBtn_dark, &ImageButton::clicked, [this]() {

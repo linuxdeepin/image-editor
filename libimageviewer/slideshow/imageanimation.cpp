@@ -14,10 +14,12 @@
 #include <QTimer>
 #include <QScreen>
 #include <QObject>
-#include <QDesktopWidget>
 #include <QPalette>
 #include <QMutex>
 #include <QApplication>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QDesktopWidget>
+#endif
 
 #include <cmath>
 
@@ -518,8 +520,8 @@ void LibImageAnimationPrivate::setPathList(const QString &first, const QStringLi
 
 void LibImageAnimationPrivate::startAnimation()
 {
-    qsrand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
-    m_animationType = static_cast<AnimationType>(qrand() % (3));
+    std::srand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
+    m_animationType = static_cast<AnimationType>(std::rand() % (3));
     if (!m_continuousanimationTimer) {
         m_continuousanimationTimer = new QTimer(this);
         m_factor = 0.0f;
@@ -592,8 +594,8 @@ void LibImageAnimationPrivate::onStaticTimer()
     qDebug() << "ImageAnimationPrivate::onStaticTimer m_SliderModel = " << LibImageAnimation::AutoPlayModel;
 
     if (m_PlayOrStatue == LibImageAnimation::PlayStatue && m_SliderModel == LibImageAnimation::AutoPlayModel) {
-        qsrand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
-        m_animationType = static_cast<AnimationType>(qrand() % (3));
+        std::srand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
+        m_animationType = static_cast<AnimationType>(std::rand() % (3));
         setImage1(m_imageName2);
         setImage2(queue->jumpTonext());
         startAnimation();
@@ -608,18 +610,34 @@ void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
     LibUnionImage_NameSpace::loadStaticImageFromFile(imageName1_bar, tImg, errMsg);
     QPixmap p1 = QPixmap::fromImage(tImg);
     int beginX = 0, beginY = 0;
+
+    QRect screenGeometry;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (auto screen = QGuiApplication::primaryScreen()) {
+        screenGeometry = screen->geometry();
+    }
+
+#else
+    // 双屏下或者多屏下
     int number = QApplication::desktop()->screenNumber(q_ptr);
     if (number < 0) {
         number = 0;
     }
+
+    if (auto screen = QGuiApplication::screens().at(number)) {
+        screenGeometry = screen->geometry();
+    }
+
+#endif
+
     // 多屏显示问题，定位当前屏幕
     if (p1.width() >= p1.height()) {
-        m_pixmap1 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
+        m_pixmap1 = QPixmap(screenGeometry.size());
         QPainter pa1(&m_pixmap1);
         m_pixmap1.fill(QColor("#252525"));
-        p1 = p1.scaledToWidth(QGuiApplication::screens().at(number)->geometry().size().width());
-        if (p1.height() > QGuiApplication::screens().at(number)->geometry().size().height()) {
-            p1 = p1.scaledToHeight(QGuiApplication::screens().at(number)->geometry().size().height());
+        p1 = p1.scaledToWidth(screenGeometry.width());
+        if (p1.height() > screenGeometry.height()) {
+            p1 = p1.scaledToHeight(screenGeometry.height());
         }
         // 多屏显示去除x偏移
         centrePoint = q_ptr->getCurScreenGeometry().center();
@@ -630,12 +648,12 @@ void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
         pa1.drawPixmap(beginX, beginY, p1);
         pa1.end();
     } else {
-        m_pixmap1 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
+        m_pixmap1 = QPixmap(screenGeometry.size());
         QPainter pa1(&m_pixmap1);
         m_pixmap1.fill(QColor("#252525"));
-        p1 = p1.scaledToHeight(QGuiApplication::screens().at(number)->geometry().size().height() + 8);
-        if (p1.width() > QGuiApplication::screens().at(number)->geometry().size().width()) {
-            p1 = p1.scaledToWidth(QGuiApplication::screens().at(number)->geometry().size().width());
+        p1 = p1.scaledToHeight(screenGeometry.height() + 8);
+        if (p1.width() > screenGeometry.width()) {
+            p1 = p1.scaledToWidth(screenGeometry.width());
         }
         // 多屏显示去除x偏移
         centrePoint = q_ptr->getCurScreenGeometry().center();
@@ -656,18 +674,33 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     QString errMsg;
     LibUnionImage_NameSpace::loadStaticImageFromFile(imageName2_bar, tImg, errMsg);
     QPixmap p2 = QPixmap::fromImage(tImg);
+
+    QRect screenGeometry;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (auto screen = QGuiApplication::primaryScreen()) {
+        screenGeometry = screen->geometry();
+    }
+
+#else
     // 双屏下或者多屏下
     int number = QApplication::desktop()->screenNumber(q_ptr);
     if (number < 0) {
         number = 0;
     }
+
+    if (auto screen = QGuiApplication::screens().at(number)) {
+        screenGeometry = screen->geometry();
+    }
+
+#endif
+
     if (p2.width() >= p2.height()) {
-        m_pixmap2 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
+        m_pixmap2 = QPixmap(screenGeometry.size());
         QPainter pa2(&m_pixmap2);
         m_pixmap2.fill(QColor("#252525"));
-        p2 = p2.scaledToWidth(QGuiApplication::screens().at(number)->geometry().size().width());
-        if (p2.height() > QGuiApplication::screens().at(number)->geometry().size().height()) {
-            p2 = p2.scaledToHeight(QGuiApplication::screens().at(number)->geometry().size().height());
+        p2 = p2.scaledToWidth(screenGeometry.width());
+        if (p2.height() > screenGeometry.height()) {
+            p2 = p2.scaledToHeight(screenGeometry.height());
         }
         // 多屏显示下，要去除x偏移
         centrePoint = q_ptr->getCurScreenGeometry().center();
@@ -678,12 +711,12 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
         pa2.drawPixmap(beginX, beginY, p2);
         pa2.end();
     } else {
-        m_pixmap2 = QPixmap(QGuiApplication::screens().at(number)->geometry().size());
+        m_pixmap2 = QPixmap(screenGeometry.size());
         QPainter pa2(&m_pixmap2);
         m_pixmap2.fill(QColor("#252525"));
-        p2 = p2.scaledToHeight(QGuiApplication::screens().at(number)->geometry().size().height() + 8);
-        if (p2.width() > QGuiApplication::screens().at(number)->geometry().size().width()) {
-            p2 = p2.scaledToWidth(QGuiApplication::screens().at(number)->geometry().size().width());
+        p2 = p2.scaledToHeight(screenGeometry.height() + 8);
+        if (p2.width() > screenGeometry.width()) {
+            p2 = p2.scaledToWidth(screenGeometry.width());
         }
         // 多屏显示下，要去除x偏移
         centrePoint = q_ptr->getCurScreenGeometry().center();
@@ -704,7 +737,7 @@ LibImageAnimation::LibImageAnimation(QWidget *parent) :
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setAttribute(Qt::WA_StyledBackground, true);
     QPalette pal(palette());
-    pal.setColor(QPalette::Background, Qt::black);
+    pal.setColor(QPalette::Window, Qt::black);
     setAutoFillBackground(true);
     setPalette(pal);
 }
@@ -779,11 +812,18 @@ const QString LibImageAnimation::currentPath()
 
 const QRect LibImageAnimation::getCurScreenGeometry()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QRect tempRect;
+    if (auto screen = QApplication::primaryScreen()) {
+        tempRect = screen->geometry();
+    }
+#else
     int number = QApplication::desktop()->screenNumber(this);
     if (number < 0) {
         number = 0;
     }
     QRect tempRect = QGuiApplication::screens().at(number)->geometry();
+#endif
     tempRect.setRect(0, 0, tempRect.width(), tempRect.height());
     return tempRect;
 }

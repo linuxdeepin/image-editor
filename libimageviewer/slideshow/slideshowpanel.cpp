@@ -13,7 +13,9 @@
 #include <QResizeEvent>
 #include <QStyleFactory>
 #include <QScreen>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#endif
 #include <QGuiApplication>
 #include <QApplication>
 
@@ -157,7 +159,7 @@ LibSlideShowPanel::LibSlideShowPanel(QWidget *parent) : QWidget(parent)
     initConnections();
     setMouseTracking(true);
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_animation);
     this->setLayout(layout);
     qDebug() << QGuiApplication::primaryScreen()->geometry().width();
@@ -295,12 +297,27 @@ void LibSlideShowPanel::startSlideShow(const ViewInfo &vinfo)
         //todo屏蔽了全局信号
 //        emit dApp->signalM->updatePauseButton();
     }
+
+    QRect screenGeometry;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (auto screen = QGuiApplication::primaryScreen()) {
+        screenGeometry = screen->geometry();
+    }
+
+#else
     int number = QApplication::desktop()->screenNumber(this);
     if (number < 0) {
         number = 0;
     }
-    int nParentWidth = QGuiApplication::screens().at(number)->geometry().width();
-    int nParentHeight = QGuiApplication::screens().at(number)->geometry().height();
+
+    if (auto screen = QGuiApplication::screens().at(number)) {
+        screenGeometry = screen->geometry();
+    }
+
+#endif
+
+    int nParentWidth = screenGeometry.width();
+    int nParentHeight = screenGeometry.height();
     slideshowbottombar->move((nParentWidth - slideshowbottombar->width()) / 2, nParentHeight);
     m_animation->startSlideShow(m_vinfo.path, m_vinfo.paths);
     auto actionlist = m_menu->actions();
@@ -395,12 +412,28 @@ void LibSlideShowPanel::mouseMoveEvent(QMouseEvent *event)
 
     if (window()->isFullScreen()) {
         QPoint pos = mapFromGlobal(QCursor::pos());
+
+
         // 处理程序界面的初始高度和全屏下幻灯片界面不一致导致底部工具栏位置错误
+        QRect screenGeometry;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        if (auto screen = QGuiApplication::primaryScreen()) {
+            screenGeometry = screen->geometry();
+        }
+
+#else
         int number = QApplication::desktop()->screenNumber(this);
         if (number < 0) {
             number = 0;
         }
-        if (QGuiApplication::screens().at(number)->geometry().size().height() != height())
+
+        if (auto screen = QGuiApplication::screens().at(number)) {
+            screenGeometry = screen->geometry();
+        }
+
+#endif
+
+        if (screenGeometry.height() != height())
             return;
         if (height() - 20 < pos.y() && height() >= pos.y() && height() >= slideshowbottombar->y()) {
             QPropertyAnimation *animation = new QPropertyAnimation(slideshowbottombar, "pos");

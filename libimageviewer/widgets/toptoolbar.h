@@ -13,7 +13,6 @@
 #include <DLabel>
 #include <QGraphicsDropShadowEffect>
 #include <DFontSizeManager>
-#include <DApplicationHelper>
 #include <DMenu>
 #include <DBlurEffectWidget>
 

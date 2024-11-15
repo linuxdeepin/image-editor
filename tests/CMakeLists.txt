@@ -5,11 +5,11 @@ project(image-editor-test VERSION 0.1)
 ADD_COMPILE_OPTIONS(-fno-access-control)
 
 #"option"用来定义宏，"ON"表示打开，"OFF"表示关闭
-option (LITE_DIV "Use tutorial provided math implementation" ON)
-add_definitions( -DLITE_DIV )
+option(LITE_DIV "Use tutorial provided math implementation" ON)
+add_definitions(-DLITE_DIV)
 
-option (USE_TEST "Use TESTS" ON)
-add_definitions( -DUSE_TEST )
+option(USE_TEST "Use TESTS" ON)
+add_definitions(-DUSE_TEST)
 
 ADD_COMPILE_OPTIONS(-fno-access-control)
 
@@ -26,7 +26,7 @@ execute_process(COMMAND uname -m OUTPUT_VARIABLE MACH
 
 
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 endif()
 
@@ -35,28 +35,28 @@ endif()
 set(AllTestQRC
     ./testqrc/testresource.qrc)
 file(GLOB_RECURSE HEADERSCURRENT "*.h")
-file(GLOB_RECURSE  SOURCESCURRENT  "*.cpp")
+file(GLOB_RECURSE SOURCESCURRENT "*.cpp")
 
-file (GLOB_RECURSE SOURCES
+file(GLOB_RECURSE SOURCES
     "../libimageviewer/*.cpp"
     "../libimageviewer/*.h"
     "../libimagevisualresult/exposure.cpp"
     "../libimagevisualresult/exposure.h"
-    )
+)
 file(GLOB_RECURSE SOURCESC "../libimageviewer/*.c")
 #file(GLOB_RECURSE HEADERS "../src/src/module/modulepanel.h")
 file(GLOB_RECURSE FORMS "../libimageviewer/*.ui")
 file(GLOB_RECURSE RESOURCES "../*.qrc")
 # 三方库 tiff-tools tiffcp.c
 file(GLOB tiffToolsSources ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.c
-                           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/tiff-tools/*.h)
 
 include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(PROJECT_INCLUDE ${PROJECT_SOURCE_DIR}/../libimageviewer/
     ${PROJECT_SOURCE_DIR}/../src/src/utils
-    )
+)
 
 find_package(PkgConfig REQUIRED)
 find_package(TIFF)
@@ -71,18 +71,14 @@ find_package(Qt5Concurrent)
 find_package(Qt5Svg)
 find_package(Qt5X11Extras)
 find_package(Qt5PrintSupport)
-find_package(Qt5OpenGL)
 find_package(Qt5LinguistTools)
 
 pkg_check_modules(3rd_lib REQUIRED
     dtkcore
     dtkwidget
-    gio-qt
-    gio-unix-2.0
-    gsettings-qt
     gstreamer-1.0
     libmediainfo
-        )
+)
 
 ## translations
 
@@ -91,17 +87,17 @@ file(GLOB TS LIST_DIRECTORIES false translations/${CMD_NAME}*.ts)
 
 set_source_files_properties(${TS} PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/translations)
 
-qt5_create_translation(QM ${SOURCES}  ${GLOB})
+qt5_create_translation(QM ${SOURCES} ${GLOB})
 
-if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
+if(NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
     qt5_create_translation(QM ${SRCS} ${TS})
-endif ()
+endif()
 
-add_executable( ${TARGET_NAME} ${SOURCES} ${SOURCESC}
+add_executable(${TARGET_NAME} ${SOURCES} ${SOURCESC}
     ${HEADERS} ${AllTestQRC}
     ${RESOURCES} ${HEADERSCURRENT}
     ${SOURCESCURRENT} ${QM} ${tiffToolsSources}
-    )
+)
 
 # 暂未使用OpenCV, 暂时屏蔽
 # find_package(OpenCV REQUIRED)
@@ -124,19 +120,15 @@ target_link_libraries(
     Qt5::Concurrent
     Qt5::X11Extras
     Qt5::PrintSupport
-    Qt5::OpenGL
     Qt5::Test
     dtkwidget
     dtkcore
     X11
     Xext
     exif
-#    gio-unix-2.0
-    gio-qt
-    udisks2-qt5
     pthread
     gtest
-    )
+)
 
 
 include_directories(${PROJECT_BINARY_DIR})
@@ -150,7 +142,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # 添加gocv覆盖率文件的输出
 #set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
 # 加速编译优化参数
-if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
     set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
 else()
     set(CMAKE_CXX_FLAGS "-fsanitize=undefined,address,leak -fno-omit-frame-pointer -g -fprofile-arcs -ftest-coverage -pthread ")
@@ -182,7 +174,7 @@ add_custom_command(TARGET test
     COMMAND genhtml -o ./coverageResult/report ./coverageResult/${PROJECT_NAME}_Coverage_fileter.info
     COMMAND echo " -- Coverage files have been output to ${CMAKE_BINARY_DIR}/coverageResult/report "
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
+)
 add_dependencies(test ${PROJECT_NAME})
 
 

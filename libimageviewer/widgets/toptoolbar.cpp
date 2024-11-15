@@ -23,7 +23,7 @@
 #include <QLabel>
 #include <QPainterPath>
 #include <DFontSizeManager>
-#include <DApplicationHelper>
+
 DWIDGET_USE_NAMESPACE
 
 namespace {
@@ -61,7 +61,7 @@ LibTopToolbar::LibTopToolbar(bool manager, QWidget *parent)
 {
     m_manager = manager;
     QPalette palette;
-    palette.setColor(QPalette::Background, QColor(0, 0, 0, 0)); // 最后一项为透明度
+    palette.setColor(QPalette::Window, QColor(0, 0, 0, 0)); // 最后一项为透明度
     setPalette(palette);
     initMenu();
     initWidgets();

@@ -31,6 +31,7 @@
 #include <QImageReader>
 #include <QTranslator>
 #include <QDirIterator>
+#include <QStandardPaths>
 
 #include <DApplication>
 #include <DDesktopServices>
@@ -384,12 +385,12 @@ bool trashFile(const QString &file)
 QString SpliteText(const QString &text, const QFont &font, int nLabelSize, bool bReturn)
 {
     QFontMetrics fm(font);
-    int nTextSize = fm.width(text);
+    int nTextSize = fm.horizontalAdvance(text);
     if (nTextSize > nLabelSize) {
         int nPos = 0;
         long nOffset = 0;
         for (int i = 0; i < text.size(); i++) {
-            nOffset += fm.width(text.at(i));
+            nOffset += fm.horizontalAdvance(text.at(i));
             if (nOffset >= nLabelSize) {
                 nPos = i;
                 break;
@@ -514,7 +515,11 @@ bool loadLibTransaltor()
             }
         }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QStringList parseLocalNameList = QLocale::system().name().split("_", Qt::SkipEmptyParts);
+#else
         QStringList parseLocalNameList = QLocale::system().name().split("_", QString::SkipEmptyParts);
+#endif
         if (parseLocalNameList.length() > 0) {
             QString translateFilename = QString("/libimageviewer_%2.qm").arg(parseLocalNameList.at(0));
 

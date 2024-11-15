@@ -7,7 +7,6 @@
 
 #include <QDebug>
 #include <QFile>
-#include <QOpenGLWidget>
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QMovie>
@@ -23,9 +22,15 @@
 #include <QGestureEvent>
 #include <QSvgRenderer>
 #include <QtGlobal>
-#include <QDesktopWidget>
 #include <QShortcut>
 #include <QApplication>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QDesktopWidget>
+#endif
+
+#include <DGuiApplicationHelper>
 #include <DSpinner>
 
 #include "graphicsitem.h"
@@ -40,14 +45,8 @@
 #include "service/aimodelservice.h"
 #include "service/permissionconfig.h"
 
-#include <DGuiApplicationHelper>
-#include <DApplicationHelper>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 
-#ifndef QT_NO_OPENGL
-//#include <QGLWidget>
-#endif
+
 
 #include <sys/inotify.h>
 #include "service/commonservice.h"
@@ -79,7 +78,6 @@ QVariantList cachePixmap(const QString &path)
     QPixmap p = QPixmap::fromImage(tImg);
     if (QFileInfo(path).exists() && p.isNull()) {
         //判定为损坏图片
-//        p = utils::image::getDamagePixmap(DApplicationHelper::instance()->themeType() == DApplicationHelper::LightType);
         if(path.contains("ftp:host=")) {//前面失败后再处理ftp图片
             QFileInfo info(path);
             if(info.size() <=  1024*1024*1024) {//小于1Mftp文件做下载本地处理
@@ -172,40 +170,40 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     }, Qt::QueuedConnection);
 
     //让默认的快捷键失效，默认会滑动窗口
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsUp);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsDown);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right), this);
+    connect(new QShortcut(QKeySequence(Qt::CTRL, Qt::Key_Up), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsUp);
+    connect(new QShortcut(QKeySequence(Qt::CTRL, Qt::Key_Down), this), &QShortcut::activated, this, &LibImageGraphicsView::slotsDown);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::Key_Right), this);
 
-    new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::Key_Down), this);
 
-    new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::SHIFT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::SHIFT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::SHIFT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::SHIFT, Qt::Key_Down), this);
 
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Down), this);
 
-    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::SHIFT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::SHIFT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::SHIFT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::ALT, Qt::SHIFT, Qt::Key_Down), this);
 
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::Key_Down), this);
 
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Left), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Right), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Up), this);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::SHIFT + Qt::Key_Down), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::SHIFT, Qt::Key_Left), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::SHIFT, Qt::Key_Right), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::SHIFT, Qt::Key_Up), this);
+    new QShortcut(QKeySequence(Qt::CTRL, Qt::ALT, Qt::SHIFT, Qt::Key_Down), this);
 }
 
 int LibImageGraphicsView::getcurrentImgCount()
@@ -1557,7 +1555,7 @@ void LibImageGraphicsView::addLoadSpinner(bool enhanceImage)
         m_spinnerCtx = new QWidget(this);
         m_spinnerCtx->setFixedSize(SPINNER_SIZE);
         QVBoxLayout *hLayout = new QVBoxLayout;
-        hLayout->setMargin(0);
+        hLayout->setContentsMargins(0, 0, 0, 0);
         hLayout->setSpacing(0);
         hLayout->addWidget(m_spinner, 0, Qt::AlignCenter);
 
@@ -1613,9 +1611,9 @@ void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
     }
 
     if ((event->modifiers() == Qt::ControlModifier)) {
-        if (event->delta() > 0) {
+        if (event->angleDelta().y() > 0) {
             emit previousRequested();
-        } else if (event->delta() < 0) {
+        } else if (event->angleDelta().y() < 0) {
             emit nextRequested();
         }
 
@@ -1625,127 +1623,11 @@ void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
             event->accept();
         } else {
 
-            qreal factor = qPow(1.2, event->delta() / 240.0);
+            qreal factor = qPow(1.2, event->angleDelta().y() / 240.0);
             qDebug() << factor;
-            scaleAtPoint(event->pos(), factor);
+            scaleAtPoint(event->position().toPoint(), factor);
 
             event->accept();
         }
     }
-//    qDebug() << "---" << __FUNCTION__ << "---" << this->sceneRect();
 }
-
-//CFileWatcher::CFileWatcher(QObject *parent): QThread(parent)
-//{
-//    _handleId = inotify_init();
-//}
-
-//CFileWatcher::~CFileWatcher()
-//{
-//    clear();
-//}
-
-//bool CFileWatcher::isVaild()
-//{
-//    return (_handleId != -1);
-//}
-
-//void CFileWatcher::addWather(const QString &path)
-//{
-//    QMutexLocker loker(&_mutex);
-//    if (!isVaild())
-//        return;
-//    QFileInfo info(path);
-//    if (!info.exists() || !info.isFile()) {
-//        return;
-//    }
-//    if (watchedFiles.find(path) != watchedFiles.end()) {
-//        return;
-//    }
-//    std::string sfile = path.toStdString();
-//    int fileId = inotify_add_watch(_handleId, sfile.c_str(), IN_MODIFY | IN_DELETE_SELF | IN_MOVE_SELF);
-//    watchedFiles.insert(path, fileId);
-//    watchedFilesId.insert(fileId, path);
-//    if (!_running) {
-//        _running = true;
-//        start();
-//    }
-//}
-
-//void CFileWatcher::removePath(const QString &path)
-//{
-//    QMutexLocker loker(&_mutex);
-//    if (!isVaild())
-//        return;
-//    auto itf = watchedFiles.find(path);
-//    if (itf != watchedFiles.end()) {
-//        inotify_rm_watch(_handleId, itf.value());
-//        watchedFilesId.remove(itf.value());
-//        watchedFiles.erase(itf);
-//    }
-//}
-
-//void CFileWatcher::clear()
-//{
-//    QMutexLocker loker(&_mutex);
-//    for (auto it : watchedFiles) {
-//        inotify_rm_watch(_handleId, it);
-//    }
-//    watchedFilesId.clear();
-//    watchedFiles.clear();
-//}
-
-//void CFileWatcher::run()
-//{
-//    doRun();
-//}
-
-//void CFileWatcher::doRun()
-//{
-//    if (!isVaild())
-//        return;
-
-//    char name[1024];
-//    auto freadsome = [ = ](void *dest, size_t remain, FILE * file) {
-//        char *offset = reinterpret_cast<char *>(dest);
-//        while (remain) {
-//            if (file == nullptr)
-//                return -1;
-//            size_t n = fread(offset, 1, remain, file);
-//            if (n == 0) {
-//                return -1;
-//            }
-
-//            remain -= n;
-//            offset += n;
-//        }
-//        return 0;
-//    };
-
-//    FILE *watcher_file = fdopen(_handleId, "r");
-
-//    while (true) {
-//        inotify_event event;
-//        if (-1 == freadsome(&event, sizeof(event), watcher_file)) {
-//            qWarning() << "------------- freadsome error !!!!!---------- ";
-//            break;
-//        }
-//        if (event.len) {
-//            freadsome(name, event.len, watcher_file);
-//        } else {
-//            QMutexLocker loker(&_mutex);
-//            auto itf = watchedFilesId.find(event.wd);
-//            if (itf != watchedFilesId.end()) {
-//                //qDebug() << "file = " << itf.value() << " event.wd = " << event.wd << "event.mask = " << event.mask;
-
-//                if (event.mask & IN_MODIFY) {
-//                    emit fileChanged(itf.value(), EFileModified);
-//                } else if (event.mask & IN_MOVE_SELF) {
-//                    emit fileChanged(itf.value(), EFileMoved);
-//                } else if (event.mask & IN_DELETE_SELF) {
-//                    emit fileChanged(itf.value(), EFileMoved);
-//                }
-//            }
-//        }
-//    }
-//}

@@ -23,7 +23,6 @@
 #include <DMenu>
 #include <DPushButton>
 #include <DIconButton>
-#include <DApplicationHelper>
 
 #include "image-viewer_global.h"
 

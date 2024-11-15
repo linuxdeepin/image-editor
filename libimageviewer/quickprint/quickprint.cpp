@@ -141,7 +141,11 @@ void QuickPrintPrivate::asyncPrint(DPrinter *printer, const QVector<int> &pageRa
     QPainter painter(printer);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QRect rect = printer->pageRect(QPrinter::DevicePixel).toRect();
+#else
     QRect rect = printer->pageRect();
+#endif
     qreal ratio = 0.0;
 
     for (int page : pageRange) {

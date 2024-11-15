@@ -193,7 +193,7 @@ void ThumbnailWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     if (m_defaultImage.isNull() && !m_isDefaultThumbnail) {
         QPainter painter(this);
-        painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
         QIcon m_icon(m_defaultImage);
         m_icon.paint(&painter, QRect(1, 1, 1, 1));
         return;
@@ -214,9 +214,7 @@ void ThumbnailWidget::paintEvent(QPaintEvent *event)
     QRect imgRect = QRect(imgStartPoint.x(), imgStartPoint.y(), 128, 128);
 
     QPainter painter(this);
-    painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::SmoothPixmapTransform);
-    //    painter.drawPixmap(imgRect, m_defaultImage);
-    //    QIcon m_icon(m_picString);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     QIcon m_icon(m_defaultImage);
     m_icon.paint(&painter, imgRect);
 }
@@ -295,9 +293,9 @@ ThumbnailWidget::~ThumbnailWidget() {}
 void ThumbnailWidget::wheelEvent(QWheelEvent *event)
 {
     if ((event->modifiers() == Qt::ControlModifier)) {
-        if (event->delta() > 0) {
+        if (event->angleDelta().y() > 0) {
             emit previousRequested();
-        } else if (event->delta() < 0) {
+        } else if (event->angleDelta().y() < 0) {
             emit nextRequested();
         }
         qDebug() << "control++";
