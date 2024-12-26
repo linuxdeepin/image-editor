@@ -6,8 +6,7 @@ project(libimageviewer VERSION 0.1.0)
 
 # Check dtkwidget version
 find_package(DtkWidget REQUIRED)
-
-if (${DtkWidget_VERSION} VERSION_LESS "5.6.9")
+if (DtkWidget_VERSION VERSION_LESS "5.6.9")
     message(STATUS "Use specific dtk watermakr, Version < 5.6.9")
     add_definitions(-DUSE_SPECIFIC_DTK_WATERMARK)
 else()
@@ -24,7 +23,7 @@ set(CMAKE_C_FLAGS "-fPIC")
 set(CMAKE_CXX_FLAGS "-fPIC")
 
 #Qt需要的包
-set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools)
+set(QtModule Core Gui Widgets Svg DBus Concurrent PrintSupport LinguistTools Network)
 
 set(TARGET_NAME imageviewer)
 set(CMD_NAME imageviewer)
