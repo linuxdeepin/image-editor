@@ -260,23 +260,25 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
     }
 
     try {
-        if (s_SingleFrame == imagePtr->frame) {
-            QImageReader reader(imagePtr->filePath);
-            // jumpToImage 可能返回 false, 但数据正常读取
+        QImageReader reader(imagePtr->filePath);
+        // jumpToImage 可能返回 false, 但数据正常读取
+        if (s_SingleFrame != imagePtr->frame) {
             reader.jumpToImage(imagePtr->frame);
-            if (!reader.canRead()) {
-                qWarning() << QString("Load multi frame image failed(jump to image): %1").arg(reader.errorString());
-                imagePtr->state = ContentError;
-                return false;
-            }
-
-            imagePtr->data = reader.read();
-            if (imagePtr->data.isNull()) {
-                qWarning() << QString("Load multi frame image failed: %1").arg(reader.errorString());
-                imagePtr->state = ContentError;
-                return false;
-            }
         }
+        
+        if (!reader.canRead()) {
+            qWarning() << QString("Load multi frame image failed(jump to image): %1").arg(reader.errorString());
+            imagePtr->state = ContentError;
+            return false;
+        }
+
+        imagePtr->data = reader.read();
+        if (imagePtr->data.isNull()) {
+            qWarning() << QString("Load multi frame image failed: %1").arg(reader.errorString());
+            imagePtr->state = ContentError;
+            return false;
+        }
+
     } catch (const std::exception &e) {
         // 图片读取，考虑未界定异常
         qCritical() << qPrintable("Exception: load image failed!") << qPrintable(e.what());
