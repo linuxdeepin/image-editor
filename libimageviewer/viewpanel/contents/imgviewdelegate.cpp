@@ -92,8 +92,8 @@ void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
                             QPainter::Antialiasing);
     QRect backgroundRect = option.rect;
     if (backgroundRect.width() != LibImgViewListView::ITEM_CURRENT_WH) {
-        backgroundRect.setTopLeft(QPoint(backgroundRect.topLeft() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET)));
-        backgroundRect.setBottomRight(QPoint(backgroundRect.bottomRight() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET)));
+        backgroundRect.setTopLeft(QPoint(backgroundRect.topLeft() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET + 3)));
+        backgroundRect.setBottomRight(QPoint(backgroundRect.bottomRight() + QPoint(0, NORMAL_ITEM_PAINT_OFFSET + 3)));
     } else {
         backgroundRect.setTopLeft(QPoint(backgroundRect.topLeft() + QPoint(0, SELECT_ITEM_PAINT_OFFSET)));
         backgroundRect.setBottomRight(QPoint(backgroundRect.bottomRight() + QPoint(0, SELECT_ITEM_PAINT_OFFSET)));
