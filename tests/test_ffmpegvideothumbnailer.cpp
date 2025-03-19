@@ -37,7 +37,7 @@ TEST_F(ut_ffmpegvideothumbnailer, runFFmpegVideoThumbnailer)
     QImage image = runFFmpegVideoThumbnailer(QUrl());
     ASSERT_TRUE(image.isNull());
 
-    QString localFile("/usr/share/wallpapers/deepin/abc-123.jpg");
+    QString localFile("/usr/share/wallpapers/deepin/desktop.jpg");
     image = runFFmpegVideoThumbnailer(QUrl::fromLocalFile(localFile));
     bool exceptExists = QFile::exists(localFile) && foundLib;
     ASSERT_EQ(exceptExists, !image.isNull());

@@ -16,7 +16,7 @@
 
 #define JPEG1 "/usr/share/uosbrowser/product_logo_32.png"
 #define GIF2 "/usr/share/deepin-app-store/web_dist/en-AU/assets/images/loading2.gif"
-#define JPEGPATH "/usr/share/wallpapers/deepin/abc-123.jpg"
+#define JPEGPATH "/usr/share/wallpapers/deepin/desktop.jpg"
 #define SVGPATH "/usr/share/deepin-image-viewer/icons/logo/deepin-image-viewer.svg"
 #define DDSPATH "/data/home/lmh/0916/tu/DDS.dds"
 
