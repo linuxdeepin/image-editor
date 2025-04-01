@@ -253,6 +253,12 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
         QImageReader reader;
         QImage res_qt;
         reader.setFileName(path);
+        //当不能读取数据时,设置以内容判断格式进行加载,这样可以避免后缀名修改后文件无法打开的情况
+        if (!reader.canRead()) {
+            reader.setAutoDetectImageFormat(true);  //控制是否通过内容识别格式
+            reader.setDecideFormatFromContent(true); // 根据内容识别格式
+            reader.setFileName(path); //必须重新设置一下文件,才能触发内部加载方式的切换
+        }
         if (format_bar.isEmpty()) {
             reader.setFormat(file_suffix_lower.toLatin1());
         } else {
