@@ -129,14 +129,19 @@ int QuickPrintPrivate::showPrintDialog(QWidget *parentWidget)
     qInfo() << "Showing print dialog for" << loadDataList.size() << "images";
     DPrintPreviewDialog printDialog(parentWidget);
     printDialog.setObjectName("QuickPrint_PrintDialog");
+#if DTK_VERSION > DTK_VERSION_CHECK(5, 4, 10, 0)
     printDialog.setAsynPreview(loadDataList.size());
     // 设置打印文件名，用于 Cups 服务记录打印任务
     printDialog.setDocName(loadDataList.first()->filePath);
 
     connect(&printDialog,
-            QOverload<DPrinter *, const QVector<int> &>::of(&DPrintPreviewDialog::paintRequested),
-            this,
-            &QuickPrintPrivate::asyncPrint);
+        QOverload<DPrinter *, const QVector<int> &>::of(&DPrintPreviewDialog::paintRequested),
+        this,
+        &QuickPrintPrivate::asyncPrint);
+#else
+    connect(&printDialog, SIGNAL(paintRequested(DPrinter *)),
+        this, SLOT(paintRequestSync(DPrinter *)));
+#endif
 
     return printDialog.exec();
 }
