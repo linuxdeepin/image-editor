@@ -1,3 +1,14 @@
+image-editor (6.5.1) unstable; urgency=medium
+
+  * fix: support multi frame image load(Influence: quickprint)
+  * test: Add initFFmpegVideoThumbnailer unit test.
+          (Bug: 213565, 221557)(Influence: VideoThumbnailer)
+  * test: update test image path
+  * feat: [translation]add transifex config(Task: 361363)
+  * fix: Update build configuration and dependencies
+
+ -- renbin <renbin@uniontech.com>  Thu, 17 Apr 2025 13:23:01 +0800
+
 image-editor (6.5.0) unstable; urgency=medium
 
   * fix: Use common method to check the version of dtkwidget
