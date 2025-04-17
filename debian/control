@@ -51,7 +51,7 @@ Build-Depends:
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
-# Support Qt5
+# Support Qt6
 Package: libimageeditor6
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -65,7 +65,7 @@ Description: Image Viewer library.
 
 Package: libimageeditor6-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor(=${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor6(=${binary:Version})
 Conflicts:
  libimage-viewer-dev
 Replaces:
