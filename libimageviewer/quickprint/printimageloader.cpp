@@ -265,6 +265,11 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
             // jumpToImage 可能返回 false, 但数据正常读取
             reader.jumpToImage(imagePtr->frame);
             if (!reader.canRead()) {
+                reader.setAutoDetectImageFormat(true);  //控制是否通过内容识别格式
+                reader.setDecideFormatFromContent(true); // 根据内容识别格式
+                reader.setFileName(imagePtr->filePath); //必须重新设置一下文件,才能触发内部加载方式的切换
+            }
+            if (!reader.canRead()) {
                 qWarning() << QString("Load multi frame image failed(jump to image): %1").arg(reader.errorString());
                 imagePtr->state = ContentError;
                 return false;
