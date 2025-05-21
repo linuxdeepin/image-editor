@@ -46,22 +46,22 @@ AIModelServiceData::AIModelServiceData(AIModelService *q)
     : qptr(q)
 {
     supportNameToModel = initDBusModelList();
-    qInfo() << qPrintable("Support image enhance models:") << supportNameToModel;
+    qInfo() << "Support image enhance models:" << supportNameToModel;
 
     // QTemporaryDir::isValid() 会创建临时文件路径，在没有模型数据时不进行路径判断
     if (!supportNameToModel.isEmpty()) {
         enhanceTemp.reset(new QTemporaryDir);
         if (!enhanceTemp->isValid()) {
-            qWarning() << qPrintable("Create enhance temp dir failed") << enhanceTemp->errorString();
+            qWarning() << "Create enhance temp dir failed:" << enhanceTemp->errorString();
         } else {
-            qInfo() << qPrintable("Enhance temp dir:") << enhanceTemp->path();
+            qDebug() << "Enhance temp dir:" << enhanceTemp->path();
         }
 
         convertTemp.reset(new QTemporaryDir);
         if (!convertTemp->isValid()) {
-            qWarning() << qPrintable("Create convert temp dir failed") << convertTemp->errorString();
+            qWarning() << "Create convert temp dir failed:" << convertTemp->errorString();
         } else {
-            qInfo() << qPrintable("Convert temp dir:") << convertTemp->path();
+            qDebug() << "Convert temp dir:" << convertTemp->path();
         }
     }
 }
@@ -71,6 +71,7 @@ AIModelServiceData::AIModelServiceData(AIModelService *q)
  */
 QList<QPair<int, QString>> AIModelServiceData::initDBusModelList()
 {
+    qDebug() << "Initializing DBus model list";
     // 预期的模型项顺序
     QStringList sortModelList = {s_ModelColoring,
                                  s_ModelSuperResol,
@@ -87,10 +88,11 @@ QList<QPair<int, QString>> AIModelServiceData::initDBusModelList()
 
     if (modelList.isEmpty()) {
         auto error = interface.lastError();
-        qInfo() << QString("[Enhance DBus] No AI models on device? Get model list failed, %1: %2").arg(error.name()).arg(error.message());
+        qWarning() << QString("[Enhance DBus] No AI models on device? Get model list failed, %1: %2").arg(error.name()).arg(error.message());
         return {};
     }
 
+    qDebug() << "Available models from DBus:" << modelList;
     // 调整模型顺序, 模型-名称排序列表
     QList<QPair<int, QString>> mapModelList;
     for (const QString &model : sortModelList) {
@@ -195,17 +197,20 @@ AIModelService::AIModelService(QObject *parent)
     : QObject(parent)
     , dptr(new AIModelServiceData(this))
 {
+    qDebug() << "AIModelService initialized";
     connect(&dptr->enhanceWatcher, &QFutureWatcherBase::finished, this, [this]() {
         EnhancePtr ptr = dptr->enhanceWatcher.result();
         if (ptr.isNull()) {
+            qWarning() << "Enhance result is null";
             return;
         }
 
         auto curState = static_cast<AIModelService::State>(ptr->state.loadAcquire());
         if (AIModelService::Cancel == curState) {
-            // 处理中断，不继续处理
+            qDebug() << "Enhance process cancelled";
             return;
         } else if (AIModelService::LoadFailed == curState) {
+            qWarning() << "Enhance process failed";
             Q_EMIT enhanceEnd(ptr->source, ptr->output, curState);
         } else {
             // Note: 备用的超时机制
@@ -224,8 +229,7 @@ AIModelService::AIModelService(QObject *parent)
                                                      this,
                                                      SLOT(onDBusEnhanceEnd(const QString &, int)));
     if (!conn) {
-        qWarning()
-            << QString("[Enhance DBus] Connect dbus %1 signal %2 failed").arg(s_EnhanceInterface).arg(s_EnhanceFinishSignal);
+        qWarning() << QString("[Enhance DBus] Connect dbus %1 signal %2 failed").arg(s_EnhanceInterface).arg(s_EnhanceFinishSignal);
     }
 }
 
@@ -332,9 +336,11 @@ AIModelService::Error AIModelService::modelEnabled(int modelID, const QString &f
 QString AIModelService::imageProcessing(const QString &filePath, int modelID, const QImage &image)
 {
     if (!dptr->mapModelInfo.contains(modelID)) {
+        qWarning() << "Invalid model ID:" << modelID;
         return {};
     }
 
+    qInfo() << "Starting image processing for file:" << filePath << "with model:" << modelID;
     resetProcess();
 
     // 如果图片已是增强后的图片，则获取源图片进行处理
@@ -343,6 +349,7 @@ QString AIModelService::imageProcessing(const QString &filePath, int modelID, co
     // 生命周期交由子线程维护
     QImage caputureImage = image.copy();
     if (!dptr->enhanceTemp) {
+        qWarning() << "Enhance temp directory not available";
         return {};
     }
     dptr->lastOutput = dptr->enhanceTemp->filePath(QString("%1.png").arg(dptr->enhanceCache.size()));
@@ -357,18 +364,21 @@ QString AIModelService::imageProcessing(const QString &filePath, int modelID, co
 
     QFuture<EnhancePtr> f = QtConcurrent::run([=]() -> EnhancePtr {
         if (AIModelService::Cancel == ptr->state.loadAcquire()) {
+            qDebug() << "Enhance process cancelled before start";
             return ptr;
         }
 
         // 写入文件移动到子线程。
         QString tmpSrcFile = checkConvertFile(sourceFile, caputureImage);
         if (tmpSrcFile.isEmpty()) {
+            qDebug() << "Using original source file:" << sourceFile;
             tmpSrcFile = ptr->source;
         }
 
         // 若DBus调用失败，则直接返回错误
         bool ret = AIModelServiceData::sendImageEnhance(tmpSrcFile, ptr->output, ptr->model);
         if (!ret) {
+            qWarning() << "DBus enhance call failed";
             ptr->state.storeRelease(LoadFailed);
         }
 
@@ -388,9 +398,11 @@ void AIModelService::reloadImageProcessing(const QString &filePath)
     // 仅允许最后一次调用
     EnhancePtr ptr = dptr->enhanceCache.value(filePath);
     if (ptr.isNull() || ptr->index != dptr->enhanceCache.size() - 1) {
+        qWarning() << "Cannot reload: invalid file path or not the last processed image";
         return;
     }
 
+    qInfo() << "Reloading image processing for:" << filePath;
     resetProcess();
 
     // 如果图片已是增强后的图片，则获取源图片进行处理
@@ -400,18 +412,21 @@ void AIModelService::reloadImageProcessing(const QString &filePath)
 
     QFuture<EnhancePtr> f = QtConcurrent::run([=]() -> EnhancePtr {
         if (AIModelService::Cancel == ptr->state.loadAcquire()) {
+            qDebug() << "Reload process cancelled before start";
             return ptr;
         }
 
         // 已处理过的数据，一般存在缓存
         QString tmpSrcFile = checkConvertFile(sourceFile, QImage());
         if (tmpSrcFile.isEmpty()) {
+            qDebug() << "Using original source file for reload:" << sourceFile;
             tmpSrcFile = ptr->source;
         }
 
         // 若 DBus 调用失败，则直接返回错误
         bool ret = AIModelServiceData::sendImageEnhance(tmpSrcFile, ptr->output, ptr->model);
         if (!ret) {
+            qWarning() << "DBus enhance call failed during reload";
             ptr->state.storeRelease(LoadFailed);
         }
 
@@ -429,6 +444,7 @@ void AIModelService::reloadImageProcessing(const QString &filePath)
 void AIModelService::resetProcess()
 {
     if (dptr->enhanceWatcher.isRunning()) {
+        qDebug() << "Cancelling running enhance process";
         dptr->enhanceWatcher.cancel();
     }
     // 清理之前的图像增强状态
@@ -440,13 +456,14 @@ void AIModelService::resetProcess()
  */
 void AIModelService::cancelProcess(const QString &output)
 {
+    qDebug() << "Cancelling process for output:" << output;
     resetProcess();
     // 标记当前处理图片状态为Cancel
     if (dptr->enhanceCache.contains(output)) {
         EnhancePtr ptr = dptr->enhanceCache.value(output);
         if (!ptr.isNull() && Loading == ptr->state.loadAcquire()) {
             ptr->state.storeRelease(Cancel);
-
+            qDebug() << "Process cancelled successfully";
             Q_EMIT enhanceEnd(ptr->source, ptr->output, Cancel);
         }
     }
@@ -797,18 +814,20 @@ void AIModelService::onDBusEnhanceEnd(const QString &output, int error)
     // 多实例，可能传入其它实例的任务
     EnhancePtr ptr = dptr->enhanceCache.value(output);
     if (ptr.isNull()) {
+        qWarning() << "Received enhance end for unknown output:" << output;
         return;
     }
     qInfo() << QString("Receive DBus enhance result: %1 (%2)").arg(output).arg(error);
 
     // 只允许最新的图片更新
     if ((ptr->index != dptr->enhanceCache.size() - 1) && (output == dptr->lastOutput)) {
+        qDebug() << "Ignoring enhance result for outdated process";
         return;
     }
 
     State state = static_cast<State>(ptr->state.loadAcquire());
     if (Cancel == state || LoadTimeout == state) {
-        // 处理终止，不继续处理
+        qDebug() << "Ignoring enhance result for cancelled/timeout process";
         return;
     } else if (Loading != state) {
         qWarning() << qPrintable("[Enhance DBus] Reentrant enhance image process! ") << output << state;
@@ -822,19 +841,21 @@ void AIModelService::onDBusEnhanceEnd(const QString &output, int error)
                 qWarning() << qPrintable("[Enhance DBus] Create enhance image failed! ") << output;
                 state = LoadFailed;
             } else {
+                qDebug() << "Enhance process completed successfully";
                 state = LoadSucc;
             }
             break;
         }
         case AIModelServiceData::DBusNoPortrait:
+            qWarning() << "No portrait detected in image";
             state = NotDetectPortrait;
             break;
         default:
+            qWarning() << "Enhance process failed with error:" << error;
             state = LoadFailed;
             break;
     }
 
     ptr->state.storeRelease(state);
-
     Q_EMIT enhanceEnd(ptr->source, output, state);
 }

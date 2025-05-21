@@ -20,12 +20,14 @@ static const int s_SingleFrame = -1;
 PrintImageLoader::PrintImageLoader(QObject *parent)
     : QObject(parent)
 {
+    qInfo() << "PrintImageLoader initialized";
     connect(this, &PrintImageLoader::asyncLoadError, this, &PrintImageLoader::onLoadError);
 }
 
 PrintImageLoader::~PrintImageLoader()
 {
     if (isLoading()) {
+        qInfo() << "PrintImageLoader destroyed while still loading, cancelling...";
         cancel();
     }
 }
@@ -39,6 +41,7 @@ PrintImageLoader::~PrintImageLoader()
 bool PrintImageLoader::loadImageList(const QStringList &fileList, bool async)
 {
     if (fileList.isEmpty() || loaderState != Stopped) {
+        qWarning() << "Failed to start loading: fileList is empty or loader is busy";
         return false;
     }
 
@@ -47,15 +50,18 @@ bool PrintImageLoader::loadImageList(const QStringList &fileList, bool async)
     loaderState = Preloading;
 
     if (async) {
-        // 开始异步预加载
+        qDebug() << "Starting async preload for" << fileList.size() << "files";
         asyncPreload(fileList);
     } else {
+        qDebug() << "Starting sync preload for" << fileList.size() << "files";
         if (!syncPreload(fileList)) {
+            qWarning() << "Sync preload failed";
             return false;
         }
 
         loaderState = Loading;
         if (!syncLoad(loadData)) {
+            qWarning() << "Sync load failed";
             return false;
         }
 
@@ -117,49 +123,55 @@ PrintDataList PrintImageLoader::takeLoadData()
  */
 PrintDataList PrintImageLoader::preloadImageData(const QString &filePath)
 {
+    qDebug() << "Preloading image:" << filePath;
+
     // 判断文件是否存在，是否有权限读取
     QFileInfo info(filePath);
     if (!info.exists()) {
+        qWarning() << "File does not exist:" << filePath;
         PrintImageData::Ptr notExistsPtr(new PrintImageData(filePath));
         notExistsPtr->state = NotExists;
-        return {notExistsPtr};
+        return { notExistsPtr };
     }
 
     if (!info.permission(QFile::ReadUser)) {
+        qWarning() << "No read permission for file:" << filePath;
         PrintImageData::Ptr permissionPtr(new PrintImageData(filePath));
         permissionPtr->state = NoPermission;
-        return {permissionPtr};
+        return { permissionPtr };
     }
 
     // 根据文件类型区分处理
     PrintDataList dataList;
     const imageViewerSpace::ImageType type = LibUnionImage_NameSpace::getImageType(filePath);
+    qDebug() << "Image type:" << type << "for file:" << filePath;
+
     switch (type) {
-        case imageViewerSpace::ImageTypeSvg:
-            Q_FALLTHROUGH();
-        case imageViewerSpace::ImageTypeStatic: {
-            // 单张图片处理
-            dataList.append(PrintImageData::Ptr(new PrintImageData(filePath)));
-            break;
-        }
+    case imageViewerSpace::ImageTypeSvg:
+        Q_FALLTHROUGH();
+    case imageViewerSpace::ImageTypeStatic: {
+        // 单张图片处理
+        dataList.append(PrintImageData::Ptr(new PrintImageData(filePath)));
+        break;
+    }
 
-        case imageViewerSpace::ImageTypeDynamic:
-            Q_FALLTHROUGH();
-        case imageViewerSpace::ImageTypeMulti: {
-            // Note: 由于 QGifHandler 没有实现 jumpToImage() 接口，因此动图直接进行加载
-            dataList = preloadMultiImage(filePath, bool(imageViewerSpace::ImageTypeDynamic == type));
-            break;
-        }
+    case imageViewerSpace::ImageTypeDynamic:
+        Q_FALLTHROUGH();
+    case imageViewerSpace::ImageTypeMulti: {
+        // Note: 由于 QGifHandler 没有实现 jumpToImage() 接口，因此动图直接进行加载
+        dataList = preloadMultiImage(filePath, bool(imageViewerSpace::ImageTypeDynamic == type));
+        break;
+    }
 
-        case imageViewerSpace::ImageTypeDamaged: {
-            PrintImageData::Ptr damangePtr(new PrintImageData(filePath));
-            damangePtr->state = ContentError;
-            dataList.append(damangePtr);
-            break;
-        }
+    case imageViewerSpace::ImageTypeDamaged: {
+        PrintImageData::Ptr damangePtr(new PrintImageData(filePath));
+        damangePtr->state = ContentError;
+        dataList.append(damangePtr);
+        break;
+    }
 
-        default:
-            return {};
+    default:
+        return {};
     }
 
     return dataList;
@@ -249,12 +261,16 @@ PrintDataList PrintImageLoader::preloadMultiImage(const QString &filePath, bool 
  */
 bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
 {
+    qDebug() << "Loading image data for:" << imagePtr->filePath << "frame:" << imagePtr->frame;
+
     // 动图数据在预加载流程加载
     if (Loaded == imagePtr->state) {
+        qDebug() << "Image already loaded, skipping";
         return true;
     }
 
     if (!QFileInfo::exists(imagePtr->filePath)) {
+        qWarning() << "File no longer exists:" << imagePtr->filePath;
         imagePtr->state = NotExists;
         return false;
     }
@@ -263,9 +279,10 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
         QImageReader reader(imagePtr->filePath);
         // jumpToImage 可能返回 false, 但数据正常读取
         if (s_SingleFrame != imagePtr->frame) {
+            qDebug() << "Jumping to frame:" << imagePtr->frame;
             reader.jumpToImage(imagePtr->frame);
         }
-        
+
         if (!reader.canRead()) {
             qWarning() << QString("Load multi frame image failed(jump to image): %1").arg(reader.errorString());
             imagePtr->state = ContentError;
@@ -278,6 +295,9 @@ bool PrintImageLoader::loadImageData(PrintImageData::Ptr &imagePtr)
             imagePtr->state = ContentError;
             return false;
         }
+
+        qDebug() << "Successfully loaded image:" << imagePtr->filePath << "frame:" << imagePtr->frame
+                 << "size:" << imagePtr->data.size();
 
     } catch (const std::exception &e) {
         // 图片读取，考虑未界定异常
@@ -327,10 +347,10 @@ void PrintImageLoader::asyncPreload(const QStringList &fileList)
 
     // 按*顺序*插入数据
     QFuture<PrintDataList> asyncData = QtConcurrent::mappedReduced<PrintDataList>(
-        fileList,
-        preloadMapedFunc,
-        [](PrintDataList &result, const PrintDataList &parsed) { result.append(parsed); },
-        (QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce));
+            fileList,
+            preloadMapedFunc,
+            [](PrintDataList &result, const PrintDataList &parsed) { result.append(parsed); },
+            (QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce));
 
     // 仅在调用时绑定信号
     connect(&preloadWatcher, &QFutureWatcherBase::finished, this, &PrintImageLoader::onAsyncLoadFinished);
@@ -375,26 +395,26 @@ void PrintImageLoader::asyncLoad(PrintDataList &dataList)
 void PrintImageLoader::onAsyncLoadFinished()
 {
     switch (loaderState) {
-        case Preloading:
-            qInfo() << "Async print image preload finished.";
-            // 清理缓存的数据, 继续加载数据
-            loadData = preloadWatcher.result();
-            disconnect(&preloadWatcher, &QFutureWatcherBase::finished, this, &PrintImageLoader::onAsyncLoadFinished);
-            preloadWatcher.setFuture(QFuture<PrintDataList>());
-            loaderState = Loading;
-            asyncLoad(loadData);
-            break;
+    case Preloading:
+        qInfo() << "Async print image preload finished.";
+        // 清理缓存的数据, 继续加载数据
+        loadData = preloadWatcher.result();
+        disconnect(&preloadWatcher, &QFutureWatcherBase::finished, this, &PrintImageLoader::onAsyncLoadFinished);
+        preloadWatcher.setFuture(QFuture<PrintDataList>());
+        loaderState = Loading;
+        asyncLoad(loadData);
+        break;
 
-        case Loading:
-            qInfo() << "Async print image load finished.";
-            disconnect(&loadWatcher, &QFutureWatcherBase::finished, this, &PrintImageLoader::onAsyncLoadFinished);
-            loaderState = Stopped;
-            Q_EMIT loadFinished(false, {});
-            break;
+    case Loading:
+        qInfo() << "Async print image load finished.";
+        disconnect(&loadWatcher, &QFutureWatcherBase::finished, this, &PrintImageLoader::onAsyncLoadFinished);
+        loaderState = Stopped;
+        Q_EMIT loadFinished(false, {});
+        break;
 
-        default:
-            qWarning() << QString("Async load state error %1").arg(loaderState);
-            break;
+    default:
+        qWarning() << QString("Async load state error %1").arg(loaderState);
+        break;
     }
 }
 

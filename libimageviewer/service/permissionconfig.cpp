@@ -92,15 +92,19 @@ bool activateWindowFromDock(quintptr winId)
 PermissionConfig::PermissionConfig(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << "Initializing PermissionConfig";
 #ifndef DTKWIDGET_CLASS_DWaterMarkHelper
-    qWarning() << qPrintable("Current version is not support read watermark");
+    qWarning() << "Current version does not support watermark functionality";
 #endif
 }
 
 /**
    @brief 析构函数
  */
-PermissionConfig::~PermissionConfig() {}
+PermissionConfig::~PermissionConfig() 
+{
+    qDebug() << "PermissionConfig destructor called";
+}
 
 /**
    @return 返回权限控制单实例
@@ -116,6 +120,7 @@ PermissionConfig *PermissionConfig::instance()
  */
 bool PermissionConfig::isValid() const
 {
+    qDebug() << "Checking permission config validity:" << valid;
     return valid;
 }
 
@@ -124,7 +129,11 @@ bool PermissionConfig::isValid() const
  */
 bool PermissionConfig::isCurrentIsTargetImage() const
 {
-    return isValid() && currentImagePath == targetImagePath;
+    bool isTarget = isValid() && currentImagePath == targetImagePath;
+    qDebug() << "Checking if current image is target:" << isTarget 
+             << "Current:" << currentImagePath 
+             << "Target:" << targetImagePath;
+    return isTarget;
 }
 
 /**
@@ -134,10 +143,15 @@ bool PermissionConfig::isCurrentIsTargetImage() const
 bool PermissionConfig::isPrintable(const QString &fileName) const
 {
     if (checkAuthInvalid(fileName)) {
+        qDebug() << "File is not under permission control:" << fileName;
         return true;
     }
 
-    return !!printLimitCount;
+    bool printable = !!printLimitCount;
+    qDebug() << "Checking print permission for:" << fileName 
+             << "Printable:" << printable 
+             << "Remaining count:" << printLimitCount;
+    return printable;
 }
 
 /**
@@ -164,10 +178,12 @@ bool PermissionConfig::hasPrintWaterMark() const
 void PermissionConfig::triggerPrint(const QString &fileName)
 {
     if (checkAuthInvalid(fileName)) {
+        qDebug() << "Skipping print trigger for unauthorized file:" << fileName;
         return;
     }
 
     // 减少打印计数
+    qInfo() << "Triggering print for file:" << fileName;
     reduceOnePrintCount();
     QJsonObject data{{g_KeyTid, TidPrint}, {g_KeyOperate, "print"}, {g_KeyFilePath, fileName}, {g_KeyRemaining, printCount()}};
 
@@ -200,14 +216,16 @@ bool PermissionConfig::isUnlimitPrint() const
 void PermissionConfig::reduceOnePrintCount()
 {
     if (g_UnlimitPrintCount == printLimitCount) {
+        qDebug() << "Print count is unlimited, no reduction needed";
         return;
     }
 
     if (printLimitCount > 0) {
         printLimitCount--;
+        qInfo() << "Reduced print count, remaining:" << printLimitCount;
         Q_EMIT printCountChanged();
     } else {
-        qWarning() << qPrintable("Escape print authorise check!");
+        qWarning() << "Attempted to reduce print count when already at zero";
     }
 }
 
@@ -218,6 +236,7 @@ void PermissionConfig::reduceOnePrintCount()
 void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
 {
     if (checkAuthInvalid(fileName)) {
+        qDebug() << "Skipping action trigger for unauthorized file:" << fileName;
         return;
     }
 
@@ -225,6 +244,7 @@ void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
     switch (tid) {
         case TidOpen:
             if (NotOpen != status) {
+                qDebug() << "Skipping open action - invalid status:" << status;
                 return;
             }
             status = Open;
@@ -232,12 +252,12 @@ void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
             break;
         case TidClose:
             if (Open != status) {
+                qDebug() << "Skipping close action - invalid status:" << status;
                 return;
             }
             status = Close;
             // Note: 授权文件关闭后(关闭窗口或打开其他图片)，权限控制无效化
             valid = false;
-
             optName = "close";
             break;
         case TidEdit:
@@ -266,6 +286,7 @@ void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
             return;
     }
 
+    qInfo() << "Triggering action:" << optName << "for file:" << fileName;
     QJsonObject data{{g_KeyTid, tid}, {g_KeyOperate, optName}, {g_KeyFilePath, fileName}};
     triggerNotify(data);
 }
@@ -275,6 +296,7 @@ void PermissionConfig::triggerAction(TidType tid, const QString &fileName)
  */
 void PermissionConfig::triggerNotify(const QJsonObject &data)
 {
+    qDebug() << "Sending permission notification:" << data;
     enum ReportMode { Broadcast = 1, Report = 2, ReportAndBroadcast = Broadcast | Report };
     QJsonObject sendData;
     sendData.insert("policy", QJsonObject{{"reportMode", ReportAndBroadcast}});
@@ -322,9 +344,11 @@ bool PermissionConfig::eventFilter(QObject *watched, QEvent *event)
 void PermissionConfig::setCurrentImagePath(const QString &fileName)
 {
     if (!valid) {
+        qDebug() << "Permission config not valid, skipping current image path update";
         return;
     }
 
+    qInfo() << "Setting current image path:" << fileName;
     currentImagePath = fileName;
 
     // 通知当前展示的图片变更
@@ -483,6 +507,7 @@ void PermissionConfig::activateProcess(qint64 pid)
 void PermissionConfig::initFromArguments(const QStringList &arguments)
 {
     if (valid) {
+        qDebug() << "Permission config already initialized, skipping";
         return;
     }
 
@@ -496,16 +521,18 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
             QString filePath = info.absoluteFilePath();
             if (ImageEngine::instance()->isImage(filePath) || info.suffix() == "dsps") {
                 targetImagePath = filePath;
+                qInfo() << "Found target image path:" << targetImagePath;
                 break;
             }
         }
 
         if (targetImagePath.isEmpty()) {
-            qWarning() << qPrintable("Authorise config with no target image path.");
+            qWarning() << "No valid target image path found in arguments";
             return;
         }
+
         QByteArray jsonData = QByteArray::fromBase64(configParam.toUtf8());
-        qInfo() << QString("Parse authorise config, data: %1").arg(QString(jsonData));
+        qDebug() << "Decoded config data:" << QString(jsonData);
 
         QJsonParseError error;
         QJsonDocument doc = QJsonDocument::fromJson(jsonData, &error);
@@ -516,27 +543,27 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
             initReadWaterMark(root.value("readWatermark").toObject());
             initPrintWaterMark(root.value("printWatermark").toObject());
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
-
-            qInfo() << qPrintable("Current Enable permission") << authFlags;
+#endif
+            qInfo() << "Permission config initialized successfully. Enabled flags:" << authFlags;
         } else {
-            qWarning()
-                << QString("Parse authorise config error at pos: %1, details: %2").arg(error.offset).arg(error.errorString());
+            qWarning() << "Failed to parse permission config JSON. Error at position:" 
+                      << error.offset << "Details:" << error.errorString();
         }
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
         // 存在打印水印设置时，检测是否存在打印水印插件，若存在则通过设置环境变量调用打印插件而不是手动设置
         if (authFlags.testFlag(EnablePrintWaterMark)) {
+            qDebug() << "Checking for watermark plugin";
             detectWaterMarkPluginExists();
         }
-#endif  // DTKWIDGET_CLASS_DWaterMarkHelper
+#endif
 
         // 只要传入参数、图片即认为有效，无论参数是否正常解析
         valid = true;
         // 首次触发打开图片
         triggerAction(TidOpen, targetImagePath);
     } else {
-        qWarning() << qPrintable("Parse authorise config is empty.");
+        qWarning() << "Failed to parse permission config arguments";
     }
 
     if (valid) {
@@ -545,9 +572,9 @@ void PermissionConfig::initFromArguments(const QStringList &arguments)
         bool connRet = connection.connect(
             "com.wps.cryptfs", "/com/wps/cryptfs", "cryptfs.method.Type", "activateProcess", this, SLOT(activateProcess(qint64)));
         if (!connRet) {
-            qWarning() << qPrintable("DBus connect activateProcess failed!");
+            qWarning() << "Failed to connect DBus activateProcess signal";
         } else {
-            qInfo() << qPrintable("DBus connect activateProcess success!");
+            qInfo() << "Successfully connected DBus activateProcess signal";
         }
     }
 }
@@ -598,11 +625,12 @@ bool PermissionConfig::parseConfigOption(const QStringList &arguments, QString &
 void PermissionConfig::initAuthorise(const QJsonObject &param)
 {
     if (param.isEmpty()) {
-        qInfo() << qPrintable("Authorise config not contains authorise data.");
+        qInfo() << "No authorization data in config";
         return;
     }
 
     // 屏蔽 delete / rename ，默认无此功能
+    qDebug() << "Initializing authorization from config";
     authFlags.setFlag(EnableEdit, param.value("edit").toBool(false));
     authFlags.setFlag(EnableCopy, param.value("copy").toBool(false));
     authFlags.setFlag(EnableSwitch, param.value("pictureSwitch").toBool(false));
@@ -611,17 +639,20 @@ void PermissionConfig::initAuthorise(const QJsonObject &param)
     // Internal 内部使用，默认均为false
     ignoreDevicePixelRatio = param.value("ignoreDevicePixelRatio").toBool(false);
     breakPrintSpacingLimit = param.value("breakPrintSpacingLimit").toBool(false);
+    
     if (ignoreDevicePixelRatio) {
-        qInfo() << qPrintable("Enable internal property: ignore device pixel ratio.");
+        qInfo() << "Device pixel ratio will be ignored";
     }
     if (breakPrintSpacingLimit) {
-        qInfo() << qPrintable("Enable internal property: break print spacing limit.");
+        qInfo() << "Print spacing limits will be ignored";
     }
 
     printLimitCount = param.value("printCount").toInt(0);
     if (printLimitCount < g_UnlimitPrintCount) {
+        qWarning() << "Invalid print count in config:" << printLimitCount << "Setting to 0";
         printLimitCount = 0;
     }
+    qInfo() << "Print limit count set to:" << printLimitCount;
 }
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper

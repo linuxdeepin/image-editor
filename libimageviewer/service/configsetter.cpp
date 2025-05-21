@@ -16,17 +16,22 @@ const QString DB_PATH = QDir::homePath() +
 
 LibConfigSetter::LibConfigSetter(QObject *parent) : QObject(parent)
 {
-    if (!QFileInfo(CONFIG_PATH).exists())
+    qDebug() << "Initializing LibConfigSetter";
+    
+    if (!QFileInfo(CONFIG_PATH).exists()) {
+        qInfo() << "Config file does not exist, removing old database:" << DB_PATH;
         QProcess::startDetached(QString("rm %1").arg(DB_PATH));
+    }
 
     m_settings = new QSettings(CONFIG_PATH, QSettings::IniFormat, this);
-    qDebug() << "Setting file:" << m_settings->fileName();
+    qDebug() << "Settings file initialized:" << m_settings->fileName();
 }
 
 LibConfigSetter *LibConfigSetter::m_setter = nullptr;
 LibConfigSetter *LibConfigSetter::instance()
 {
     if (! m_setter) {
+        qDebug() << "Creating new LibConfigSetter instance";
         m_setter = new LibConfigSetter();
     }
 
@@ -36,8 +41,8 @@ LibConfigSetter *LibConfigSetter::instance()
 void LibConfigSetter::setValue(const QString &group, const QString &key,
                             const QVariant &value)
 {
-//    QMutexLocker locker(&m_mutex);
-
+    qDebug() << "Setting config value - Group:" << group << "Key:" << key << "Value:" << value;
+    
     m_settings->beginGroup(group);
     m_settings->setValue(key, value);
     m_settings->endGroup();

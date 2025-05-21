@@ -26,6 +26,7 @@ QuickPrintPrivate::QuickPrintPrivate(QuickPrint *q)
     : q_ptr(q)
     , imageLoader(new PrintImageLoader)
 {
+    qDebug() << "QuickPrint initialized";
     // 快速打印可能无需加载主窗体，单独加载动态库翻译信息
     Libutils::base::loadLibTransaltor();
 
@@ -45,6 +46,7 @@ QuickPrintPrivate::QuickPrintPrivate(QuickPrint *q)
 void QuickPrintPrivate::startLoadSpinnerTimer()
 {
     if (!procSpinnerTimer.isActive()) {
+        qDebug() << "Starting load spinner timer";
         procSpinnerTimer.start(s_LoadSpinnerTimeOut, this);
     }
 }
@@ -55,6 +57,7 @@ void QuickPrintPrivate::startLoadSpinnerTimer()
 void QuickPrintPrivate::startSpinner()
 {
     if (!spinner) {
+        qDebug() << "Creating and showing load spinner";
         spinner.reset(new DSpinner);
 
         spinner->setObjectName("QuickPrint_Spinner");
@@ -83,10 +86,12 @@ void QuickPrintPrivate::startSpinner()
 void QuickPrintPrivate::stopSpinner()
 {
     if (procSpinnerTimer.isActive()) {
+        qDebug() << "Stopping load spinner timer";
         procSpinnerTimer.stop();
     }
 
     if (spinner) {
+        qDebug() << "Stopping and hiding load spinner";
         spinner->stop();
         spinner->hide();
     }
@@ -97,6 +102,7 @@ void QuickPrintPrivate::stopSpinner()
  */
 void QuickPrintPrivate::showWarningNotify(const QString &errorString)
 {
+    qDebug() << "Showing print warning dialog:" << errorString;
     // 错误信息预留
     Q_UNUSED(errorString)
 
@@ -116,9 +122,11 @@ void QuickPrintPrivate::showWarningNotify(const QString &errorString)
 int QuickPrintPrivate::showPrintDialog(QWidget *parentWidget)
 {
     if (loadDataList.isEmpty()) {
+        qWarning() << "Cannot show print dialog: no images loaded";
         return QDialog::Rejected;
     }
 
+    qInfo() << "Showing print dialog for" << loadDataList.size() << "images";
     DPrintPreviewDialog printDialog(parentWidget);
     printDialog.setObjectName("QuickPrint_PrintDialog");
     printDialog.setAsynPreview(loadDataList.size());
@@ -138,6 +146,7 @@ int QuickPrintPrivate::showPrintDialog(QWidget *parentWidget)
  */
 void QuickPrintPrivate::asyncPrint(DPrinter *printer, const QVector<int> &pageRange)
 {
+    qDebug() << "Starting async print for pages:" << pageRange;
     QPainter painter(printer);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -179,6 +188,7 @@ void QuickPrintPrivate::timerEvent(QTimerEvent *e)
     if (e->timerId() == procSpinnerTimer.timerId()) {
         procSpinnerTimer.stop();
         if (imageLoader->isLoading()) {
+            qDebug() << "Load timeout reached, showing spinner";
             startSpinner();
         }
     }
@@ -190,12 +200,14 @@ void QuickPrintPrivate::timerEvent(QTimerEvent *e)
 bool QuickPrintPrivate::setPrintImage(const QStringList &fileList)
 {
     if (fileList.isEmpty()) {
+        qWarning() << "Cannot set print images: file list is empty";
         return false;
     }
 
     /// todo:判断MTP文件代理
 
     bool async = checkNeedAsyncLoadData(fileList);
+    qInfo() << "Setting print images, async mode:" << async << "file count:" << fileList.size();
     return imageLoader->loadImageList(fileList, async);
 }
 
@@ -212,6 +224,7 @@ bool QuickPrintPrivate::checkNeedAsyncLoadData(const QStringList &fileList)
     bool async = true;
     if (QThread::idealThreadCount() <= s_ThreadLimit) {
         // Note: 部分环境(服务器/云桌面)可用线程较少，使用多线程处理会出现异常
+        qDebug() << "Using sync mode: thread count" << QThread::idealThreadCount() << "is below limit" << s_ThreadLimit;
         async = false;
     } else if (fileList.size() <= s_FileCountLimit) {
         qint64 fileSizeCount = 0;
@@ -220,6 +233,8 @@ bool QuickPrintPrivate::checkNeedAsyncLoadData(const QStringList &fileList)
         }
 
         if (fileSizeCount < s_FileSizeLimitMB) {
+            qDebug() << "Using sync mode: total file size" << (fileSizeCount / 1024 / 1024) << "MB is below limit" 
+                     << (s_FileSizeLimitMB / 1024 / 1024) << "MB";
             async = false;
         }
     }
@@ -232,6 +247,7 @@ bool QuickPrintPrivate::checkNeedAsyncLoadData(const QStringList &fileList)
  */
 void QuickPrintPrivate::printLoadFinished(bool error, const QString &errorString)
 {
+    qDebug() << "Print load finished, error:" << error << "message:" << errorString;
     this->stopSpinner();
 
     int ret = QDialog::Rejected;
@@ -239,8 +255,8 @@ void QuickPrintPrivate::printLoadFinished(bool error, const QString &errorString
         this->showWarningNotify(errorString);
     } else {
         loadDataList = imageLoader->takeLoadData();
-
         // 在此处弹出打印窗口
+        qDebug() << "Successfully loaded" << loadDataList.size() << "images for printing";
         ret = this->showPrintDialog(this->parentWidget);
     }
 
@@ -255,6 +271,7 @@ bool QuickPrintPrivate::waitLoadFinished()
 {
     bool ret = true;
     if (imageLoader->isLoading()) {
+        qDebug() << "Waiting for print load to finish";
         QEventLoop loop;
         connect(this, &QuickPrintPrivate::notifyLoadFinished, this, [&ret, &loop](int, bool error) {
             ret = !error;
@@ -278,9 +295,13 @@ QuickPrint::QuickPrint(QObject *parent)
     : QObject(parent)
     , dd_ptr(new QuickPrintPrivate(this))
 {
+    qDebug() << "QuickPrint instance created";
 }
 
-QuickPrint::~QuickPrint() {}
+QuickPrint::~QuickPrint() 
+{
+    qDebug() << "QuickPrint instance destroyed";
+}
 
 /**
    @brief 执行同步打印文件 \a fileList (指此函数在此使用 EventLoop 等待)，阻塞当前函数处理。
@@ -288,6 +309,7 @@ QuickPrint::~QuickPrint() {}
  */
 bool QuickPrint::showPrintDialog(const QStringList &fileList, QWidget *parentWidget)
 {
+    qDebug() << "Starting sync print dialog for" << fileList.size() << "files";
     Q_D(QuickPrint);
 
     if (!showPrintDialogAsync(fileList, parentWidget)) {
@@ -303,11 +325,13 @@ bool QuickPrint::showPrintDialog(const QStringList &fileList, QWidget *parentWid
  */
 bool QuickPrint::showPrintDialogAsync(const QStringList &fileList, QWidget *parentWidget)
 {
+    qDebug() << "Starting async print dialog for" << fileList.size() << "files";
     Q_D(QuickPrint);
 
     d->startLoadSpinnerTimer();
     d->parentWidget = parentWidget;
     if (!d->setPrintImage(fileList)) {
+        qWarning() << "Failed to set print images";
         return false;
     }
     // 等待 loadFinished() 信号，触发展示打印窗口
@@ -327,6 +351,7 @@ bool QuickPrint::isLoading()
  */
 void QuickPrint::cancel()
 {
+    qInfo() << "Cancelling print operation";
     Q_D(QuickPrint);
 
     d->stopSpinner();
@@ -341,6 +366,7 @@ extern "C" {
  */
 bool quickPrintDialog(const QStringList &fileList, QWidget *parentWidget)
 {
+    qDebug() << "Starting C-style print dialog for" << fileList.size() << "files";
     QuickPrint print;
     return print.showPrintDialog(fileList, parentWidget);
 }

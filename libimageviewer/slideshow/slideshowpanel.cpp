@@ -18,6 +18,7 @@
 #endif
 #include <QGuiApplication>
 #include <QApplication>
+#include <QDebug>
 
 namespace  {
 const int DELAY_HIDE_CURSOR_INTERVAL = 3000;
@@ -36,6 +37,7 @@ const int HEIGHT = 81;
 
 SlideShowBottomBar::SlideShowBottomBar(QWidget *parent) : DFloatingWidget(parent)
 {
+    qDebug() << "Initializing SlideShowBottomBar";
     setCursor(Qt::ArrowCursor);
     setFixedSize(WIDTH, HEIGHT);
     QHBoxLayout *hb = new QHBoxLayout();
@@ -93,6 +95,7 @@ SlideShowBottomBar::SlideShowBottomBar(QWidget *parent) : DFloatingWidget(parent
 
 void SlideShowBottomBar::onPreButtonClicked()
 {
+    qDebug() << "Previous button clicked";
     //todo屏蔽了全局信号
 //    emit dApp->signalM->updatePauseButton();
 //    emit dApp->signalM->updateButton();
@@ -104,6 +107,7 @@ void SlideShowBottomBar::onPreButtonClicked()
 void SlideShowBottomBar::onPlaypauseButtonClicked()
 {
     if (!isStop) {
+        qDebug() << "Pausing slideshow";
         m_playpauseButton->setIcon(QIcon::fromTheme("dcc_play_normal"));
         m_playpauseButton->setToolTip(tr("Play"));
         isStop = true;
@@ -111,6 +115,7 @@ void SlideShowBottomBar::onPlaypauseButtonClicked()
 //        emit dApp->signalM->updateButton();
         emit showPause();
     } else {
+        qDebug() << "Resuming slideshow";
         m_playpauseButton->setIcon(QIcon::fromTheme("dcc_suspend_normal"));
         m_playpauseButton->setToolTip(tr("Pause"));
         isStop = false;
@@ -136,6 +141,7 @@ void SlideShowBottomBar::onInitSlideShowButton()
 
 void SlideShowBottomBar::onNextButtonClicked()
 {
+    qDebug() << "Next button clicked";
     //todo屏蔽了全局信号
 //    emit dApp->signalM->updatePauseButton();
 //    emit dApp->signalM->updateButton();
@@ -146,6 +152,7 @@ void SlideShowBottomBar::onNextButtonClicked()
 
 void SlideShowBottomBar::onCancelButtonClicked()
 {
+    qDebug() << "Cancel button clicked";
     emit showCancel();
 }
 
