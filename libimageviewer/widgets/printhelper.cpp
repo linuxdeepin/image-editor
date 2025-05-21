@@ -45,7 +45,9 @@ PrintHelper::~PrintHelper()
 
 void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 {
+    qInfo() << "Opening print dialog for" << paths.size() << "images";
     if (!PermissionConfig::instance()->isPrintable()) {
+        qWarning() << "Printing not allowed by permission config";
         return;
     }
 
@@ -57,6 +59,7 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
         QString errMsg;
         QImageReader imgReadreder(path);
         if (imgReadreder.imageCount() > 1) {
+            qInfo() << "Loading multi-page image:" << path << "with" << imgReadreder.imageCount() << "pages";
             for (int imgindex = 0; imgindex < imgReadreder.imageCount(); imgindex++) {
                 imgReadreder.jumpToImage(imgindex);
                 m_re->appendImage(imgReadreder.read());
@@ -67,6 +70,8 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
             LibUnionImage_NameSpace::loadStaticImageFromFile(path, img, errMsg);         
             if (!img.isNull()) {
                 m_re->appendImage(img);
+            } else {
+                qWarning() << "Failed to load image:" << path << "Error:" << errMsg;
             }
         }
         tempExsitPaths << paths;
@@ -88,11 +93,12 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     // 检查是否过滤 DTK 部分设置
     if (PermissionConfig::instance()->installFilterPrintDialog(&printDialog2)) {
-        qInfo() << qPrintable("Enable breakPrintSpacingLimit, filter print spacing config.");
+        qInfo() << "Enable breakPrintSpacingLimit, filter print spacing config";
     }
 
     // 定制分支，水印功能不依赖DTK版本，更新打印水印设置
     if (PermissionConfig::instance()->hasPrintWaterMark()) {
+        qInfo() << "Setting print watermark";
         PermissionConfig::instance()->setDialogPrintWatermark(&printDialog2);
     }
 #endif
@@ -114,8 +120,11 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
     if (QDialog::Accepted == ret) {
 #endif
         if (!tempExsitPaths.isEmpty()) {
+            qInfo() << "Printing completed for image:" << tempExsitPaths.first();
             PermissionConfig::instance()->triggerPrint(tempExsitPaths.first());
         }
+    } else {
+        qInfo() << "Print operation cancelled";
     }
 
     m_re->clearPrintState();
@@ -156,6 +165,7 @@ void RequestedSlot::appendImage(const QImage &img)
  */
 void RequestedSlot::paintRequestSync(DPrinter *_printer)
 {
+    qInfo() << "Painting" << m_imgs.size() << "images for printing";
     // 由于之前再度修改了打印的逻辑，导致了相同图片不在被显示，多余多页tiff来说不合理
     QPainter painter(_printer);
     int indexNum = 0;
@@ -166,7 +176,7 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
             QRect wRect = _printer->pageRect(QPrinter::DevicePixel).toRect();
             // 修复bug98129，打印不完全问题，ratio应该是适应宽或者高，不应该直接适应宽
             qreal ratio = 0.0;
-            qDebug() << wRect;
+            qDebug() << "Page rect:" << wRect;
             ratio = wRect.width() * 1.0 / img.width();
             if (qreal(wRect.height() - img.height() * ratio) > 0) {
                 painter.drawImage(
@@ -176,6 +186,8 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
                 painter.drawImage(QRectF(qreal(wRect.width() - img.width() * ratio) / 2, 0, img.width() * ratio, wRect.height()),
                                   img);
             }
+        } else {
+            qWarning() << "Skipping null image at index" << indexNum;
         }
         indexNum++;
         if (indexNum != m_imgs.size()) {
@@ -186,5 +198,6 @@ void RequestedSlot::paintRequestSync(DPrinter *_printer)
 
     if (!m_printed && 0 != indexNum) {
         m_printed = true;
+        qInfo() << "Successfully painted" << indexNum << "images for printing";
     }
 }

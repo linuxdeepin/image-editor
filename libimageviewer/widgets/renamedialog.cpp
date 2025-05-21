@@ -24,6 +24,7 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
     : DDialog(parent)
     , m_filenamepath(filename)
 {
+    qDebug() << "Opening rename dialog for file:" << filename;
     this->setIcon(QIcon::fromTheme("deepin-image-viewer"));
     DWidget *widet = new DWidget(this);
     this->setContentsMargins(0, 0, 0, 0);
@@ -141,11 +142,13 @@ RenameDialog::RenameDialog(const QString &filename, QWidget *parent)
 
 QString RenameDialog::GetFilePath()
 {
+    qDebug() << "Getting new file path:" << m_filenamepath;
     return m_filenamepath;
 }
 
 QString RenameDialog::GetFileName()
 {
+    qDebug() << "Getting new file name:" << m_filename;
     return m_filename;
 }
 
@@ -158,6 +161,7 @@ void RenameDialog::InitDlg()
     QString basename;
     // basename会过滤掉.,那么1.....png就会出现basename为1,completeBaseName不会,修改bug66356
     m_basename = fileinfo.completeBaseName();
+    qDebug() << "Initializing rename dialog - Directory:" << m_DirPath << "Base name:" << m_basename << "Format:" << format;
     m_lineedt->setText(m_basename);
     m_labformat->setText("." + format);
 }
@@ -167,16 +171,20 @@ void RenameDialog::setCurrentTip()
     QString fileabname = m_DirPath + "/" + m_lineedt->text() + m_labformat->text();
     QFile file(fileabname);
     if (m_filenamepath == fileabname) {
+        qDebug() << "New filename same as original, enabling confirm button";
         okbtn->setEnabled(true);
         m_lineedt->hideAlertMessage();
     } else if (file.exists()) {
+        qWarning() << "File already exists:" << fileabname;
         okbtn->setEnabled(false);
         m_lineedt->setAlert(true);
         m_lineedt->showAlertMessage(tr("The file already exists, please use another name"), m_lineedt);
     } else if (m_lineedt->text().isEmpty()) {
+        qDebug() << "New filename is empty, disabling confirm button";
         okbtn->setEnabled(false);
         m_lineedt->hideAlertMessage();
     } else {
+        qDebug() << "New filename is valid:" << fileabname;
         okbtn->setEnabled(true);
         m_lineedt->hideAlertMessage();
     }
@@ -206,6 +214,7 @@ void RenameDialog::slotsFocusChanged(bool onFocus)
 
 void RenameDialog::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 {
+    qDebug() << "Theme changed to:" << (theme == DGuiApplicationHelper::ColorType::DarkType ? "Dark" : "Light");
     // 文件后缀颜色跟随主题变化
     QPalette palette = m_labformat->palette();
     if (theme == DGuiApplicationHelper::ColorType::DarkType) {
@@ -220,5 +229,6 @@ void RenameDialog::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 
 void RenameDialog::slotsUpdate()
 {
+    qDebug() << "Updating rename dialog state";
     setCurrentTip();
 }

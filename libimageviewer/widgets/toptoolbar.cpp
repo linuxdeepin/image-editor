@@ -59,6 +59,7 @@ int paintBrushHeight()
 LibTopToolbar::LibTopToolbar(bool manager, QWidget *parent)
     : AbstractTopToolbar(parent)
 {
+    qInfo() << "Initializing top toolbar, manager mode:" << manager;
     m_manager = manager;
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(0, 0, 0, 0)); // 最后一项为透明度
@@ -69,6 +70,7 @@ LibTopToolbar::LibTopToolbar(bool manager, QWidget *parent)
 
 void LibTopToolbar::setMiddleContent(const QString &path)
 {
+    qDebug() << "Setting middle content:" << path;
     //保存当前名称
     m_filename = path;
     //修复名字过长显示不完整bug
@@ -81,6 +83,7 @@ void LibTopToolbar::setMiddleContent(const QString &path)
 
 void LibTopToolbar::setTitleBarTransparent(bool a)
 {
+    qDebug() << "Setting title bar transparency:" << a;
     m_viewChange = a;
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
@@ -90,12 +93,10 @@ void LibTopToolbar::setTitleBarTransparent(bool a)
         shadowEffect->setOffset(0, 1);
         shadowEffect->setBlurRadius(1);
         m_titletxt->setGraphicsEffect(shadowEffect);
-        //        if (themeType == DGuiApplicationHelper::LightType) {
         pa1.setColor(QPalette::ButtonText, QColor(255, 255, 255, 204));
         pa2.setColor(QPalette::WindowText, QColor(255, 255, 255, 204));
         m_titlebar->setPalette(pa1);
         m_titletxt->setPalette(pa2);
-
     } else {
         m_titlebar->setBackgroundTransparent(false);
         shadowEffect->setOffset(0, 0);
@@ -118,6 +119,7 @@ void LibTopToolbar::setTitleBarTransparent(bool a)
 void LibTopToolbar::mouseDoubleClickEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton) {
+        qDebug() << "Title bar double clicked, current window state:" << (window()->isMaximized() ? "maximized" : "normal");
         if (window()->isMaximized())
             window()->showNormal();
         else if (! window()->isFullScreen())  // It would be normal state
@@ -142,6 +144,7 @@ void LibTopToolbar::paintEvent(QPaintEvent *e)
 
 void LibTopToolbar::resizeEvent(QResizeEvent *event)
 {
+    qDebug() << "Resizing top toolbar to width:" << width();
     //在resize的时候,需要重新计算大小
     if (m_filename != "") {
         QString b = geteElidedText(DFontSizeManager::instance()->get(DFontSizeManager::T7),
@@ -155,12 +158,14 @@ void LibTopToolbar::resizeEvent(QResizeEvent *event)
 
 void LibTopToolbar::leaveEvent(QEvent *event)
 {
+    qDebug() << "Mouse left title bar area";
     emit sigLeaveTitle();
     return AbstractTopToolbar::leaveEvent(event);
 }
 
 void LibTopToolbar::initWidgets()
 {
+    qDebug() << "Initializing top toolbar widgets";
     m_layout = new QHBoxLayout(this);
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->setSpacing(0);
@@ -174,6 +179,7 @@ void LibTopToolbar::initWidgets()
     pa.setColor(QPalette::WindowText, QColor(255, 255, 255, 255));
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
     this, [ = ]() {
+        qDebug() << "Theme type changed";
         DGuiApplicationHelper::ColorType themeType =
             DGuiApplicationHelper::instance()->themeType();
         QPalette pa1, pa2;
@@ -191,7 +197,6 @@ void LibTopToolbar::initWidgets()
         }
     });
 
-
     m_titlebar->setPalette(pa);
     m_titlebar->setTitle("");
     m_titletxt = new DLabel;
@@ -207,8 +212,6 @@ void LibTopToolbar::initWidgets()
     m_titlebar->addWidget(m_titletxt, Qt::AlignCenter);
 
     m_layout->addWidget(m_titlebar);
-
-//    connect(dApp->signalM, &SignalManager::updateFileName, this, &TopToolbar::onUpdateFileName);
 }
 
 QString LibTopToolbar::geteElidedText(QFont font, QString str, int MaxWidth)
@@ -246,6 +249,7 @@ QString LibTopToolbar::geteElidedText(QFont font, QString str, int MaxWidth)
 
 void LibTopToolbar::initMenu()
 {
+    qDebug() << "Initializing top toolbar menu";
     m_menu = new DMenu(this);
     m_menu->addSeparator();
 }
