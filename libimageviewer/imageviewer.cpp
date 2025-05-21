@@ -51,12 +51,13 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
                                        ImageViewer *parent)
     : q_ptr(parent)
 {
+    qDebug() << "Initializing image viewer private, viewer type:" << imgViewerType << "save path:" << savePath;
     // 初始化检测wayland环境
     Libutils::base::initCheckWaylandEnv();
 
     // 在界面前初始化授权配置
     if (!qApp) {
-        qWarning() << qPrintable("Must init authorise config after QApplication initialized!");
+        qWarning() << "Must init authorise config after QApplication initialized!";
     } else {
         PermissionConfig::instance()->initFromArguments(qApp->arguments());
     }
@@ -71,6 +72,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
             QTranslator *translator = new QTranslator(qApp);
             if (translator->load(finfo.baseName(), finfo.absolutePath())) {
                 qApp->installTranslator(translator);
+                qDebug() << "Installed translator for:" << finfo.baseName();
             }
         }
 
@@ -84,7 +86,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
 
             QString translatePath = PLUGINTRANSPATH + translateFilename;
             if (QFile::exists(translatePath)) {
-                qDebug() << "translatePath after feedback:" << translatePath;
+                qDebug() << "Loading translation file:" << translatePath;
                 auto translator = new QTranslator(qApp);
                 translator->load(translatePath);
                 qApp->installTranslator(translator);
@@ -104,10 +106,12 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
     q->setLayout(layout);
     m_panel = new LibViewPanel(customTopToolbar, q);
     layout->addWidget(m_panel);
+    qDebug() << "Image viewer panel initialized";
 
 #ifdef DTKWIDGET_CLASS_DWaterMarkHelper
     // 设置看图水印，目前仅在主要展示区域显示
     if (PermissionConfig::instance()->hasReadWaterMark()) {
+        qDebug() << "Setting up watermark for image viewer";
         auto data = PermissionConfig::instance()->readWaterMarkData();
         DWaterMarkHelper::instance()->setData(data);
         DWaterMarkHelper::instance()->registerWidget(m_panel);
@@ -124,6 +128,7 @@ ImageViewerPrivate::ImageViewerPrivate(imageViewerSpace::ImgViewerType imgViewer
                              DWaterMarkWidget *mark = m_panel->findChild<DWaterMarkWidget *>();
                              if (mark) {
                                  mark->setVisible(isTargetImage);
+                                 qDebug() << "Watermark visibility changed to:" << isTargetImage;
                              }
                          });
     }
@@ -141,11 +146,13 @@ ImageViewer::ImageViewer(imageViewerSpace::ImgViewerType imgViewerType,
     : DWidget(parent)
     , d_ptr(new ImageViewerPrivate(imgViewerType, savePath, customTopToolbar, this))
 {
+    qDebug() << "Image viewer constructed";
     Q_INIT_RESOURCE(icons);
 }
 
 ImageViewer::~ImageViewer()
 {
+    qDebug() << "Image viewer being destroyed";
     //析构时删除m_panel
     Q_D(ImageViewer);
     d->m_panel->deleteLater();
@@ -155,12 +162,15 @@ ImageViewer::~ImageViewer()
 
 bool ImageViewer::startChooseFileDialog()
 {
+    qDebug() << "Starting file choose dialog";
     Q_D(ImageViewer);
     return d->m_panel->startChooseFileDialog();
 }
 
 bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album)
 {
+    qInfo() << "Starting drag image operation with" << paths.size() << "images, first path:" << firstPath 
+            << "is custom:" << isCustom << "album:" << album;
     Q_D(ImageViewer);
     d->m_panel->setIsCustomAlbum(isCustom, album);
     return d->m_panel->startdragImage(paths, firstPath);
@@ -169,6 +179,8 @@ bool ImageViewer::startdragImage(const QStringList &paths, const QString &firstP
 bool ImageViewer::startdragImageWithUID(
     const QStringList &paths, const QString &firstPath, bool isCustom, const QString &album, int UID)
 {
+    qInfo() << "Starting drag image operation with UID:" << UID << "paths:" << paths.size() 
+            << "first path:" << firstPath << "is custom:" << isCustom << "album:" << album;
     Q_D(ImageViewer);
     d->m_panel->setIsCustomAlbumWithUID(isCustom, album, UID);
     return d->m_panel->startdragImage(paths, firstPath);
@@ -176,6 +188,7 @@ bool ImageViewer::startdragImageWithUID(
 
 void ImageViewer::startImgView(const QString &currentPath, const QStringList &paths)
 {
+    qInfo() << "Starting image view with current path:" << currentPath << "total paths:" << paths.size();
     Q_D(ImageViewer);
 
     QStringList realPaths = paths;
@@ -188,6 +201,7 @@ void ImageViewer::startImgView(const QString &currentPath, const QStringList &pa
     //启动线程制作缩略图
     if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal ||
         LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeNull) {
+        qDebug() << "Generating thumbnails for local image viewer";
         //首先生成当前图片的缓存
         ImageEngine::instance()->makeImgThumbnail(LibCommonService::instance()->getImgSavePath(), QStringList(realPath), 1);
         //看图制作全部缩略图
@@ -197,12 +211,14 @@ void ImageViewer::startImgView(const QString &currentPath, const QStringList &pa
 
 void ImageViewer::switchFullScreen()
 {
+    qDebug() << "Switching fullscreen mode";
     Q_D(ImageViewer);
     d->m_panel->toggleFullScreen();
 }
 
 void ImageViewer::startSlideShow(const QStringList &paths, const QString &firstPath)
 {
+    qInfo() << "Starting slideshow with" << paths.size() << "images, first path:" << firstPath;
     Q_D(ImageViewer);
 
     ViewInfo info;
@@ -218,6 +234,7 @@ void ImageViewer::startSlideShow(const QStringList &paths, const QString &firstP
 
 void ImageViewer::setTopBarVisible(bool visible)
 {
+    qDebug() << "Setting top bar visibility:" << visible;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setTopBarVisible(visible);
@@ -226,6 +243,7 @@ void ImageViewer::setTopBarVisible(bool visible)
 
 void ImageViewer::setBottomtoolbarVisible(bool visible)
 {
+    qDebug() << "Setting bottom toolbar visibility:" << visible;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setBottomtoolbarVisible(visible);
@@ -234,6 +252,7 @@ void ImageViewer::setBottomtoolbarVisible(bool visible)
 
 DIconButton *ImageViewer::getBottomtoolbarButton(imageViewerSpace::ButtonType type)
 {
+    qDebug() << "Getting bottom toolbar button of type:" << type;
     DIconButton *button = nullptr;
     Q_D(ImageViewer);
     if (d->m_panel) {
@@ -248,12 +267,14 @@ QString ImageViewer::getCurrentPath()
     QString path;
     if (d->m_panel) {
         path = d->m_panel->getCurrentPath();
+        qDebug() << "Getting current path:" << path;
     }
     return path;
 }
 
 void ImageViewer::setViewPanelContextMenuItemVisible(imageViewerSpace::NormalMenuItemId id, bool visible)
 {
+    qDebug() << "Setting context menu item visibility, id:" << id << "visible:" << visible;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setContextMenuItemVisible(id, visible);
@@ -262,6 +283,7 @@ void ImageViewer::setViewPanelContextMenuItemVisible(imageViewerSpace::NormalMen
 
 void ImageViewer::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::ButtonType id, bool notVisible)
 {
+    qDebug() << "Setting bottom toolbar button always not visible, id:" << id << "not visible:" << notVisible;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setBottomToolBarButtonAlawysNotVisible(id, notVisible);
@@ -270,6 +292,7 @@ void ImageViewer::setBottomToolBarButtonAlawysNotVisible(imageViewerSpace::Butto
 
 void ImageViewer::setCustomAlbumName(const QMap<QString, bool> map, bool isFav)
 {
+    qDebug() << "Setting custom album names, is favorite:" << isFav;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->updateCustomAlbum(map, isFav);
@@ -278,6 +301,7 @@ void ImageViewer::setCustomAlbumName(const QMap<QString, bool> map, bool isFav)
 
 void ImageViewer::setCustomAlbumNameAndUID(const QMap<int, std::pair<QString, bool> > &map, bool isFav)
 {
+    qDebug() << "Setting custom album names with UID, is favorite:" << isFav;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->updateCustomAlbumAndUID(map, isFav);
@@ -286,6 +310,7 @@ void ImageViewer::setCustomAlbumNameAndUID(const QMap<int, std::pair<QString, bo
 
 void ImageViewer::setDropEnabled(bool enable)
 {
+    qDebug() << "Setting drop enabled:" << enable;
     Q_D(ImageViewer);
     if (d->m_panel) {
         d->m_panel->setAcceptDrops(enable);

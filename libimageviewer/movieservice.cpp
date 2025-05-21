@@ -45,6 +45,7 @@ MovieService *MovieService::instance(QObject *parent)
     //线程安全单例
     std::call_once(instanceFlag, [&]() {
         m_movieService = new MovieService;
+        qDebug() << "Created MovieService singleton instance";
     });
     return m_movieService;
 }
@@ -52,27 +53,32 @@ MovieService *MovieService::instance(QObject *parent)
 MovieService::MovieService(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << "Initializing MovieService";
     //检查ffmpeg是否存在
     if (Libutils::base::checkCommandExist("ffmpeg")) {
         resolutionPattern = "[0-9]+x[0-9]+";
         codeRatePattern = "[0-9]+\\skb/s";
         fpsPattern = "[0-9]+\\sfps";
         m_ffmpegExist = true;
+        qDebug() << "FFmpeg found and initialized";
     }
 
     //检查ffmpegthumbnailer是否存在
     if (Libutils::base::checkCommandExist("ffmpegthumbnailer")) {
         m_ffmpegthumbnailerExist = true;
+        qDebug() << "FFmpegthumbnailer found";
     }
 
     //检查ffmpegthumbnailerlib是否存在
     if (initFFmpegVideoThumbnailer()) {
         m_ffmpegThumLibExist = true;
+        qDebug() << "FFmpegVideoThumbnailer library initialized";
     }
 }
 
 MovieInfo MovieService::getMovieInfo(const QUrl &url)
 {
+    qDebug() << "Getting movie info for:" << url.toString();
     MovieInfo result;
 
     m_bufferMutex.lock();
@@ -81,6 +87,7 @@ MovieInfo MovieService::getMovieInfo(const QUrl &url)
     });
     if (iter != m_movieInfoBuffer.end()) {
         m_bufferMutex.unlock();
+        qInfo() << "Found cached movie info for:" << url.toString();
         return iter->second;
     }
     m_bufferMutex.unlock();
@@ -88,7 +95,10 @@ MovieInfo MovieService::getMovieInfo(const QUrl &url)
     if (url.isLocalFile()) {
         QFileInfo fi(url.toLocalFile());
         if (fi.exists() && fi.permission(QFile::Permission::ReadOwner)) { //存在且有读权限才能导入
+            qInfo() << "Parsing movie info from file:" << fi.absoluteFilePath();
             result = parseFromFile(fi);
+        } else {
+            qWarning() << "Cannot read movie file:" << fi.absoluteFilePath() << "exists:" << fi.exists() << "readable:" << fi.permission(QFile::Permission::ReadOwner);
         }
     }
 
@@ -177,17 +187,28 @@ MovieInfo MovieService::parseFromFile(const QFileInfo &fi)
 
 QImage MovieService::getMovieCover(const QUrl &url, const QString &savePath)
 {
+    qInfo() << "Getting movie cover for:" << url.toString();
     QImage image;
 
     if (m_ffmpegThumLibExist) {
+        qDebug() << "Using FFmpegVideoThumbnailer library to get cover";
         image = getMovieCover_ffmpegthumbnailerlib(url);
         if (!image.isNull()) {
+            qDebug() << "Successfully got cover using FFmpegVideoThumbnailer library";
             return image;
         }
     }
 
     if (image.isNull() && m_ffmpegthumbnailerExist) {
+        qDebug() << "Using ffmpegthumbnailer to get cover";
         image = getMovieCover_ffmpegthumbnailer(url, savePath);
+        if (!image.isNull()) {
+            qInfo() << "Successfully got cover using ffmpegthumbnailer";
+        }
+    }
+
+    if (image.isNull()) {
+        qWarning() << "Failed to get movie cover for:" << url.toString();
     }
 
     return image;
@@ -274,9 +295,11 @@ std::vector<std::pair<QString, QString>> searchGroupFromKey(const QString &key, 
 
 MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
 {
+    qInfo() << "Getting movie info using ffmpeg for:" << fi.absoluteFilePath();
     struct MovieInfo mi;
 
     if (!m_ffmpegExist) {
+        qWarning() << "FFmpeg not available";
         mi.valid = false;
         return mi;
     }
@@ -287,14 +310,15 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
     try {
         QProcess ffmpeg;
         QStringList cmds{"-i", filePath, "-hide_banner"};
+        qInfo() << "Running ffmpeg command:" << cmds.join(" ");
         ffmpeg.start("ffmpeg", cmds, QIODevice::ReadOnly);
         if (!ffmpeg.waitForFinished()) {
-            qWarning() << ffmpeg.errorString();
+            qWarning() << "FFmpeg process failed:" << ffmpeg.errorString();
             return mi;
         }
         output = ffmpeg.readAllStandardError(); //ffmpeg的视频基础信息是打在标准错误里面的，读标准输出是读不到东西的
     } catch (std::logic_error &e) {
-        qWarning() << e.what();
+        qWarning() << "FFmpeg process exception:" << e.what();
         return mi;
     }
 
@@ -304,11 +328,13 @@ MovieInfo MovieService::getMovieInfo_ffmpeg(const QFileInfo &fi)
     QString ffmpegOut = QString::fromUtf8(output);
     if (ffmpegOut.endsWith("Invalid data found when processing input\n") ||
             ffmpegOut.endsWith("Permission denied\n")) {
+        qWarning() << "Invalid input or permission denied for:" << filePath;
         return mi;
     }
 
     //2.解析数据
     mi.valid = true;
+    qDebug() << "Successfully parsed movie info using ffmpeg";
 
     //2.1.文件信息
     mi.filePath = filePath;
@@ -448,6 +474,7 @@ QJsonObject MovieService::getMovieInfoByJson(const QUrl &url)
 
 MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
 {
+    qInfo() << "Getting movie info using MediaInfo for:" << fi.absoluteFilePath();
     struct MovieInfo mi;
 
     MediaInfoDLL::MediaInfo info;
@@ -471,8 +498,10 @@ MovieInfo MovieService::getMovieInfo_mediainfo(const QFileInfo &fi)
 
     if (!videoGroup.empty()) {
         mi.valid = true;
+        qDebug() << "Successfully parsed movie info using MediaInfo";
     } else {
         mi.valid = false;
+        qWarning() << "No video stream found in:" << fi.absoluteFilePath();
         return mi;
     }
 
