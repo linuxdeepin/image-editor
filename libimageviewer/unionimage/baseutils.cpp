@@ -51,6 +51,7 @@ const QString DATETIME_FORMAT_EXIF = "yyyy:MM:dd HH:mm:ss";
 
 QPixmap renderSVG(const QString &filePath, const QSize &size)
 {
+    qDebug() << "Rendering SVG file:" << filePath << "with size:" << size;
     QImageReader reader;
     QPixmap pixmap;
 
@@ -61,7 +62,9 @@ QPixmap renderSVG(const QString &filePath, const QSize &size)
         reader.setScaledSize(size * ratio);
         pixmap = QPixmap::fromImage(reader.read());
         pixmap.setDevicePixelRatio(ratio);
+        qDebug() << "SVG rendered successfully with ratio:" << ratio;
     } else {
+        qWarning() << "Failed to read SVG file:" << filePath;
         pixmap.load(filePath);
     }
 
@@ -124,10 +127,12 @@ QDateTime stringToDateTime(const QString &time)
 void showInFileManager(const QString &path)
 {
     if (path.isEmpty() || !QFile::exists(path)) {
+        qWarning() << "Cannot show in file manager: path is empty or file does not exist:" << path;
         return;
     }
 
 #if 1
+    qDebug() << "Showing file in file manager:" << path;
     QUrl url = QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath());
 #else
     QUrl url = QUrl::fromLocalFile(path);
@@ -172,9 +177,11 @@ void showInFileManager(const QString &path)
 void copyImageToClipboard(const QStringList &paths, const QImage &sourceImage)
 {
     if (paths.isEmpty()) {
+        qWarning() << "Cannot copy to clipboard: path list is empty";
         return;
     }
 
+    qDebug() << "Copying" << paths.size() << "images to clipboard";
     //  Get clipboard
     QClipboard *cb = qApp->clipboard();
 
@@ -217,11 +224,15 @@ void copyImageToClipboard(const QStringList &paths, const QImage &sourceImage)
 
 QString getFileContent(const QString &file)
 {
+    qDebug() << "Reading content from file:" << file;
     QFile f(file);
     QString fileContent = "";
     if (f.open(QFile::ReadOnly)) {
         fileContent = QLatin1String(f.readAll());
         f.close();
+        qDebug() << "Successfully read file content, size:" << fileContent.size();
+    } else {
+        qWarning() << "Failed to open file for reading:" << file;
     }
     return fileContent;
 }
@@ -241,6 +252,7 @@ QString getFileContent(const QString &file)
 
 QString getNotExistsTrashFileName(const QString &fileName)
 {
+    qDebug() << "Generating unique trash filename for:" << fileName;
     QByteArray name = fileName.toUtf8();
 
     int index = name.lastIndexOf('/');
@@ -278,6 +290,7 @@ QString getNotExistsTrashFileName(const QString &fileName)
 bool trashFile(const QString &file)
 {
 #ifdef QT_GUI_LIB
+    qDebug() << "Moving file to trash:" << file;
     QString trashPath;
     QString trashInfoPath;
     QString trashFilesPath;
@@ -290,15 +303,17 @@ bool trashFile(const QString &file)
     trashInfoPath = trashPath + "/info";
     trashFilesPath = trashPath + "/files";
     if (! QDir(trashFilesPath).exists()) {
+        qDebug() << "Creating trash files directory:" << trashFilesPath;
         QDir().mkpath(trashFilesPath);
     }
     if (! QDir(trashInfoPath).exists()) {
+        qDebug() << "Creating trash info directory:" << trashInfoPath;
         QDir().mkpath(trashInfoPath);
     }
 
     QFileInfo originalInfo(file);
     if (! originalInfo.exists()) {
-        qWarning() << "File doesn't exists, can't move to trash";
+        qWarning() << "File doesn't exist, can't move to trash:" << file;
         return false;
     }
     // Info for restore
@@ -328,11 +343,12 @@ bool trashFile(const QString &file)
         infoFile.close();
 
         if (!QDir().rename(originalInfo.absoluteFilePath(), filepath)) {
-            qWarning() << "move to trash failed!";
+            qWarning() << "Failed to move file to trash:" << file;
             return false;
         }
+        qDebug() << "Successfully moved file to trash:" << file;
     } else {
-        qDebug() << "Move to trash failed! Could not write *.trashinfo!";
+        qWarning() << "Failed to write trash info file:" << infopath;
         return false;
     }
     // Remove thumbnail
@@ -340,7 +356,7 @@ bool trashFile(const QString &file)
     return true;
 #else
     Q_UNUSED(file);
-    qWarning() << "Trash in server-mode not supported";
+    qWarning() << "Trash operation not supported in server mode";
     return false;
 #endif
 }
@@ -384,6 +400,7 @@ bool trashFile(const QString &file)
 
 QString SpliteText(const QString &text, const QFont &font, int nLabelSize, bool bReturn)
 {
+    qDebug() << "Splitting text with label size:" << nLabelSize << "return:" << bReturn;
     QFontMetrics fm(font);
     int nTextSize = fm.horizontalAdvance(text);
     if (nTextSize > nLabelSize) {
@@ -427,17 +444,20 @@ QString SpliteText(const QString &text, const QFont &font, int nLabelSize, bool 
 
 QString hash(const QString &str)
 {
+    qDebug() << "Generating MD5 hash for string";
     return QString(QCryptographicHash::hash(str.toUtf8(),
                                             QCryptographicHash::Md5).toHex());
 }
 
 bool onMountDevice(const QString &path)
 {
+    qDebug() << "Checking if path is on mount device:" << path;
     return (path.startsWith("/media/") || path.startsWith("/run/media/"));
 }
 
 bool mountDeviceExist(const QString &path)
 {
+    qDebug() << "Checking if mount device exists for path:" << path;
     QString mountPoint;
     if (path.startsWith("/media/")) {
         const int sp = path.indexOf("/", 7) + 1;
@@ -455,11 +475,14 @@ bool mountDeviceExist(const QString &path)
 
 bool checkCommandExist(const QString &command)
 {
+    qDebug() << "Checking if command exists:" << command;
     try {
         QString path = QStandardPaths::findExecutable(command);
-        return !path.isEmpty();
+        bool exists = !path.isEmpty();
+        qDebug() << "Command" << command << (exists ? "exists" : "does not exist");
+        return exists;
     } catch (std::logic_error &e) {
-        qWarning() << e.what();
+        qWarning() << "Error checking command existence:" << e.what();
         return false;
     }
 }
@@ -470,14 +493,17 @@ static bool g_IsWaylandEnv = false;
  */
 bool initCheckWaylandEnv()
 {
+    qDebug() << "Initializing Wayland environment check";
     auto e = QProcessEnvironment::systemEnvironment();
     QString XDG_SESSION_TYPE = e.value(QStringLiteral("XDG_SESSION_TYPE"));
     QString WAYLAND_DISPLAY = e.value(QStringLiteral("WAYLAND_DISPLAY"));
 
     if (XDG_SESSION_TYPE == QLatin1String("wayland") || WAYLAND_DISPLAY.contains(QLatin1String("wayland"), Qt::CaseInsensitive)) {
         g_IsWaylandEnv = true;
+        qInfo() << "Running in Wayland environment";
         return true;
     } else {
+        qInfo() << "Not running in Wayland environment";
         return false;
     }
 }
@@ -499,9 +525,11 @@ static bool g_LoadTranslator = false;
 bool loadLibTransaltor()
 {
     if (g_LoadTranslator) {
+        qDebug() << "Translator already loaded";
         return true;
     }
 
+    qDebug() << "Loading library translator";
     QDir dir(PLUGIN_QM_TRANS_PATH);
     if (dir.exists()) {
         QDirIterator qmIt(PLUGIN_QM_TRANS_PATH, QStringList() << QString("*%1.qm").arg(QLocale::system().name()), QDir::Files);
@@ -511,7 +539,10 @@ bool loadLibTransaltor()
             QFileInfo finfo = qmIt.fileInfo();
             QTranslator *translator = new QTranslator(qApp);
             if (translator->load(finfo.baseName(), finfo.absolutePath())) {
+                qDebug() << "Loaded translator:" << finfo.baseName();
                 qApp->installTranslator(translator);
+            } else {
+                qWarning() << "Failed to load translator:" << finfo.baseName();
             }
         }
 
@@ -533,9 +564,11 @@ bool loadLibTransaltor()
         }
 
         g_LoadTranslator = true;
+        qInfo() << "Library translator loaded successfully";
         return true;
     }
 
+    qWarning() << "Translator directory does not exist:" << PLUGIN_QM_TRANS_PATH;
     return false;
 }
 

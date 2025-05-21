@@ -294,22 +294,25 @@ LibImageAnimationPrivate::LibImageAnimationPrivate(LibImageAnimation *qq) :
     m_singleanimationTimer(nullptr), m_continuousanimationTimer(nullptr), m_staticTimer(nullptr),  q_ptr(qq)
 {
     Q_UNUSED(m_padding2);
+    qDebug() << "Initializing LibImageAnimationPrivate";
 }
 
 LibImageAnimationPrivate::~LibImageAnimationPrivate()
 {
-
+    qDebug() << "Destroying LibImageAnimationPrivate";
 }
 
 void LibImageAnimationPrivate::effectPainter(QPainter *painter, const QRect &rect)
 {
     if (m_pixmap1.isNull() || m_pixmap2.isNull()) {
+        qWarning() << "Cannot paint effect: One or both pixmaps are null";
         return;
     } else if (!m_isAnimationIng) {
         painter->drawPixmap(0, 0, m_pixmap2);
         return;
     }
     centrePoint = rect.center();
+    qDebug() << "Painting effect type:" << m_animationType;
     switch (m_animationType) {
     case 0:
         fadeEffect(painter, rect, m_factor, m_pixmap1, m_pixmap2);
@@ -327,6 +330,7 @@ void LibImageAnimationPrivate::effectPainter(QPainter *painter, const QRect &rec
         moveLeftToRightEffect(painter, rect, m_factor, m_pixmap1, m_pixmap2);
         break;
     default:
+        qWarning() << "Unknown animation type:" << m_animationType;
         break;
     }
     painter->end();
@@ -513,6 +517,7 @@ const QString LibImageAnimationPrivate::getCurrentPath()
 
 void LibImageAnimationPrivate::setPathList(const QString &first, const QStringList &list)
 {
+    qDebug() << "Setting path list with first image:" << first << "Total images:" << list.size();
     queue = QSharedPointer<LoopQueue>(new LoopQueue(first, list));
     setImage1(queue->last());
     setImage2(queue->first());
@@ -520,6 +525,7 @@ void LibImageAnimationPrivate::setPathList(const QString &first, const QStringLi
 
 void LibImageAnimationPrivate::startAnimation()
 {
+    qDebug() << "Starting animation";
     std::srand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
     m_animationType = static_cast<AnimationType>(std::rand() % (3));
     if (!m_continuousanimationTimer) {
@@ -536,7 +542,9 @@ void LibImageAnimationPrivate::startAnimation()
 
 void LibImageAnimationPrivate::startSingleNextAnimation()
 {
+    qDebug() << "Starting single next animation";
     if (m_isAnimationIng) {
+        qDebug() << "Animation already in progress, stopping";
         m_isAnimationIng = false;
     } else {
         setImage1(m_imageName2);
@@ -547,7 +555,9 @@ void LibImageAnimationPrivate::startSingleNextAnimation()
 
 void LibImageAnimationPrivate::startSinglePreAnimation()
 {
+    qDebug() << "Starting single previous animation";
     if (m_isAnimationIng) {
+        qDebug() << "Animation already in progress, stopping";
         m_isAnimationIng = false;
     } else {
         setImage1(m_imageName2);
@@ -558,6 +568,7 @@ void LibImageAnimationPrivate::startSinglePreAnimation()
 
 void LibImageAnimationPrivate::startStatic()
 {
+    qDebug() << "Starting static display";
     if (!m_staticTimer) {
         m_staticTimer = new QTimer(this);
         m_staticTimer->setSingleShot(true);
@@ -575,6 +586,7 @@ void LibImageAnimationPrivate::onContinuousAnimationTimer()
     if (m_factor + 0.005f > 1)
         m_factor = 1.0f;
     if (m_funval > 1.0f) {
+        qDebug() << "Animation completed, factor:" << m_factor;
         m_isAnimationIng = false;
         if (m_PlayOrStatue == LibImageAnimation::PlayStatue && m_SliderModel == LibImageAnimation::AutoPlayModel) {
             m_continuousanimationTimer->stop();
@@ -590,8 +602,8 @@ void LibImageAnimationPrivate::onContinuousAnimationTimer()
 
 void LibImageAnimationPrivate::onStaticTimer()
 {
-    qDebug() << "ImageAnimationPrivate::onStaticTimer m_PlayOrStatue = " << LibImageAnimation::PlayStatue;
-    qDebug() << "ImageAnimationPrivate::onStaticTimer m_SliderModel = " << LibImageAnimation::AutoPlayModel;
+    qDebug() << "Static timer triggered - Play status:" << m_PlayOrStatue 
+             << "Slide model:" << m_SliderModel;
 
     if (m_PlayOrStatue == LibImageAnimation::PlayStatue && m_SliderModel == LibImageAnimation::AutoPlayModel) {
         std::srand(static_cast<uint>(QTime(0, 0, 0).secsTo(QTime::currentTime())));
@@ -604,6 +616,7 @@ void LibImageAnimationPrivate::onStaticTimer()
 
 void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
 {
+    qDebug() << "Setting image 1:" << imageName1_bar;
     m_imageName1 = imageName1_bar;
     QImage tImg;
     QString errMsg;
@@ -631,6 +644,8 @@ void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
 #endif
 
     // 多屏显示问题，定位当前屏幕
+    qDebug() << "Screen geometry for image 1:" << screenGeometry;
+
     if (p1.width() >= p1.height()) {
         m_pixmap1 = QPixmap(screenGeometry.size());
         QPainter pa1(&m_pixmap1);
@@ -668,6 +683,7 @@ void LibImageAnimationPrivate::setImage1(const QString &imageName1_bar)
 
 void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
 {
+    qDebug() << "Setting image 2:" << imageName2_bar;
     m_imageName2 = imageName2_bar;
     int beginX = 0, beginY = 0;
     QImage tImg;
@@ -680,7 +696,6 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     if (auto screen = QGuiApplication::primaryScreen()) {
         screenGeometry = screen->geometry();
     }
-
 #else
     // 双屏下或者多屏下
     int number = QApplication::desktop()->screenNumber(q_ptr);
@@ -691,8 +706,9 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
     if (auto screen = QGuiApplication::screens().at(number)) {
         screenGeometry = screen->geometry();
     }
-
 #endif
+
+    qDebug() << "Screen geometry for image 2:" << screenGeometry;
 
     if (p2.width() >= p2.height()) {
         m_pixmap2 = QPixmap(screenGeometry.size());
@@ -734,6 +750,7 @@ void LibImageAnimationPrivate::setImage2(const QString &imageName2_bar)
 LibImageAnimation::LibImageAnimation(QWidget *parent) :
     QWidget(parent), current_target(EffectPlay), d_ptr(new LibImageAnimationPrivate(this))
 {
+    qDebug() << "Initializing LibImageAnimation";
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setAttribute(Qt::WA_StyledBackground, true);
     QPalette pal(palette());
@@ -744,16 +761,17 @@ LibImageAnimation::LibImageAnimation(QWidget *parent) :
 
 LibImageAnimation::~LibImageAnimation()
 {
+    qDebug() << "Destroying LibImageAnimation";
     Q_D(LibImageAnimation);
     delete d;
 }
 
 void LibImageAnimation::startSlideShow(const QString &beginPath, const QStringList &pathlist)
 {
+    qInfo() << "Starting slideshow with" << pathlist.size() << "images, beginning with:" << beginPath;
     Q_D(LibImageAnimation);
     setPaintTarget(EffectPlay);
     d->setPathList(beginPath, pathlist);
-//    d->startAnimation();
     d->setPlayOrStatue(LibImageAnimation::PlayStatue);
     d->setSlideModel(LibImageAnimation::AutoPlayModel);
     d->startStatic();
@@ -761,12 +779,14 @@ void LibImageAnimation::startSlideShow(const QString &beginPath, const QStringLi
 
 void LibImageAnimation::endSlider()
 {
+    qDebug() << "Ending slideshow";
     Q_D(LibImageAnimation);
     d->endSlide();
 }
 
 void LibImageAnimation::playAndNext()
 {
+    qDebug() << "Playing next image";
     Q_D(LibImageAnimation);
     d->setPlayOrStatue(LibImageAnimation::PlayStatue);
     d->setSlideModel(LibImageAnimation::ManualPlayModel);
@@ -776,6 +796,7 @@ void LibImageAnimation::playAndNext()
 
 void LibImageAnimation::playAndPre()
 {
+    qDebug() << "Playing previous image";
     Q_D(LibImageAnimation);
     d->setPlayOrStatue(LibImageAnimation::PlayStatue);
     d->setSlideModel(LibImageAnimation::ManualPlayModel);
@@ -785,6 +806,7 @@ void LibImageAnimation::playAndPre()
 
 void LibImageAnimation::pauseAndNext()
 {
+    qDebug() << "Pausing and moving to next image";
     Q_D(LibImageAnimation);
     d->setPlayOrStatue(LibImageAnimation::StopStatue);
     d->setSlideModel(LibImageAnimation::ManualPlayModel);
@@ -795,6 +817,7 @@ void LibImageAnimation::pauseAndNext()
 
 void LibImageAnimation::ifPauseAndContinue()
 {
+    qDebug() << "Resuming slideshow from pause";
     Q_D(LibImageAnimation);
     d->setPlayOrStatue(LibImageAnimation::PlayStatue);
     d->setSlideModel(LibImageAnimation::AutoPlayModel);

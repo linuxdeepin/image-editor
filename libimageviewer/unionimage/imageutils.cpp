@@ -33,18 +33,21 @@ namespace image {
 
 const QImage scaleImage(const QString &path, const QSize &size)
 {
+    qDebug() << "Scaling image:" << path << "to size:" << size;
     if (!imageSupportRead(path)) {
+        qWarning() << "Image format not supported for reading:" << path;
         return QImage();
     }
     QImageReader reader(path);
     reader.setAutoTransform(true);
     if (! reader.canRead()) {
-        qDebug() << "Can't read image: " << path;
+        qWarning() << "Cannot read image:" << path;
         return QImage();
     }
 
     QSize tSize = reader.size();
     if (! tSize.isValid()) {
+        qDebug() << "Image size not valid, trying to get from metadata";
         QStringList rl = getAllMetaData(path).value("Dimension").split("x");
         if (rl.length() == 2) {
             tSize = QSize(QString(rl.first()).toInt(),
@@ -57,24 +60,30 @@ const QImage scaleImage(const QString &path, const QSize &size)
     // Some format does not support scaling
     if (tImg.width() > size.width() || tImg.height() > size.height()) {
         if (tImg.isNull()) {
+            qWarning() << "Failed to read scaled image:" << path;
             return QImage();
         } else {
+            qDebug() << "Image format does not support scaling, converting to PNG";
             // Save as supported format and scale it again
             const QString tmp = QDir::tempPath() + "/scale_tmp_image.png";
             QFile::remove(tmp);
             if (tImg.save(tmp, "png", 50)) {
                 return scaleImage(tmp, size);
             } else {
+                qWarning() << "Failed to save temporary PNG for scaling:" << path;
                 return QImage();
             }
         }
-    } else
+    } else {
+        qDebug() << "Successfully scaled image:" << path;
         return tImg;
+    }
 }
 
 const QDateTime getCreateDateTime(const QString &path)
 {
-    QDateTime dt; /*= libexif::getCreateDateTime(path);*/
+    qDebug() << "Getting creation date time for:" << path;
+    QDateTime dt;
 
     // fallback to metadata.
     if (!dt.isValid()) {
@@ -84,6 +93,7 @@ const QDateTime getCreateDateTime(const QString &path)
             s = getAllMetaData(path).value("DateTimeDigitized");
         }
         if (s.isEmpty()) {
+            qDebug() << "No metadata date found, using current time";
             s = QDateTime::currentDateTime().toString();
         }
         dt = QDateTime::fromString(s, "yyyy.MM.dd HH:mm:ss");
@@ -91,12 +101,14 @@ const QDateTime getCreateDateTime(const QString &path)
 
     // fallback to file create time.
     if (!dt.isValid()) {
+        qDebug() << "No valid metadata date, using file creation time";
         QFileInfo finfo(path);
         dt = finfo.birthTime();
     }
 
     // fallback to today.
     if (!dt.isValid()) {
+        qDebug() << "No valid file creation time, using current time";
         dt = QDateTime::currentDateTime();
     }
 
@@ -105,6 +117,7 @@ const QDateTime getCreateDateTime(const QString &path)
 
 bool imageSupportRead(const QString &path)
 {
+    qDebug() << "Checking if image format is supported for reading:" << path;
     const QString suffix = QFileInfo(path).suffix();
     if (suffix == "icns") return true;
     // take them here for good.
@@ -112,6 +125,7 @@ bool imageSupportRead(const QString &path)
     errorList << "X3F";
 
     if (errorList.indexOf(suffix.toUpper()) != -1) {
+        qWarning() << "Unsupported image format:" << suffix;
         return false;
     }
     return (suffix == "svg");
@@ -119,9 +133,11 @@ bool imageSupportRead(const QString &path)
 
 bool imageSupportSave(const QString &path)
 {
+    qDebug() << "Checking if image format is supported for saving:" << path;
     const QString suffix = QFileInfo(path).suffix();
     //J2K格式暂时不支持
     if (suffix.toUpper() == "J2K") {
+        qWarning() << "J2K format is not supported for saving";
         return false;
     }
     // RAW image decode is too slow, and most of these does not support saving
@@ -153,8 +169,13 @@ bool imageSupportSave(const QString &path)
 
 bool rotate(const QString &path, int degree)
 {
+    qDebug() << "Rotating image:" << path << "by" << degree << "degrees";
     QString erroMsg;
-    return LibUnionImage_NameSpace::rotateImageFIle(degree, path, erroMsg);
+    bool result = LibUnionImage_NameSpace::rotateImageFIle(degree, path, erroMsg);
+    if (!result) {
+        qWarning() << "Failed to rotate image:" << erroMsg;
+    }
+    return result;
 }
 
 /*!
@@ -165,6 +186,7 @@ bool rotate(const QString &path, int degree)
  */
 const QPixmap cutSquareImage(const QPixmap &pixmap)
 {
+    qDebug() << "Cutting square image from pixmap";
     return Libutils::image::cutSquareImage(pixmap, pixmap.size());
 }
 
@@ -177,6 +199,7 @@ const QPixmap cutSquareImage(const QPixmap &pixmap)
  */
 const QPixmap cutSquareImage(const QPixmap &pixmap, const QSize &size)
 {
+    qDebug() << "Cutting square image from pixmap with size:" << size;
     const qreal ratio = qApp->devicePixelRatio();
     QImage img = pixmap.toImage().scaled(size * ratio,
                                          Qt::KeepAspectRatioByExpanding,
@@ -218,6 +241,7 @@ const QPixmap cutSquareImage(const QPixmap &pixmap, const QSize &size)
  */
 const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
 {
+    qDebug() << "Getting image info from directory:" << dir << "recursive:" << recursive;
     QFileInfoList infos;
 
     if (! recursive) {
@@ -227,6 +251,7 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
                 infos << info;
             }
         }
+        qDebug() << "Found" << infos.size() << "images in directory";
         return infos;
     }
 
@@ -237,23 +262,25 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
         dirIterator.next();
         if (imageSupportRead(dirIterator.fileInfo().absoluteFilePath())) {
             infos << dirIterator.fileInfo();
-#include "imageutils.h"
         }
     }
 
+    qDebug() << "Found" << infos.size() << "images in directory and subdirectories";
     return infos;
 }
 
 int getOrientation(const QString &path)
 {
+    qDebug() << "Getting image orientation for:" << path;
     return LibUnionImage_NameSpace::getOrientation(path);
 }
 
 const QImage loadTga(QString filePath, bool &success)
 {
+    qDebug() << "Loading TGA image:" << filePath;
     QImage img;
     if (!img.load(filePath)) {
-
+        qDebug() << "Standard TGA loading failed, trying custom loader";
         // open the file
         std::fstream fsPicture(filePath.toUtf8().constData(), std::ios::in | std::ios::binary);
 
@@ -385,8 +412,7 @@ const QImage loadTga(QString filePath, bool &success)
  */
 const QImage getRotatedImage(const QString &path)
 {
-
-
+    qDebug() << "Getting rotated image for:" << path;
     QImage tImg;
     QString format = DetectImageFormat(path);
     if (format.isEmpty()) {
@@ -401,9 +427,7 @@ const QImage getRotatedImage(const QString &path)
         if (readerF.canRead()) {
             tImg = readerF.read();
         } else {
-            qWarning() << "can't read image:" << readerF.errorString()
-                       << format;
-
+            qWarning() << "Cannot read image:" << readerF.errorString() << "format:" << format;
             tImg = QImage(path);
         }
     }
@@ -442,6 +466,7 @@ QString size2HumanT(const qlonglong bytes)
 
 const QMap<QString, QString> getAllMetaData(const QString &path)
 {
+    qDebug() << "Getting all metadata for:" << path;
     QMap<QString, QString> admMap;
 
     //移除秒　　2020/6/5 DJH
@@ -472,6 +497,7 @@ const QMap<QString, QString> getAllMetaData(const QString &path)
 
 const QPixmap cachePixmap(const QString &path)
 {
+    qDebug() << "Caching pixmap for:" << path;
     QPixmap pp;
     if (! QPixmapCache::find(path, &pp)) {
         pp = QPixmap(path);
@@ -482,6 +508,7 @@ const QPixmap cachePixmap(const QString &path)
 
 const QString toMd5(const QByteArray &data)
 {
+    qDebug() << "Generating MD5 hash for data";
     return QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex();
 }
 
@@ -493,6 +520,7 @@ const QString toMd5(const QByteArray &data)
  */
 QMap<QString, QString> thumbnailAttribute(const QUrl  &url)
 {
+    qDebug() << "Getting thumbnail attributes for:" << url.toString();
     QMap<QString, QString> set;
 
     if (url.isLocalFile()) {
@@ -518,6 +546,7 @@ QMap<QString, QString> thumbnailAttribute(const QUrl  &url)
 
 const QString thumbnailCachePath()
 {
+    qDebug() << "Getting thumbnail cache path";
     QString cacheP;
 
     QStringList systemEnvs = QProcess::systemEnvironment();
@@ -542,6 +571,7 @@ const QString thumbnailCachePath()
 QMutex mutex;
 const QPixmap getThumbnail(const QString &path, bool cacheOnly)
 {
+    qDebug() << "Getting thumbnail for:" << path << "cacheOnly:" << cacheOnly;
     QMutexLocker locker(&mutex);
     //优先读取自身缓存的图片
 //    if (dApp->m_imagemap.value(path).isNull()) {
@@ -575,6 +605,7 @@ const QPixmap getThumbnail(const QString &path, bool cacheOnly)
  */
 bool generateThumbnail(const QString &path)
 {
+    qDebug() << "Generating thumbnail for:" << path;
     const QUrl url = QUrl::fromLocalFile(path);
     const QString md5 = toMd5(url.toString(QUrl::FullyEncoded).toLocal8Bit());
     const auto attributes = thumbnailAttribute(url);
@@ -592,6 +623,7 @@ bool generateThumbnail(const QString &path)
 
     // Create filed thumbnail
     if (lImg.isNull() || nImg.isNull()) {
+        qWarning() << "Failed to generate thumbnail images for:" << path;
         const QString failedP = cacheP + "/fail/" + md5 + ".png";
         QImage img(1, 1, QImage::Format_ARGB32_Premultiplied);
         const auto keys = attributes.keys();
@@ -599,8 +631,7 @@ bool generateThumbnail(const QString &path)
             img.setText(key, attributes[key]);
         }
 
-        qDebug() << "Save failed thumbnail:" << img.save(failedP,  "png")
-                 << failedP << url;
+        qDebug() << "Saving failed thumbnail:" << failedP;
         return false;
     } else {
         for (QString key : attributes.keys()) {
@@ -610,8 +641,10 @@ bool generateThumbnail(const QString &path)
         const QString largeP = cacheP + "/large/" + md5 + ".png";
         const QString normalP = cacheP + "/normal/" + md5 + ".png";
         if (lImg.save(largeP, "png", 50) && nImg.save(normalP, "png", 50)) {
+            qDebug() << "Successfully generated thumbnails for:" << path;
             return true;
         } else {
+            qWarning() << "Failed to save thumbnails for:" << path;
             return false;
         }
     }
@@ -641,6 +674,7 @@ const QString thumbnailPath(const QString &path, ThumbnailType type)
 
 void removeThumbnail(const QString &path)
 {
+    qDebug() << "Removing thumbnails for:" << path;
     QFile(thumbnailPath(path, ThumbLarge)).remove();
     QFile(thumbnailPath(path, ThumbNormal)).remove();
     QFile(thumbnailPath(path, ThumbFail)).remove();
@@ -648,10 +682,8 @@ void removeThumbnail(const QString &path)
 
 bool thumbnailExist(const QString &path, ThumbnailType type)
 {
-    if (QFileInfo(thumbnailPath(path, type)).exists()
-//            || QFileInfo(thumbnailPath(path, ThumbNormal)).exists()
-//            || QFileInfo(thumbnailPath(path, ThumbFail)).exists()
-       ) {
+    qDebug() << "Checking if thumbnail exists for:" << path << "type:" << type;
+    if (QFileInfo(thumbnailPath(path, type)).exists()) {
         return true;
     } else {
         return false;
@@ -682,7 +714,8 @@ static QStringList fromByteArrayList(const QByteArrayList &list)
 
 QStringList supportedImageFormats()
 {
-    QStringList list ;
+    qDebug() << "Getting supported image formats";
+    QStringList list;
     for (auto str : LibUnionImage_NameSpace::unionImageSupportFormat()) {
         str = "*." + str;
         list += str;
@@ -698,6 +731,7 @@ QStringList supportedImageFormats()
 //直接搬运文管代码
 bool imageSupportWallPaper(const QString &path)
 {
+    qDebug() << "Checking if image supports wallpaper:" << path;
     QMimeDatabase db;
     QMimeType mt = db.mimeTypeForFile(path, QMimeDatabase::MatchDefault);
     return mt.name().startsWith("image")
@@ -715,6 +749,7 @@ bool imageSupportWallPaper(const QString &path)
  */
 bool imageSupportGreeterDirect(const QString &path)
 {
+    qDebug() << "Checking if image supports direct greeter:" << path;
     static qint64 s_maxFileSize = 5 * 1024 * 1024;
     if (QFileInfo(path).size() > s_maxFileSize) {
         return false;

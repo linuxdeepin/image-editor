@@ -31,6 +31,7 @@ static QString realPath(const QStringList &paths, const QString &filePath)
 static void fileOperateCallbackFunc(bool ret, void *data)
 {
     if (data) {
+        qDebug() << "File operation callback received - Success:" << ret;
         MtpFileProxy::instance()->loadFinished(*reinterpret_cast<QString *>(data), ret);
     }
 }
@@ -38,13 +39,16 @@ static void fileOperateCallbackFunc(bool ret, void *data)
 MtpFileProxy::MtpFileProxy()
 {
 #ifdef USE_DFM_IO
-    qInfo() << qPrintable("Use dfm-io copy MTP file.");
+    qInfo() << "Initializing MtpFileProxy with dfm-io support";
 #else
-    qInfo() << qPrintable("Use QFile copy MTP file.");
+    qInfo() << "Initializing MtpFileProxy with QFile support";
 #endif
 }
 
-MtpFileProxy::~MtpFileProxy() {}
+MtpFileProxy::~MtpFileProxy() 
+{
+    qDebug() << "MtpFileProxy destructor called";
+}
 
 MtpFileProxy *MtpFileProxy::instance()
 {
@@ -68,12 +72,14 @@ bool MtpFileProxy::isValid() const
 bool MtpFileProxy::checkAndCreateProxyFile(QStringList &paths, QString &firstPath)
 {
     firstPath = realPath(paths, firstPath);
+    qDebug() << "Checking file for MTP device:" << firstPath;
+    
     if (MtpFileProxy::instance()->checkFileDeviceIsMtp(firstPath)) {
         firstPath = MtpFileProxy::instance()->createPorxyFile(firstPath);
         paths.clear();
         paths.append(firstPath);
 
-        qInfo() << qPrintable("Detect MTP mount file.");
+        qInfo() << "MTP mount file detected and proxy created:" << firstPath;
         return true;
     }
 
@@ -87,14 +93,15 @@ bool MtpFileProxy::checkAndCreateProxyFile(QStringList &paths, QString &firstPat
 bool MtpFileProxy::checkFileDeviceIsMtp(const QString &filePath)
 {
     QStorageInfo storage(filePath);
+    qDebug() << "Checking storage device for:" << filePath << "Device:" << storage.device();
+    
     if (storage.device().startsWith("gvfs") || storage.device().startsWith("cifs")) {
         // /run/user/1000/gvfs/mtp: /run/user/1000/gvfs/gphoto2:
         QString absoluteFilePath = QFileInfo(filePath).absoluteFilePath();
         if (absoluteFilePath.contains(QRegularExpression("fs/(mtp|gphoto2):"))) {
-            // 判断是否为图片文件
-            if (ImageEngine::instance()->isImage(filePath)) {
-                return true;
-            }
+            bool isImage = ImageEngine::instance()->isImage(filePath);
+            qDebug() << "File is on MTP device:" << isImage;
+            return isImage;
         }
     }
 
@@ -108,26 +115,29 @@ bool MtpFileProxy::submitChangesToMTP(const QString &proxyFile)
 {
     if (isValid() && proxyCache.contains(proxyFile)) {
         auto infoPtr = proxyCache.value(proxyFile);
+        qDebug() << "Submitting changes to MTP file:" << proxyFile << "->" << infoPtr->originFileName;
 
         // 提交临时文件变更到 MTP 原始文件目录
 #ifdef USE_DFM_IO
         DOperator copyOpt(QUrl::fromLocalFile(proxyFile));
         if (!copyOpt.copyFile(QUrl::fromLocalFile(infoPtr->originFileName), DFile::CopyFlag::kOverwrite)) {
-            qWarning()
-                << QString("Submit changes to MTP mount file failed! DOperator error:%!").arg(copyOpt.lastError().errorMsg());
+            qWarning() << "Failed to submit changes to MTP file using DOperator. Error:" 
+                      << copyOpt.lastError().errorMsg();
             return false;
         }
 #else
         QFile copyFile(proxyFile);
         if (!copyFile.copy(infoPtr->originFileName)) {
-            qWarning() << QString("Submit changes to MTP mount file failed! QFile error:%!").arg(copyFile.errorString());
+            qWarning() << "Failed to submit changes to MTP file using QFile. Error:" 
+                      << copyFile.errorString();
             return false;
         }
 #endif
-
+        qInfo() << "Successfully submitted changes to MTP file";
         return true;
     }
 
+    qWarning() << "Cannot submit changes: Invalid proxy file or cache not found:" << proxyFile;
     return false;
 }
 
@@ -175,6 +185,8 @@ MtpFileProxy::FileState MtpFileProxy::state(const QString &proxyFile) const
  */
 QString MtpFileProxy::createPorxyFile(const QString &filePath)
 {
+    qDebug() << "Creating proxy file for:" << filePath;
+    
     auto findItr = std::find_if(proxyCache.begin(), proxyCache.end(), [&](const QSharedPointer<ProxyInfo> &info) {
         return info->originFileName == filePath;
     });
@@ -183,14 +195,16 @@ QString MtpFileProxy::createPorxyFile(const QString &filePath)
         // 同一路径文件已变更，移除之前缓存信息
         QFileInfo current(filePath);
         if (findItr.value()->lastModified == current.lastModified()) {
+            qDebug() << "Using existing proxy file:" << findItr.key();
             return findItr.key();
         }
+        qDebug() << "Removing outdated proxy file:" << findItr.key();
         proxyCache.erase(findItr);
     }
 
     QSharedPointer<ProxyInfo> infoPtr = QSharedPointer<ProxyInfo>(new ProxyInfo);
     if (!infoPtr->tempDir.isValid()) {
-        qWarning() << qPrintable("Cannot create temporary dir for MTP mount device.");
+        qWarning() << "Failed to create temporary directory for MTP file";
         return filePath;
     }
 
@@ -203,6 +217,7 @@ QString MtpFileProxy::createPorxyFile(const QString &filePath)
     proxyCache.insert(proxyFile, infoPtr);
 
     // 异步拷贝文件到临时目录
+    qDebug() << "Created new proxy file:" << proxyFile;
     copyFileFromMtpAsync(infoPtr);
 
     return proxyFile;
@@ -228,11 +243,15 @@ void MtpFileProxy::loadFinished(const QString &proxyFile, bool ret)
 {
     if (proxyCache.contains(proxyFile)) {
         if (!ret) {
-            qWarning() << qPrintable("Copy MTP mount file to tmp folder failed!");
+            qWarning() << "Failed to copy MTP file to temporary folder:" << proxyFile;
+        } else {
+            qDebug() << "Successfully copied MTP file to temporary folder:" << proxyFile;
         }
 
         proxyCache.value(proxyFile)->fileState = ret ? LoadSucc : LoadFailed;
         Q_EMIT createProxyFileFinished(proxyFile, ret);
+    } else {
+        qWarning() << "Received load finished for unknown proxy file:" << proxyFile;
     }
 }
 
@@ -241,11 +260,14 @@ void MtpFileProxy::loadFinished(const QString &proxyFile, bool ret)
  */
 void MtpFileProxy::triggerOriginFileChanged(const QString &originFile)
 {
+    qDebug() << "Checking origin file changes:" << originFile;
+    
     auto findItr = std::find_if(proxyCache.begin(), proxyCache.end(), [&](const QSharedPointer<ProxyInfo> &info) {
         return info->originFileName == originFile;
     });
 
     if (findItr == proxyCache.end()) {
+        qDebug() << "No proxy found for origin file:" << originFile;
         return;
     }
 
@@ -254,20 +276,23 @@ void MtpFileProxy::triggerOriginFileChanged(const QString &originFile)
 
     if (!info.exists()) {
         // 文件已被移除
+        qInfo() << "Origin file has been deleted:" << originFile;
         if (QFile::rename(proxyPtr->proxyFileName, proxyPtr->proxyFileName + ".delete")) {
             proxyPtr->fileState = FileDelete;
         } else {
-            qWarning() << qPrintable("For delete, rename MTP cached file failed!");
+            qWarning() << "Failed to rename proxy file for deletion:" << proxyPtr->proxyFileName;
         }
     } else if (FileDelete == findItr.value()->fileState) {
         // 文件恢复
+        qInfo() << "Origin file has been restored:" << originFile;
         if (QFile::rename(proxyPtr->proxyFileName + ".delete", proxyPtr->proxyFileName)) {
             proxyPtr->fileState = LoadSucc;
         } else {
-            qWarning() << qPrintable("For restore, rename MTP cached file failed!");
+            qWarning() << "Failed to rename proxy file for restoration:" << proxyPtr->proxyFileName;
         }
     } else if (info.lastModified() != findItr.value()->lastModified) {
         // 文件变更
+        qInfo() << "Origin file has been modified:" << originFile;
         copyFileFromMtpAsync(proxyPtr);
         proxyPtr->lastModified = info.lastModified();
     }
@@ -300,7 +325,7 @@ void MtpFileProxy::copyFileFromMtpAsync(const QSharedPointer<MtpFileProxy::Proxy
 
     bool ret = copyFile.copy(proxyPtr->proxyFileName);
     if (!ret) {
-        qWarning() << QString("Copy from MTP mount file failed! QFile error:%!").arg(copyFile.errorString());
+        qWarning() << "Failed to copy MTP file using QFile. Error:" << copyFile.errorString();
     }
 
     loadFinished(proxyPtr->proxyFileName, ret);

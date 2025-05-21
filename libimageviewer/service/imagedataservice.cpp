@@ -28,6 +28,7 @@ LibImageDataService *LibImageDataService::instance(QObject *parent)
     Q_UNUSED(parent);
 
     std::call_once(dataServiceFlag, []() {
+        qInfo() << "Creating new LibImageDataService instance";
         s_ImageDataService = new LibImageDataService();
     });
 
@@ -36,12 +37,14 @@ LibImageDataService *LibImageDataService::instance(QObject *parent)
 
 LibImageDataService::~LibImageDataService()
 {
+    qDebug() << "LibImageDataService destructor called";
     stopReadThumbnail();
 }
 
 bool LibImageDataService::add(const QStringList &paths)
 {
     QMutexLocker locker(&m_imgDataMutex);
+    qDebug() << "Adding" << paths.size() << "paths to request queue";
     // FIXME: 虽然这样修改将后续的数据优先添加，但也会导致边缘变更单独更新的数据被优先读取，变成非中心加载而是偏向一侧加载。
     // 反向添加，尾部数据在之后添加，QList两侧都有预留分配，非共享差异不大
     std::for_each(paths.rbegin(), paths.rend(), [this](const QString &path){
@@ -58,6 +61,7 @@ bool LibImageDataService::add(const QString &path)
     QMutexLocker locker(&m_imgDataMutex);
     if (!path.isEmpty()) {
         if (!m_AllImageMap.contains(path)) {
+            qDebug() << "Adding single path to request queue:" << path;
             // 后添加的单一数据优先加载
             m_requestQueue.prepend(path);
         }
@@ -68,10 +72,13 @@ bool LibImageDataService::add(const QString &path)
 QString LibImageDataService::pop()
 {
     QMutexLocker locker(&m_imgDataMutex);
-    if (m_requestQueue.empty())
+    if (m_requestQueue.empty()) {
+        qDebug() << "Request queue is empty";
         return QString();
+    }
     QString res = m_requestQueue.first();
     m_requestQueue.pop_front();
+    qDebug() << "Popped path from request queue:" << res;
     return res;
 }
 
@@ -91,6 +98,7 @@ bool LibImageDataService::readThumbnailByPaths(const QString &thumbnailPath, con
     Q_UNUSED(thumbnailPath)
     Q_UNUSED(remake)
 
+    qInfo() << "Starting thumbnail generation for" << files.size() << "files";
     LibImageDataService::instance()->add(files);
 
     int threadCounts = static_cast<int>(readThreadGroup.size());
@@ -99,12 +107,16 @@ bool LibImageDataService::readThumbnailByPaths(const QString &thumbnailPath, con
     int needCoreCounts = qBound(1, files.size(), recommendThreadCounts);
     int curActivateThreads = 0;
 
+    qDebug() << "Thread configuration - Recommended:" << recommendThreadCounts 
+             << "Needed:" << needCoreCounts << "Current:" << threadCounts;
+
     // 激活已有的线程
     for (int i = 0; i < threadCounts && i < needCoreCounts; ++i) {
         auto thread = readThreadGroup.at(static_cast<uint>(i));
         if (!thread->isRunning()) {
             thread->start();
             curActivateThreads++;
+            qDebug() << "Activated existing thread" << i;
         }
     }
 
@@ -113,6 +125,7 @@ bool LibImageDataService::readThumbnailByPaths(const QString &thumbnailPath, con
     int requesetThreads = needCoreCounts - curActivateThreads;
     int addThreads = qMin(avaliableThreads, requesetThreads);
     for (int i = 0; i < addThreads; ++i) {
+        qDebug() << "Creating new thumbnail thread" << (i + 1) << "of" << addThreads;
         LibReadThumbnailThread *thread = new LibReadThumbnailThread;
         thread->start();
         readThreadGroup.push_back(thread);
@@ -126,8 +139,9 @@ void LibImageDataService::addImage(const QString &path, const QImage &image)
 {
     QMutexLocker locker(&m_imgDataMutex);
     m_AllImageMap[path] = image;
-    qDebug() << "------------m_requestQueue.size = " << m_requestQueue.size();
-    qDebug() << "------------m_AllImageMap.size = " << m_AllImageMap.size();
+    qDebug() << "Added image to cache - Path:" << path 
+             << "Queue size:" << m_requestQueue.size()
+             << "Cache size:" << m_AllImageMap.size();
 
 //    emit ImageEngine::instance()->sigOneImgReady(path, info);
 
@@ -146,6 +160,7 @@ void LibImageDataService::addMovieDurationStr(const QString &path, const QString
 {
     QMutexLocker locker(&m_imgDataMutex);
     m_movieDurationStrMap[path] = durationStr;
+    qDebug() << "Added movie duration for:" << path << "Duration:" << durationStr;
 }
 
 QString LibImageDataService::getMovieDurationStrByPath(const QString &path)
@@ -192,6 +207,7 @@ LibImageDataService::LibImageDataService(QObject *parent)
 void LibImageDataService::stopReadThumbnail()
 {
     if (!readThreadGroup.empty()) {
+        qInfo() << "Stopping" << readThreadGroup.size() << "thumbnail threads";
         for (auto &thread : readThreadGroup) {
             thread->setQuit(true);
         }
@@ -202,6 +218,7 @@ void LibImageDataService::stopReadThumbnail()
         }
 
         readThreadGroup.clear();
+        qDebug() << "All thumbnail threads stopped and cleaned up";
     }
 }
 
@@ -215,11 +232,13 @@ LibReadThumbnailThread::LibReadThumbnailThread(QObject *parent)
 void LibReadThumbnailThread::readThumbnail(QString path)
 {
     if (!QFileInfo(path).exists()) {
+        qWarning() << "File does not exist:" << path;
         return;
     }
+
+    qDebug() << "Reading thumbnail for:" << path;
     //新增,增加缓存
     imageViewerSpace::ItemInfo itemInfo;
-
     itemInfo.path = path;
 
     QImage tImg;
@@ -233,6 +252,7 @@ void LibReadThumbnailThread::readThumbnail(QString path)
     }
 
     if (imageType == imageViewerSpace::ImageTypeSvg) {
+        qDebug() << "Processing SVG file:" << path;
         QSvgRenderer renderer(path);
         QImage tImg(128, 128, QImage::Format_ARGB32);
         tImg.fill(0);
@@ -243,12 +263,17 @@ void LibReadThumbnailThread::readThumbnail(QString path)
         itemInfo.image = tImg;
     } else {
         if (!LibUnionImage_NameSpace::loadStaticImageFromFile(path, tImg, errMsg)) {
-            qDebug() << errMsg;
+            qWarning() << "Failed to load image:" << path << "Error:" << errMsg;
             //损坏图片也需要缓存更新
             itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
             LibCommonService::instance()->slotSetImgInfoByPath(path, itemInfo);
             return;
         }
+
+        qDebug() << "Successfully loaded image:" << path 
+                 << "Size:" << tImg.size()
+                 << "Format:" << tImg.format();
+
         //读取图片,给长宽重新赋值
         itemInfo.imgOriginalWidth = tImg.width();
         itemInfo.imgOriginalHeight = tImg.height();
@@ -283,8 +308,12 @@ void LibReadThumbnailThread::readThumbnail(QString path)
     }
 
     if (itemInfo.image.isNull()) {
+        qWarning() << "Generated thumbnail is null for:" << path;
         itemInfo.imageType = imageViewerSpace::ImageTypeDamaged;
     } else {
+        qDebug() << "Successfully generated thumbnail for:" << path 
+                 << "Size:" << itemInfo.image.size()
+                 << "Type:" << itemInfo.imageType;
         //获取图片类型
         itemInfo.imageType = imageType;
     }
@@ -308,8 +337,10 @@ imageViewerSpace::PathType LibReadThumbnailThread::getPathType(const QString &im
 
 void LibReadThumbnailThread::run()
 {
+    qDebug() << "Thumbnail thread started";
     while (!LibImageDataService::instance()->isRequestQueueEmpty()) {
         if (m_quit) {
+            qDebug() << "Thumbnail thread received quit signal";
             break;
         }
         QString res = LibImageDataService::instance()->pop();
@@ -317,5 +348,6 @@ void LibReadThumbnailThread::run()
             readThumbnail(res);
         }
     }
+    qDebug() << "Thumbnail thread finished";
     emit LibImageDataService::instance()->sigeUpdateListview();
 }

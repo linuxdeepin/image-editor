@@ -41,19 +41,23 @@ static bool resolveSuccessed = false;
  */
 static QString libPath(const QString &strlib)
 {
+    qDebug() << "Searching for library:" << strlib;
     QDir dir;
     QString path = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
     dir.setPath(path);
     QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
     if (list.contains(strlib)) {
+        qDebug() << "Found exact library match:" << strlib;
         return strlib;
     } else {
         list.sort();
     }
 
     if (list.size() > 0) {
+        qDebug() << "Found library variant:" << list.last();
         return list.last();
     } else {
+        qWarning() << "No library found matching pattern:" << strlib;
         return QString();
     }
 }
@@ -68,9 +72,11 @@ static QString libPath(const QString &strlib)
 bool initFFmpegVideoThumbnailer()
 {
     if (resolveSuccessed) {
+        qDebug() << "FFmpeg video thumbnailer already initialized";
         return true;
     }
 
+    qInfo() << "Initializing FFmpeg video thumbnailer";
     // 没有显式调用 unload() ，动态库会保存在内存中，直到程序结束。resolve() 在内部会自动调用 load() 加载。
     QLibrary library("libffmpegthumbnailer.so.4");
     if (!library.load()) {
@@ -94,6 +100,7 @@ bool initFFmpegVideoThumbnailer()
         }
     }
 
+    qDebug() << "Loading FFmpeg thumbnailer functions";
     m_creat_video_thumbnailer = reinterpret_cast<mvideo_thumbnailer_create>(library.resolve("video_thumbnailer_create"));
     m_mvideo_thumbnailer_destroy = reinterpret_cast<mvideo_thumbnailer_destroy>(library.resolve("video_thumbnailer_destroy"));
     m_mvideo_thumbnailer_create_image_data = reinterpret_cast<mvideo_thumbnailer_create_image_data>(library.resolve("video_thumbnailer_create_image_data"));
@@ -117,6 +124,7 @@ bool initFFmpegVideoThumbnailer()
     }
 
     resolveSuccessed = true;
+    qInfo() << "FFmpeg video thumbnailer initialized successfully";
     return true;
 }
 
@@ -127,9 +135,11 @@ bool initFFmpegVideoThumbnailer()
 QImage runFFmpegVideoThumbnailer(const QUrl &url)
 {
     if (!resolveSuccessed) {
+        qWarning() << "Cannot generate thumbnail: FFmpeg video thumbnailer not initialized";
         return QImage();
     }
 
+    qDebug() << "Generating video thumbnail for:" << url.toString();
     m_video_thumbnailer->thumbnail_size = static_cast<int>(400 * qApp->devicePixelRatio());
     image_data *image_data = m_mvideo_thumbnailer_create_image_data();
     QString file = QFileInfo(url.toLocalFile()).absoluteFilePath();
@@ -137,6 +147,13 @@ QImage runFFmpegVideoThumbnailer(const QUrl &url)
     QImage img = QImage::fromData(image_data->image_data_ptr, static_cast<int>(image_data->image_data_size), "png");
     m_mvideo_thumbnailer_destroy_image_data(image_data);
     image_data = nullptr;
+
+    if (img.isNull()) {
+        qWarning() << "Failed to create QImage from thumbnail data for:" << file;
+    } else {
+        qDebug() << "Successfully generated thumbnail for:" << file << "Size:" << img.size();
+    }
+
     return img;
 }
 
