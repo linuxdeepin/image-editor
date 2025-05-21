@@ -25,6 +25,7 @@
 LibImgViewListView::LibImgViewListView(QWidget *parent)
     :  DListView(parent)
 {
+    qDebug() << "Initializing LibImgViewListView";
     m_model = new QStandardItemModel(this);
     m_delegate = new LibImgViewDelegate(this);
     setResizeMode(QListView::Adjust);
@@ -39,28 +40,24 @@ LibImgViewListView::LibImgViewListView(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     this->verticalScrollBar()->setDisabled(true); // 禁用滚动
-//    setAttribute(Qt::WA_TransparentForMouseEvents, true);
-//    QScroller::grabGesture(viewport(), QScroller::LeftMouseButtonGesture);
-
-//    setUniformItemSizes(true);
+    qDebug() << "Scroll bars disabled";
 
     setItemDelegate(m_delegate);
     setModel(m_model);
-//    installEventFilter(viewport());
+    qDebug() << "Model and delegate set up";
 
-//    setMouseTracking(true);
-//    this->viewport()->setMouseTracking(true);
     connect(ImageEngine::instance(), &ImageEngine::sigOneImgReady, this, &LibImgViewListView::slotOneImgReady, Qt::QueuedConnection);
+    qDebug() << "LibImgViewListView initialization completed";
 }
 
 LibImgViewListView::~LibImgViewListView()
 {
-    qDebug() << "~-------------------ImgViewListView";
+    qDebug() << "Destroying LibImgViewListView";
 }
 
 void LibImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos, QString path)
 {
-    qDebug() << "---" << __FUNCTION__ << "---path = " << path;
+    qDebug() << "Setting all files, count:" << itemInfos.size() << "current path:" << path;
     m_model->clear();
     m_currentPath = path;
     int count = itemInfos.size();
@@ -70,6 +67,7 @@ void LibImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos,
             info.imgWidth = ITEM_CURRENT_WH;
             info.imgHeight = ITEM_CURRENT_WH;
             m_currentRow = i;
+            qDebug() << "Current item found at index:" << i;
         } else {
             info.imgWidth = ITEM_NORMAL_WIDTH;
             info.imgHeight = ITEM_NORMAL_HEIGHT;
@@ -86,6 +84,7 @@ void LibImgViewListView::setAllFile(QList<imageViewerSpace::ItemInfo> itemInfos,
     doItemsLayout();
 
     this->setFixedSize((2 * (count + 1) + ITEM_NORMAL_WIDTH * count + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH), 80);
+    qDebug() << "List view size set to:" << this->size();
 }
 
 int LibImgViewListView::getSelectIndexByPath(QString path)
@@ -111,19 +110,24 @@ void LibImgViewListView::setSelectCenter()
 void LibImgViewListView::openNext()
 {
     if (m_currentRow == (m_model->rowCount() - 1)) {
+        qDebug() << "Already at last item, cannot open next";
         return;
     }
 
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
     QModelIndex nextIndex = m_model->index((m_currentRow + 1), 0);
     if (!nextIndex.isValid()) {
+        qWarning() << "Next index is invalid";
         return;
     }
 
     imageViewerSpace::ItemInfo info = nextIndex.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
     if (info.path.isEmpty()) {
+        qWarning() << "Next item path is empty";
         return;
     }
+
+    qDebug() << "Opening next item at index:" << (m_currentRow + 1) << "path:" << info.path;
 
     if (currentIndex.isValid()) {
         //重置前一个选中项的宽高
@@ -135,7 +139,6 @@ void LibImgViewListView::openNext()
         //重置新选中项的宽高
         m_model->setData(nextIndex,
                          QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
-
     }
     doItemsLayout();
 
@@ -143,7 +146,6 @@ void LibImgViewListView::openNext()
     m_currentPath = info.path;
 
     loadFiftyRight();
-
     startMoveToLeftAnimation();
 
     emit openImg(m_currentRow, m_currentPath);
@@ -152,19 +154,24 @@ void LibImgViewListView::openNext()
 void LibImgViewListView::openPre()
 {
     if (m_currentRow <= 0) {
+        qDebug() << "Already at first item, cannot open previous";
         return;
     }
 
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
     QModelIndex preIndex = m_model->index((m_currentRow - 1), 0);
     if (!preIndex.isValid()) {
+        qWarning() << "Previous index is invalid";
         return;
     }
 
     imageViewerSpace::ItemInfo info = preIndex.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
     if (info.path.isEmpty()) {
+        qWarning() << "Previous item path is empty";
         return;
     }
+
+    qDebug() << "Opening previous item at index:" << (m_currentRow - 1) << "path:" << info.path;
 
     if (currentIndex.isValid()) {
         //重置前一个选中项的宽高
@@ -176,7 +183,6 @@ void LibImgViewListView::openPre()
         //重置新选中项的宽高
         m_model->setData(preIndex,
                          QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
-
     }
     doItemsLayout();
 
@@ -194,6 +200,7 @@ void LibImgViewListView::removeCurrent()
         qDebug() << "---" << __FUNCTION__ << "---m_currentRow = " << m_currentRow;
         qDebug() << "---" << __FUNCTION__ << "---m_model->rowCount() = " << m_model->rowCount();
         if (m_currentRow == (m_model->rowCount() - 1)) {
+            qDebug() << "Removing last item, switching to previous";
             QModelIndex index;
             if (m_currentRow >= 1) {
                 index = m_model->index(m_currentRow - 1, 0);
@@ -208,6 +215,7 @@ void LibImgViewListView::removeCurrent()
             }
         } else {
             //显示下一张
+            qDebug() << "Removing current item, switching to next";
             QModelIndex index = m_model->index((m_currentRow + 1), 0);
             onClicked(index);
             m_currentRow = m_currentRow - 1;
@@ -216,6 +224,7 @@ void LibImgViewListView::removeCurrent()
         }
     } else if (m_model->rowCount() == 1) {
         //数量只有一张
+        qDebug() << "Removing last remaining item";
         m_model->clear();
         m_currentRow = -1;
         m_currentPath = "";
@@ -247,11 +256,6 @@ QStringList LibImgViewListView::getAllPath()
 int LibImgViewListView::getCurrentItemX()
 {
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
-//    qDebug() << this->visualRect(currentIndex).x();
-//    qDebug() << this->visualRect(currentIndex).x();
-//    qDebug() << 2 * (count + 1) + ITEM_NORMAL_WIDTH *count + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH;
-//    qDebug() << (2 * (m_currentRow + 1) + ITEM_NORMAL_WIDTH * m_currentRow + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH);
-//    qDebug() << this->visualRect(currentIndex).x();
     return this->visualRect(currentIndex).x();
 }
 
@@ -261,28 +265,9 @@ int LibImgViewListView::getRowWidth()
     return 2 * (count + 1) + ITEM_NORMAL_WIDTH * count + ITEM_CURRENT_WH - ITEM_NORMAL_WIDTH;
 }
 
-
-
-//void ImgViewListView::mousePressEvent(QMouseEvent *event)
-//{
-//    qDebug() << "mousePressEvent";
-//    return DListView::mousePressEvent(event);
-//}
-
-//void ImgViewListView::mouseMoveEvent(QMouseEvent *event)
-//{
-//    qDebug() << "mouseMoveEvent";
-//    return DListView::mouseMoveEvent(event);
-//}
-
-//void ImgViewListView::mouseReleaseEvent(QMouseEvent *event)
-//{
-//    qDebug() << "mouseReleaseEvent";
-//    return DListView::mouseReleaseEvent(event);
-//}
-
 void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInfo pix)
 {
+    qDebug() << "Image ready for path:" << path;
     for (int i = 0; i < m_model->rowCount(); i++) {
         QModelIndex index = m_model->index(i, 0);
         imageViewerSpace::ItemInfo data = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
@@ -297,6 +282,7 @@ void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInf
 
             // 判断当前的文件路径是否变更(重命名时)，若变更则更新
             if (path == m_currentPath && pix.path != m_currentPath) {
+                qDebug() << "Updating current path from" << m_currentPath << "to" << pix.path;
                 m_currentPath = pix.path;
             }
 
@@ -309,6 +295,7 @@ void LibImgViewListView::slotOneImgReady(QString path, imageViewerSpace::ItemInf
 
 void LibImgViewListView::slotCurrentImgFlush(QPixmap pix, const QSize &originalSize)
 {
+    qDebug() << "Flushing current image, original size:" << originalSize;
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
     imageViewerSpace::ItemInfo data = currentIndex.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
 
@@ -319,6 +306,7 @@ void LibImgViewListView::slotCurrentImgFlush(QPixmap pix, const QSize &originalS
     // FIX:暂时修复，用于解决某些场景下初始化，图片全数据还未处理完成（多线程处理）
     // data.imageType 还未设置的情况
     if (data.imageType == imageViewerSpace::ImageTypeBlank) {
+        qDebug() << "Setting image type for blank image";
         data.imageType = LibUnionImage_NameSpace::getImageType(data.path);
     }
 
@@ -336,13 +324,18 @@ void LibImgViewListView::onClicked(const QModelIndex &index)
     //重新点击,m_currentPath需要重新赋值
     imageViewerSpace::ItemInfo info = index.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
     m_currentPath = info.path;
+    
     if (index.row() == m_currentRow) {
+        qDebug() << "Clicked on current item, no action needed";
         return;
     }
 
     if (info.path.isEmpty()) {
+        qWarning() << "Clicked item path is empty";
         return;
     }
+
+    qDebug() << "Item clicked at index:" << index.row() << "path:" << info.path;
 
     QModelIndex currentIndex = m_model->index(m_currentRow, 0);
     if (currentIndex.isValid()) {
@@ -355,9 +348,6 @@ void LibImgViewListView::onClicked(const QModelIndex &index)
                      QVariant(QSize(LibImgViewListView::ITEM_CURRENT_WH, LibImgViewListView::ITEM_CURRENT_WH)), Qt::SizeHintRole);
 
     m_currentRow = index.row();
-    qDebug() << "---" << __FUNCTION__ << "---m_currentRow = " << m_currentRow;
-    qDebug() << "---" << __FUNCTION__ << "---info.path = " << info.path;
-    //刷新界面
     doItemsLayout();
     //如果点击的是最后一个则向前移动
     startMoveToLeftAnimation();
@@ -388,19 +378,17 @@ void LibImgViewListView::cutPixmap(imageViewerSpace::ItemInfo &iteminfo)
         }
     }
 }
-//加载后50张
+
 void LibImgViewListView::loadFiftyRight()
 {
+    qDebug() << "Loading next 50 images starting from index:" << m_currentRow;
     int count = 0;
     for (int i = m_currentRow; i < m_model->rowCount(); i++) {
         count++;
         QModelIndex indexImg = m_model->index(i, 0);
         imageViewerSpace::ItemInfo infoImg = indexImg.data(Qt::DisplayRole).value<imageViewerSpace::ItemInfo>();
         if (infoImg.image.isNull()) {
-//            if (!ImageEngineApi::instance()->m_imgLoaded.contains(infoImg.path)) {
-//                emit ImageEngineApi::instance()->sigLoadThumbnailIMG(infoImg.path);
-//                ImageEngineApi::instance()->m_imgLoaded.append(infoImg.path);
-//            }
+            qDebug() << "Loading thumbnail for image at index:" << i;
         }
         if (count == 50) {
             break;
@@ -410,6 +398,7 @@ void LibImgViewListView::loadFiftyRight()
 
 void LibImgViewListView::startMoveToLeftAnimation()
 {
+    qDebug() << "Starting move to left animation";
     if (m_moveAnimation == nullptr) {
         m_moveAnimation = new QPropertyAnimation(this->horizontalScrollBar(), "value", this);
     }
@@ -425,6 +414,7 @@ void LibImgViewListView::startMoveToLeftAnimation()
             m_moveAnimation->stop();
         }
         m_moveAnimation->start();
+        qDebug() << "Animation started, current position:" << rect.x();
     }
 }
 

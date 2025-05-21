@@ -62,7 +62,9 @@ const int LOAD_LEFT_RIGHT = 25;     //前后加载图片数（动态）
 
 LibBottomToolbar::LibBottomToolbar(QWidget *parent) : DFloatingWidget(parent)
 {
+    qDebug() << "Initializing LibBottomToolbar";
     m_ocrIsExists = Libutils::base::checkCommandExist("deepin-ocr");
+    qDebug() << "OCR feature" << (m_ocrIsExists ? "available" : "not available");
     this->setBlurBackgroundEnabled(true);
     initUI();
     initConnection();
@@ -73,7 +75,7 @@ LibBottomToolbar::LibBottomToolbar(QWidget *parent) : DFloatingWidget(parent)
 
 LibBottomToolbar::~LibBottomToolbar()
 {
-
+    qDebug() << "Destroying LibBottomToolbar";
 }
 
 int LibBottomToolbar::getAllFileCount()
@@ -258,15 +260,20 @@ void LibBottomToolbar::checkAdaptScreenBtn()
 
 void LibBottomToolbar::deleteImage()
 {
+    qDebug() << "Starting image deletion process";
     //移除正在展示照片
     if (m_imgListWidget) {
-        if (m_imgListWidget->getImgCount() == 0)
+        if (m_imgListWidget->getImgCount() == 0) {
+            qWarning() << "No images to delete";
             return;
+        }
 
         QString path = getCurrentItemInfo().path;
+        qDebug() << "Deleting image:" << path;
 
         QFile file(path);
         if (!file.exists()) {
+            qWarning() << "File does not exist:" << path;
             return;
         }
         //文件是否被删除的判断bool值
@@ -274,18 +281,24 @@ void LibBottomToolbar::deleteImage()
         if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeLocal) {
             //先删除文件，需要判断文件是否删除，如果删除了，再决定看图软件的显示
             //不再采用默认删除,使用utils里面的删除
+            qDebug() << "Deleting local file";
             Libutils::base::trashFile(path);
             QFile fileRemove(path);
             if (!fileRemove.exists()) {
                 iRetRemove = true;
+                qDebug() << "File successfully moved to trash";
             }
         } else if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerTypeAlbum) {
             iRetRemove = true;
+            qDebug() << "Album file marked for deletion";
         }
 
         if (iRetRemove) {
             m_imgListWidget->removeCurrent();
+            qDebug() << "Remaining images count:" << m_imgListWidget->getImgCount();
+            
             if (m_imgListWidget->getImgCount() == 1) {
+                qDebug() << "Last image remaining, adjusting UI";
                 if (m_preButton) {
                     setButtonVisible(imageViewerSpace::ButtonTypePre, false);
                 }
@@ -305,11 +318,14 @@ void LibBottomToolbar::deleteImage()
                 m_trashBtn->clearFocus();
                 //当图片不存在的时候,回到初始界面
                 if (!QFileInfo(m_imgListWidget->getCurrentImgInfo().path).isFile()) {
+                    qDebug() << "Current image no longer exists, emitting sigPicCountIsNull";
                     emit ImageEngine::instance()->sigPicCountIsNull();
-                };
+                }
             } else if (m_imgListWidget->getImgCount() == 0) {
+                qDebug() << "No images remaining, emitting sigPicCountIsNull";
                 emit ImageEngine::instance()->sigPicCountIsNull();
             }
+
             if (m_imgListWidget->getCurrentCount() >= m_imgListWidget->getImgCount() - 1) {
                 m_nextButton->setEnabled(false);
             }
@@ -324,7 +340,6 @@ void LibBottomToolbar::deleteImage()
             PermissionConfig::instance()->triggerAction(PermissionConfig::TidDelete, path);
         }
     }
-
 }
 
 void LibBottomToolbar::onBackButtonClicked()
@@ -336,6 +351,7 @@ void LibBottomToolbar::onBackButtonClicked()
 
 void LibBottomToolbar::onAdaptImageBtnClicked()
 {
+    qDebug() << "Adapt image button clicked";
     emit resetTransform(false);
     m_adaptImageBtn->setChecked(true);
     if (!badaptImageBtnChecked) {
@@ -345,6 +361,7 @@ void LibBottomToolbar::onAdaptImageBtnClicked()
 
 void LibBottomToolbar::onAdaptScreenBtnClicked()
 {
+    qDebug() << "Adapt screen button clicked";
     emit resetTransform(true);
     m_adaptScreenBtn->setChecked(true);
     if (!badaptScreenBtnChecked) {
@@ -364,17 +381,20 @@ void LibBottomToolbar::onclBTClicked()
 
 void LibBottomToolbar::onRotateLBtnClicked()
 {
+    qDebug() << "Rotate left button clicked";
     emit rotateClockwise();
 }
 
 void LibBottomToolbar::onRotateRBtnClicked()
 {
+    qDebug() << "Rotate right button clicked";
     emit rotateCounterClockwise();
 }
 
 void LibBottomToolbar::onTrashBtnClicked()
 {
     //更换删除顺序,相册需要现在显示删除,再删除本体
+    qDebug() << "Trash button clicked";
     QString path;
     if (m_imgListWidget) {
         path = getCurrentItemInfo().path;
@@ -385,6 +405,7 @@ void LibBottomToolbar::onTrashBtnClicked()
 
     if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) {
         // 相册浏览图片-删除按钮逻辑处理
+        qDebug() << "Album mode - sending delete signal for:" << path;
 #ifdef DELETE_CONFIRM
         // 新流程，相册会弹出删除确认提示框，点击确认，相册才给imageeditor发送sigDeleteImage信号删除图片
         emit ImageEngine::instance()->sigDel(path);
@@ -395,6 +416,7 @@ void LibBottomToolbar::onTrashBtnClicked()
 #endif
     } else {
         //本地图片浏览-删除图片，直接删除
+        qDebug() << "Local mode - deleting file:" << path;
         deleteImage();
         emit ImageEngine::instance()->sigDel(path);
     }
@@ -402,6 +424,7 @@ void LibBottomToolbar::onTrashBtnClicked()
 
 void LibBottomToolbar::slotThemeChanged(int type)
 {
+    qDebug() << "Theme changed to:" << (type == 1 ? "light" : "dark");
     QString rStr;
     if (type == 1) {
         QColor maskColor(247, 247, 247);
@@ -465,6 +488,7 @@ void LibBottomToolbar::slotThemeChanged(int type)
 
 void LibBottomToolbar::slotOpenImage(int index, QString path)
 {
+    qDebug() << "Opening image at index:" << index << "path:" << path;
     if (index == 0) {
         m_preButton->setEnabled(false);
     } else {
@@ -475,7 +499,6 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
     } else {
         m_nextButton->setEnabled(true);
     }
-//    qDebug() << index << m_imgListWidget->getImgCount();
 
     //BUG#93143
     QFileInfo info(path);
@@ -488,24 +511,26 @@ void LibBottomToolbar::slotOpenImage(int index, QString path)
             m_ocrBtn->setToolTip(QObject::tr("Extract text"));
         } else {
             m_ocrBtn->setToolTip(QObject::tr("Extract text") + QObject::tr("(Disabled)"));
-        } 
-    } 
+        }
+    }
 
     //左转右转的控制不在这里
     if (!info.isFile() || !info.exists()) {
+        qWarning() << "File does not exist or is not a file:" << path;
         m_adaptImageBtn->setEnabled(false);
         m_adaptImageBtn->setChecked(false);
         m_adaptScreenBtn->setEnabled(false);
-
         m_trashBtn->setEnabled(false);
         if (m_ocrIsExists) {
             m_ocrBtn->setEnabled(false);
         }
     } else {
+        qDebug() << "File exists, enabling controls";
         m_adaptImageBtn->setEnabled(true);
         m_adaptScreenBtn->setEnabled(true);
 
         if (!PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableEdit)) {
+            qWarning() << "Edit permission not granted";
             return;
         }
 
@@ -618,14 +643,17 @@ void LibBottomToolbar::leaveEvent(QEvent *e)
 void LibBottomToolbar::setAllFile(QString path, QStringList paths)
 {
     //每次打开清空一下缩略图
+    qDebug() << "Setting all files, count:" << paths.size() << "current path:" << path;
     m_imgListWidget->clearListView();
     if (paths.size() <= 1) {
+        qDebug() << "Single image mode, hiding navigation controls";
         setButtonVisible(imageViewerSpace::ButtonTypePre, false);
         setButtonVisible(imageViewerSpace::ButtonTypeNext, false);
         m_spaceWidget->setVisible(false);
         m_spaceWidget_thumbnailLeft->setVisible(false);
         m_spaceWidget_thumbnailRight->setVisible(false);
     } else {
+        qDebug() << "Multiple images mode, showing navigation controls";
         setButtonVisible(imageViewerSpace::ButtonTypePre, true);
         setButtonVisible(imageViewerSpace::ButtonTypeNext, true);
         m_spaceWidget->setVisible(true);

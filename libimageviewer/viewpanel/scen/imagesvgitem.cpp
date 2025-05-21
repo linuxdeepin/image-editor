@@ -21,16 +21,19 @@ QT_BEGIN_NAMESPACE
 LibImageSvgItem::LibImageSvgItem(QGraphicsItem *parent)
     : QGraphicsObject(parent)
 {
+    qDebug() << "Initializing LibImageSvgItem with parent";
     setParentItem(parent);
     m_renderer = new QSvgRenderer(this);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     setMaximumCacheSize(QSize(1024, 768));
+    qDebug() << "SVG renderer initialized with cache size:" << QSize(1024, 768);
 }
 
 LibImageSvgItem::LibImageSvgItem(const QString &fileName, QGraphicsItem *parent)
 //:QGraphicsSvgItem(parent)
     : QGraphicsObject(parent)
 {
+    qDebug() << "Initializing LibImageSvgItem with file:" << fileName;
     setParentItem(parent);
     m_renderer = new QSvgRenderer(this);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
@@ -41,6 +44,7 @@ LibImageSvgItem::LibImageSvgItem(const QString &fileName, QGraphicsItem *parent)
 
 LibImageSvgItem::~LibImageSvgItem()
 {
+    qDebug() << "Destroying LibImageSvgItem";
 }
 
 QSvgRenderer *LibImageSvgItem::renderer() const
@@ -107,19 +111,25 @@ static void qt_graphicsItem_highlightSelected(QGraphicsItem *item, QPainter *pai
 
 void LibImageSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    //    Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if (!m_renderer->isValid())
+    if (!m_renderer->isValid()) {
+        qWarning() << "SVG renderer is not valid, skipping paint";
         return;
+    }
 
-    if (m_elemId.isEmpty())
+    if (m_elemId.isEmpty()) {
+        qDebug() << "Rendering entire SVG";
         m_renderer->render(painter, m_boundingRect);
-    else
+    } else {
+        qDebug() << "Rendering SVG element:" << m_elemId;
         m_renderer->render(painter, m_elemId, m_boundingRect);
+    }
 
-    if (option->state & QStyle::State_Selected)
+    if (option->state & QStyle::State_Selected) {
+        qDebug() << "Drawing selection highlight";
         qt_graphicsItem_highlightSelected(this, painter, option);
+    }
 }
 
 int LibImageSvgItem::type() const
@@ -129,13 +139,17 @@ int LibImageSvgItem::type() const
 
 void LibImageSvgItem::updateDefaultSize()
 {
+    qDebug() << "Updating default size";
     QRectF bounds;
     if (m_elemId.isEmpty()) {
         bounds = QRectF(QPointF(0, 0), m_renderer->defaultSize());
+        qDebug() << "Using default size:" << m_renderer->defaultSize();
     } else {
         bounds = m_renderer->boundsOnElement(m_elemId);
+        qDebug() << "Using element bounds for:" << m_elemId << "size:" << bounds.size();
     }
     if (m_boundingRect.size() != bounds.size()) {
+        qDebug() << "Bounding rect size changed from" << m_boundingRect.size() << "to" << bounds.size();
         prepareGeometryChange();
         m_boundingRect.setSize(bounds.size());
     }
@@ -143,18 +157,19 @@ void LibImageSvgItem::updateDefaultSize()
 
 void LibImageSvgItem::setMaximumCacheSize(const QSize &size)
 {
+    qDebug() << "Setting maximum cache size to:" << size;
     Q_UNUSED(size);
-//    QGraphicsItem::d_ptr->setExtra(QGraphicsItemPrivate::ExtraMaxDeviceCoordCacheSize, size);
     update();
 }
 
 QSize LibImageSvgItem::maximumCacheSize() const
 {
-    return QSize();//QGraphicsItem::d_ptr->extra(QGraphicsItemPrivate::ExtraMaxDeviceCoordCacheSize).toSize();
+    return QSize();
 }
 
 void LibImageSvgItem::setElementId(const QString &id)
 {
+    qDebug() << "Setting element ID to:" << id;
     m_elemId = id;
     updateDefaultSize();
     update();
@@ -167,15 +182,15 @@ QString LibImageSvgItem::elementId() const
 
 void LibImageSvgItem::setSharedRenderer(QSvgRenderer *renderer)
 {
+    qDebug() << "Setting shared renderer";
     m_renderer = renderer;
-
     updateDefaultSize();
-
     update();
 }
 
 void LibImageSvgItem::setCachingEnabled(bool caching)
 {
+    qDebug() << "Setting caching" << (caching ? "enabled" : "disabled");
     setCacheMode(caching ? QGraphicsItem::DeviceCoordinateCache : QGraphicsItem::NoCache);
 }
 

@@ -39,8 +39,10 @@ using namespace Dtk::Widget;
 NavigationWidget::NavigationWidget(QWidget *parent)
     : QWidget(parent)
 {
+    qDebug() << "Initializing NavigationWidget";
     hide();
     resize(150, 112);
+    qDebug() << "NavigationWidget size set to:" << QSize(150, 112);
 
     ImageButton *closeBtn_light = new ImageButton(ICON_CLOSE_NORMAL_LIGHT, ICON_CLOSE_HOVER_LIGHT, ICON_CLOSE_PRESS_LIGHT, " ", this);
     closeBtn_light->setTooltipVisible(true);
@@ -70,6 +72,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
 
     //修复style问题
     if (DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::DarkType) {
+        qDebug() << "Setting up dark theme";
         closeBtn_light->hide();
         closeBtn_dark->show();
         m_bgImgUrl = Libutils::view::naviwindow::DARK_BG_IMG ;
@@ -78,6 +81,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
         m_mrBorderColor = Libutils::view::naviwindow::DARK_MR_BORDER_Color;
         m_imgRBorderColor = Libutils::view::naviwindow:: DARK_IMG_R_BORDER_COLOR;
     } else {
+        qDebug() << "Setting up light theme";
         closeBtn_dark->hide();
         closeBtn_light->show();
         m_bgImgUrl = Libutils::view::naviwindow::LIGHT_BG_IMG ;
@@ -90,6 +94,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, [ = ]() {
         DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
         if (themeType == DGuiApplicationHelper::DarkType) {
+            qDebug() << "Theme changed to dark";
             closeBtn_light->hide();
             closeBtn_dark->show();
             m_bgImgUrl = Libutils::view::naviwindow::DARK_BG_IMG ;
@@ -98,6 +103,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
             m_mrBorderColor = Libutils::view::naviwindow::DARK_MR_BORDER_Color;
             m_imgRBorderColor = Libutils::view::naviwindow:: DARK_IMG_R_BORDER_COLOR;
         } else {
+            qDebug() << "Theme changed to light";
             closeBtn_dark->hide();
             closeBtn_light->show();
             m_bgImgUrl = Libutils::view::naviwindow::LIGHT_BG_IMG ;
@@ -112,7 +118,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
                        rect().y() + IMAGE_MARGIN_BOTTOM,
                        rect().width() - IMAGE_MARGIN * 2,
                        rect().height() - IMAGE_MARGIN_BOTTOM * 2);
-
+    qDebug() << "Main rectangle set to:" << m_mainRect;
 
 //    connect(dApp->viewerTheme, &ViewerThemeManager::viewerThemeChanged, this,
 //            &NavigationWidget::onThemeChanged);
@@ -120,6 +126,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
 
 void NavigationWidget::setAlwaysHidden(bool value)
 {
+    qDebug() << "Setting always hidden to:" << value;
     LibConfigSetter::instance()->setValue(SETTINGS_GROUP, SETTINGS_ALWAYSHIDDEN_KEY,
                                           QVariant(value));
     if (isAlwaysHidden())
@@ -141,17 +148,18 @@ QPoint NavigationWidget::transImagePos(QPoint pos)
 
 void NavigationWidget::setImage(const QImage &img)
 {
+    qDebug() << "Setting navigation image, original size:" << img.size();
     const qreal ratio = devicePixelRatioF();
 
     QRect tmpImageRect = QRect(m_mainRect.x(), m_mainRect.y(),
                                qRound(m_mainRect.width() * ratio),
                                qRound(m_mainRect.height() * ratio));
-//    QRect tmpImageRect = m_mainRect;
 
     m_originRect = img.rect();
 
     // 只在图片比可显示区域大时才缩放
     if (tmpImageRect.width() < m_originRect.width() || tmpImageRect.height() < m_originRect.height()) {
+        qDebug() << "Scaling image to fit display area";
         m_img = img.scaled(tmpImageRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     } else {
         m_img = img;
@@ -161,8 +169,10 @@ void NavigationWidget::setImage(const QImage &img)
 
     //适应缩放比例
     if (m_img.height() > (tmpImageRect.height() - 20) && m_img.width() >= (tmpImageRect.width() - 10)) {
+        qDebug() << "Adjusting image height to fit display area";
         m_img = m_img.scaled(m_img.width(), tmpImageRect.height() - 20);
     } else if (m_img.height() > (tmpImageRect.height() - 10) && m_img.width() > (tmpImageRect.width() - 25)) {
+        qDebug() << "Adjusting image width to fit display area";
         m_img = m_img.scaled((tmpImageRect.width() - 25), m_img.height());
     }
 
@@ -172,25 +182,23 @@ void NavigationWidget::setImage(const QImage &img)
     m_pix.setDevicePixelRatio(ratio);
 
     m_imageScale = qMax(1.0, qMax(qreal(img.width()) / qreal(m_img.width()), qreal(img.height()) / qreal(m_img.height())));
-//    m_r = QRectF(0, 0, m_img.width() / ratio, m_img.height() / ratio);
-//    m_widthScale = img.width() / m_img.width();
-//    m_heightScale = img.height() / m_img.height();
-
     m_r = QRectF(0, 0, m_img.width(), m_img.height());
-
-
 
     imageDrawRect = QRect((m_mainRect.width() - m_img.width() / ratio) / 2 + IMAGE_MARGIN,
                           (m_mainRect.height() - m_img.height() / ratio) / 2 + Libutils::common::BORDER_WIDTH,
                           m_img.width() / ratio, m_img.height() / ratio);
+    qDebug() << "Image processing completed, final size:" << m_img.size() << "scale:" << m_imageScale;
 
     update();
 }
 
 void NavigationWidget::setRectInImage(const QRect &r)
 {
-    if (m_img.isNull())
+    if (m_img.isNull()) {
+        qWarning() << "Cannot set rect in image: image is null";
         return;
+    }
+    qDebug() << "Setting rect in image:" << r;
     m_r.setX(qreal(r.x()) / m_imageScale / m_heightScale);
     m_r.setY(qreal(r.y()) / m_imageScale / m_widthScale);
     m_r.setWidth(qreal(r.width()) / m_imageScale / m_heightScale);
@@ -201,43 +209,36 @@ void NavigationWidget::setRectInImage(const QRect &r)
 
 void NavigationWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == Qt::LeftButton) {
+        qDebug() << "Mouse press at position:" << e->pos();
         tryMoveRect(transImagePos(e->pos()));
+    }
 }
 
 void NavigationWidget::mouseMoveEvent(QMouseEvent *e)
 {
+    qDebug() << "Mouse move to position:" << e->pos();
     tryMoveRect(transImagePos(e->pos()));
 }
 
 void NavigationWidget::tryMoveRect(const QPoint &p)
 {
-//    int x0 = (m_mainRect.width() - m_img.width()) / 2 / devicePixelRatioF();
-//    int y0 = (m_mainRect.height() - m_img.height()) / 2 / devicePixelRatioF();
-//    const QRect imageRect(x0, y0, m_img.width(), m_img.height());
-//    if (! imageRect.contains(p))
-//        return;
-
-    if (!m_mainRect.contains(p))
+    if (!m_mainRect.contains(p)) {
+        qDebug() << "Point" << p << "is outside main rectangle";
         return;
+    }
 
-//    const qreal x = 1.0 * (p.x() / devicePixelRatioF() - x0) / m_img.width() * m_originRect.width();
-//    const qreal y = 1.0 * (p.y() / devicePixelRatioF() - y0) / m_img.height() * m_originRect.height();
     //修复鼠标位置存在出入的问题
     qreal x = p.x() * m_imageScale * m_heightScale;
     qreal y = p.y() * m_imageScale * m_widthScale;
-
-//    qDebug() << p ;
-//    qDebug() << x << y;
-//    qDebug() << m_r;
-
+    qDebug() << "Moving rect to position:" << QPointF(x, y);
 
     Q_EMIT requestMove(x, y);
 }
 
 bool NavigationWidget::checkbgisdark(QImage &img) const
 {
-    //long l = m_r.toRect().width() * m_r.toRect().height() / 100;
+    qDebug() << "Checking if background is dark";
     int npixcntx, npixcnty;
     bool numlessflag;
     m_r.toRect().width() * m_r.toRect().height() < 50 ? numlessflag = true : numlessflag = false;
@@ -248,6 +249,7 @@ bool NavigationWidget::checkbgisdark(QImage &img) const
         npixcntx = m_r.toRect().width() / 5;
         npixcnty = m_r.toRect().height() / 5;
     }
+
     int total = 0;
     int darktotal = 0;
     for (int i = 0; i < npixcntx; i++) {
@@ -268,29 +270,29 @@ bool NavigationWidget::checkbgisdark(QImage &img) const
             }
         }
     }
-    if (darktotal / (total * 1.00) > 0.95)
-        return  true;
-    else
-        return false;
+    bool isDark = darktotal / (total * 1.00) > 0.95;
+    qDebug() << "Background darkness check result:" << isDark << "dark pixels:" << darktotal << "total pixels:" << total;
+    return isDark;
 }
 
 void NavigationWidget::paintEvent(QPaintEvent *)
 {
     QImage img(m_img);
     if (m_img.isNull()) {
+        qDebug() << "Painting empty navigation widget";
         QPainter p(this);
         p.fillRect(m_r, m_BgColor);
         return;
     }
 
-//    const qreal ratio = devicePixelRatioF();
-
+    qDebug() << "Painting navigation widget with image size:" << img.size();
     QPainter p(&img);
     p.fillRect(m_r, m_mrBgColor);
-//    p.setPen(m_mrBorderColor);
     if (checkbgisdark(img)) {
+        qDebug() << "Using gray pen for dark background";
         p.setPen(QPen(Qt::gray));
     } else {
+        qDebug() << "Using white pen for light background";
         p.setPen(QColor(Qt::white));
     }
 
@@ -303,24 +305,9 @@ void NavigationWidget::paintEvent(QPaintEvent *)
     p.begin(this);
     QImage background(m_bgImgUrl);
     p.drawImage(this->rect(), background);
-
-    //**draw transparent background
-//    QPixmap pm(12, 12);
-//    QPainter pmp(&pm);
-//    //TODO: the transparent box
-//    //should not be scaled with the image
-//    pmp.fillRect(0, 0, 6, 6, LIGHT_CHECKER_COLOR);
-//    pmp.fillRect(6, 6, 6, 6, LIGHT_CHECKER_COLOR);
-//    pmp.fillRect(0, 6, 6, 6, DARK_CHECKER_COLOR);
-//    pmp.fillRect(6, 0, 6, 6, DARK_CHECKER_COLOR);
-//    pmp.end();
-
-//    p.fillRect(imageDrawRect, QBrush(pm));
     p.drawImage(imageDrawRect, img);
     QRect borderRect = QRect(imageDrawRect.x(), imageDrawRect.y() + 1, imageDrawRect.width(), imageDrawRect.height() + 1);
-//    p.setPen(m_imgRBorderColor);
     p.setPen(QColor(0, 0, 0, 0));
-    //p.setPen(QPen(Qt::red));
     p.drawRect(borderRect);
     p.end();
 }
