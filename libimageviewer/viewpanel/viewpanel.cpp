@@ -179,6 +179,7 @@ LibViewPanel::~LibViewPanel()
 
 void LibViewPanel::loadImage(const QString &path, QStringList paths)
 {
+    qInfo() << "Loading image:" << path;
     // 初始化图像缓存目录
     Libutils::image::initCacheImageFolder();
 
@@ -729,6 +730,7 @@ void LibViewPanel::updateMenuContent(const QString &path)
 
 void LibViewPanel::toggleFullScreen()
 {
+    qInfo() << "Toggling fullscreen mode";
 //    m_view->setFitState(false, false);
     if (window()->isFullScreen()) {
         showNormal();
@@ -746,6 +748,7 @@ void LibViewPanel::toggleFullScreen()
 
 void LibViewPanel::showFullScreen()
 {
+    qInfo() << "Entering fullscreen mode";
     m_windowSize = window()->size();
     m_windowX = window()->x();
     m_windowY = window()->y();
@@ -768,18 +771,14 @@ void LibViewPanel::showFullScreen()
     pAn->setEndValue(1);
     pAn->setStartValue(0);
     pAn->start(QAbstractAnimation::DeleteWhenStopped);
-    //增加切换全屏和默认大小下方工具栏的移动
-//    connect(pAn, &QPropertyAnimation::destroyed, this, [ = ] {
-//        slotBottomMove();
-//    });
 
     window()->showFullScreen();
     m_hideCursorTid = startTimer(DELAY_HIDE_CURSOR_INTERVAL);
-
 }
 
 void LibViewPanel::showNormal()
 {
+    qInfo() << "Exiting fullscreen mode";
     if (m_view) {
         m_view->setWindowIsFullScreen(false);
     }
@@ -897,10 +896,10 @@ void LibViewPanel::setWallpaper(const QImage &img)
             tmpImage.setFileTemplate(tempPathTemplate);
             // 使用JPG压缩而不是PNG以压缩减少缓存图片大小
             if (!tmpImage.open() || !img.save(tmpImage.fileName(), "JPG")) {
-                qWarning() << QString("Copy image set wallpaper failed! path: %1").arg(tmpImage.fileName());
+                qWarning() << "Failed to save temporary wallpaper image:" << tmpImage.fileName();
                 return;
             }
-            qInfo() << QString("Copy image set wallpaper, path: %1").arg(tmpImage.fileName());
+            qInfo() << "Saving temporary wallpaper image:" << tmpImage.fileName();
 
             setWallpaperWithDBus(tmpImage.fileName());
         });
@@ -912,6 +911,7 @@ void LibViewPanel::setWallpaper(const QImage &img)
 void LibViewPanel::setWallpaper(const QString &imgPath)
 {
     if (!imgPath.isEmpty()) {
+        qInfo() << "Setting wallpaper from file:" << imgPath;
         QThread *th1 = QThread::create([ = ]() { setWallpaperWithDBus(imgPath); });
         connect(th1, &QThread::finished, th1, &QObject::deleteLater);
         th1->start();
@@ -920,6 +920,7 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
 
 bool LibViewPanel::startdragImage(const QStringList &paths, const QString &firstPath)
 {
+    qInfo() << "Starting drag image operation with" << paths.size() << "images";
     // 若为 MTP 挂载文件，转换为目录加载
     QStringList realPaths = paths;
     QString realPath = firstPath;
@@ -927,13 +928,16 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
 
     bool bRet = false;
     QStringList image_list = realPaths;
-    if (image_list.isEmpty())
+    if (image_list.isEmpty()) {
+        qWarning() << "No images to drag";
         return false;
+    }
 
     // 判断是否允许切换图片 (首次进入同样判断)
     bool enableSwitch = PermissionConfig::instance()->checkAuthFlag(PermissionConfig::EnableSwitch, image_list.first());
     if (!enableSwitch) {
         if (image_list.first() != PermissionConfig::instance()->targetImage()) {
+            qWarning() << "Image switching not allowed by permission config";
             return false;
         }
     }
@@ -980,6 +984,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         if (image_list.count() > 0) {
             bRet = true;
         } else {
+            qWarning() << "No valid images found in directory";
             bRet = false;
         }
 
@@ -1506,6 +1511,7 @@ void LibViewPanel::slotChangeShowTopBottom()
 bool LibViewPanel::slotOcrPicture()
 {
     if (!m_ocrInterface) {
+        qInfo() << "Initializing OCR interface";
         initOcr();
     }
     QString path = m_bottomToolbar->getCurrentItemInfo().path;
@@ -1516,14 +1522,16 @@ bool LibViewPanel::slotOcrPicture()
 
         QImage image = m_view->image();
         if (image.width() > 2500) {
+            qInfo() << "Resizing image width from" << image.width() << "to 2500 for OCR";
             image = image.scaledToWidth(2500, Qt::SmoothTransformation);
         }
         if (image.height() > 2500) {
+            qInfo() << "Resizing image height from" << image.height() << "to 2500 for OCR";
             image = image.scaledToHeight(2500, Qt::SmoothTransformation);
         }
         //替换为了保存为文件,用路径去打开ocr
         QFileInfo info(path);
-        qDebug() << info.completeBaseName();
+        qDebug() << "OCR base name:" << info.completeBaseName();
         QString savePath = IMAGE_TMPPATH + info.completeBaseName() + ".png";
         image.save(savePath);
         //采用路径，以防止名字出错
@@ -1996,6 +2004,7 @@ void LibViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo item
 
 void LibViewPanel::startSlideShow(const ViewInfo &info)
 {
+    qInfo() << "Starting slideshow";
     //判断旋转图片本体是否旋转
     if (m_view) {
         m_view->slotRotatePixCurrent();
@@ -2005,6 +2014,7 @@ void LibViewPanel::startSlideShow(const ViewInfo &info)
     }
     //todo,幻灯片
     if (!m_sliderPanel) {
+        qDebug() << "Initializing slideshow panel";
         initSlidePanel();
     }
     m_sliderPanel->startSlideShow(info);
@@ -2049,16 +2059,19 @@ void LibViewPanel::resetBottomToolbarGeometry(bool visible)
 
 void LibViewPanel::openImg(int index, QString path)
 {
+    qInfo() << "Opening image:" << path;
     if (AIModelService::instance()->isValid()) {
         // 判断当前图片是否为图像增强图片
         bool previousEnhanced = AIModelService::instance()->isTemporaryFile(m_currentPath);
         if (previousEnhanced) {
             if (AIModelService::instance()->isWaitSave()) {
+                qWarning() << "Previous enhanced image is waiting to be saved, cannot open new image";
                 return;
             }
 
             // 提示是否保存
             if (!notNeedNotifyEnhanceSave) {
+                qInfo() << "Prompting to save enhanced image before opening new image";
                 AIModelService::instance()->saveFileDialog(m_currentPath, this);
             }
         }
@@ -2091,6 +2104,7 @@ void LibViewPanel::openImg(int index, QString path)
 
 void LibViewPanel::slotRotateImage(int angle)
 {
+    qInfo() << "Rotating image by" << angle << "degrees";
     if (m_view) {
         if (m_view->loadPhase() == LibImageGraphicsView::ThumbnailFinish) {
             m_view->setNewImageRotateAngle(angle);
@@ -2111,6 +2125,7 @@ void LibViewPanel::slotRotateImage(int angle)
 
 void LibViewPanel::slotResetTransform(bool bRet)
 {
+    qInfo() << "Resetting image transform, fit to window:" << bRet;
     if (bRet && m_view) {
         m_view->fitWindow();
     } else if (!bRet && m_view) {
@@ -2479,7 +2494,7 @@ void LibViewPanel::onEnhanceEnd(const QString &source, const QString &output, in
     // 仅会处理当前图片
     if (source != AIModelService::instance()->sourceFilePath(m_currentPath)) {
         if (m_AIEnhancing) {
-            qWarning() << qPrintable("Detect error! receive previous procssing file but still in enhancing state.");
+            qWarning() << "Detect error! receive previous processing file but still in enhancing state.";
             blockInputControl(false);
         }
         return;
@@ -2490,21 +2505,25 @@ void LibViewPanel::onEnhanceEnd(const QString &source, const QString &output, in
     switch (state) {
         case AIModelService::LoadSucc: {
             procPath = output;
+            qInfo() << "AI enhancement completed successfully";
             break;
         }
         case AIModelService::LoadFailed: {
             procPath = source;
             error = AIModelService::LoadFiledError;
+            qWarning() << "AI enhancement failed to load image";
             break;
         }
         case AIModelService::NotDetectPortrait: {
             procPath = source;
             error = AIModelService::NotDetectPortraitError;
+            qWarning() << "No portrait detected in image for AI enhancement";
             break;
         }
         default:
             // 其它错误，默认还原图片
             procPath = source;
+            qWarning() << "Unknown error occurred during AI enhancement";
             break;
     }
 

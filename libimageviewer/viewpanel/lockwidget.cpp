@@ -21,27 +21,37 @@ LockWidget::LockWidget(const QString &darkFile,
     : ThemeWidget(darkFile, lightFile, parent),
       m_picString("")
 {
+    qDebug() << "Initializing LockWidget with dark file:" << darkFile << "and light file:" << lightFile;
     setMouseTracking(true);
     this->setAttribute(Qt::WA_AcceptTouchEvents);
     grabGesture(Qt::PinchGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
+    qDebug() << "Touch gestures initialized";
+
     //修复style问题
     if (DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::DarkType) {
         m_picString = ICON_PIXMAP_DARK;
         m_theme = true;
+        qDebug() << "Using dark theme icon:" << ICON_PIXMAP_DARK;
     } else {
         m_picString = ICON_PIXMAP_LIGHT;
         m_theme = false;
+        qDebug() << "Using light theme icon:" << ICON_PIXMAP_LIGHT;
     }
+
     m_bgLabel = new DLabel(this);
     m_bgLabel->setFixedSize(151, 151);
     m_bgLabel->setObjectName("BgLabel");
+    qDebug() << "Background label created with size:" << QSize(151, 151);
+
 #ifdef OPENACCESSIBLE
     setObjectName(Lock_Widget);
     setAccessibleName(Lock_Widget);
     m_bgLabel->setAccessibleName("BgLabel");
+    qDebug() << "Accessibility names set";
 #endif
+
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
     this, [ = ]() {
         DGuiApplicationHelper::ColorType themeType =
@@ -50,20 +60,26 @@ LockWidget::LockWidget(const QString &darkFile,
         if (themeType == DGuiApplicationHelper::DarkType) {
             m_picString = ICON_PIXMAP_DARK;
             m_theme = true;
+            qDebug() << "Theme changed to dark";
         } else {
             m_picString = ICON_PIXMAP_LIGHT;
             m_theme = false;
+            qDebug() << "Theme changed to light";
         }
 
         QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
         if (m_bgLabel) {
             m_bgLabel->setPixmap(logo_pix);
+            qDebug() << "Updated background label with new theme icon";
         }
     });
+
     m_lockTips = new DLabel(this);
     m_lockTips->setObjectName("LockTips");
     m_lockTips->setVisible(false);
     setContentText(tr("You have no permission to view the image"));
+    qDebug() << "Lock tips label created and initialized";
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -71,9 +87,8 @@ LockWidget::LockWidget(const QString &darkFile,
     QPixmap logo_pix = Libutils::base::renderSVG(m_picString, THUMBNAIL_SIZE);
     m_bgLabel->setPixmap(logo_pix);
     layout->addWidget(m_bgLabel, 0, Qt::AlignHCenter);
-    //layout->addSpacing(18);
-    //layout->addWidget(m_lockTips, 0, Qt::AlignHCenter);
     layout->addStretch(1);
+    qDebug() << "Layout initialized with background label";
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged, this,
             &LockWidget::onThemeChanged);
@@ -81,25 +96,29 @@ LockWidget::LockWidget(const QString &darkFile,
 
 void LockWidget::setContentText(const QString &text)
 {
+    qDebug() << "Setting lock tips text:" << text;
     m_lockTips->setText(text);
     int textHeight = Libutils::base::stringHeight(m_lockTips->font(),
                                                   m_lockTips->text());
     m_lockTips->setMinimumHeight(textHeight + 2);
+    qDebug() << "Lock tips height set to:" << (textHeight + 2);
 }
 
 void LockWidget::handleGestureEvent(QGestureEvent *gesture)
 {
-    /*    if (QGesture *swipe = gesture->gesture(Qt::SwipeGesture))
-            swipeTriggered(static_cast<QSwipeGesture *>(swipe));
-        else */if (QGesture *pinch = gesture->gesture(Qt::PinchGesture))
+    if (QGesture *pinch = gesture->gesture(Qt::PinchGesture)) {
+        qDebug() << "Handling pinch gesture";
         pinchTriggered(static_cast<QPinchGesture *>(pinch));
+    }
 }
 
 void LockWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
     //非平板才能双击,其他是单击全屏
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == Qt::LeftButton) {
+        qDebug() << "Double click detected, emitting showfullScreen signal";
         emit showfullScreen();
+    }
     ThemeWidget::mouseDoubleClickEvent(e);
 }
 
@@ -120,11 +139,11 @@ void LockWidget::mouseReleaseEvent(QMouseEvent *e)
         int offset = e->globalPos().x() - m_startx;
         if (qAbs(offset) > 200) {
             if (offset > 0) {
+                qDebug() << "Swipe right detected, emitting previousRequested signal";
                 emit previousRequested();
-                qDebug() << "zy------ThumbnailWidget::event previousRequested";
             } else {
+                qDebug() << "Swipe left detected, emitting nextRequested signal";
                 emit nextRequested();
-                qDebug() << "zy------ThumbnailWidget::event nextRequested";
             }
         }
     }
@@ -141,6 +160,7 @@ void LockWidget::mousePressEvent(QMouseEvent *e)
 #endif
     QWidget::mousePressEvent(e);
     m_startx = e->globalPos().x();
+    qDebug() << "Mouse press at x position:" << m_startx;
 }
 
 void LockWidget::mouseMoveEvent(QMouseEvent *event)
@@ -155,11 +175,13 @@ bool LockWidget::event(QEvent *event)
     if (evType == QEvent::TouchBegin || evType == QEvent::TouchUpdate ||
             evType == QEvent::TouchEnd) {
         if (evType == QEvent::TouchBegin) {
-            qDebug() << "QEvent::TouchBegin";
+            qDebug() << "Touch begin event detected";
             m_maxTouchPoints = 1;
         }
-    } else if (event->type() == QEvent::Gesture)
+    } else if (event->type() == QEvent::Gesture) {
+        qDebug() << "Gesture event detected";
         handleGestureEvent(static_cast<QGestureEvent *>(event));
+    }
     return QWidget::event(event);
 }
 
@@ -167,23 +189,28 @@ void LockWidget::pinchTriggered(QPinchGesture *gesture)
 {
     Q_UNUSED(gesture);
     m_maxTouchPoints = 2;
+    qDebug() << "Pinch gesture triggered, max touch points set to 2";
 }
 
 void LockWidget::onThemeChanged(DGuiApplicationHelper::ColorType theme)
 {
+    qDebug() << "Theme changed to:" << (theme == DGuiApplicationHelper::DarkType ? "Dark" : "Light");
     ThemeWidget::onThemeChanged(theme);
     update();
 }
 
 LockWidget::~LockWidget()
 {
+    qDebug() << "Destroying LockWidget";
     if (m_bgLabel) {
         m_bgLabel->deleteLater();
         m_bgLabel = nullptr;
+        qDebug() << "Background label deleted";
     }
     if (m_lockTips) {
         m_lockTips->deleteLater();
         m_lockTips = nullptr;
+        qDebug() << "Lock tips label deleted";
     }
 }
 
@@ -191,11 +218,11 @@ void LockWidget::wheelEvent(QWheelEvent *event)
 {
     if ((event->modifiers() == Qt::ControlModifier)) {
         if (event->angleDelta().y() > 0) {
+            qDebug() << "Control + wheel up detected, emitting previousRequested signal";
             emit previousRequested();
         } else if (event->angleDelta().y() < 0) {
+            qDebug() << "Control + wheel down detected, emitting nextRequested signal";
             emit nextRequested();
         }
-        qDebug() << "control++";
-
     }
 }

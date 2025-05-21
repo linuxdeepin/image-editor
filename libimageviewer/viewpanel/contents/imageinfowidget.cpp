@@ -134,6 +134,7 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     , m_maxFieldWidth(0)
     , m_currentFontSize(0)
 {
+    qDebug() << "Initializing LibImageInfoWidget";
 #ifdef OPENACCESSIBLE
     setObjectName(IMAGE_WIDGET);
     setAccessibleName(IMAGE_WIDGET);
@@ -173,16 +174,19 @@ LibImageInfoWidget::LibImageInfoWidget(const QString &darkStyle, const QString &
     m_mainLayout->addWidget(m_exif_base);
     m_mainLayout->addWidget(m_exif_details);
     this->setLayout(m_mainLayout);
+    qDebug() << "LibImageInfoWidget initialization completed";
 }
 
 LibImageInfoWidget::~LibImageInfoWidget()
 {
+    qDebug() << "Destroying LibImageInfoWidget";
     clearLayout(m_exifLayout_base);
     clearLayout(m_exifLayout_details);
 }
 
 void updateFileTime(QMap<QString, QString> &data, const QString &path)
 {
+    qDebug() << "Updating file time for:" << path;
     QFileInfo info(path);
     if (data.contains("DateTime")) {
         QDateTime time = QDateTime::fromString(data["DateTime"], "yyyy:MM:dd hh:mm:ss");
@@ -195,8 +199,13 @@ void updateFileTime(QMap<QString, QString> &data, const QString &path)
 
 void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
 {
+    qDebug() << "Setting image path:" << path << "forceUpdate:" << forceUpdate;
+    
     // MTP文件需调整文件路径
     bool needMtpProxy = MtpFileProxy::instance()->contains(path);
+    if (needMtpProxy) {
+        qDebug() << "MTP file detected, using proxy";
+    }
 
     // 根据forceUpdate标志判断使用本函数进行整个image info弹窗的整体强制重刷
     if (!forceUpdate && m_path == path) {
@@ -207,6 +216,7 @@ void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
 
         // 检测数据是否存在变更
         if (m_metaData == metaData) {
+            qDebug() << "Metadata unchanged, skipping update";
             return;
         }
     } else {
@@ -224,6 +234,7 @@ void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
     QStringList titleList;
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->layout());
     if (nullptr != layout) {
+        qDebug() << "Clearing existing layout";
         QLayoutItem *child;
         while ((child = layout->takeAt(0)) != nullptr) {
             if (child->widget()) {
@@ -243,9 +254,11 @@ void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
     // Wayland 下延迟首次动画展示
     if (Libutils::base::checkWayland()) {
         firstExpand = isVisible();
+        qDebug() << "Wayland detected, first expand:" << firstExpand;
     }
 
     if (m_isBaseInfo == true && m_isDetailsInfo == true) {
+        qDebug() << "Adding both basic info and details sections";
         titleList << tr("Basic info");
         titleList << tr("Details");
         m_expandGroup = addExpandWidget(titleList);
@@ -255,6 +268,7 @@ void LibImageInfoWidget::setImagePath(const QString &path, bool forceUpdate)
         m_expandGroup.at(1)->setExpand(firstExpand);
 
     } else if (m_isBaseInfo == true && m_isDetailsInfo == false) {
+        qDebug() << "Adding basic info section only";
         titleList << tr("Basic info");
         m_expandGroup = addExpandWidget(titleList);
         m_expandGroup.at(0)->setContent(m_exif_base);
@@ -271,6 +285,7 @@ void LibImageInfoWidget::showEvent(QShowEvent *e)
     // Note: Wayland 下默认动画和应用动画重叠，同时可能导致 wayland 未正确取得
     //  控件信息，显示花屏，调整应用动画在 wayland 动画后
     if (Libutils::base::checkWayland()) {
+        qDebug() << "Wayland detected, scheduling delayed animation";
         const int waylandAnimationDuration = 250;
         QTimer::singleShot(waylandAnimationDuration, this, [this]() {
             for (auto expand : m_expandGroup) {
@@ -297,6 +312,7 @@ void LibImageInfoWidget::paintEvent(QPaintEvent *event)
     int currentSize = DFontSizeManager::instance()->fontPixelSize(font);
     // LMH0609判断与上次自体的大小是否一样，不一样则刷新
     if (currentSize != m_currentFontSize) {
+        qDebug() << "Font size changed from" << m_currentFontSize << "to" << currentSize;
         m_currentFontSize = currentSize;
         TITLE_MAXCNWIDETH = currentSize * 4;
         updateInfo();
@@ -333,6 +349,7 @@ const QString LibImageInfoWidget::trLabel(const char *str)
 
 void LibImageInfoWidget::updateInfo()
 {
+    qDebug() << "Updating image info display";
     // Minus layout margins
     //    m_maxFieldWidth = width() - m_maxTitleWidth - 20*2;
     // solve bug 1623 根据中英文系统语言设置Title宽度  shuwenzhi   20200313
@@ -342,9 +359,11 @@ void LibImageInfoWidget::updateInfo()
     if (lan == QLocale::Language::Chinese) {
         m_maxFieldWidth = width() - TITLE_MAXCNWIDETH /* - 20 * 2 */ - 10 * 2 - 10;
         CNflag = true;
+        qDebug() << "Using Chinese layout with width:" << m_maxFieldWidth;
     } else {
         m_maxFieldWidth = width() - TITLE_MAXOTHERWIDETH /* - 20 * 2 */ - 10 * 2 - 10;
         CNflag = false;
+        qDebug() << "Using other language layout with width:" << m_maxFieldWidth;
     }
 
     updateBaseInfo(m_metaData, CNflag);
@@ -353,6 +372,7 @@ void LibImageInfoWidget::updateInfo()
 
 void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, bool CNflag)
 {
+    qDebug() << "Updating basic info section";
     using namespace Libutils::image;
     using namespace Libutils::base;
     clearLayout(m_exifLayout_base);
@@ -374,11 +394,13 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         //部分图片采用meta data的形式无法正确读取大小，此处改成使用已缓存的图片大小数据
         if (i->key == "Dimension") {
             value = QString("%1x%2").arg(info.imgOriginalWidth).arg(info.imgOriginalHeight);
+            qDebug() << "Using cached dimensions:" << value;
         }
 
         /*lmh0825真实格式，没有真格式采用后缀名*/
         if (i->key == "FileFormat" && !suffix.isEmpty() && infos.value(i->key).isNull()) {
             value = fi.suffix();
+            qDebug() << "Using file suffix as format:" << value;
         }
         // value必须为小写
         if (i->key == "FileFormat") {
@@ -397,8 +419,10 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
         if (i->key == "DateTimeOriginal" || i->key == "DateTimeDigitized") {
             if (CNflag) {
                 QDateTime tmpTime = QDateTime::fromString(value, "yyyy/MM/dd hh:mm:ss");
-                if (!tmpTime.isNull())
+                if (!tmpTime.isNull()) {
                     value = tmpTime.toString("yyyy年MM月dd日 hh:mm:ss");
+                    qDebug() << "Converting date format to Chinese:" << value;
+                }
             }
         }
 
@@ -433,6 +457,7 @@ void LibImageInfoWidget::updateBaseInfo(const QMap<QString, QString> &infos, boo
 
 void LibImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, bool CNflag)
 {
+    qDebug() << "Updating details info section";
     using namespace Libutils::image;
     using namespace Libutils::base;
     clearLayout(m_exifLayout_details);
@@ -475,12 +500,12 @@ void LibImageInfoWidget::updateDetailsInfo(const QMap<QString, QString> &infos, 
 
 QList<DDrawer *> LibImageInfoWidget::addExpandWidget(const QStringList &titleList)
 {
+    qDebug() << "Adding expand widgets for titles:" << titleList;
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->layout());
     QList<DDrawer *> group;
 
     for (const QString &title : titleList) {
-        //        DFMDArrowLineExpand *expand = new DFMDArrowLineExpand;  // DArrowLineExpand;
-        DArrowLineDrawer *expand = new DArrowLineDrawer;  // DArrowLineExpand;
+        DArrowLineDrawer *expand = new DArrowLineDrawer;
         expand->setTitle(title);
         initExpand(layout, expand);
         group.push_back(expand);
@@ -504,8 +529,8 @@ void LibImageInfoWidget::initExpand(QVBoxLayout *layout, DDrawer *expand)
         QRect rc1 = geometry();
         rc1.setHeight(contentHeight() + ArrowLineExpand_SPACING * 2);
         setGeometry(rc1);
-
-        emit extensionPanelHeight(contentHeight() /*+ ArrowLineExpand_SPACING*/);
+        qDebug() << "Expand widget height changed to:" << rc1.height();
+        emit extensionPanelHeight(contentHeight());
     });
 }
 

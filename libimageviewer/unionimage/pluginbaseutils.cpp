@@ -172,11 +172,14 @@ const QString DATETIME_FORMAT_EXIF = "yyyy:MM:dd HH:mm:ss";
 
 bool checkMimeData(const QMimeData *mimeData)
 {
+    qDebug() << "Checking mime data for drag and drop";
     if (!mimeData->hasUrls()) {
+        qDebug() << "No URLs found in mime data";
         return false;
     }
     QList<QUrl> urlList = mimeData->urls();
     if (1 > urlList.size()) {
+        qDebug() << "Empty URL list in mime data";
         return false;
     }
 
@@ -189,12 +192,15 @@ bool checkMimeData(const QMimeData *mimeData)
         if (path.isEmpty()) {
             path = url.path();
         }
+        qDebug() << "Processing URL path:" << path;
         QFileInfo fileinfo(path);
         if (fileinfo.isDir()) {
             if (LibCommonService::instance()->getImgViewerType() == imageViewerSpace::ImgViewerType::ImgViewerTypeAlbum) { //相册模式的时候额外允许文件夹拖入
+                qDebug() << "Album mode: Directory drag allowed";
                 result = true;
                 break;
             } else {
+                qDebug() << "Non-album mode: Directory drag not allowed";
                 continue;
             }
         } else {
@@ -203,18 +209,23 @@ bool checkMimeData(const QMimeData *mimeData)
             QMimeType mt = db.mimeTypeForFile(info.filePath(), QMimeDatabase::MatchContent);
             QMimeType mt1 = db.mimeTypeForFile(info.filePath(), QMimeDatabase::MatchExtension);
             QString str = info.suffix().toLower();
+            qDebug() << "File suffix:" << str << "MIME type (content):" << mt.name() << "MIME type (extension):" << mt1.name();
+            
             if (str.isEmpty()) {
                 if (mt.name().startsWith("image/") || mt.name().startsWith("video/x-mng")) {
                     if (supportedImageFormats().contains(str, Qt::CaseInsensitive)) {
+                        qDebug() << "Empty suffix but supported format found";
                         result = true;
                         break;
                     } else if (str.isEmpty()) {
+                        qDebug() << "Empty suffix but valid image MIME type";
                         result = true;
                         break;
                     }
                 }
             } else {
                 if (mt1.name().startsWith("image/") || mt1.name().startsWith("video/x-mng")) {
+                    qDebug() << "Valid image format with extension";
                     result = true;
                     break;
                 }
@@ -223,6 +234,7 @@ bool checkMimeData(const QMimeData *mimeData)
         }
     }
 
+    qDebug() << "Mime data check result:" << result;
     return result;
 }
 
@@ -248,45 +260,56 @@ bool checkMimeData(const QMimeData *mimeData)
 
 QString mkMutiDir(const QString &path)   //创建多级目录
 {
+    qDebug() << "Creating directory structure for:" << path;
     QDir dir(path);
     if (dir.exists(path)) {
+        qDebug() << "Directory already exists:" << path;
         return path;
     }
     QString parentDir = mkMutiDir(path.mid(0, path.lastIndexOf('/')));
     QString dirname = path.mid(path.lastIndexOf('/') + 1);
     QDir parentPath(parentDir);
-    if (!dirname.isEmpty())
+    if (!dirname.isEmpty()) {
+        qDebug() << "Creating subdirectory:" << dirname << "in" << parentDir;
         parentPath.mkpath(dirname);
+    }
     return parentDir + "/" + dirname;
 }
 
 bool imageSupportRead(const QString &path)
 {
+    qDebug() << "Checking if image format is supported for:" << path;
     const QString suffix = QFileInfo(path).suffix();
     // take them here for good.
     QStringList errorList;
     errorList << "X3F";
     if (errorList.indexOf(suffix.toUpper()) != -1) {
+        qWarning() << "Unsupported format:" << suffix;
         return false;
     }
-    //return QImageReader::supportedImageFormats().contains(suffix.toUtf8());
-    return LibUnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
+    bool supported = LibUnionImage_NameSpace::unionImageSupportFormat().contains(suffix.toUpper());
+    qDebug() << "Format support check result:" << supported;
+    return supported;
 }
 
 const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
 {
+    qDebug() << "Getting image information from directory:" << dir << "recursive:" << recursive;
     QFileInfoList infos;
 
     if (! recursive) {
+        qDebug() << "Non-recursive directory scan";
         auto nsl = QDir(dir).entryInfoList(QDir::Files);
         for (QFileInfo info : nsl) {
             if (imageSupportRead(info.absoluteFilePath())) {
                 infos << info;
             }
         }
+        qDebug() << "Found" << infos.size() << "images in directory";
         return infos;
     }
 
+    qDebug() << "Recursive directory scan";
     QDirIterator dirIterator(dir,
                              QDir::Files,
                              QDirIterator::Subdirectories);
@@ -297,12 +320,16 @@ const QFileInfoList getImagesInfo(const QString &dir, bool recursive)
         }
     }
 
+    qDebug() << "Found" << infos.size() << "images in directory and subdirectories";
     return infos;
 }
-//
+
 QStringList supportedImageFormats()
 {
-    return LibUnionImage_NameSpace::unionImageSupportFormat();
+    qDebug() << "Getting list of supported image formats";
+    QStringList formats = LibUnionImage_NameSpace::unionImageSupportFormat();
+    qDebug() << "Supported formats:" << formats;
+    return formats;
 }
 
 }  // namespace base

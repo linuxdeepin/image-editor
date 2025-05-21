@@ -42,6 +42,7 @@ class UnionImage_Private
 public:
     UnionImage_Private()
     {
+        qDebug() << "Initializing UnionImage_Private with supported formats";
         /*
          * 由于原设计方案采用多个key对应一个value的方案，在判断可读可写的过程中是通过value去找key因此造成了多种情况而在下方变量中未将key，写完整因此补全
          * */
@@ -99,6 +100,8 @@ public:
                       << "EPS"
                       << "SR2"
                       << "AVIFS";
+        qDebug() << "Added" << m_qtSupported.size() << "supported formats";
+        
         m_canSave << "BMP"
                   << "JPG"
                   << "JPEG"
@@ -108,7 +111,8 @@ public:
                   << "XPM"
                   << "ICO"
                   << "ICNS";
-        /*<< "PGM" << "PBM"*/
+        qDebug() << "Added" << m_canSave.size() << "saveable formats";
+        
         m_qtrotate << "BMP"
                    << "JPG"
                    << "JPEG"
@@ -118,9 +122,11 @@ public:
                    << "XPM"
                    << "ICO"
                    << "ICNS";
+        qDebug() << "Added" << m_qtrotate.size() << "rotatable formats";
     }
     ~UnionImage_Private()
     {
+        qDebug() << "Destroying UnionImage_Private";
     }
     QStringList m_qtSupported;
     QHash<QString, int> m_movie_formats;
@@ -136,16 +142,19 @@ static UnionImage_Private union_image_private;
  */
 UNIONIMAGESHARED_EXPORT QImage noneQImage()
 {
+    qDebug() << "Creating empty QImage";
     static QImage none(0, 0, QImage::Format_Invalid);
     return none;
 }
 
 UNIONIMAGESHARED_EXPORT const QStringList unionImageSupportFormat()
 {
+    qDebug() << "Getting supported image formats";
     static QStringList res;
     if (res.empty()) {
         QStringList list = union_image_private.m_qtSupported;
         res.append(list);
+        qDebug() << "Added" << list.size() << "supported formats";
     }
     return res;
 }
@@ -235,14 +244,18 @@ UNIONIMAGESHARED_EXPORT QString unionImageVersion()
 QString PrivateDetectImageFormat(const QString &filepath);
 UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage &res, QString &errorMsg, const QString &format_bar)
 {
+    qDebug() << "Loading static image from file:" << path;
     QFileInfo file_info(path);
     if (file_info.size() == 0) {
+        qWarning() << "Empty file:" << path;
         res = QImage();
         errorMsg = "error file!";
         return false;
     }
+
     QMap<QString, QString> dataMap = getAllMetaData(path);
     QString file_suffix_upper = dataMap.value("FileFormat").toUpper();
+    qDebug() << "File format:" << file_suffix_upper;
 
     QByteArray temp_path;
     temp_path.append(path.toUtf8());
@@ -259,9 +272,11 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
             reader.setFormat(format_bar.toLatin1());
         }
         reader.setAutoTransform(true);
+        
         if (reader.imageCount() > 0 || file_suffix_upper != "ICNS") {
             res_qt = reader.read();
             if (res_qt.isNull()) {
+                qWarning() << "Failed to read image with QImageReader, trying alternative method";
                 //try old loading method
                 QString format = PrivateDetectImageFormat(path);
                 QImageReader readerF(path, format.toLatin1());
@@ -271,22 +286,25 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                     try_res = readerF.read();
                 } else {
                     errorMsg = "can't read image:" + readerF.errorString() + format;
+                    qWarning() << errorMsg;
                     try_res = QImage(path);
                 }
 
                 // 单独处理TIF格式情况
                 if (try_res.isNull() && (file_suffix_upper == "TIF" || file_suffix_upper == "TIFF")) {
                     // 读取失败，tif需要单独处理，尝试通过转换函数处理
+                    qDebug() << "Processing TIFF format with special handling";
                     QFileInfo imageFile(path);
                     QString cacheFile = Libutils::image::getCacheImagePath() + QDir::separator() + imageFile.fileName();
                     // 判断是否存在缓存图片数据
                     if (Libutils::image::checkCacheImage(imageFile.fileName())) {
+                        qDebug() << "Using cached TIFF image";
                         try_res = QImage(cacheFile);
                     } else {
                         // 由于多线程调用，可能同时访问文件，使用临时文件处理，防止部分线程读取未转码完成的图片文件
                         QString tempFile = Libutils::image::getCacheImagePath() + QDir::separator()
                                 + QUuid::createUuid().toString() + imageFile.fileName();
-                        qDebug() << "convert" << imageFile.absoluteFilePath() << cacheFile << tempFile;
+                        qDebug() << "Converting TIFF image:" << imageFile.absoluteFilePath() << "to" << tempFile;
 
                         // 转换图像编码格式
                         int nRet = convertOldStyleImage(imageFile.absoluteFilePath().toUtf8().data(), tempFile.toUtf8().data());
@@ -303,12 +321,15 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                                     QFile::rename(tempFile, cacheFile);
                                 }
                             }
+                        } else {
+                            qWarning() << "Failed to convert TIFF image, error code:" << nRet;
                         }
                     }
                 }
 
                 if (try_res.isNull()) {
                     errorMsg = "load image by qt failed, use format:" + reader.format() + " ,path:" + path;
+                    qWarning() << errorMsg;
                     res = QImage();
                     return false;
                 }
@@ -319,11 +340,13 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
             errorMsg = "use QImage";
             res = res_qt;
         } else {
+            qWarning() << "No images found in file:" << path;
             res = QImage();
             return false;
         }
         return true;
     }
+    qWarning() << "Unsupported image format:" << file_suffix_upper;
     return false;
 }
 
@@ -432,9 +455,13 @@ UNIONIMAGESHARED_EXPORT bool isNoneQImage(const QImage &qi)
 
 UNIONIMAGESHARED_EXPORT bool rotateImage(int angel, QImage &image)
 {
-    if (angel % 90 != 0)
+    qDebug() << "Rotating image by" << angel << "degrees";
+    if (angel % 90 != 0) {
+        qWarning() << "Unsupported rotation angle:" << angel;
         return false;
+    }
     if (image.isNull()) {
+        qWarning() << "Cannot rotate null image";
         return false;
     }
     QImage image_copy(image);
@@ -442,8 +469,10 @@ UNIONIMAGESHARED_EXPORT bool rotateImage(int angel, QImage &image)
         QTransform rotatematrix;
         rotatematrix.rotate(angel);
         image = image_copy.transformed(rotatematrix, Qt::SmoothTransformation);
+        qDebug() << "Image rotated successfully";
         return true;
     }
+    qWarning() << "Failed to create image copy for rotation";
     return false;
 }
 
@@ -485,15 +514,21 @@ QImage adjustImageToRealPosition(const QImage &image, int orientation)
 
 UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QString &erroMsg)
 {
+    qDebug() << "Rotating image file:" << path << "by" << angel << "degrees";
     if (angel % 90 != 0) {
         erroMsg = "unsupported angel";
+        qWarning() << erroMsg;
         return false;
     }
     QString format = detectImageFormat(path);
+    qDebug() << "Image format:" << format;
+
     if (format == "SVG") {
+        qDebug() << "Processing SVG rotation";
         QImage image_copy;
         if (!loadStaticImageFromFile(path, image_copy, erroMsg)) {
             erroMsg = "rotate load QImage failed, path:" + path + "  ,format:+" + format;
+            qWarning() << erroMsg;
             return false;
         }
         QSvgGenerator generator;
@@ -519,9 +554,11 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         rotatePainter.resetTransform();
         generator.setSize(QSize(image_copy.width(), image_copy.height()));
         rotatePainter.end();
+        qDebug() << "SVG rotation completed successfully";
         return true;
     } else if (union_image_private.m_qtrotate.contains(format)) {
         //由于Qt内部不会去读图片的EXIF信息来判断当前的图像矩阵的真实位置，同时回写数据的时候会丢失全部的EXIF数据
+        qDebug() << "Processing standard image rotation";
         int orientation = getOrientation(path);
         QImage image_copy(path);
         image_copy = adjustImageToRealPosition(image_copy, orientation);
@@ -532,12 +569,15 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
 
             // 调整图片质量，不再默认使用满质量 SAVE_QUAITY_VALUE
             if (image_copy.save(path, format.toLatin1().data(), -1)) {
+                qDebug() << "Image rotation and save completed successfully";
                 return true;
             }
         }
         erroMsg = "rotate by qt failed";
+        qWarning() << erroMsg;
         return false;
     }
+    qWarning() << "Unsupported format for rotation:" << format;
     return false;
 }
 
@@ -643,23 +683,30 @@ UNIONIMAGESHARED_EXPORT bool creatNewImage(QImage &res, int width, int height, i
 }
 imageViewerSpace::ImageType getImageType(const QString &imagepath)
 {
+    qDebug() << "Getting image type for:" << imagepath;
     imageViewerSpace::ImageType type = imageViewerSpace::ImageType::ImageTypeBlank;
     //新增获取图片是属于静态图还是动态图还是多页图
     if (!imagepath.isEmpty()) {
         QFileInfo fi(imagepath);
         QString strType = fi.suffix().toLower();
+        qDebug() << "File suffix:" << strType;
+
         //解决bug57394 【专业版1031】【看图】【5.6.3.74】【修改引入】pic格式图片变为翻页状态，不为动图且首张显示序号为0
         QMimeDatabase db;
         QMimeType mt = db.mimeTypeForFile(imagepath, QMimeDatabase::MatchContent);
         QMimeType mt1 = db.mimeTypeForFile(imagepath, QMimeDatabase::MatchExtension);
         QString path1 = mt.name();
         QString path2 = mt1.name();
+        qDebug() << "MIME types - Content:" << path1 << "Extension:" << path2;
+
         int nSize = -1;
         QImageReader imgreader(imagepath);
         nSize = imgreader.imageCount();
+        qDebug() << "Image count:" << nSize;
 
         if (strType == "svg" && QSvgRenderer().load(imagepath)) {
             type = imageViewerSpace::ImageTypeSvg;
+            qDebug() << "Detected SVG image type";
         } else if ((strType == "mng")
                    || ((strType == "gif") && nSize > 1)
                    || (strType == "webp" && nSize > 1)
@@ -668,13 +715,16 @@ imageViewerSpace::ImageType getImageType(const QString &imagepath)
                    || ((mt.name().startsWith("video/x-mng")))
                    || ((mt1.name().startsWith("video/x-mng")))) {
             type = imageViewerSpace::ImageTypeDynamic;
+            qDebug() << "Detected dynamic image type";
         } else if (nSize > 1) {
             type = imageViewerSpace::ImageTypeMulti;
+            qDebug() << "Detected multi-page image type";
         } else if (mt.name().startsWith("image/")
                    || mt.name().startsWith("video/x-mng")
                    || mt1.name().startsWith("image/")
                    || mt1.name().startsWith("video/x-mng")) {
             type = imageViewerSpace::ImageTypeStatic;
+            qDebug() << "Detected static image type";
         }
     }
     return type;

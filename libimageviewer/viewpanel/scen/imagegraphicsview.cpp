@@ -113,6 +113,7 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     , m_movieItem(nullptr)
     , m_pixmapItem(nullptr)
 {
+    qDebug() << "Initializing LibImageGraphicsView";
     this->setObjectName("ImageView");
 //    onThemeChanged(dApp->viewerTheme->getCurrentTheme());
     setScene(new QGraphicsScene(this));
@@ -134,6 +135,7 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     grabGesture(Qt::PinchGesture);
     grabGesture(Qt::SwipeGesture);
     grabGesture(Qt::PanGesture);
+    qDebug() << "Touch gestures initialized";
 
     connect(&m_watcher, &QFutureWatcherBase::finished, this, &LibImageGraphicsView::onCacheFinish);
 //    connect(dApp->viewerTheme, &ViewerThemeManager::viewerThemeChanged, this, &ImageView::onThemeChanged);
@@ -146,14 +148,17 @@ LibImageGraphicsView::LibImageGraphicsView(QWidget *parent)
     QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &LibImageGraphicsView::onThemeTypeChanged);
     //初始化主题
     onThemeTypeChanged();
+    qDebug() << "Theme initialized";
     m_imgFileWatcher = new QFileSystemWatcher(this);
     connect(m_imgFileWatcher, &QFileSystemWatcher::fileChanged, this, &LibImageGraphicsView::onImgFileChanged);
     m_isChangedTimer = new QTimer(this);
     QObject::connect(m_isChangedTimer, &QTimer::timeout, this, &LibImageGraphicsView::onIsChangedTimerTimeout);
+    qDebug() << "File watchers initialized";
 
     // MTP文件加载完成通知, 使用 QueuedConnection 确保不在 setImage 时触发，保证先后顺序。
     QObject::connect(MtpFileProxy::instance(), &MtpFileProxy::createProxyFileFinished, this, [ this ](const QString &proxyFile, bool){
         if (proxyFile == m_loadPath) {
+            qDebug() << "MTP proxy file created:" << proxyFile;
             // SVG/TIF/GIF 需重新加载
             imageViewerSpace::ImageType Type = LibUnionImage_NameSpace::getImageType(m_loadPath);
             if (imageViewerSpace::ImageTypeDynamic == Type
@@ -226,6 +231,7 @@ void LibImageGraphicsView::setWindowIsFullScreen(bool bRet)
 
 LibImageGraphicsView::~LibImageGraphicsView()
 {
+    qDebug() << "Destroying LibImageGraphicsView";
     if (m_imgFileWatcher) {
 //        m_imgFileWatcher->clear();
 //        m_imgFileWatcher->quit();
@@ -255,6 +261,7 @@ LibImageGraphicsView::~LibImageGraphicsView()
     }
     //保存旋转状态
     slotRotatePixCurrent();
+    qDebug() << "LibImageGraphicsView destroyed";
 }
 
 void LibImageGraphicsView::clear()
@@ -269,6 +276,7 @@ void LibImageGraphicsView::clear()
 
 void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 {
+    qDebug() << "Setting image:" << path;
     // m_spinner 生命周期由 scene() 管理
     hideSpinner();
 
@@ -285,6 +293,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     // 判断是否需要等待 MTP 代理文件加载完成，失败同样无需等待加载
     MtpFileProxy::FileState state = MtpFileProxy::instance()->state(path);
     bool needProxyLoad = MtpFileProxy::instance()->contains(path) && (MtpFileProxy::Loading == state);
+    qDebug() << "MTP proxy state:" << state << "needProxyLoad:" << needProxyLoad;
 
     bool delayLoad = needProxyLoad;
     // 判断是否为AI模型处理图片，需要延迟加载
@@ -292,11 +301,13 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     bool imageEnhance = (AIModelService::None != enhanceState);
     delayLoad |= (AIModelService::Loading == enhanceState);
     QString sourceFile = AIModelService::instance()->sourceFilePath(path);
+    qDebug() << "Image enhance state:" << enhanceState << "delayLoad:" << delayLoad;
 
     //检测数据缓存,如果存在,则使用缓存
     imageViewerSpace::ItemInfo info;
     if (needProxyLoad) {
         // 不获取数据
+        qDebug() << "Skipping cache for proxy load";
     } else if (imageEnhance) {
         info = LibCommonService::instance()->getImgInfoByPath(sourceFile);
     } else {
@@ -304,10 +315,12 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
     }
 
     m_bRoate = ImageEngine::instance()->isRotatable(path); //是否可旋转
+    qDebug() << "Image is rotatable:" << m_bRoate;
 
     m_loadPath = path;
     // Empty path will cause crash in release-build mode
     if (path.isEmpty()) {
+        qWarning() << "Empty path provided to setImage";
         return;
     }
 
@@ -346,6 +359,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 
     //ImageTypeDynamic
     if (Type == imageViewerSpace::ImageTypeDynamic) {
+        qDebug() << "Loading dynamic image (GIF/MNG)";
         m_pixmapItem = nullptr;
         m_movieItem = nullptr;
         m_imgSvgItem = nullptr;
@@ -355,7 +369,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         //        m_movieItem->start();
         // Make sure item show in center of view after reload
         setSceneRect(m_movieItem->boundingRect());
-        qDebug() << "m_movieItem->boundingRect() = " << m_movieItem->boundingRect();
+        qDebug() << "Movie item bounding rect:" << m_movieItem->boundingRect();
         s->addItem(m_movieItem);
         emit imageChanged(path);
         QMetaObject::invokeMethod(this, [ = ]() {
@@ -364,6 +378,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         }, Qt::QueuedConnection);
         m_newImageLoadPhase = FullFinish;
     } else if (Type == imageViewerSpace::ImageTypeSvg) {
+        qDebug() << "Loading SVG image";
         m_pixmapItem = nullptr;
         m_movieItem = nullptr;
         m_imgSvgItem = nullptr;
@@ -387,6 +402,7 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
         }, Qt::QueuedConnection);
         m_newImageLoadPhase = FullFinish;
     } else {
+        qDebug() << "Loading static image";
         QPixmap previousPix;
         if (imageEnhance && m_pixmapItem) {
             previousPix = m_pixmapItem->pixmap();
@@ -510,12 +526,15 @@ void LibImageGraphicsView::setImage(const QString &path, const QImage &image)
 void LibImageGraphicsView::setScaleValue(qreal v)
 {
     //预先计算需要的缩放比
+    qDebug() << "Setting scale value:" << v << "current scale:" << m_scal;
     double temp = m_scal * v;
     double scaleFactor = -1.0;
     if (v < 1 && temp <= MIN_SCALE_FACTOR) {
         scaleFactor = MIN_SCALE_FACTOR / m_scal;
+        qDebug() << "Scale limited to minimum:" << MIN_SCALE_FACTOR;
     } else if (v > 1 && temp >= MAX_SCALE_FACTOR) {
         scaleFactor = MAX_SCALE_FACTOR / m_scal;
+        qDebug() << "Scale limited to maximum:" << MAX_SCALE_FACTOR;
     } else {
         scaleFactor = v;
         m_isFitImage = false;
@@ -525,7 +544,7 @@ void LibImageGraphicsView::setScaleValue(qreal v)
     //执行缩放
     m_scal *= scaleFactor;
     scale(scaleFactor, scaleFactor);
-    qDebug() << m_scal;
+    qDebug() << "New scale value:" << m_scal;
 
     //1:1高亮按钮
     if (m_scal - 1 > -0.01 && m_scal - 1 < 0.01) {
@@ -638,10 +657,11 @@ void LibImageGraphicsView::fitImage()
 
 void LibImageGraphicsView::rotateClockWise()
 {
+    qDebug() << "Rotating image clockwise";
     QString errMsg;
     QImage rotateResult;
     if (!LibUnionImage_NameSpace::rotateImageFIleWithImage(90, rotateResult, m_path, errMsg)) {
-        qDebug() << errMsg;
+        qWarning() << "Failed to rotate image:" << errMsg;
         return;
     }
 //    dApp->m_imageloader->updateImageLoader(QStringList(m_path), QList<QImage>({rotateResult}));
@@ -650,10 +670,11 @@ void LibImageGraphicsView::rotateClockWise()
 
 void LibImageGraphicsView::rotateCounterclockwise()
 {
+    qDebug() << "Rotating image counterclockwise";
     QString errMsg;
     QImage rotateResult;
     if (!LibUnionImage_NameSpace::rotateImageFIleWithImage(-90, rotateResult, m_path, errMsg)) {
-        qDebug() << errMsg;
+        qWarning() << "Failed to rotate image:" << errMsg;
         return;
     }
 //    dApp->m_imageloader->updateImageLoader(QStringList(m_path), QList<QImage>({rotateResult}));
@@ -765,6 +786,7 @@ void LibImageGraphicsView::slotSavePic()
 
 void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
 {
+    qDebug() << "Image file changed:" << ddfFile;
     // 判断是否为MTP原始路径文件，若为则同步更新代理文件状态
     MtpFileProxy::instance()->triggerOriginFileChanged(ddfFile);
 
@@ -775,6 +797,7 @@ void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
         QString lastProcImage = AIModelService::instance()->lastProcOutput();
         QString lastSource = AIModelService::instance()->sourceFilePath(lastProcImage);
         if (lastSource == ddfFile) {
+            qDebug() << "Cancelling AI processing for changed file";
             AIModelService::instance()->cancelProcess(lastProcImage);
         }
     }
@@ -782,6 +805,7 @@ void LibImageGraphicsView::onImgFileChanged(const QString &ddfFile)
 
 void LibImageGraphicsView::onLoadTimerTimeout()
 {
+    qDebug() << "Load timer timeout, starting image cache";
     QFuture<QVariantList> f = QtConcurrent::run(m_pool, cachePixmap, m_loadPath);
     if (m_watcher.isRunning()) {
         m_watcher.cancel();
@@ -1207,6 +1231,7 @@ bool LibImageGraphicsView::event(QEvent *event)
 
 void LibImageGraphicsView::onCacheFinish()
 {
+    qDebug() << "Image cache finished";
     hideSpinner();
 
     QVariantList vl = m_watcher.result();
@@ -1214,6 +1239,7 @@ void LibImageGraphicsView::onCacheFinish()
         const QString path = vl.first().toString();
         if (path == m_path) {
             if (!m_pixmapItem) {
+                qWarning() << "No pixmap item available for cache update";
                 return;
             }
             QPixmap pixmap = vl.last().value<QPixmap>();
@@ -1223,6 +1249,7 @@ void LibImageGraphicsView::onCacheFinish()
                 pixmap = tmpPixmap;
             }
             if (m_newImageRotateAngle != 0) {
+                qDebug() << "Applying rotation angle:" << m_newImageRotateAngle;
                 QTransform rotate;
                 rotate.rotate(m_newImageRotateAngle);
                 pixmap = pixmap.transformed(rotate, Qt::SmoothTransformation);
@@ -1241,6 +1268,7 @@ void LibImageGraphicsView::onCacheFinish()
 
             //刷新缩略图
             if (!pixmap.isNull() && !currentImageEnhance) {
+                qDebug() << "Generating thumbnail for cached image";
                 QPixmap thumbnailPixmap;
                 if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
                     bool cache_exist = false;
