@@ -839,11 +839,15 @@ static void setWallpaperWithDBus(const QString &path)
 {
     //202011/12 bug54279 设置壁纸代码改变，采用DBus
     qDebug() << "SettingWallpaper: " << "flatpak" << path;
-    QDBusInterface interface("com.deepin.daemon.Appearance",
+    QDBusInterface interfaceV20("com.deepin.daemon.Appearance",
                                  "/com/deepin/daemon/Appearance",
                                  "com.deepin.daemon.Appearance");
+    QDBusInterface interfaceV23("org.deepin.dde.Appearance1",
+                                 "/org/deepin/dde/Appearance1",
+                                 "org.deepin.dde.Appearance1");
+    QDBusInterface *interface = interfaceV23.isValid() ? &interfaceV23 : &interfaceV20;
 
-    if (interface.isValid()) {
+    if (interface->isValid()) {
         QString screenname;
 
         //判断环境是否是wayland
@@ -860,19 +864,21 @@ static void setWallpaperWithDBus(const QString &path)
 
         // wayland下设置壁纸使用，2020/09/21
         if (isWayland) {
-            QDBusInterface interfaceWayland("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
-            screenname = qvariant_cast< QString >(interfaceWayland.property("Primary"));
+            QDBusInterface interfaceWaylandV20("com.deepin.daemon.Display", "/com/deepin/daemon/Display", "com.deepin.daemon.Display");
+            QDBusInterface interfaceWaylandV23("org.deepin.dde.Display1", "/org/deepin/dde/Display1", "org.deepin.dde.Display1");
+            QDBusInterface *interfaceWayland = interfaceWaylandV23.isValid() ? &interfaceWaylandV23 : &interfaceWaylandV20;
+            screenname = qvariant_cast< QString >(interfaceWayland->property("Primary"));
         } else {
             screenname = QGuiApplication::primaryScreen()->name();
         }
-        QDBusMessage reply = interface.call(QStringLiteral("SetMonitorBackground"), screenname, path);
+        QDBusMessage reply = interface->call(QStringLiteral("SetMonitorBackground"), screenname, path);
         QString error = reply.errorMessage();
         if (!error.isEmpty()) {
             qWarning() << "SettingWallpaper: replay" << reply.errorMessage();
         }
 
         // 新增需求32367：同时设置锁屏壁纸
-        reply = interface.call(QStringLiteral("Set"), QStringLiteral("greeterbackground"), path);
+        reply = interface->call(QStringLiteral("Set"), QStringLiteral("greeterbackground"), path);
         error = reply.errorMessage();
         if (!error.isEmpty()) {
             qWarning() << "Set greeterbackground: replay" << reply.errorMessage();
@@ -881,7 +887,7 @@ static void setWallpaperWithDBus(const QString &path)
         // 通知触发设置壁纸动作（属于拷贝动作）
         PermissionConfig::instance()->triggerAction(PermissionConfig::TidCopy, path);
     } else {
-        qWarning() << "SettingWallpaper failed" << interface.lastError();
+        qWarning() << "SettingWallpaper failed" << interface->lastError();
     }
 }
 
