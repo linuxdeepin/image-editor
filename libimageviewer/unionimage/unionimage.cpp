@@ -24,7 +24,7 @@
 
 #include "unionimage/imageutils.h"
 extern "C" {
-#include "3rdparty/tiff-tools/converttiff.h"
+#include "../../3rdparty/tiff-tools/converttiff.h"
 }
 
 #include <cstring>
