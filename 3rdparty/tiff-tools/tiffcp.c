@@ -97,6 +97,13 @@ static TIFF* bias = NULL;
 static int pageNum = 0;
 static int pageInSeq = 0;
 
+static void setOptions(int i, int p)
+{
+    /*set options which will be set by command line options in main() */
+    ignore = i;
+    pageInSeq = p;
+}
+
 static int nextSrcImage (TIFF *tif, char **imageSpec)
 /*
   seek to the next image specified in *imageSpec
