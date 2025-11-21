@@ -1,3 +1,9 @@
+image-editor (6.5.2) unstable; urgency=medium
+
+  * fix: Fix cppcheck warning
+
+ -- re2zero <yangwu@uniontech.com>  Fri, 21 Nov 2025 08:50:06 +0800
+
 image-editor (6.5.1) unstable; urgency=medium
 
   * fix: support multi frame image load(Influence: quickprint)
