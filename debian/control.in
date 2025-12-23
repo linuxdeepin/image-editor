@@ -6,14 +6,14 @@ Build-Depends:
  debhelper (>= 11), 
  cmake, 
  pkg-config,
-# Qt6
- qt6-base-dev | qtbase5-dev,
- qt6-base-private-dev | qtbase5-private-dev,
- qt6-tools-dev | qttools5-dev,
- qt6-tools-dev-tools | qttools5-dev-tools,
- qt6-multimedia-dev | qtmultimedia5-dev, 
- libqt6svg6-dev | libqt5svg5-dev,
- libqt6opengl6-dev | libqt5x11extras5-dev,
+# Qt5
+ qtbase5-dev,
+ qtbase5-private-dev,
+ qttools5-dev,
+ qttools5-dev-tools,
+ qtmultimedia5-dev,
+ libqt5svg5-dev,
+ libqt5x11extras5-dev,
  libexif-dev, 
  libsqlite3-dev, 
  libxcb-util0-dev, 
@@ -27,34 +27,33 @@ Build-Depends:
  libfreetype6-dev, 
  libxrender-dev, 
 # DTK
- libdtk6widget-dev | libdtkwidget-dev,
- libdtk6core-bin | libdtkcore5-bin,
- libdfm6-io-dev | libdfm-io-dev,
+ libdtkwidget-dev,
+ libdtkcore5-bin,
  libmediainfo-dev,
  libffmpegthumbnailer-dev,
- libtiff-dev
+ libtiff-dev,
+ libdfm-io-dev
 Standards-Version: 3.9.8
 Homepage: http://www.deepin.org
 
-# Support Qt6
-Package: libimageeditor6
+Package: libimageeditor
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts:
  libimage-viewer
 Replaces:
  libimage-viewer
-Recommends: libqt6libqgtk2, kimageformat6-plugins, deepin-ocr, ffmpegthumbnailer, ffmpeg
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr, ffmpegthumbnailer, ffmpeg
 Description: Image Viewer library.
  Deepin Image Viewer library.
 
-Package: libimageeditor6-dev
+Package: libimageeditor-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor6(=${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor(=${binary:Version})
 Conflicts:
  libimage-viewer-dev
 Replaces:
  libimage-viewer-dev
-Recommends: libqt6libgtk2, kimageformat6-plugins, deepin-ocr
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr
 Description: Image Viewer library development headers.
  Deepin Image Viewer library development headers.
