@@ -3,6 +3,20 @@ include /usr/share/dpkg/default.mk
 export QT_SELECT=6
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
+# 定义检测Qt版本的函数
+define check_qt_version
+	$(shell echo "Checking OS version..." >&2; \
+	if ! which qmake6 >/dev/null 2>&1; then \
+		cp debian/control.in debian/control; \
+		echo "Using Qt5..." >&2; \
+	else \
+		echo "Using Qt6..." >&2; \
+	fi)
+endef
+
+# 调用检测Qt版本的命令
+$(eval $(call check_qt_version))
+
 %:
 	dh $@
 
