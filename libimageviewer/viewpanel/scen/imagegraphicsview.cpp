@@ -1653,8 +1653,11 @@ void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
 
             qreal factor = qPow(1.2, event->angleDelta().y() / 240.0);
             qDebug() << factor;
+#if QT_VERSION_MAJOR >= 6
             scaleAtPoint(event->position().toPoint(), factor);
-
+#else
+            scaleAtPoint(event->pos(), factor);
+#endif
             event->accept();
         }
     }
