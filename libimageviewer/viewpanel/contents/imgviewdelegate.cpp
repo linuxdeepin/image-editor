@@ -161,10 +161,20 @@ void LibImgViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     QPainterPath bp1;
     bp1.addRoundedRect(pixmapRect, 4, 4);
     painter->setClipPath(bp1);
-    _pixmap = _pixmap.scaled(pixmapRect.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    // 根据选中状态使用不同的缩放模式
+    if (backgroundRect.width() != LibImgViewListView::ITEM_NORMAL_WIDTH) {
+        // 选中状态：保持宽高比
+        _pixmap = _pixmap.scaled(pixmapRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    } else {
+        // 未选中状态：填充整个区域
+        _pixmap = _pixmap.scaled(pixmapRect.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    }
     qreal adjustx = _pixmap.width() - pixmapRect.width();
     qreal adjusty = _pixmap.height() - pixmapRect.height();
-    painter->drawImage(pixmapRect,_pixmap,_pixmap.rect().adjusted(adjustx / 2, -adjusty / 2, -adjustx / 2, adjusty / 2));
+    
+    // 修复：居中显示时，偏移量应该是正值，负责旋转时计算
+    QRect sourceRect = _pixmap.rect().adjusted(adjustx / 2, adjusty / 2, -adjustx / 2, -adjusty / 2);
+    painter->drawImage(pixmapRect, _pixmap, sourceRect);
 
     painter->restore();
 }
