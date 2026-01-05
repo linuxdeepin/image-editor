@@ -274,7 +274,13 @@ UNIONIMAGESHARED_EXPORT bool loadStaticImageFromFile(const QString &path, QImage
                 QImage try_res;
                 readerF.setAutoTransform(true);
                 if (readerF.canRead()) {
-                    try_res = readerF.read();
+                    qInfo() << "img can read, file:" << path;
+                    // 某些已损坏的PNG文件这里会返回false，但同时也读取到了数据，我们按正常流程处理
+                    if (readerF.read(&try_res)) {
+                        qInfo() << "img read success after can read, file:" << path;
+                    } else {
+                        qWarning() << "img read failed after can read, file:" << path;
+                    }
                 } else {
                     errorMsg = "can't read image:" + readerF.errorString() + format;
                     try_res = QImage(path);
