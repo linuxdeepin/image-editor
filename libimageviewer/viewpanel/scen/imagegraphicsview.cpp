@@ -1324,20 +1324,9 @@ void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
 #ifndef tablet_PC
     //二指旋转
     if (changeFlags & QPinchGesture::RotationAngleChanged) {
-        if (!m_bRoate || m_maxTouchPoints > 2) return;
-        //释放手指后旋转的位置未结束不能进行下次旋转
-        if (!m_rotateflag) {
-            qDebug() << "ratateflag" << gesture->lastRotationAngle();
-            gesture->setRotationAngle(gesture->lastRotationAngle());
-            return;
-        }
-        qreal rotationDelta = gesture->rotationAngle() - gesture->lastRotationAngle();
-        //防止在旋转过程中触发切换到下一张
-        if (abs(gesture->rotationAngle()) > 20) m_bnextflag = false;
-        if (abs(rotationDelta) > 0.2) {
-            m_rotateAngelTouch = gesture->rotationAngle();
-            rotate(rotationDelta);
-        }
+        // 新需求：不再支持双指触发旋转，仅保留双指缩放
+        gesture->setRotationAngle(gesture->lastRotationAngle());
+        return;
     }
 //    if (gesture->state() == Qt::GestureFinished) {
 
@@ -1365,120 +1354,8 @@ void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
     if (gesture->state() == Qt::GestureFinished) {
         m_isFirstPinch = false;
         gesture->setCenterPoint(m_centerPoint);
-        //旋转松开手势操作
-        // m_rotateAngelTouch = m_rotateAngelTouch % 360;
-        //int abs(m_rotateAngelTouch);
-        if (!m_bRoate) return;
-        m_rotateflag = false;
-        QPropertyAnimation *animation = new QPropertyAnimation(this, "rotation");
-        animation->setDuration(200);
-        if (m_rotateAngelTouch < 0) m_rotateAngelTouch += 360;
-        qreal endvalue;
-        if (abs(0 - abs(m_rotateAngelTouch)) <= 10) {
-            endvalue = 0;
-        } else if (abs(360 - abs(m_rotateAngelTouch)) <= 10) {
-            endvalue = 0;
-        } else if (abs(90 - abs(m_rotateAngelTouch)) <= 10) {
-            endvalue = 90;
-        } else if (abs(180 - abs(m_rotateAngelTouch)) <= 10) {
-            endvalue = 180;
-        } else if (abs(270 - abs(m_rotateAngelTouch)) <= 10) {
-            endvalue = 270;
-        } else {
-            endvalue = 0;
-        }
-//         if(!m_bRoate) endvalue = 0;
-        m_endvalue = endvalue;
-        qreal startvalue;
-        if (abs(m_rotateAngelTouch - endvalue) > 180) {
-            startvalue = m_rotateAngelTouch - 360;
-        } else {
-            startvalue = m_rotateAngelTouch;
-        }
-        animation->setStartValue(startvalue);
-        animation->setEndValue(endvalue);
-        // qDebug()<<"angle finish" <<m_rotateAngelTouch << endvalue;
-        connect(animation, &QVariantAnimation::valueChanged, [ = ](const QVariant & value) {
-            qreal angle = value.toReal() - m_rotateAngelTouch;
-            m_rotateAngelTouch = value.toReal();
-            if (static_cast<int>(value.toReal()) != static_cast<int>(endvalue) /*|| m_imgSvgItem*/)
-                this->rotate(angle);
-            //setPixmap(pixmap.transformed(t));
-        });
-        // animation->setLoopCount(1); //旋转次数
-        connect(animation, SIGNAL(finished()), this, SLOT(OnFinishPinchAnimal()));
-        animation->start(QAbstractAnimation::KeepWhenStopped);
-        qDebug() << "finish";
-
+        return;
     }
-}
-
-void LibImageGraphicsView::OnFinishPinchAnimal()
-{
-
-    m_rotateflag = true;
-    m_bnextflag = true;
-    m_rotateAngelTouch = 0;
-//    if(m_imgSvgItem)
-//    {
-//      //  reloadSvgPix(m_path,90,false);
-//        m_rotateAngel += m_endvalue;
-//        dApp->m_imageloader->updateImageLoader(QStringList(m_path), true,static_cast<int>(m_endvalue));
-//        emit dApp->signalM->sigUpdateThunbnail(m_path);
-//        return;
-//    }
-    if (!m_pixmapItem) return;
-    //QStranform旋转到180度有问题，暂未解决，因此动画结束后旋转Pixmap到180
-    QPixmap pixmap;
-    pixmap = m_pixmapItem->pixmap();
-    QTransform rotate;
-    rotate.rotate(m_endvalue);
-
-    pixmap = pixmap.transformed(rotate, Qt::FastTransformation);
-    pixmap.setDevicePixelRatio(devicePixelRatioF());
-    scene()->clear();
-    resetTransform();
-    m_pixmapItem = new LibGraphicsPixmapItem(pixmap);
-    m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
-    // Make sure item show in center of view after reload
-    QRectF rect = m_pixmapItem->boundingRect();
-    //            rect.setHeight(rect.height() + 50);
-    setSceneRect(rect);
-    //            setSceneRect(m_pixmapItem->boundingRect());
-
-    scene()->addItem(m_pixmapItem);
-    scale(m_scal, m_scal);
-    if (m_bRoate) {
-        m_rotateAngel += m_endvalue;
-        if (m_endvalue > 0) {
-            emit gestureRotate(static_cast<int>(0));
-            QPixmap thumbnailPixmap;
-            if (0 != pixmap.height() && 0 != pixmap.width() && (pixmap.height() / pixmap.width()) < 10 && (pixmap.width() / pixmap.height()) < 10) {
-                bool cache_exist = false;
-                if (pixmap.height() != 200 && pixmap.width() != 200) {
-                    if (pixmap.height() >= pixmap.width()) {
-                        cache_exist = true;
-                        thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
-                    } else if (pixmap.height() <= pixmap.width()) {
-                        cache_exist = true;
-                        thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
-                    }
-                }
-                if (!cache_exist) {
-                    if (static_cast<float>(pixmap.height()) / static_cast<float>(pixmap.width()) > 3) {
-                        thumbnailPixmap = pixmap.scaledToWidth(200,  Qt::FastTransformation);
-                    } else {
-                        thumbnailPixmap = pixmap.scaledToHeight(200,  Qt::FastTransformation);
-                    }
-                }
-            }
-            emit currentThumbnailChanged(thumbnailPixmap, pixmap.size());
-            emit UpdateNavImg();
-        }
-    }
-    qDebug() << m_endvalue;
-    //结束需要更改标题栏状态
-    titleBarControl();
 }
 
 /**
