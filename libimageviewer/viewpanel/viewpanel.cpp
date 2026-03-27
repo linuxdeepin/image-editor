@@ -126,8 +126,6 @@ LibViewPanel::LibViewPanel(AbstractTopToolbar *customToolbar, QWidget *parent)
 //    initExtensionPanel();
 
     QObject::connect(m_view, &LibImageGraphicsView::currentThumbnailChanged, m_bottomToolbar, &LibBottomToolbar::onThumbnailChanged, Qt::DirectConnection);
-    QObject::connect(m_view, &LibImageGraphicsView::gestureRotate, this, &LibViewPanel::slotRotateImage);
-
     //删除完了图片需要返回原状bug137195
     QObject::connect(ImageEngine::instance(), &ImageEngine::sigPicCountIsNull, this, [ = ] {
         if (ImgViewerType::ImgViewerTypeAlbum != LibCommonService::instance()->getImgViewerType())
