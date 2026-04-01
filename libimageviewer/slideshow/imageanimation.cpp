@@ -119,6 +119,7 @@ public:
     void startSingleNextAnimation();
     void startSinglePreAnimation();
     void startStatic();
+    void forceStopCurrentAnimation();
     void endSlide()
     {
         if (m_staticTimer) {
@@ -545,12 +546,11 @@ void LibImageAnimationPrivate::startSingleNextAnimation()
     qDebug() << "Starting single next animation";
     if (m_isAnimationIng) {
         qDebug() << "Animation already in progress, stopping";
-        m_isAnimationIng = false;
-    } else {
-        setImage1(m_imageName2);
-        setImage2(queue->jumpTonext());
-        startAnimation();
+        forceStopCurrentAnimation();
     }
+    setImage1(m_imageName2);
+    setImage2(queue->jumpTonext());
+    startAnimation();
 }
 
 void LibImageAnimationPrivate::startSinglePreAnimation()
@@ -558,12 +558,11 @@ void LibImageAnimationPrivate::startSinglePreAnimation()
     qDebug() << "Starting single previous animation";
     if (m_isAnimationIng) {
         qDebug() << "Animation already in progress, stopping";
-        m_isAnimationIng = false;
-    } else {
-        setImage1(m_imageName2);
-        setImage2(queue->jumpTopre());
-        startAnimation();
+        forceStopCurrentAnimation();
     }
+    setImage1(m_imageName2);
+    setImage2(queue->jumpTopre());
+    startAnimation();
 }
 
 void LibImageAnimationPrivate::startStatic()
@@ -576,6 +575,20 @@ void LibImageAnimationPrivate::startStatic()
     }
     m_isAnimationIng = false;
     m_staticTimer->start(SLIDER_TIME);
+}
+
+void LibImageAnimationPrivate::forceStopCurrentAnimation()
+{
+    if (m_continuousanimationTimer) {
+        m_continuousanimationTimer->stop();
+        m_continuousanimationTimer->setInterval(0);
+        m_factor = 0.0f;
+        m_isAnimationIng = false;
+    }
+    if (m_staticTimer) {
+        m_staticTimer->stop();
+        m_staticTimer->setInterval(0);
+    }
 }
 
 void LibImageAnimationPrivate::onContinuousAnimationTimer()
