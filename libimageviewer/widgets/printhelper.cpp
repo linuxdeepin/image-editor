@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -69,7 +69,9 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
                 m_re->appendImage(img);
             }
         }
-        tempExsitPaths << paths;
+        if (!path.isEmpty()) {
+            tempExsitPaths << path;
+        }
     }
 
     // 看图采用同步,因为只有一张图片，传入父指针
@@ -78,10 +80,13 @@ void PrintHelper::showPrintDialog(const QStringList &paths, QWidget *parent)
      (DTK_VERSION_MAJOR >= 5 && DTK_VERSION_MINOR >= 4 && DTK_VERSION_PATCH >= 10))  // 5.4.4暂时没有合入
     // 增加运行时版本判断
     if (DApplication::runtimeDtkVersion() >= DTK_VERSION_CHECK(5, 4, 10, 0)) {
-        if (!tempExsitPaths.isEmpty()) {
-            // 直接传递为路径,不会有问题
-            printDialog2.setDocName(QFileInfo(tempExsitPaths.at(0)).absoluteFilePath());
+        QString documentName = tempExsitPaths.isEmpty()
+                ? QStringLiteral("print")
+                : QFileInfo(tempExsitPaths.first()).fileName();
+        if (documentName.isEmpty()) {
+            documentName = QStringLiteral("print");
         }
+        printDialog2.setDocName(documentName);
     }
 #endif
 
