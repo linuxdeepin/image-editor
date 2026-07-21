@@ -117,7 +117,9 @@ public:
                    << "PPM"
                    << "XPM"
                    << "ICO"
-                   << "ICNS";
+                   << "ICNS"
+                   << "TIF"
+                   << "TIFF";
     }
     ~UnionImage_Private()
     {
@@ -517,9 +519,13 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
             erroMsg = "rotate load QImage failed, path:" + path + "  ,format:+" + format;
             return false;
         }
+        const QSize rotatedSize = qAbs(angel / 90) % 2 == 0
+                ? image_copy.size()
+                : QSize(image_copy.height(), image_copy.width());
         QSvgGenerator generator;
         generator.setFileName(path);
-        generator.setViewBox(QRect(0, 0, image_copy.width(), image_copy.height()));
+        generator.setSize(rotatedSize);
+        generator.setViewBox(QRect(QPoint(0, 0), rotatedSize));
         QPainter rotatePainter;
         rotatePainter.begin(&generator);
         rotatePainter.resetTransform();
@@ -527,18 +533,17 @@ UNIONIMAGESHARED_EXPORT bool rotateImageFIle(int angel, const QString &path, QSt
         int realangel = angel / 90;
         if (realangel > 0) {
             for (int i = 0; i < qAbs(realangel); i++) {
-                rotatePainter.translate(image_copy.width(), 0);
+                rotatePainter.translate(image_copy.height(), 0);
                 rotatePainter.rotate(90 * (realangel / qAbs(realangel)));
             }
         } else {
             for (int i = 0; i < qAbs(realangel); i++) {
-                rotatePainter.translate(0, image_copy.height());
+                rotatePainter.translate(0, image_copy.width());
                 rotatePainter.rotate(90 * (realangel / qAbs(realangel)));
             }
         }
         rotatePainter.drawImage(image_copy.rect(), image_copy.scaled(image_copy.width(), image_copy.height()));
         rotatePainter.resetTransform();
-        generator.setSize(QSize(image_copy.width(), image_copy.height()));
         rotatePainter.end();
         return true;
     } else if (union_image_private.m_qtrotate.contains(format)) {

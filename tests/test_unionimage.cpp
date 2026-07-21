@@ -5,6 +5,7 @@
 #include "gtestview.h"
 #include "accessibility/ac-desktop-define.h"
 #include <DGuiApplicationHelper>
+#include <QSvgRenderer>
 #include "imageviewer.h"
 #include "imageengine.h"
 #include "service/imagedataservice.h"
@@ -73,6 +74,22 @@ TEST_F(gtestview, image_rotateNormal45)
 {
     bool bRet = Libutils::image::rotate(QApplication::applicationDirPath() + "/test/jpg170.jpg", 45);
     EXPECT_EQ(false, bRet);
+}
+
+TEST_F(gtestview, image_rotateTiff)
+{
+    bool bRet = Libutils::image::rotate(m_TIFPath, 90);
+    EXPECT_EQ(true, bRet);
+}
+
+TEST_F(gtestview, image_rotateSvg)
+{
+    bool bRet = Libutils::image::rotate(m_SVGPath, 90);
+    EXPECT_EQ(true, bRet);
+
+    QSvgRenderer renderer(m_SVGPath);
+    EXPECT_EQ(3610, renderer.defaultSize().width());
+    EXPECT_EQ(2761, renderer.defaultSize().height());
 }
 
 TEST_F(gtestview, image_thumbnailExist)
