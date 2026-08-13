@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -249,6 +249,8 @@ private:
 
     //单击时间
     qint64 m_clickTime{0};
+    //最近一次滚轮/缩放手势的时间戳，用于过滤手势结束后合成的点击
+    qint64 m_lastWheelOrGestureTime{0};
 };
 
 #endif // IMAGEVIEW_H

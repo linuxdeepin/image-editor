@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -1046,7 +1046,8 @@ void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
                 }
             }
         }
-        if ((QDateTime::currentMSecsSinceEpoch() - m_clickTime) < 200 && abs(xpos) < 50) {
+        if ((QDateTime::currentMSecsSinceEpoch() - m_clickTime) < 200 && abs(xpos) < 50 &&
+                (QDateTime::currentMSecsSinceEpoch() - m_lastWheelOrGestureTime) >= 300) {
             m_clickTime = QDateTime::currentMSecsSinceEpoch();
             emit sigClicked();
         }
@@ -1062,6 +1063,12 @@ void LibImageGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 
 void LibImageGraphicsView::mousePressEvent(QMouseEvent *e)
 {
+    // 过滤触摸板/触摸屏缩放手势结束后短时间内的合成点击，避免误触发查看模式切换
+    if (e->source() == Qt::MouseEventSynthesizedByQt &&
+            (QDateTime::currentMSecsSinceEpoch() - m_lastWheelOrGestureTime) < 300) {
+        e->accept();
+        return;
+    }
 #ifdef tablet_PC
     m_press = true;
 #endif
@@ -1353,6 +1360,7 @@ void LibImageGraphicsView::pinchTriggered(QPinchGesture *gesture)
 
     if (gesture->state() == Qt::GestureFinished) {
         m_isFirstPinch = false;
+        m_lastWheelOrGestureTime = QDateTime::currentMSecsSinceEpoch();
         gesture->setCenterPoint(m_centerPoint);
         return;
     }
@@ -1484,6 +1492,9 @@ void LibImageGraphicsView::hideSpinner()
 
 void LibImageGraphicsView::wheelEvent(QWheelEvent *event)
 {
+    // 记录滚轮时间戳，用于过滤手势结束后短时间内的合成点击
+    m_lastWheelOrGestureTime = QDateTime::currentMSecsSinceEpoch();
+
     // 加载过程不可缩放
     if (m_spinner && m_spinner->isVisible()) {
         return;
