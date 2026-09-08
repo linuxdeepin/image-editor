@@ -192,6 +192,15 @@ void ExtensionPanel::init()
 //        emit hideExtensionPanel();
         this->hide();
     });
+
+    QShortcut *previousShortcut = new QShortcut(QKeySequence(Qt::Key_Left), this);
+    previousShortcut->setContext(Qt::WindowShortcut);
+    connect(previousShortcut, &QShortcut::activated, this, &ExtensionPanel::previousRequested);
+
+    QShortcut *nextShortcut = new QShortcut(QKeySequence(Qt::Key_Right), this);
+    nextShortcut->setContext(Qt::WindowShortcut);
+    connect(nextShortcut, &QShortcut::activated, this, &ExtensionPanel::nextRequested);
+
     // Esc
     m_scEsc = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     m_scEsc->setContext(Qt::WindowShortcut);
