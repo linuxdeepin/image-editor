@@ -30,6 +30,8 @@ public:
     void init();
 signals:
     void requestStopAnimation();
+    void previousRequested();
+    void nextRequested();
 public slots:
     void updateRectWithContent(int height);
 private:
