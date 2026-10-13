@@ -644,6 +644,7 @@ void LibBottomToolbar::setAllFile(QString path, QStringList paths)
 {
     //每次打开清空一下缩略图
     qDebug() << "Setting all files, count:" << paths.size() << "current path:" << path;
+    qInfo() << "[BUG-376715] setAllFile paths.size:" << paths.size();
     m_imgListWidget->clearListView();
     if (paths.size() <= 1) {
         qDebug() << "Single image mode, hiding navigation controls";
@@ -927,5 +928,6 @@ int LibBottomToolbar::estimatedDisplayCount()
         Q_EMIT displayItemGrowUp(m_estimateDisplayCount);
     }
 
+    qInfo() << "[BUG-376715] estimatedDisplayCount imgListWidget.width:" << m_imgListWidget->width() << "curCount:" << curCount;
     return curCount;
 }

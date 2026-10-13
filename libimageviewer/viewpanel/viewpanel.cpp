@@ -921,6 +921,7 @@ void LibViewPanel::setWallpaper(const QString &imgPath)
 bool LibViewPanel::startdragImage(const QStringList &paths, const QString &firstPath)
 {
     qInfo() << "Starting drag image operation with" << paths.size() << "images";
+    qInfo() << "[BUG-376715] startdragImage paths.size:" << paths.size();
     // 若为 MTP 挂载文件，转换为目录加载
     QStringList realPaths = paths;
     QString realPath = firstPath;
@@ -965,6 +966,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
             QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
             QDir _dirinit(DirPath);
             QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+            qInfo() << "[BUG-376715] startdragImage entryInfoList count:" << m_AllPath.size();
             //修复Ｑt带后缀排序错误的问题
             std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
 
@@ -998,6 +1000,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         //stack设置正确位置
         m_stack->setCurrentWidget(m_view);
         //展示当前图片
+        qInfo() << "[BUG-376715] startdragImage final image_list.size:" << image_list.size();
         loadImage(loadingPath, image_list);
 
         LibCommonService::instance()->m_listAllPath = image_list;
@@ -1995,10 +1998,14 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
 
 void LibViewPanel::slotOneImgReady(QString path, imageViewerSpace::ItemInfo itemInfo)
 {
+    qInfo() << "[BUG-376715] slotOneImgReady path:" << path;
     imageViewerSpace::ItemInfo ItemInfo = m_bottomToolbar->getCurrentItemInfo();
     if (path.contains(ItemInfo.path)) {
         updateMenuContent();
     }
+    //图片就绪后重算底部工具栏几何，覆盖缩略图内容不显示的独立根因
+    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
+    qInfo() << "[BUG-376715] slotOneImgReady re-layout triggered, currentWidget is view:" << (m_stack->currentWidget() == m_view);
     Q_UNUSED(itemInfo);
 }
 
@@ -2040,6 +2047,7 @@ void LibViewPanel::resetBottomToolbarGeometry(bool visible)
     }
     if (visible) {
         int width = qMin(m_bottomToolbar->getToolbarWidth() + 22, (this->width() - RT_SPACING));
+        qInfo() << "[BUG-376715] resetBottomToolbarGeometry visible:" << visible << "this->width():" << this->width() << "this->height():" << this->height() << "toolbarWidth:" << width;
         int x = (this->width() - width) / 2;
         //窗口高度-工具栏高度-工具栏到底部距离
         //全屏默认隐藏
@@ -2196,12 +2204,13 @@ void LibViewPanel::resizeEvent(QResizeEvent *e)
 
 void LibViewPanel::showEvent(QShowEvent *e)
 {
+    qInfo() << "[BUG-376715] showEvent enter this->width():" << this->width();
     if (this->m_topToolbar) {
         m_topToolbar->resize(width(), titleBarHeight());
     }
     //显示的时候需要判断一次滑动
     noAnimationBottomMove();
-//    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
+    resetBottomToolbarGeometry(m_stack->currentWidget() == m_view);
     QFrame::showEvent(e);
 }
 

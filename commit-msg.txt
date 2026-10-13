@@ -1,0 +1,40 @@
+fix: recalc toolbar geometry on show and ready
+
+1. Root cause: resetBottomToolbarGeometry was commented out in
+   showEvent, so toolbar width was not recomputed when the window
+   became visible; slotOneImgReady updated menu content but also
+   never triggered a toolbar re-layout, leaving thumbnails and
+   prev/next buttons missing after async image load
+2. Fix: restore resetBottomToolbarGeometry in showEvent and add
+   the same call in slotOneImgReady so geometry is recomputed both
+   on window show and on image-ready, covering both trigger paths
+3. Impact: prev/next buttons and thumbnails now appear consistently
+   when opening images; add temporary qInfo diagnostics tagged
+   [BUG-376715] for FlemingX verification, removable after confirm
+
+Log: Fix missing prev/next buttons and thumbnails when opening images
+
+Influence:
+1. Open images via double-click and drag-and-drop, verify toolbar
+   buttons and thumbnails appear consistently
+2. Repeat open/close 50+ times under high system load
+3. Verify diagnostic logs output expected values on FlemingX
+
+fix: 显示与图片就绪时重算工具栏几何
+
+1. 根因：showEvent 中 resetBottomToolbarGeometry 被注释，窗口显示时
+   未重算工具栏宽度；slotOneImgReady 仅更新菜单内容未触发工具栏
+   重布局，异步图片加载后缩略图与上一张/下一张按钮偶现缺失
+2. 方案：恢复 showEvent 中的 resetBottomToolbarGeometry 调用，并在
+   slotOneImgReady 中补充同一调用，覆盖窗口显示与图片就绪两条触发路径
+3. 影响：打开图片时上一张/下一张按钮与缩略图稳定显示；新增带
+   [BUG-376715] 标记的临时 qInfo 诊断日志供 FlemingX 验证，确认后可移除
+
+Log: 修复打开图片时上一张/下一张按钮与缩略图偶现缺失
+
+Influence:
+1. 双击与拖拽方式打开图片，验证工具栏按钮与缩略图稳定显示
+2. 高负载下重复打开关闭 50 次以上
+3. 在 FlemingX 环境验证诊断日志输出符合预期
+
+PMS: BUG-376715
