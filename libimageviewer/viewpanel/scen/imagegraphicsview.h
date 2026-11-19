@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -132,9 +132,6 @@ signals:
     //当前缩略图
     void currentThumbnailChanged(QPixmap pix, const QSize &originalSize);
 
-    //手势旋转
-    void gestureRotate(int endValue);
-
     //单击按键
     void sigClicked();
 
@@ -184,12 +181,6 @@ private slots:
 //    void swipeTriggered(QSwipeGesture *gesture);
 //    void updateImages(const QStringList &path);
 
-    /**
-     * @brief OnFinishPinchAnimal
-     * 旋转图片松开手指回到特殊位置结束动画槽函数
-     */
-    void OnFinishPinchAnimal();
-
 private:
     QPixmap getBlurPixmap(const QString &path, const imageViewerSpace::ItemInfo &info, const QPixmap &previousPix);
     void addLoadSpinner(bool enhanceImage = false);
@@ -238,12 +229,6 @@ private:
 
     //是否可以旋转
     bool m_bRoate{false};
-    //旋转状态
-    bool m_rotateflag = true;
-    //允许二指滑动切换上下一张标记
-    bool m_bnextflag = true;
-    qreal m_rotateAngelTouch = 0;
-    qreal m_endvalue;
     qreal m_scal = 1.0;
 
     NewImageLoadPhase m_newImageLoadPhase{FullFinish};
