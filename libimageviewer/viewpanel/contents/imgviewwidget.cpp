@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 - 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2020-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -30,7 +30,6 @@
 DWIDGET_USE_NAMESPACE
 
 #define LEFT_LISTVIEW_MOVE_MAXLEN 60
-#define RIGHT_LISTVIEW_MOVE_UPDATE 35
 
 MyImageListWidget::MyImageListWidget(QWidget *parent)
     : QWidget(parent)
@@ -137,12 +136,12 @@ bool MyImageListWidget::eventFilter(QObject *obj, QEvent *e)
             m_movePoints.pop_front();
             m_movePoints.push_back(p);
         }
-        // 限制缩略图List的移动范围
+        // 限制缩略图List的移动范围：下界按真实可视宽度计算，避免末尾缩略图被挤出可视区（BUG 247309）
         int moveRangeX = m_listview->x() + p.x() - m_moveViewPoint.x();
         int rowWidth = m_listview->getRowWidth();
-        int offsetRowMove = rowWidth - ((rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE) > 14 ? 12 : (rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE - 3)) * RIGHT_LISTVIEW_MOVE_UPDATE;
+        int minRangeX = qMin(0, this->geometry().width() - rowWidth);
         moveRangeX = moveRangeX > LEFT_LISTVIEW_MOVE_MAXLEN ? LEFT_LISTVIEW_MOVE_MAXLEN : moveRangeX;
-        moveRangeX = moveRangeX < (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) ? (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) : moveRangeX;
+        moveRangeX = moveRangeX < minRangeX ? minRangeX : moveRangeX;
         m_listview->move(moveRangeX, m_listview->y());
         m_moveViewPoint = p;
 
@@ -398,9 +397,11 @@ void MyImageListWidget::animationStart(bool isReset, int endPos, int duration)
     m_resetAnimation->setStartValue(m_listview->pos());
     // 限制缩略图List的移动范围
     int moveRangeX = m_listview->pos().x() + moveX;
-    int offsetRowMove = rowWidth - ((rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE) >= 12 ? 9 : (rowWidth / RIGHT_LISTVIEW_MOVE_UPDATE - 3)) * RIGHT_LISTVIEW_MOVE_UPDATE;
+    // 下界按真实可视宽度计算，保证"右对齐最后一张"时不会被 375px 魔数挤出可视区（BUG 247309）；
+    // 内容不足一屏时不强制右移（qMin(0, ...)），保持原有左对齐/居中行为
+    int minRangeX = qMin(0, this->geometry().width() - rowWidth);
     moveRangeX = moveRangeX > LEFT_LISTVIEW_MOVE_MAXLEN ? LEFT_LISTVIEW_MOVE_MAXLEN : moveRangeX;
-    moveRangeX = moveRangeX < (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) ? (LEFT_LISTVIEW_MOVE_MAXLEN - offsetRowMove) : moveRangeX;
+    moveRangeX = moveRangeX < minRangeX ? minRangeX : moveRangeX;
     m_resetAnimation->setEndValue(QPoint(moveRangeX, m_listview->pos().y()));
     m_resetAnimation->start();
 }
